@@ -80,7 +80,6 @@
             background: linear-gradient(90deg, #b57cff, #7f5bff, #caa8ff);
             -webkit-background-clip: text;
             color: transparent;
-            animation: fadeIn 1.2s ease-out;
         }
 
         .hero p {
@@ -88,11 +87,6 @@
             font-size: 20px;
             color: #cfcfcf;
             opacity: 0.85;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Category Grid */
@@ -124,4 +118,51 @@
         .card:hover {
             transform: translateY(-6px);
             border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 0 25px rgba(150,80,255
+            box-shadow: 0 0 25px rgba(150,80,255,0.25);
+        }
+
+        footer {
+            margin-top: 140px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow"></div>
+
+    <!-- Navigation -->
+    <div class="navbar">
+        <div class="logo">Nebula Core</div>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Games</a>
+            <a href="#">AI Tools</a>
+            <a href="#">Settings</a>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Welcome to Nebula Core</h1>
+        <p>Your gateway to tools, games, and creativity.</p>
+    </div>
+
+    <!-- Category Grid -->
+    <div class="grid">
+        <div class="card">Games</div>
+        <div class="card">AI Tools</div>
+        <div class="card">Utilities</div>
+        <div class="card">Creative</div>
+    </div>
+
+    <footer>
+        © 2026 Nebula Core — Designed for Exploration
+    </footer>
+
+</body>
+</html>
