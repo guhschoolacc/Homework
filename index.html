@@ -51,7 +51,7 @@
 
         /* Center Search Box */
         .center-box {
-            margin-top: 180px;
+            margin-top: 170px;
             display: flex;
             justify-content: center;
             width: 100%;
@@ -88,7 +88,35 @@
             opacity: 0.7;
         }
 
-        /* Footer */
+        /* Category Buttons */
+        .categories {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cat-btn {
+            background: #1a1a1d;
+            padding: 16px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            transition: 0.25s;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .cat-btn:hover {
+            background: #2a2a2f;
+            border-color: rgba(255,255,255,0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 0 18px rgba(255,255,255,0.1);
+        }
+
         footer {
             margin-top: 200px;
             text-align: center;
@@ -117,6 +145,14 @@
             <img src="https://img.icons8.com/ios-filled/50/ffffff/search.png" class="search-icon">
             <input type="text" placeholder="Search the galaxy...">
         </div>
+    </div>
+
+    <!-- Category Buttons -->
+    <div class="categories">
+        <button class="cat-btn">Games</button>
+        <button class="cat-btn">Tools</button>
+        <button class="cat-btn">Entertainment</button>
+        <button class="cat-btn">AI</button>
     </div>
 
     <footer>
