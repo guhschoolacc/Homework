@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Starlight</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background: #0d0d0f;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation */
+        .navbar {
+            width: 100%;
+            height: 70px;
+            background: rgba(20, 20, 25, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            margin-right: 40px;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a {
+            margin-right: 25px;
+            text-decoration: none;
+            color: #dcdcdc;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* Center Search Box */
+        .center-box {
+            margin-top: 180px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .search-box {
+            width: 600px;
+            max-width: 90%;
+            background: #1a1a1d;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.25s;
+        }
+
+        .search-box:hover {
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .search-box input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 18px;
+        }
+
+        .search-icon {
+            width: 22px;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 200px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <div class="navbar">
+        <div class="logo">Project Starlight</div>
+        <div class="nav-links">
+            <a href="games.html">Games</a>
+            <a href="tools.html">Tools</a>
+            <a href="entertainment.html">Entertainment</a>
+        </div>
+    </div>
+
+    <!-- Center Search Box -->
+    <div class="center-box">
+        <div class="search-box">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/search.png" class="search-icon">
+            <input type="text" placeholder="Search the galaxy...">
+        </div>
+    </div>
+
+    <footer>
+        © 2026 Project Starlight — Explore Without Limits
+    </footer>
+
+</body>
+</html>
