@@ -16,6 +16,7 @@
   --muted: #bbbbbb;
   --accent: #6366f1;
   --border: #222;
+  --accent-rgb: 99,102,241; /* auto-updated by JS */
 }
 
 /* -------------------------------------------------- */
@@ -105,6 +106,7 @@ body {
   margin: 0 0 20px 0;
 }
 
+/* THEME-MATCHING CATEGORY BUTTONS */
 .nav-btn {
   padding: 12px;
   margin-bottom: 10px;
@@ -114,10 +116,12 @@ body {
   cursor: pointer;
   text-align: left;
   color: var(--text);
+  transition: 0.25s ease;
 }
 
 .nav-btn:hover {
   border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.15);
 }
 
 .settings-icon {
@@ -165,7 +169,7 @@ body {
   margin-top: 0;
 }
 
-/* THEME-MATCHING BUTTONS */
+/* THEME-MATCHING ACTION BUTTONS */
 .action-btn {
   padding: 14px;
   background: var(--accent);
@@ -175,10 +179,12 @@ body {
   cursor: pointer;
   margin-top: 15px;
   font-size: 16px;
+  transition: 0.25s ease;
 }
 
 .action-btn:hover {
-  opacity: 0.8;
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 /* Theme option styling */
@@ -220,7 +226,6 @@ body {
     <h2>Games</h2>
     <p>Games content goes here.</p>
 
-    <!-- ⭐ SANDBOX BUTTON (THEME MATCHING) -->
     <button class="action-btn" onclick="location.href='sandbox.html'">
       Open Sandbox
     </button>
@@ -276,12 +281,32 @@ function openPage(name) {
 function setTheme(theme) {
   document.body.className = theme;
   localStorage.setItem("homewrk_theme", theme);
+  updateAccentRGB();
 }
 
 (function(){
   const saved = localStorage.getItem("homewrk_theme") || "dark";
   document.body.className = saved;
 })();
+
+/* Convert hex → rgb for hover effects */
+function hexToRgb(hex) {
+  const c = hex.replace('#', '');
+  const bigint = parseInt(c, 16);
+  return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
+}
+
+function updateAccentRGB() {
+  const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+  if (accent.startsWith('#')) {
+    document.documentElement.style.setProperty('--accent-rgb', hexToRgb(accent));
+  } else {
+    document.documentElement.style.setProperty('--accent-rgb', "99,102,241");
+  }
+}
+
+new MutationObserver(updateAccentRGB).observe(document.body, { attributes: true });
+updateAccentRGB();
 </script>
 
 </body>
