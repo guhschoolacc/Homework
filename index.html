@@ -176,6 +176,22 @@ body {
 .theme-option:hover {
   border-color: var(--accent);
 }
+
+/* Sandbox button */
+.game-btn {
+  padding: 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.game-btn:hover {
+  opacity: 0.8;
+}
 </style>
 </head>
 
@@ -198,21 +214,30 @@ body {
 <!-- MAIN -->
 <div class="main">
 
+  <!-- GAMES PAGE -->
   <div class="page" id="gamesPage">
     <h2>Games</h2>
     <p>Games content goes here.</p>
+
+    <!-- ⭐ SANDBOX BUTTON -->
+    <button class="game-btn" onclick="location.href='sandbox.html'">
+      Open Sandbox
+    </button>
   </div>
 
+  <!-- TOOLS PAGE -->
   <div class="page" id="toolsPage">
     <h2>Tools</h2>
     <p>Tools content goes here.</p>
   </div>
 
+  <!-- OTHER PAGE -->
   <div class="page" id="otherPage">
     <h2>Other</h2>
     <p>Other content goes here.</p>
   </div>
 
+  <!-- SETTINGS PAGE -->
   <div class="page" id="settingsPage">
     <h2>Settings</h2>
 
