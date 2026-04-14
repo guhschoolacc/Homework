@@ -19,7 +19,6 @@
   --transition: 0.25s ease;
 }
 
-/* GLOBAL */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -30,7 +29,7 @@ body {
 }
 
 /* -------------------------------------------------- */
-/* COLLAPSIBLE SIDEBAR                                */
+/* SIDEBAR                                            */
 /* -------------------------------------------------- */
 .sidebar {
   width: 240px;
@@ -43,6 +42,8 @@ body {
   top: 0;
   transition: transform 0.3s ease;
   box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.closed {
@@ -68,6 +69,24 @@ body {
 }
 
 .nav-btn:hover {
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+/* SETTINGS ICON */
+.settings-icon {
+  margin-top: auto;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  text-align: center;
+  transition: 0.2s;
+  font-size: 20px;
+}
+
+.settings-icon:hover {
   border-color: var(--accent);
   transform: translateX(4px);
 }
@@ -119,39 +138,33 @@ body {
   width: 100%;
 }
 
-/* SECTION CARDS */
-.section-card {
+/* -------------------------------------------------- */
+/* SETTINGS PANEL                                     */
+/* -------------------------------------------------- */
+.settings-panel {
+  display: none;
   background: var(--card);
   border: 1px solid var(--border);
   padding: 26px;
   border-radius: 20px;
   box-shadow: 0 4px 18px rgba(0,0,0,0.25);
-  margin-bottom: 28px;
+  max-width: 500px;
 }
 
-.section-card h2 {
-  margin: 0 0 18px 0;
-  font-size: 22px;
+.settings-panel h2 {
+  margin-top: 0;
 }
 
-.tools-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.tool-card {
-  background: var(--card);
+.theme-option {
+  padding: 10px;
   border: 1px solid var(--border);
-  padding: 18px;
-  border-radius: 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.tool-card:hover {
+.theme-option:hover {
   border-color: var(--accent);
-  transform: translateY(-4px);
 }
 </style>
 </head>
@@ -165,6 +178,8 @@ body {
   <button class="nav-btn" onclick="openPage('games.html')">Games</button>
   <button class="nav-btn" onclick="openPage('tools.html')">Tools</button>
   <button class="nav-btn" onclick="openPage('other.html')">Other</button>
+
+  <div class="settings-icon" onclick="openSettings()">⚙️</div>
 </div>
 
 <!-- TOP BAR -->
@@ -175,20 +190,50 @@ body {
 
 <!-- MAIN CONTENT -->
 <div class="main">
-  <!-- EMPTY MAIN AREA (you asked to remove welcome/dashboard) -->
+  <div class="settings-panel" id="settingsPanel">
+    <h2>Settings</h2>
+
+    <h3>Theme Settings</h3>
+
+    <div class="theme-option" onclick="setTheme('dark')">Dark</div>
+    <div class="theme-option" onclick="setTheme('light')">Light</div>
+    <div class="theme-option" onclick="setTheme('neon')">Neon</div>
+    <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
+    <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
+    <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
+    <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
+    <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
+  </div>
 </div>
 
 <script>
 /* SIDEBAR TOGGLE */
 function toggleSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("closed");
+  document.getElementById("sidebar").classList.toggle("closed");
 }
 
 /* OPEN PAGE */
 function openPage(url) {
   window.location.href = url;
 }
+
+/* OPEN SETTINGS */
+function openSettings() {
+  const panel = document.getElementById("settingsPanel");
+  panel.style.display = panel.style.display === "block" ? "none" : "block";
+}
+
+/* THEME SWITCHING */
+function setTheme(theme) {
+  document.body.className = theme;
+  localStorage.setItem("homewrk_theme", theme);
+}
+
+/* LOAD SAVED THEME */
+(function(){
+  const saved = localStorage.getItem("homewrk_theme") || "dark";
+  document.body.className = saved;
+})();
 </script>
 
 </body>
