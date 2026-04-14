@@ -165,6 +165,23 @@ body {
   margin-top: 0;
 }
 
+/* THEME-MATCHING BUTTONS */
+.action-btn {
+  padding: 14px;
+  background: var(--accent);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.action-btn:hover {
+  opacity: 0.8;
+}
+
+/* Theme option styling */
 .theme-option {
   padding: 12px;
   border: 1px solid var(--border);
@@ -175,22 +192,6 @@ body {
 
 .theme-option:hover {
   border-color: var(--accent);
-}
-
-/* Sandbox button */
-.game-btn {
-  padding: 14px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 15px;
-  font-size: 16px;
-}
-
-.game-btn:hover {
-  opacity: 0.8;
 }
 </style>
 </head>
@@ -219,8 +220,8 @@ body {
     <h2>Games</h2>
     <p>Games content goes here.</p>
 
-    <!-- ⭐ SANDBOX BUTTON -->
-    <button class="game-btn" onclick="location.href='sandbox.html'">
+    <!-- ⭐ SANDBOX BUTTON (THEME MATCHING) -->
+    <button class="action-btn" onclick="location.href='sandbox.html'">
       Open Sandbox
     </button>
   </div>
@@ -228,7 +229,18 @@ body {
   <!-- TOOLS PAGE -->
   <div class="page" id="toolsPage">
     <h2>Tools</h2>
-    <p>Tools content goes here.</p>
+
+    <button class="action-btn" onclick="location.href='calculator.html'">
+      Calculator
+    </button>
+
+    <button class="action-btn" onclick="location.href='clock.html'">
+      Clock
+    </button>
+
+    <button class="action-btn" onclick="location.href='converter.html'">
+      File Converter
+    </button>
   </div>
 
   <!-- OTHER PAGE -->
