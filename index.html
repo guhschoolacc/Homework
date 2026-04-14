@@ -55,6 +55,7 @@ body {
   font-size: 22px;
 }
 
+/* NAV BUTTONS */
 .nav-btn {
   width: 100%;
   padding: 12px 14px;
@@ -73,17 +74,20 @@ body {
   transform: translateX(4px);
 }
 
-/* SETTINGS ICON */
+/* SETTINGS ICON (BOTTOM LEFT, SQUARE) */
 .settings-icon {
-  margin-top: auto;
-  padding: 12px;
+  width: 48px;
+  height: 48px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--card);
   cursor: pointer;
-  text-align: center;
   transition: 0.2s;
-  font-size: 20px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
 }
 
 .settings-icon:hover {
@@ -139,27 +143,36 @@ body {
 }
 
 /* -------------------------------------------------- */
-/* SETTINGS PANEL                                     */
+/* FULLSCREEN SETTINGS PAGE                           */
 /* -------------------------------------------------- */
-.settings-panel {
+.settings-page {
   display: none;
+  position: absolute;
+  top: 70px;
+  left: 240px;
+  width: calc(100% - 240px);
+  height: calc(100vh - 70px);
   background: var(--card);
-  border: 1px solid var(--border);
-  padding: 26px;
-  border-radius: 20px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
-  max-width: 500px;
+  border-left: 1px solid var(--border);
+  padding: 30px;
+  overflow-y: auto;
+  transition: 0.3s ease;
 }
 
-.settings-panel h2 {
+.sidebar.closed ~ .settings-page {
+  left: 0;
+  width: 100%;
+}
+
+.settings-page h2 {
   margin-top: 0;
 }
 
 .theme-option {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-bottom: 10px;
+  border-radius: 10px;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 
@@ -188,23 +201,24 @@ body {
   <div class="topbar-title">homewrk</div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="main">
-  <div class="settings-panel" id="settingsPanel">
-    <h2>Settings</h2>
+<!-- FULLSCREEN SETTINGS PAGE -->
+<div class="settings-page" id="settingsPage">
+  <h2>Settings</h2>
 
-    <h3>Theme Settings</h3>
+  <h3>Theme Settings</h3>
 
-    <div class="theme-option" onclick="setTheme('dark')">Dark</div>
-    <div class="theme-option" onclick="setTheme('light')">Light</div>
-    <div class="theme-option" onclick="setTheme('neon')">Neon</div>
-    <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
-    <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
-    <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
-    <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
-    <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
-  </div>
+  <div class="theme-option" onclick="setTheme('dark')">Dark</div>
+  <div class="theme-option" onclick="setTheme('light')">Light</div>
+  <div class="theme-option" onclick="setTheme('neon')">Neon</div>
+  <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
+  <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
+  <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
+  <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
+  <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
 </div>
+
+<!-- MAIN CONTENT (EMPTY) -->
+<div class="main"></div>
 
 <script>
 /* SIDEBAR TOGGLE */
@@ -217,10 +231,10 @@ function openPage(url) {
   window.location.href = url;
 }
 
-/* OPEN SETTINGS */
+/* OPEN SETTINGS PAGE */
 function openSettings() {
-  const panel = document.getElementById("settingsPanel");
-  panel.style.display = panel.style.display === "block" ? "none" : "block";
+  const page = document.getElementById("settingsPage");
+  page.style.display = page.style.display === "block" ? "none" : "block";
 }
 
 /* THEME SWITCHING */
