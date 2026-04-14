@@ -1,142 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homewrk</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0d0d0d;
-        color: white;
-    }
-
-    /* Top Navigation */
-    nav {
-        width: 100%;
-        padding: 20px 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #0f0f0f;
-        border-bottom: 1px solid #ffffff15;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-
-    .logo {
-        font-size: 2rem;
-        font-weight: bold;
-        letter-spacing: 1px;
-    }
-
-    .nav-links a {
-        margin-left: 25px;
-        text-decoration: none;
-        color: #ccc;
-        font-size: 1.1rem;
-        transition: 0.2s;
-    }
-
-    .nav-links a:hover {
-        color: white;
-    }
-
-    /* Hero Section */
-    .hero {
-        height: 70vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .hero h1 {
-        font-size: 4rem;
-        margin-bottom: 10px;
-    }
-
-    .hero p {
-        font-size: 1.3rem;
-        opacity: 0.8;
-        max-width: 600px;
-    }
-
-    /* Search Bar */
-    .search-box {
-        margin-top: 30px;
-        width: 60%;
-        max-width: 600px;
-        display: flex;
-        background: #1a1a1a;
-        border: 1px solid #ffffff20;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .search-box input {
-        flex: 1;
-        padding: 15px;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: white;
-        font-size: 1.1rem;
-    }
-
-    .search-box button {
-        padding: 15px 25px;
-        background: #ffffff15;
-        border: none;
-        color: white;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .search-box button:hover {
-        background: #ffffff25;
-    }
-
-    /* Footer */
-    footer {
-        text-align: center;
-        padding: 30px;
-        opacity: 0.5;
-        font-size: 0.9rem;
-        margin-top: 40px;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<nav>
-    <div class="logo">Homewrk</div>
-    <div class="nav-links">
-        <a href="games.html">Games</a>
-        <a href="tools.html">Tools</a>
-        <a href="entertainment.html">Entertainment</a>
-    </div>
-</nav>
+    <!-- Top Navigation -->
+    <header class="topbar">
+        <div class="logo">YourSite</div>
+        <nav class="nav-links">
+            <a href="tools.html">Tools</a>
+            <a href="games.html">Games</a>
+            <a href="entertainment.html">Entertainment</a>
+        </nav>
+    </header>
 
-<section class="hero">
-    <h1>Welcome to Homewrk</h1>
-    <p>Your clean, fast, unblocked game hub — built for students who want a smooth experience.</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to YourSite</h1>
+        <p>Your hub for tools, games, and fun stuff online.</p>
 
-    <div class="search-box">
-        <input type="text" placeholder="Search games...">
-        <button>Go</button>
-    </div>
-</section>
+        <div class="search-box">
+            <input type="text" placeholder="Search the site...">
+            <button>Search</button>
+        </div>
+    </section>
 
-<footer>
-    Homewrk © 2026 — Unblocked. Fast. Clean.
-</footer>
+    <!-- Category Cards -->
+    <section class="categories">
+        <div class="card" onclick="location.href='tools.html'">
+            <h2>Tools</h2>
+            <p>Useful utilities and productivity tools.</p>
+        </div>
+
+        <div class="card" onclick="location.href='games.html'">
+            <h2>Games</h2>
+            <p>Play unblocked games instantly.</p>
+        </div>
+
+        <div class="card" onclick="location.href='entertainment.html'">
+            <h2>Entertainment</h2>
+            <p>Fun apps, generators, and more.</p>
+        </div>
+    </section>
 
 </body>
 </html>
