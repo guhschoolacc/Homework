@@ -179,14 +179,14 @@ body {
 /* MAIN CONTENT AREA                                  */
 /* -------------------------------------------------- */
 .main {
-  position: absolute;
-  top: 70px;
-  left: 240px;
+  position: fixed;
+  top: 70px;          /* below topbar */
+  left: 240px;        /* beside sidebar */
   right: 0;
   bottom: 0;
   overflow-y: auto;
   background: var(--bg);
-  transition: 0.3s ease;
+  transition: left 0.3s ease;
 }
 
 .sidebar.closed ~ .main {
@@ -300,3 +300,6 @@ function setTheme(theme) {
   document.body.className = saved;
 })();
 </script>
+
+</body>
+</html>
