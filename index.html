@@ -2,7 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolHub</title>
+
+    <style>
+        /* ====== THEME ====== */
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #0f0f17;
+            color: #e6e6e6;
+        }
+
+        /* ====== HEADER ====== */
+        header {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #1f1f2e, #151521);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+        }
+
+        header h1 {
+            font-size: 48px;
+            margin: 0;
+            color: #7df9ff;
+            text-shadow: 0 0 10px #00eaff;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 20px;
+            opacity: 0.8;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: #00eaff;
+            color: #000;
+            font-weight: bold;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 0 0 15px #00eaff;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 25px #00eaff;
+            transform: translateY(-2px);
+        }
+
+        /* ====== TOOL GRID ====== */
+        .tools-section {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .tools-section h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #7df9ff;
+            text-shadow: 0 0 10px #00eaff;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        .tool-card {
+            background: #1a1a27;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            transition: 0.25s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+            border-color: #00eaff;
+        }
+
+        .tool-card h3 {
+            margin-top: 0;
+            color: #00eaff;
+            font-size: 22px;
+        }
+
+        .tool-card p {
+            opacity: 0.85;
+        }
+
+        /* ====== FOOTER ====== */
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+            background: #11111a;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ToolHub</h1>
+        <p>Your personal collection of fast, simple, and powerful tools.</p>
+        <a href="#tools" class="btn">Explore Tools</a>
+    </header>
+
+    <section id="tools" class="tools-section">
+        <h2>Available Tools</h2>
+
+        <div class="tools-grid">
+
+            <div class="tool-card">
+                <h3>QR Code Generator</h3>
+                <p>Create custom QR codes for links, text, WiFi, and more.</p>
+            </div>
+
+            <div class="tool-card">
+                <h3>File Converter</h3>
+                <p>Convert images, documents, audio, and video into the formats you need.</p>
+            </div>
+
+            <div class="tool-card">
+                <h3>Image Compressor</h3>
+                <p>Reduce image sizes while keeping them sharp and clean.</p>
+            </div>
+
+            <div class="tool-card">
+                <h3>Text Analyzer</h3>
+                <p>Analyze text for word count, readability, sentiment, and keywords.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        © 2026 ToolHub — Built for creators, students, and everyone in between
+    </footer>
+
+</body>
+</html>
+
     <title>ToolHub - All Your Tools in One Place</title>
     <style>
         body {
