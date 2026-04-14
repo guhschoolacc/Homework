@@ -19,6 +19,53 @@
   --transition: 0.25s ease;
 }
 
+/* THEMES */
+body.dark { }
+body.light {
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #111;
+  --muted: #555;
+  --accent: #4f46e5;
+  --border: #ddd;
+}
+body.neon {
+  --bg: #000;
+  --card: #0a0a0a;
+  --text: #00ffee;
+  --muted: #00b3a4;
+  --accent: #ff00ff;
+}
+body.midnight {
+  --bg: #0b0014;
+  --card: #1a0b2e;
+  --text: #e3d7ff;
+  --muted: #a88cd9;
+  --accent: #b26bff;
+}
+body.solarized {
+  --bg: #002b36;
+  --card: #073642;
+  --text: #eee8d5;
+  --muted: #93a1a1;
+  --accent: #b58900;
+}
+body.gradient1 {
+  --bg: linear-gradient(135deg, #1e3a8a, #6d28d9);
+  --card: rgba(0,0,0,0.35);
+}
+body.gradient2 {
+  --bg: linear-gradient(135deg, #f97316, #db2777);
+  --card: rgba(0,0,0,0.35);
+}
+body.gradient3 {
+  --bg: linear-gradient(135deg, #0f172a, #00ff95);
+  --card: rgba(0,0,0,0.35);
+}
+
+/* -------------------------------------------------- */
+/* GLOBAL LAYOUT                                      */
+/* -------------------------------------------------- */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -40,10 +87,9 @@ body {
   position: fixed;
   left: 0;
   top: 0;
-  transition: transform 0.3s ease;
-  box-shadow: 4px 0 20px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease;
 }
 
 .sidebar.closed {
@@ -74,7 +120,7 @@ body {
   transform: translateX(4px);
 }
 
-/* SETTINGS ICON (BOTTOM LEFT, SQUARE) */
+/* SETTINGS ICON */
 .settings-icon {
   width: 48px;
   height: 48px;
@@ -88,7 +134,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-top: auto;
-  margin-bottom: 20px; /* moved up */
+  margin-bottom: 20px;
 }
 
 .settings-icon:hover {
@@ -108,7 +154,7 @@ body {
   padding: 0 20px;
   margin-left: 240px;
   width: calc(100% - 240px);
-  transition: margin-left 0.3s ease, width 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .sidebar.closed + .topbar {
@@ -120,20 +166,19 @@ body {
   margin-right: 16px;
   cursor: pointer;
   font-size: 22px;
-  color: var(--text);
 }
 
 /* -------------------------------------------------- */
-/* MAIN CONTENT WRAPPER                               */
+/* MAIN CONTENT AREA                                  */
 /* -------------------------------------------------- */
 .main {
   margin-left: 240px;
   margin-top: 70px;
-  padding: 30px;
   width: calc(100% - 240px);
   height: calc(100vh - 70px);
   overflow-y: auto;
-  transition: margin-left 0.3s ease, width 0.3s ease;
+  padding: 0;
+  transition: 0.3s ease;
 }
 
 .sidebar.closed ~ .main {
@@ -142,10 +187,15 @@ body {
 }
 
 /* -------------------------------------------------- */
-/* CATEGORY + SETTINGS PAGES                          */
+/* PAGES (FULLSCREEN INSIDE MAIN)                     */
 /* -------------------------------------------------- */
 .page {
   display: none;
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+  background: var(--card);
+  box-sizing: border-box;
 }
 
 .page h2 {
@@ -187,25 +237,21 @@ body {
 <!-- MAIN CONTENT -->
 <div class="main">
 
-  <!-- GAMES -->
   <div class="page" id="gamesPage">
     <h2>Games</h2>
-    <p style="color:var(--muted)">Your games content goes here.</p>
+    <p style="color:var(--muted)">Games content goes here.</p>
   </div>
 
-  <!-- TOOLS -->
   <div class="page" id="toolsPage">
     <h2>Tools</h2>
-    <p style="color:var(--muted)">Your tools content goes here.</p>
+    <p style="color:var(--muted)">Tools content goes here.</p>
   </div>
 
-  <!-- OTHER -->
   <div class="page" id="otherPage">
     <h2>Other</h2>
-    <p style="color:var(--muted)">Your other content goes here.</p>
+    <p style="color:var(--muted)">Other content goes here.</p>
   </div>
 
-  <!-- SETTINGS -->
   <div class="page" id="settingsPage">
     <h2>Settings</h2>
 
