@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <title>Mini Playground Sandbox</title>
   <style>
-    /* ——— ROOT COLORS ——— */
     :root {
       --bg: #05060a;
       --text: #f9fafb;
       --text-soft: #9ca3af;
       --panel: #0b0f18;
       --border: #1f2933;
+      --accent: #38bdf8;
     }
 
     * {
@@ -29,7 +29,6 @@
       flex-direction: column;
     }
 
-    /* ——— TOP BAR ——— */
     .top-bar {
       height: 55px;
       display: flex;
@@ -62,7 +61,6 @@
       color: white;
     }
 
-    /* ——— MAIN LAYOUT ——— */
     .layout {
       flex: 1;
       display: grid;
@@ -80,9 +78,63 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      font-size: 13px;
     }
 
-    /* ——— CANVAS FIX ——— */
+    .panel h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .panel-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .tool-group {
+      margin-bottom: 10px;
+      border-top: 1px solid #1e293b;
+      padding-top: 8px;
+    }
+
+    .tool-label {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tool-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tool-btn {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.12s;
+    }
+
+    .tool-btn.active {
+      border-color: var(--accent);
+      background: #0b1120;
+      color: #f9fafb;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+    }
+
+    .tool-btn:hover {
+      border-color: #334155;
+      background: #020617;
+    }
+
     .canvas-wrapper {
       flex: 1;
       position: relative;
@@ -90,7 +142,7 @@
       overflow: hidden;
       border: 1px solid #1e293b;
       background: #020617;
-      min-height: 400px; /* FIX: ensures canvas always has height */
+      min-height: 400px;
     }
 
     #gameCanvas {
@@ -100,43 +152,169 @@
       background: #020617;
       cursor: crosshair;
     }
+
+    .hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 2px 0;
+      color: #e5e7eb;
+    }
+
+    .stat-label {
+      color: #9ca3af;
+    }
+
+    .inspector-field {
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .inspector-label {
+      color: #9ca3af;
+      margin-right: 4px;
+    }
+
+    .inspector-value {
+      color: #e5e7eb;
+    }
+
+    .section-divider {
+      margin: 8px 0;
+      border-top: 1px solid #1e293b;
+    }
   </style>
 </head>
 <body>
-
-  <!-- ——— TOP BAR ——— -->
   <header class="top-bar">
     <div class="brand">Mini Playground</div>
-
-    <!-- NEW BUTTON YOU REQUESTED -->
     <button class="return-btn" onclick="window.location.href='index.html'">
       ⬅ Return to Dashboard
     </button>
   </header>
 
-  <!-- ——— MAIN LAYOUT ——— -->
   <main class="layout">
+    <!-- LEFT PANEL: TOOLS -->
     <aside class="panel">
       <h3>Tools</h3>
-      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">
-        (Left panel content preserved — add your tools here)
-      </p>
+      <div class="panel-subtitle">
+        Click canvas to use selected tool. Right‑click for terrain. Drag entities with mouse.
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-label">Spawn</div>
+        <div class="tool-buttons">
+          <button class="tool-btn active" data-tool="spawn-box">Box</button>
+          <button class="tool-btn" data-tool="spawn-ball">Ball</button>
+          <button class="tool-btn" data-tool="spawn-npc">NPC</button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-label">World</div>
+        <div class="tool-buttons">
+          <button class="tool-btn" data-tool="terrain-place">Place Terrain</button>
+          <button class="tool-btn" data-tool="terrain-erase">Erase Terrain</button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-label">Interaction</div>
+        <div class="tool-buttons">
+          <button class="tool-btn" data-tool="select">Select / Drag</button>
+          <button class="tool-btn" data-tool="shoot">Shoot Projectiles</button>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <div class="tool-label">NPC Behavior</div>
+        <div class="tool-buttons">
+          <button class="tool-btn" data-tool="npc-wander">Set Wander</button>
+          <button class="tool-btn" data-tool="npc-pathfind">Set Pathfind</button>
+        </div>
+      </div>
+
+      <div class="hint">
+        • Left click: use current tool<br>
+        • Right click: quick terrain (place/erase)<br>
+        • Drag: move selected entity<br>
+        • Space: fire projectile from selected NPC (or center)
+      </div>
     </aside>
 
+    <!-- CENTER: CANVAS -->
     <section class="panel canvas-wrapper">
       <canvas id="gameCanvas"></canvas>
     </section>
 
+    <!-- RIGHT PANEL: STATS + INSPECTOR -->
     <aside class="panel">
       <h3>Stats</h3>
-      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">
-        (Right panel content preserved — stats go here)
-      </p>
+      <div class="panel-subtitle">Live sandbox metrics</div>
+
+      <div id="stats">
+        <div class="stat-row">
+          <span class="stat-label">Objects:</span>
+          <span id="stat-objects">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">NPCs:</span>
+          <span id="stat-npcs">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Projectiles:</span>
+          <span id="stat-projectiles">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Terrain blocks:</span>
+          <span id="stat-terrain">0</span>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <h3>Inspector</h3>
+      <div class="panel-subtitle">Click an entity with “Select / Drag”</div>
+      <div id="inspector">
+        <div class="inspector-field">
+          <span class="inspector-label">Type:</span>
+          <span class="inspector-value" id="insp-type">None</span>
+        </div>
+        <div class="inspector-field">
+          <span class="inspector-label">Position:</span>
+          <span class="inspector-value" id="insp-pos">-</span>
+        </div>
+        <div class="inspector-field">
+          <span class="inspector-label">Velocity:</span>
+          <span class="inspector-value" id="insp-vel">-</span>
+        </div>
+        <div class="inspector-field">
+          <span class="inspector-label">Mode:</span>
+          <span class="inspector-value" id="insp-mode">-</span>
+        </div>
+        <div class="inspector-field">
+          <span class="inspector-label">ID:</span>
+          <span class="inspector-value" id="insp-id">-</span>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="hint">
+        NPC Pathfinding uses a grid + A* over terrain blocks. Try building a maze and toggling “Set Pathfind”.
+      </div>
     </aside>
   </main>
 
   <script>
-    /* ——— FIXED CANVAS RESIZING ——— */
+    // ——— CANVAS SETUP ———
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -146,23 +324,682 @@
       canvas.height = rect.height * window.devicePixelRatio;
       ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
     }
-
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    /* ——— SIMPLE TEST RENDER (proves canvas works) ——— */
+    // ——— WORLD DATA ———
+    const objects = [];
+    const npcs = [];
+    const projectiles = [];
+    const terrainBlocks = [];
+
+    let entityIdCounter = 1;
+
+    const GRAVITY = 0.4;
+    const FRICTION = 0.9;
+    const FLOOR_BOUNCE = -0.3;
+
+    const GRID_SIZE = 32; // for terrain + pathfinding
+
+    // ——— UTILS ———
+    function randRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function aabbOverlap(a, b) {
+      return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+      );
+    }
+
+    function worldToGrid(x, y) {
+      return {
+        gx: Math.floor(x / GRID_SIZE),
+        gy: Math.floor(y / GRID_SIZE),
+      };
+    }
+
+    function gridToWorld(gx, gy) {
+      return {
+        x: gx * GRID_SIZE,
+        y: gy * GRID_SIZE,
+      };
+    }
+
+    // ——— BASE ENTITY ———
+    class Entity {
+      constructor(x, y, w, h, color) {
+        this.id = entityIdCounter++;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.color = color;
+        this.vx = 0;
+        this.vy = 0;
+        this.isStatic = false;
+        this.type = "object";
+      }
+
+      applyPhysics() {
+        if (this.isStatic) return;
+
+        this.vy += GRAVITY;
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // floor
+        const floor = canvas.height - this.h;
+        if (this.y > floor) {
+          this.y = floor;
+          this.vy *= FLOOR_BOUNCE;
+          this.vx *= FRICTION;
+        }
+
+        // simple world bounds
+        if (this.x < 0) {
+          this.x = 0;
+          this.vx *= -0.4;
+        }
+        if (this.x + this.w > canvas.width) {
+          this.x = canvas.width - this.w;
+          this.vx *= -0.4;
+        }
+
+        // collide with terrain
+        for (const t of terrainBlocks) {
+          if (aabbOverlap(this, t)) {
+            // simple vertical resolution
+            if (this.y + this.h - this.vy <= t.y) {
+              // came from above
+              this.y = t.y - this.h;
+              this.vy *= FLOOR_BOUNCE;
+              this.vx *= FRICTION;
+            } else if (this.y - this.vy >= t.y + t.h) {
+              // from below
+              this.y = t.y + t.h;
+              this.vy *= -0.2;
+            } else if (this.x + this.w - this.vx <= t.x) {
+              // from left
+              this.x = t.x - this.w;
+              this.vx *= -0.3;
+            } else if (this.x - this.vx >= t.x + t.w) {
+              // from right
+              this.x = t.x + t.w;
+              this.vx *= -0.3;
+            }
+          }
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+      }
+    }
+
+    // ——— NPC ———
+    class NPC extends Entity {
+      constructor(x, y) {
+        super(x, y, 28, 38, "#38bdf8");
+        this.type = "npc";
+        this.mode = "wander"; // "wander" | "pathfind"
+        this.timer = 0;
+        this.path = [];
+        this.pathIndex = 0;
+      }
+
+      setMode(mode) {
+        this.mode = mode;
+        this.path = [];
+        this.pathIndex = 0;
+      }
+
+      updateBehavior() {
+        if (this.mode === "wander") {
+          this.timer--;
+          if (this.timer <= 0) {
+            this.vx = (Math.random() - 0.5) * 4;
+            this.timer = 60 + Math.random() * 120;
+          }
+        } else if (this.mode === "pathfind") {
+          // if no path or reached end, pick new target
+          if (!this.path || this.pathIndex >= this.path.length) {
+            const target = this.pickRandomReachableCell();
+            if (target) {
+              this.path = findPathForNPC(this, target);
+              this.pathIndex = 0;
+            }
+          } else {
+            const node = this.path[this.pathIndex];
+            const world = gridToWorld(node.x, node.y);
+            const cx = this.x + this.w / 2;
+            const cy = this.y + this.h / 2;
+            const dx = world.x + GRID_SIZE / 2 - cx;
+            const dy = world.y + GRID_SIZE / 2 - cy;
+
+            const dist = Math.hypot(dx, dy);
+            if (dist < 4) {
+              this.pathIndex++;
+            } else {
+              const speed = 1.5;
+              this.vx += (dx / dist) * 0.3;
+              this.vx = Math.max(Math.min(this.vx, speed), -speed);
+              // vertical movement mostly via gravity; small nudge
+              this.vy += (dy / dist) * 0.05;
+            }
+          }
+        }
+      }
+
+      pickRandomReachableCell() {
+        // pick random grid cell not blocked
+        const cols = Math.floor(canvas.width / GRID_SIZE);
+        const rows = Math.floor(canvas.height / GRID_SIZE);
+        for (let i = 0; i < 50; i++) {
+          const gx = Math.floor(Math.random() * cols);
+          const gy = Math.floor(Math.random() * rows);
+          if (!isBlocked(gx, gy)) {
+            return { x: gx, y: gy };
+          }
+        }
+        return null;
+      }
+
+      draw() {
+        // body
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+
+        // eyes
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.x + 6, this.y + 10, 6, 6);
+        ctx.fillRect(this.x + 16, this.y + 10, 6, 6);
+
+        // mode indicator
+        if (this.mode === "pathfind") {
+          ctx.fillStyle = "#facc15";
+          ctx.fillRect(this.x + 10, this.y - 4, 8, 4);
+        }
+      }
+    }
+
+    // ——— PROJECTILE ———
+    class Projectile {
+      constructor(x, y, vx, vy) {
+        this.id = entityIdCounter++;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = 4;
+        this.life = 180;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.1;
+        this.life--;
+
+        // collide with terrain
+        for (const t of terrainBlocks) {
+          if (
+            this.x > t.x &&
+            this.x < t.x + t.w &&
+            this.y > t.y &&
+            this.y < t.y + t.h
+          ) {
+            this.life = 0;
+            break;
+          }
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = "#f97316";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ——— TERRAIN BLOCK ———
+    class TerrainBlock {
+      constructor(gx, gy) {
+        const { x, y } = gridToWorld(gx, gy);
+        this.gx = gx;
+        this.gy = gy;
+        this.x = x;
+        this.y = y;
+        this.w = GRID_SIZE;
+        this.h = GRID_SIZE;
+      }
+
+      draw() {
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.strokeStyle = "#1f2937";
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+      }
+    }
+
+    function isBlocked(gx, gy) {
+      return terrainBlocks.some((t) => t.gx === gx && t.gy === gy);
+    }
+
+    // ——— A* PATHFINDING ———
+    function findPathForNPC(npc, targetCell) {
+      const startCenter = {
+        x: npc.x + npc.w / 2,
+        y: npc.y + npc.h / 2,
+      };
+      const startGrid = worldToGrid(startCenter.x, startCenter.y);
+      const cols = Math.floor(canvas.width / GRID_SIZE);
+      const rows = Math.floor(canvas.height / GRID_SIZE);
+
+      const inBounds = (x, y) => x >= 0 && y >= 0 && x < cols && y < rows;
+
+      const startKey = `${startGrid.gx},${startGrid.gy}`;
+      const targetKey = `${targetCell.x},${targetCell.y}`;
+
+      const open = new Set([startKey]);
+      const cameFrom = new Map();
+      const gScore = new Map();
+      const fScore = new Map();
+
+      gScore.set(startKey, 0);
+      fScore.set(startKey, heuristic(startGrid.gx, startGrid.gy, targetCell.x, targetCell.y));
+
+      function heuristic(x1, y1, x2, y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+      }
+
+      function lowestFScore() {
+        let best = null;
+        let bestScore = Infinity;
+        for (const key of open) {
+          const score = fScore.get(key) ?? Infinity;
+          if (score < bestScore) {
+            bestScore = score;
+            best = key;
+          }
+        }
+        return best;
+      }
+
+      while (open.size > 0) {
+        const currentKey = lowestFScore();
+        if (!currentKey) break;
+        if (currentKey === targetKey) {
+          // reconstruct
+          const path = [];
+          let ck = currentKey;
+          while (ck) {
+            const [x, y] = ck.split(",").map(Number);
+            path.push({ x, y });
+            ck = cameFrom.get(ck);
+          }
+          path.reverse();
+          return path;
+        }
+
+        open.delete(currentKey);
+        const [cx, cy] = currentKey.split(",").map(Number);
+
+        const neighbors = [
+          [cx + 1, cy],
+          [cx - 1, cy],
+          [cx, cy + 1],
+          [cx, cy - 1],
+        ];
+
+        for (const [nx, ny] of neighbors) {
+          if (!inBounds(nx, ny) || isBlocked(nx, ny)) continue;
+          const nk = `${nx},${ny}`;
+          const tentativeG = (gScore.get(currentKey) ?? Infinity) + 1;
+          if (tentativeG < (gScore.get(nk) ?? Infinity)) {
+            cameFrom.set(nk, currentKey);
+            gScore.set(nk, tentativeG);
+            fScore.set(nk, tentativeG + heuristic(nx, ny, targetCell.x, targetCell.y));
+            if (!open.has(nk)) open.add(nk);
+          }
+        }
+      }
+
+      return [];
+    }
+
+    // ——— SPAWN HELPERS ———
+    function spawnBox(x, y) {
+      const e = new Entity(x ?? 100, y ?? 20, 40, 40, "#f87171");
+      e.type = "box";
+      objects.push(e);
+      return e;
+    }
+
+    function spawnBall(x, y) {
+      const e = new Entity(x ?? 200, y ?? 20, 30, 30, "#facc15");
+      e.type = "ball";
+      objects.push(e);
+      return e;
+    }
+
+    function spawnNPC(x, y) {
+      const n = new NPC(x ?? 300, y ?? 20);
+      npcs.push(n);
+      return n;
+    }
+
+    function placeTerrainAt(gx, gy) {
+      if (isBlocked(gx, gy)) return;
+      terrainBlocks.push(new TerrainBlock(gx, gy));
+    }
+
+    function eraseTerrainAt(gx, gy) {
+      const idx = terrainBlocks.findIndex((t) => t.gx === gx && t.gy === gy);
+      if (idx !== -1) terrainBlocks.splice(idx, 1);
+    }
+
+    // ——— TOOL STATE ———
+    let currentTool = "spawn-box";
+    const toolButtons = document.querySelectorAll(".tool-btn");
+    toolButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        toolButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTool = btn.dataset.tool;
+      });
+    });
+
+    // ——— INPUT / SELECTION ———
+    let selectedEntity = null;
+    let dragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function getMousePos(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (evt.clientX - rect.left) * (canvas.width / rect.width) / window.devicePixelRatio,
+        y: (evt.clientY - rect.top) * (canvas.height / rect.height) / window.devicePixelRatio,
+      };
+    }
+
+    function pickEntityAt(x, y) {
+      const all = [...objects, ...npcs];
+      for (let i = all.length - 1; i >= 0; i--) {
+        const e = all[i];
+        if (x >= e.x && x <= e.x + e.w && y >= e.y && y <= e.y + e.h) {
+          return e;
+        }
+      }
+      return null;
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const pos = getMousePos(e);
+      const { x, y } = pos;
+      const { gx, gy } = worldToGrid(x, y);
+
+      if (e.button === 2) {
+        // right click: quick terrain
+        if (currentTool === "terrain-erase") {
+          eraseTerrainAt(gx, gy);
+        } else {
+          placeTerrainAt(gx, gy);
+        }
+        return;
+      }
+
+      if (currentTool === "select" || currentTool === "npc-wander" || currentTool === "npc-pathfind") {
+        const ent = pickEntityAt(x, y);
+        if (ent) {
+          selectedEntity = ent;
+          if (currentTool === "npc-wander" && ent.type === "npc") {
+            ent.setMode("wander");
+          } else if (currentTool === "npc-pathfind" && ent.type === "npc") {
+            ent.setMode("pathfind");
+          } else {
+            dragging = true;
+            dragOffsetX = x - ent.x;
+            dragOffsetY = y - ent.y;
+          }
+          updateInspector();
+        } else {
+          selectedEntity = null;
+          dragging = false;
+          updateInspector();
+        }
+      } else if (currentTool === "spawn-box") {
+        selectedEntity = spawnBox(x - 20, y - 20);
+        updateInspector();
+      } else if (currentTool === "spawn-ball") {
+        selectedEntity = spawnBall(x - 15, y - 15);
+        updateInspector();
+      } else if (currentTool === "spawn-npc") {
+        selectedEntity = spawnNPC(x - 14, y - 19);
+        updateInspector();
+      } else if (currentTool === "terrain-place") {
+        placeTerrainAt(gx, gy);
+      } else if (currentTool === "terrain-erase") {
+        eraseTerrainAt(gx, gy);
+      } else if (currentTool === "shoot") {
+        shootProjectileFromPoint(x, y);
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!dragging || !selectedEntity) return;
+      const pos = getMousePos(e);
+      selectedEntity.x = pos.x - dragOffsetX;
+      selectedEntity.y = pos.y - dragOffsetY;
+      selectedEntity.vx = 0;
+      selectedEntity.vy = 0;
+      updateInspector();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      dragging = false;
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      dragging = false;
+    });
+
+    canvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+
+    // ——— PROJECTILE SHOOTING ———
+    function shootProjectileFromPoint(x, y) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 6;
+      const p = new Projectile(
+        x,
+        y,
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed
+      );
+      projectiles.push(p);
+    }
+
+    function shootFromSelectedNPC() {
+      let originX, originY;
+      if (selectedEntity && selectedEntity.type === "npc") {
+        originX = selectedEntity.x + selectedEntity.w / 2;
+        originY = selectedEntity.y + selectedEntity.h / 2;
+      } else {
+        originX = canvas.width / 2;
+        originY = canvas.height / 2;
+      }
+      const p = new Projectile(originX, originY, 0, -6);
+      projectiles.push(p);
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        shootFromSelectedNPC();
+      }
+    });
+
+    // ——— INSPECTOR + STATS ———
+    const inspType = document.getElementById("insp-type");
+    const inspPos = document.getElementById("insp-pos");
+    const inspVel = document.getElementById("insp-vel");
+    const inspMode = document.getElementById("insp-mode");
+    const inspId = document.getElementById("insp-id");
+
+    const statObjects = document.getElementById("stat-objects");
+    const statNPCs = document.getElementById("stat-npcs");
+    const statProjectiles = document.getElementById("stat-projectiles");
+    const statTerrain = document.getElementById("stat-terrain");
+
+    function updateInspector() {
+      if (!selectedEntity) {
+        inspType.textContent = "None";
+        inspPos.textContent = "-";
+        inspVel.textContent = "-";
+        inspMode.textContent = "-";
+        inspId.textContent = "-";
+        return;
+      }
+      inspType.textContent = selectedEntity.type ?? "object";
+      inspPos.textContent = `${selectedEntity.x.toFixed(1)}, ${selectedEntity.y.toFixed(1)}`;
+      inspVel.textContent = `${(selectedEntity.vx ?? 0).toFixed(2)}, ${(selectedEntity.vy ?? 0).toFixed(2)}`;
+      inspMode.textContent =
+        selectedEntity.type === "npc" ? selectedEntity.mode : "-";
+      inspId.textContent = selectedEntity.id;
+    }
+
+    function updateStats() {
+      statObjects.textContent = objects.length;
+      statNPCs.textContent = npcs.length;
+      statProjectiles.textContent = projectiles.length;
+      statTerrain.textContent = terrainBlocks.length;
+    }
+
+    // ——— MAIN LOOP ———
+    function update() {
+      // NPC behavior
+      for (const n of npcs) {
+        n.updateBehavior();
+      }
+
+      // physics for objects + npcs
+      const dynamicEntities = [...objects, ...npcs];
+      for (const e of dynamicEntities) {
+        e.applyPhysics();
+      }
+
+      // simple object-object collisions
+      for (let i = 0; i < dynamicEntities.length; i++) {
+        for (let j = i + 1; j < dynamicEntities.length; j++) {
+          const a = dynamicEntities[i];
+          const b = dynamicEntities[j];
+          if (aabbOverlap(a, b)) {
+            const overlapX =
+              a.x + a.w / 2 < b.x + b.w / 2
+                ? a.x + a.w - b.x
+                : b.x + b.w - a.x;
+            const overlapY =
+              a.y + a.h / 2 < b.y + b.h / 2
+                ? a.y + a.h - b.y
+                : b.y + b.h - a.y;
+
+            if (overlapX < overlapY) {
+              const dir = a.x < b.x ? -1 : 1;
+              a.x += (overlapX / 2) * dir;
+              b.x -= (overlapX / 2) * dir;
+              const temp = a.vx;
+              a.vx = b.vx * 0.5;
+              b.vx = temp * 0.5;
+            } else {
+              const dir = a.y < b.y ? -1 : 1;
+              a.y += (overlapY / 2) * dir;
+              b.y -= (overlapY / 2) * dir;
+              const temp = a.vy;
+              a.vy = b.vy * 0.5;
+              b.vy = temp * 0.5;
+            }
+          }
+        }
+      }
+
+      // projectiles
+      for (let i = projectiles.length - 1; i >= 0; i--) {
+        const p = projectiles[i];
+        p.update();
+        if (p.life <= 0) {
+          projectiles.splice(i, 1);
+        }
+      }
+
+      updateStats();
+      updateInspector();
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = "#020617";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+    }
+
     function render() {
-      ctx.fillStyle = "#1e293b";
+      ctx.fillStyle = "#020617";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#38bdf8";
-      ctx.font = "24px sans-serif";
-      ctx.fillText("Canvas is working!", 20, 40);
+      drawGrid();
 
-      requestAnimationFrame(render);
+      // terrain
+      for (const t of terrainBlocks) {
+        t.draw();
+      }
+
+      // objects
+      for (const o of objects) {
+        o.draw();
+      }
+
+      // npcs
+      for (const n of npcs) {
+        n.draw();
+      }
+
+      // projectiles
+      for (const p of projectiles) {
+        p.draw();
+      }
     }
-    render();
-  </script>
 
+    function loop() {
+      update();
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    // seed a little world
+    for (let i = 0; i < 4; i++) spawnBox(80 + i * 50, 40);
+    spawnNPC(260, 40);
+
+    loop();
+  </script>
 </body>
 </html>
