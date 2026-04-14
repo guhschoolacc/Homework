@@ -4,16 +4,218 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YourSite</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #050505;
+            color: #e0e0ff;
+            overflow-x: hidden;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Animated Gradient Background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(80,0,255,0.25), transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(0,200,255,0.25), transparent 60%);
+            animation: float 12s infinite alternate ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0,0); }
+            100% { transform: translate(80px, -80px); }
+        }
+
+        /* Topbar */
+        .topbar {
+            width: 100%;
+            padding: 18px 40px;
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(80, 80, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #9f9fff;
+            text-shadow: 0 0 10px #6a6aff, 0 0 20px #4a4aff;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 14px #8a8aff, 0 0 28px #6a6aff;
+        }
+
+        nav a {
+            margin-left: 25px;
+            text-decoration: none;
+            color: #b8b8ff;
+            transition: 0.2s;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 6px #6a6aff;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 90px 20px 60px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            color: #bdbdff;
+            text-shadow: 0 0 12px #5a5aff;
+            animation: glowPulse 3s infinite ease-in-out;
+        }
+
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 10px #5a5aff; }
+            50% { text-shadow: 0 0 20px #7a7aff; }
+            100% { text-shadow: 0 0 10px #5a5aff; }
+        }
+
+        .hero p {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #cfcfff;
+        }
+
+        /* Search Bar */
+        .search {
+            margin-top: 25px;
+        }
+
+        .search input {
+            padding: 12px 15px;
+            width: 260px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            background: rgba(20,20,40,0.7);
+            color: white;
+            border: 1px solid #333366;
+            box-shadow: 0 0 10px rgba(80,80,255,0.25);
+        }
+
+        .search button {
+            padding: 12px 18px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 6px;
+            background: #4a4aff;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 10px #4a4aff;
+        }
+
+        .search button:hover {
+            background: #6a6aff;
+            box-shadow: 0 0 14px #7a7aff;
+        }
+
+        /* Tiles */
+        .grid {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            padding: 40px 20px 80px;
+        }
+
+        .tile {
+            background: rgba(20, 20, 40, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 30px;
+            width: 260px;
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.25s;
+            border: 1px solid rgba(100, 100, 255, 0.25);
+            box-shadow: 0 0 12px rgba(80, 80, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glow trail */
+        .tile::after {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(120,120,255,0.15),
+                rgba(120,120,255,0)
+            );
+            transition: 0.3s;
+        }
+
+        .tile:hover::after {
+            top: 100%;
+        }
+
+        .tile:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 0 18px rgba(120, 120, 255, 0.45);
+            border-color: rgba(150, 150, 255, 0.4);
+        }
+
+        .tile h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+            color: #c0c0ff;
+            text-shadow: 0 0 8px #5a5aff;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #8888cc;
+            font-size: 14px;
+            border-top: 1px solid rgba(80,80,255,0.2);
+            background: rgba(10,10,20,0.5);
+            backdrop-filter: blur(8px);
+        }
+    </style>
 </head>
+
 <body>
 
 <header class="topbar">
     <div class="logo">YourSite</div>
     <nav>
-        <a href="tools.html">Tools</a>
-        <a href="games.html">Games</a>
-        <a href="entertainment.html">Entertainment</a>
+        <a href="#">Tools</a>
+        <a href="#">Games</a>
+        <a href="#">Entertainment</a>
     </nav>
 </header>
 
@@ -28,21 +230,25 @@
 </section>
 
 <section class="grid">
-    <div class="tile" onclick="location.href='tools.html'">
+    <div class="tile">
         <h2>Tools</h2>
         <p>Useful utilities and productivity tools.</p>
     </div>
 
-    <div class="tile" onclick="location.href='games.html'">
+    <div class="tile">
         <h2>Games</h2>
         <p>Play unblocked games instantly.</p>
     </div>
 
-    <div class="tile" onclick="location.href='entertainment.html'">
+    <div class="tile">
         <h2>Entertainment</h2>
         <p>Fun apps, generators, and more.</p>
     </div>
 </section>
+
+<footer>
+    © 2026 YourSite — Dark Neon Edition
+</footer>
 
 </body>
 </html>
