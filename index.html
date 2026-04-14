@@ -88,7 +88,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-top: auto;
-  margin-bottom: 10px; /* moved slightly up */
+  margin-bottom: 20px; /* moved up */
 }
 
 .settings-icon:hover {
@@ -123,18 +123,16 @@ body {
   color: var(--text);
 }
 
-.topbar-title {
-  font-size: 20px;
-  font-weight: 600;
-}
-
 /* -------------------------------------------------- */
-/* MAIN CONTENT                                       */
+/* MAIN CONTENT WRAPPER                               */
 /* -------------------------------------------------- */
 .main {
   margin-left: 240px;
+  margin-top: 70px;
   padding: 30px;
   width: calc(100% - 240px);
+  height: calc(100vh - 70px);
+  overflow-y: auto;
   transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
@@ -144,31 +142,13 @@ body {
 }
 
 /* -------------------------------------------------- */
-/* FULLSCREEN SETTINGS PAGE                           */
+/* CATEGORY + SETTINGS PAGES                          */
 /* -------------------------------------------------- */
-.settings-page,
-.category-page {
+.page {
   display: none;
-  position: absolute;
-  top: 70px;
-  left: 240px;
-  width: calc(100% - 240px);
-  height: calc(100vh - 70px);
-  background: var(--card);
-  border-left: 1px solid var(--border);
-  padding: 30px;
-  overflow-y: auto;
-  transition: 0.3s ease;
 }
 
-.sidebar.closed ~ .settings-page,
-.sidebar.closed ~ .category-page {
-  left: 0;
-  width: 100%;
-}
-
-.settings-page h2,
-.category-page h2 {
+.page h2 {
   margin-top: 0;
 }
 
@@ -192,53 +172,56 @@ body {
 <div class="sidebar" id="sidebar">
   <h2>homewrk</h2>
 
-  <button class="nav-btn" onclick="openCategory('games')">Games</button>
-  <button class="nav-btn" onclick="openCategory('tools')">Tools</button>
-  <button class="nav-btn" onclick="openCategory('other')">Other</button>
+  <button class="nav-btn" onclick="openPage('games')">Games</button>
+  <button class="nav-btn" onclick="openPage('tools')">Tools</button>
+  <button class="nav-btn" onclick="openPage('other')">Other</button>
 
-  <div class="settings-icon" onclick="openSettings()">⚙️</div>
+  <div class="settings-icon" onclick="openPage('settings')">⚙️</div>
 </div>
 
 <!-- TOP BAR -->
 <div class="topbar" id="topbar">
   <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
-  <div class="topbar-title">homewrk</div>
 </div>
 
-<!-- CATEGORY PAGES -->
-<div class="category-page" id="gamesPage">
-  <h2>Games</h2>
-  <p style="color:var(--muted)">Your games content goes here.</p>
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- GAMES -->
+  <div class="page" id="gamesPage">
+    <h2>Games</h2>
+    <p style="color:var(--muted)">Your games content goes here.</p>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="page" id="toolsPage">
+    <h2>Tools</h2>
+    <p style="color:var(--muted)">Your tools content goes here.</p>
+  </div>
+
+  <!-- OTHER -->
+  <div class="page" id="otherPage">
+    <h2>Other</h2>
+    <p style="color:var(--muted)">Your other content goes here.</p>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="settingsPage">
+    <h2>Settings</h2>
+
+    <h3>Theme Settings</h3>
+
+    <div class="theme-option" onclick="setTheme('dark')">Dark</div>
+    <div class="theme-option" onclick="setTheme('light')">Light</div>
+    <div class="theme-option" onclick="setTheme('neon')">Neon</div>
+    <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
+    <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
+    <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
+    <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
+    <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
+  </div>
+
 </div>
-
-<div class="category-page" id="toolsPage">
-  <h2>Tools</h2>
-  <p style="color:var(--muted)">Your tools content goes here.</p>
-</div>
-
-<div class="category-page" id="otherPage">
-  <h2>Other</h2>
-  <p style="color:var(--muted)">Your other content goes here.</p>
-</div>
-
-<!-- SETTINGS PAGE -->
-<div class="settings-page" id="settingsPage">
-  <h2>Settings</h2>
-
-  <h3>Theme Settings</h3>
-
-  <div class="theme-option" onclick="setTheme('dark')">Dark</div>
-  <div class="theme-option" onclick="setTheme('light')">Light</div>
-  <div class="theme-option" onclick="setTheme('neon')">Neon</div>
-  <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
-  <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
-  <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
-  <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
-  <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
-</div>
-
-<!-- MAIN CONTENT (EMPTY) -->
-<div class="main"></div>
 
 <script>
 /* SIDEBAR TOGGLE */
@@ -246,21 +229,10 @@ function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("closed");
 }
 
-/* OPEN CATEGORY */
-function openCategory(name) {
-  document.getElementById("settingsPage").style.display = "none";
-
-  document.querySelectorAll(".category-page").forEach(p => p.style.display = "none");
-
+/* OPEN PAGE */
+function openPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
   document.getElementById(name + "Page").style.display = "block";
-}
-
-/* OPEN SETTINGS */
-function openSettings() {
-  document.querySelectorAll(".category-page").forEach(p => p.style.display = "none");
-
-  const page = document.getElementById("settingsPage");
-  page.style.display = page.style.display === "block" ? "none" : "block";
 }
 
 /* THEME SWITCHING */
