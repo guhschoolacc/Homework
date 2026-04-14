@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mini Playground Sandbox</title>
+  <title>Mini Playground Sandbox — Advanced Edition</title>
   <style>
     :root {
       --bg: #05060a;
@@ -11,6 +11,9 @@
       --panel: #0b0f18;
       --border: #1f2933;
       --accent: #38bdf8;
+      --danger: #f87171;
+      --good: #4ade80;
+      --warn: #facc15;
     }
 
     * {
@@ -130,6 +133,21 @@
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
     }
 
+    .tool-btn.danger {
+      border-color: var(--danger);
+      color: #fecaca;
+    }
+
+    .tool-btn.good {
+      border-color: var(--good);
+      color: #bbf7d0;
+    }
+
+    .tool-btn.warn {
+      border-color: var(--warn);
+      color: #fef9c3;
+    }
+
     .tool-btn:hover {
       border-color: #334155;
       background: #020617;
@@ -190,33 +208,85 @@
       margin: 8px 0;
       border-top: 1px solid #1e293b;
     }
+
+    /* Collapsible Advanced Tools */
+    .collapsible {
+      background: #0b0f18;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 6px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-bottom: 6px;
+      user-select: none;
+    }
+
+    .collapsible:hover {
+      background: #111827;
+    }
+
+    .collapsible.active {
+      border-color: var(--accent);
+      background: #0f172a;
+    }
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+      padding-left: 4px;
+    }
+
+    .collapsible-content.open {
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
   </style>
 </head>
+
 <body>
   <header class="top-bar">
-    <div class="brand">Mini Playground</div>
+    <div class="brand">Mini Playground — Advanced Edition</div>
     <button class="return-btn" onclick="window.location.href='index.html'">
       ⬅ Return to Dashboard
     </button>
   </header>
 
   <main class="layout">
-    <!-- LEFT PANEL: TOOLS -->
+    <!-- LEFT PANEL -->
     <aside class="panel">
       <h3>Tools</h3>
       <div class="panel-subtitle">
         Click canvas to use selected tool. Right‑click for terrain. Drag entities with mouse.
       </div>
 
+      <!-- BASIC OBJECTS -->
       <div class="tool-group">
-        <div class="tool-label">Spawn</div>
+        <div class="tool-label">Spawn Objects</div>
         <div class="tool-buttons">
           <button class="tool-btn active" data-tool="spawn-box">Box</button>
           <button class="tool-btn" data-tool="spawn-ball">Ball</button>
-          <button class="tool-btn" data-tool="spawn-npc">NPC</button>
+          <button class="tool-btn" data-tool="spawn-triangle">Triangle</button>
+          <button class="tool-btn" data-tool="spawn-capsule">Capsule</button>
+          <button class="tool-btn" data-tool="spawn-cylinder">Cylinder</button>
+          <button class="tool-btn" data-tool="spawn-plank">Plank</button>
+          <button class="tool-btn" data-tool="spawn-ramp">Ramp</button>
+          <button class="tool-btn" data-tool="spawn-spike">Spike</button>
+          <button class="tool-btn" data-tool="spawn-custom">Custom</button>
         </div>
       </div>
 
+      <!-- NPC -->
+      <div class="tool-group">
+        <div class="tool-label">NPCs</div>
+        <div class="tool-buttons">
+          <button class="tool-btn" data-tool="spawn-npc">Spawn NPC</button>
+          <button class="tool-btn" data-tool="npc-wander">Set Wander</button>
+          <button class="tool-btn" data-tool="npc-pathfind">Set Pathfind</button>
+        </div>
+      </div>
+
+      <!-- WORLD -->
       <div class="tool-group">
         <div class="tool-label">World</div>
         <div class="tool-buttons">
@@ -225,781 +295,1532 @@
         </div>
       </div>
 
+      <!-- INTERACTION -->
       <div class="tool-group">
         <div class="tool-label">Interaction</div>
         <div class="tool-buttons">
           <button class="tool-btn" data-tool="select">Select / Drag</button>
-          <button class="tool-btn" data-tool="shoot">Shoot Projectiles</button>
+          <button class="tool-btn" data-tool="shoot">Shoot</button>
+          <button class="tool-btn danger" data-tool="delete">Delete</button>
         </div>
       </div>
 
-      <div class="tool-group">
-        <div class="tool-label">NPC Behavior</div>
-        <div class="tool-buttons">
-          <button class="tool-btn" data-tool="npc-wander">Set Wander</button>
-          <button class="tool-btn" data-tool="npc-pathfind">Set Pathfind</button>
+      <!-- ADVANCED TOOLS COLLAPSIBLE -->
+      <div class="section-divider"></div>
+      <div class="collapsible" id="adv-tools-toggle">Advanced Tools ▼</div>
+      <div class="collapsible-content" id="adv-tools-content">
+        <div class="tool-group">
+          <div class="tool-label">Physics Tools</div>
+          <div class="tool-buttons">
+            <button class="tool-btn good" data-tool="rope">Rope</button>
+            <button class="tool-btn good" data-tool="weld">Weld</button>
+            <button class="tool-btn warn" data-tool="gravity-gun">Gravity Gun</button>
+            <button class="tool-btn danger" data-tool="break-npc">Break NPC</button>
+          </div>
+        </div>
+
+        <div class="tool-group">
+          <div class="tool-label">Explosives</div>
+          <div class="tool-buttons">
+            <button class="tool-btn danger" data-tool="explosion">Explosion</button>
+          </div>
+        </div>
+
+        <div class="tool-group">
+          <div class="tool-label">World State</div>
+          <div class="tool-buttons">
+            <button class="tool-btn" data-tool="save-world">Save</button>
+            <button class="tool-btn" data-tool="load-world">Load</button>
+            <button class="tool-btn danger" id="clear-all-btn">Clear All</button>
+          </div>
+        </div>
+
+        <div class="tool-group">
+          <div class="tool-label">Time</div>
+          <div class="tool-buttons">
+            <button class="tool-btn warn" data-tool="slowmo">Slow Motion</button>
+          </div>
         </div>
       </div>
 
       <div class="hint">
         • Left click: use current tool<br>
-        • Right click: quick terrain (place/erase)<br>
+        • Right click: quick terrain<br>
         • Drag: move selected entity<br>
-        • Space: fire projectile from selected NPC (or center)
+        • Shift: slow motion<br>
+        • Space: fire projectile<br>
       </div>
     </aside>
 
-    <!-- CENTER: CANVAS -->
+    <!-- CANVAS -->
     <section class="panel canvas-wrapper">
       <canvas id="gameCanvas"></canvas>
     </section>
 
-    <!-- RIGHT PANEL: STATS + INSPECTOR -->
+    <!-- RIGHT PANEL -->
     <aside class="panel">
       <h3>Stats</h3>
       <div class="panel-subtitle">Live sandbox metrics</div>
 
       <div id="stats">
-        <div class="stat-row">
-          <span class="stat-label">Objects:</span>
-          <span id="stat-objects">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">NPCs:</span>
-          <span id="stat-npcs">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Projectiles:</span>
-          <span id="stat-projectiles">0</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Terrain blocks:</span>
-          <span id="stat-terrain">0</span>
-        </div>
+        <div class="stat-row"><span class="stat-label">Objects:</span><span id="stat-objects">0</span></div>
+        <div class="stat-row"><span class="stat-label">NPCs:</span><span id="stat-npcs">0</span></div>
+        <div class="stat-row"><span class="stat-label">Limbs:</span><span id="stat-limbs">0</span></div>
+        <div class="stat-row"><span class="stat-label">Projectiles:</span><span id="stat-projectiles">0</span></div>
+        <div class="stat-row"><span class="stat-label">Terrain:</span><span id="stat-terrain">0</span></div>
+        <div class="stat-row"><span class="stat-label">Ropes:</span><span id="stat-ropes">0</span></div>
+        <div class="stat-row"><span class="stat-label">Welds:</span><span id="stat-welds">0</span></div>
       </div>
 
       <div class="section-divider"></div>
 
       <h3>Inspector</h3>
       <div class="panel-subtitle">Click an entity with “Select / Drag”</div>
+
       <div id="inspector">
-        <div class="inspector-field">
-          <span class="inspector-label">Type:</span>
-          <span class="inspector-value" id="insp-type">None</span>
-        </div>
-        <div class="inspector-field">
-          <span class="inspector-label">Position:</span>
-          <span class="inspector-value" id="insp-pos">-</span>
-        </div>
-        <div class="inspector-field">
-          <span class="inspector-label">Velocity:</span>
-          <span class="inspector-value" id="insp-vel">-</span>
-        </div>
-        <div class="inspector-field">
-          <span class="inspector-label">Mode:</span>
-          <span class="inspector-value" id="insp-mode">-</span>
-        </div>
-        <div class="inspector-field">
-          <span class="inspector-label">ID:</span>
-          <span class="inspector-value" id="insp-id">-</span>
-        </div>
+        <div class="inspector-field"><span class="inspector-label">Type:</span><span class="inspector-value" id="insp-type">None</span></div>
+        <div class="inspector-field"><span class="inspector-label">Shape:</span><span class="inspector-value" id="insp-shape">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">HP:</span><span class="inspector-value" id="insp-hp">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">Limb HP:</span><span class="inspector-value" id="insp-limbhp">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">Position:</span><span class="inspector-value" id="insp-pos">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">Velocity:</span><span class="inspector-value" id="insp-vel">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">Mode:</span><span class="inspector-value" id="insp-mode">-</span></div>
+        <div class="inspector-field"><span class="inspector-label">ID:</span><span class="inspector-value" id="insp-id">-</span></div>
       </div>
 
       <div class="section-divider"></div>
 
       <div class="hint">
-        NPC Pathfinding uses a grid + A* over terrain blocks. Try building a maze and toggling “Set Pathfind”.
+        Advanced ragdoll NPCs use hybrid joints: stable torso + soft limbs.
       </div>
     </aside>
   </main>
 
-  <script>
-    // ——— CANVAS SETUP ———
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+<script>
+  // ====== CORE SETUP ======
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
 
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  const GRID_SIZE = 32;
+  const GRAVITY = 0.5;
+  const FRICTION = 0.9;
+  const FLOOR_BOUNCE = -0.25;
+
+  let timeScale = 1;
+  let slowmoHeld = false;
+  let cinematicSlowmoTimer = 0;
+
+  let entityIdCounter = 1;
+
+  const objects = [];
+  const npcs = [];
+  const limbs = [];
+  const projectiles = [];
+  const terrainBlocks = [];
+  const ropes = [];
+  const welds = [];
+  const particles = [];
+
+  // ====== UTILS ======
+  function randRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function aabbOverlap(a, b) {
+    return (
+      a.x < b.x + b.w &&
+      a.x + a.w > b.x &&
+      a.y < b.y + b.h &&
+      a.y + a.h > b.y
+    );
+  }
+
+  function worldToGrid(x, y) {
+    return {
+      gx: Math.floor(x / GRID_SIZE),
+      gy: Math.floor(y / GRID_SIZE),
+    };
+  }
+
+  function gridToWorld(gx, gy) {
+    return {
+      x: gx * GRID_SIZE,
+      y: gy * GRID_SIZE,
+    };
+  }
+
+  function distance(x1, y1, x2, y2) {
+    return Math.hypot(x2 - x1, y2 - y1);
+  }
+
+  function clamp(v, min, max) {
+    return v < min ? min : v > max ? max : v;
+  }
+
+  // ====== TERRAIN ======
+  class TerrainBlock {
+    constructor(gx, gy) {
+      const { x, y } = gridToWorld(gx, gy);
+      this.gx = gx;
+      this.gy = gy;
+      this.x = x;
+      this.y = y;
+      this.w = GRID_SIZE;
+      this.h = GRID_SIZE;
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
 
-    // ——— WORLD DATA ———
-    const objects = [];
-    const npcs = [];
-    const projectiles = [];
-    const terrainBlocks = [];
+    draw() {
+      ctx.fillStyle = "#111827";
+      ctx.fillRect(this.x, this.y, this.w, this.h);
+      ctx.strokeStyle = "#1f2937";
+      ctx.strokeRect(this.x, this.y, this.w, this.h);
+    }
+  }
 
-    let entityIdCounter = 1;
+  function isBlocked(gx, gy) {
+    return terrainBlocks.some((t) => t.gx === gx && t.gy === gy);
+  }
 
-    const GRAVITY = 0.4;
-    const FRICTION = 0.9;
-    const FLOOR_BOUNCE = -0.3;
+  function placeTerrainAt(gx, gy) {
+    if (isBlocked(gx, gy)) return;
+    terrainBlocks.push(new TerrainBlock(gx, gy));
+  }
 
-    const GRID_SIZE = 32; // for terrain + pathfinding
+  function eraseTerrainAt(gx, gy) {
+    const idx = terrainBlocks.findIndex((t) => t.gx === gx && t.gy === gy);
+    if (idx !== -1) terrainBlocks.splice(idx, 1);
+  }
 
-    // ——— UTILS ———
-    function randRange(min, max) {
-      return Math.random() * (max - min) + min;
+  // ====== BASE ENTITY (OBJECTS, NO HEALTH) ======
+  class Entity {
+    constructor(x, y, w, h, color, shape = "box") {
+      this.id = entityIdCounter++;
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.vx = 0;
+      this.vy = 0;
+      this.color = color;
+      this.shape = shape;
+      this.type = "object";
+      this.isStatic = false;
     }
 
-    function aabbOverlap(a, b) {
-      return (
-        a.x < b.x + b.w &&
-        a.x + a.w > b.x &&
-        a.y < b.y + b.h &&
-        a.y + a.h > b.y
-      );
-    }
+    applyPhysics(dt) {
+      if (this.isStatic) return;
 
-    function worldToGrid(x, y) {
-      return {
-        gx: Math.floor(x / GRID_SIZE),
-        gy: Math.floor(y / GRID_SIZE),
-      };
-    }
+      this.vy += GRAVITY * dt;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
 
-    function gridToWorld(gx, gy) {
-      return {
-        x: gx * GRID_SIZE,
-        y: gy * GRID_SIZE,
-      };
-    }
-
-    // ——— BASE ENTITY ———
-    class Entity {
-      constructor(x, y, w, h, color) {
-        this.id = entityIdCounter++;
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-        this.color = color;
-        this.vx = 0;
-        this.vy = 0;
-        this.isStatic = false;
-        this.type = "object";
+      const floor = canvas.height - this.h;
+      if (this.y > floor) {
+        this.y = floor;
+        this.vy *= FLOOR_BOUNCE;
+        this.vx *= FRICTION;
       }
 
-      applyPhysics() {
-        if (this.isStatic) return;
+      if (this.x < 0) {
+        this.x = 0;
+        this.vx *= -0.4;
+      }
+      if (this.x + this.w > canvas.width) {
+        this.x = canvas.width - this.w;
+        this.vx *= -0.4;
+      }
 
-        this.vy += GRAVITY;
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // floor
-        const floor = canvas.height - this.h;
-        if (this.y > floor) {
-          this.y = floor;
-          this.vy *= FLOOR_BOUNCE;
-          this.vx *= FRICTION;
-        }
-
-        // simple world bounds
-        if (this.x < 0) {
-          this.x = 0;
-          this.vx *= -0.4;
-        }
-        if (this.x + this.w > canvas.width) {
-          this.x = canvas.width - this.w;
-          this.vx *= -0.4;
-        }
-
-        // collide with terrain
-        for (const t of terrainBlocks) {
-          if (aabbOverlap(this, t)) {
-            // simple vertical resolution
-            if (this.y + this.h - this.vy <= t.y) {
-              // came from above
-              this.y = t.y - this.h;
-              this.vy *= FLOOR_BOUNCE;
-              this.vx *= FRICTION;
-            } else if (this.y - this.vy >= t.y + t.h) {
-              // from below
-              this.y = t.y + t.h;
-              this.vy *= -0.2;
-            } else if (this.x + this.w - this.vx <= t.x) {
-              // from left
-              this.x = t.x - this.w;
-              this.vx *= -0.3;
-            } else if (this.x - this.vx >= t.x + t.w) {
-              // from right
-              this.x = t.x + t.w;
-              this.vx *= -0.3;
-            }
+      for (const t of terrainBlocks) {
+        if (aabbOverlap(this, t)) {
+          if (this.y + this.h - this.vy * dt <= t.y) {
+            this.y = t.y - this.h;
+            this.vy *= FLOOR_BOUNCE;
+            this.vx *= FRICTION;
+          } else if (this.y - this.vy * dt >= t.y + t.h) {
+            this.y = t.y + t.h;
+            this.vy *= -0.2;
+          } else if (this.x + this.w - this.vx * dt <= t.x) {
+            this.x = t.x - this.w;
+            this.vx *= -0.3;
+          } else if (this.x - this.vx * dt >= t.x + t.w) {
+            this.x = t.x + t.w;
+            this.vx *= -0.3;
           }
         }
       }
+    }
 
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
+    draw() {
+      ctx.fillStyle = this.color;
+      ctx.strokeStyle = "rgba(15,23,42,0.9)";
+      ctx.lineWidth = 1.2;
+
+      switch (this.shape) {
+        case "ball": {
+          const r = Math.min(this.w, this.h) / 2;
+          ctx.beginPath();
+          ctx.arc(this.x + this.w / 2, this.y + this.h / 2, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "triangle": {
+          ctx.beginPath();
+          ctx.moveTo(this.x + this.w / 2, this.y);
+          ctx.lineTo(this.x + this.w, this.y + this.h);
+          ctx.lineTo(this.x, this.y + this.h);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "capsule": {
+          const r = this.h / 2;
+          const left = this.x;
+          const right = this.x + this.w;
+          const cy = this.y + this.h / 2;
+          ctx.beginPath();
+          ctx.arc(left + r, cy, r, 0.5 * Math.PI, 1.5 * Math.PI);
+          ctx.lineTo(right - r, this.y);
+          ctx.arc(right - r, cy, r, 1.5 * Math.PI, 0.5 * Math.PI);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "cylinder": {
+          const r = this.w / 2;
+          const cx = this.x + this.w / 2;
+          ctx.beginPath();
+          ctx.ellipse(cx, this.y + 6, r, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillRect(this.x, this.y + 6, this.w, this.h - 12);
+          ctx.strokeRect(this.x, this.y + 6, this.w, this.h - 12);
+          ctx.beginPath();
+          ctx.ellipse(cx, this.y + this.h - 6, r, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "plank": {
+          ctx.fillRect(this.x, this.y + this.h / 3, this.w, this.h / 3);
+          ctx.strokeRect(this.x, this.y + this.h / 3, this.w, this.h / 3);
+          break;
+        }
+        case "ramp": {
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y + this.h);
+          ctx.lineTo(this.x + this.w, this.y + this.h);
+          ctx.lineTo(this.x + this.w, this.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "spike": {
+          ctx.beginPath();
+          ctx.moveTo(this.x + this.w / 2, this.y);
+          ctx.lineTo(this.x + this.w, this.y + this.h);
+          ctx.lineTo(this.x, this.y + this.h);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        case "custom": {
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y + this.h * 0.4);
+          ctx.lineTo(this.x + this.w * 0.3, this.y);
+          ctx.lineTo(this.x + this.w * 0.7, this.y + this.h * 0.3);
+          ctx.lineTo(this.x + this.w, this.y + this.h * 0.1);
+          ctx.lineTo(this.x + this.w * 0.8, this.y + this.h);
+          ctx.lineTo(this.x + this.w * 0.2, this.y + this.h * 0.8);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
+        }
+        default: {
+          ctx.fillRect(this.x, this.y, this.w, this.h);
+          ctx.strokeRect(this.x, this.y, this.w, this.h);
+        }
+      }
+    }
+  }
+
+  // ====== RAGDOLL LIMB ======
+  class Limb {
+    constructor(x, y, w, h, color, parentNpc, role) {
+      this.id = entityIdCounter++;
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.vx = 0;
+      this.vy = 0;
+      this.color = color;
+      this.type = "limb";
+      this.role = role;
+      this.parentNpc = parentNpc;
+      this.isDetached = false;
+      this.hp = 30;
+      this.maxHp = 30;
+      this.joint = null;
+    }
+
+    center() {
+      return { x: this.x + this.w / 2, y: this.y + this.h / 2 };
+    }
+
+    applyPhysics(dt) {
+      this.vy += GRAVITY * dt;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+
+      const floor = canvas.height - this.h;
+      if (this.y > floor) {
+        this.y = floor;
+        this.vy *= FLOOR_BOUNCE;
+        this.vx *= FRICTION;
+      }
+
+      if (this.x < 0) {
+        this.x = 0;
+        this.vx *= -0.4;
+      }
+      if (this.x + this.w > canvas.width) {
+        this.x = canvas.width - this.w;
+        this.vx *= -0.4;
+      }
+
+      for (const t of terrainBlocks) {
+        if (aabbOverlap(this, t)) {
+          if (this.y + this.h - this.vy * dt <= t.y) {
+            this.y = t.y - this.h;
+            this.vy *= FLOOR_BOUNCE;
+            this.vx *= FRICTION;
+          } else if (this.y - this.vy * dt >= t.y + t.h) {
+            this.y = t.y + t.h;
+            this.vy *= -0.2;
+          } else if (this.x + this.w - this.vx * dt <= t.x) {
+            this.x = t.x - this.w;
+            this.vx *= -0.3;
+          } else if (this.x - this.vx * dt >= t.x + t.w) {
+            this.x = t.x + t.w;
+            this.vx *= -0.3;
+          }
+        }
       }
     }
 
-    // ——— NPC ———
-    class NPC extends Entity {
-      constructor(x, y) {
-        super(x, y, 28, 38, "#38bdf8");
-        this.type = "npc";
-        this.mode = "wander"; // "wander" | "pathfind"
-        this.timer = 0;
-        this.path = [];
-        this.pathIndex = 0;
-      }
+    draw() {
+      ctx.fillStyle = this.color;
+      ctx.strokeStyle = "#020617";
+      ctx.lineWidth = 1.2;
+      ctx.fillRect(this.x, this.y, this.w, this.h);
+      ctx.strokeRect(this.x, this.y, this.w, this.h);
 
-      setMode(mode) {
-        this.mode = mode;
-        this.path = [];
-        this.pathIndex = 0;
-      }
-
-      updateBehavior() {
-        if (this.mode === "wander") {
-          this.timer--;
-          if (this.timer <= 0) {
-            this.vx = (Math.random() - 0.5) * 4;
-            this.timer = 60 + Math.random() * 120;
-          }
-        } else if (this.mode === "pathfind") {
-          // if no path or reached end, pick new target
-          if (!this.path || this.pathIndex >= this.path.length) {
-            const target = this.pickRandomReachableCell();
-            if (target) {
-              this.path = findPathForNPC(this, target);
-              this.pathIndex = 0;
-            }
-          } else {
-            const node = this.path[this.pathIndex];
-            const world = gridToWorld(node.x, node.y);
-            const cx = this.x + this.w / 2;
-            const cy = this.y + this.h / 2;
-            const dx = world.x + GRID_SIZE / 2 - cx;
-            const dy = world.y + GRID_SIZE / 2 - cy;
-
-            const dist = Math.hypot(dx, dy);
-            if (dist < 4) {
-              this.pathIndex++;
-            } else {
-              const speed = 1.5;
-              this.vx += (dx / dist) * 0.3;
-              this.vx = Math.max(Math.min(this.vx, speed), -speed);
-              // vertical movement mostly via gravity; small nudge
-              this.vy += (dy / dist) * 0.05;
-            }
-          }
-        }
-      }
-
-      pickRandomReachableCell() {
-        // pick random grid cell not blocked
-        const cols = Math.floor(canvas.width / GRID_SIZE);
-        const rows = Math.floor(canvas.height / GRID_SIZE);
-        for (let i = 0; i < 50; i++) {
-          const gx = Math.floor(Math.random() * cols);
-          const gy = Math.floor(Math.random() * rows);
-          if (!isBlocked(gx, gy)) {
-            return { x: gx, y: gy };
-          }
-        }
-        return null;
-      }
-
-      draw() {
-        // body
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-
-        // eyes
-        ctx.fillStyle = "white";
-        ctx.fillRect(this.x + 6, this.y + 10, 6, 6);
-        ctx.fillRect(this.x + 16, this.y + 10, 6, 6);
-
-        // mode indicator
-        if (this.mode === "pathfind") {
-          ctx.fillStyle = "#facc15";
-          ctx.fillRect(this.x + 10, this.y - 4, 8, 4);
-        }
-      }
-    }
-
-    // ——— PROJECTILE ———
-    class Projectile {
-      constructor(x, y, vx, vy) {
-        this.id = entityIdCounter++;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.radius = 4;
-        this.life = 180;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy += 0.1;
-        this.life--;
-
-        // collide with terrain
-        for (const t of terrainBlocks) {
-          if (
-            this.x > t.x &&
-            this.x < t.x + t.w &&
-            this.y > t.y &&
-            this.y < t.y + t.h
-          ) {
-            this.life = 0;
-            break;
-          }
-        }
-      }
-
-      draw() {
-        ctx.fillStyle = "#f97316";
+      if (this.role === "head") {
+        ctx.fillStyle = "#0f172a";
+        const cx = this.x + this.w / 2;
+        const cy = this.y + this.h / 2;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.arc(cx - 3, cy - 2, 1.4, 0, Math.PI * 2);
+        ctx.arc(cx + 3, cy - 2, 1.4, 0, Math.PI * 2);
         ctx.fill();
       }
-    }
 
-    // ——— TERRAIN BLOCK ———
-    class TerrainBlock {
-      constructor(gx, gy) {
-        const { x, y } = gridToWorld(gx, gy);
-        this.gx = gx;
-        this.gy = gy;
-        this.x = x;
-        this.y = y;
-        this.w = GRID_SIZE;
-        this.h = GRID_SIZE;
-      }
-
-      draw() {
-        ctx.fillStyle = "#111827";
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-        ctx.strokeStyle = "#1f2937";
-        ctx.strokeRect(this.x, this.y, this.w, this.h);
+      if (this.hp < this.maxHp) {
+        const ratio = clamp(this.hp / this.maxHp, 0, 1);
+        const barW = this.w;
+        const barH = 2;
+        ctx.fillStyle = "#1f2937";
+        ctx.fillRect(this.x, this.y - 4, barW, barH);
+        ctx.fillStyle = ratio > 0.5 ? "#4ade80" : ratio > 0.25 ? "#facc15" : "#f97373";
+        ctx.fillRect(this.x, this.y - 4, barW * ratio, barH);
       }
     }
+  }
 
-    function isBlocked(gx, gy) {
-      return terrainBlocks.some((t) => t.gx === gx && t.gy === gy);
-    }
+  // ====== NPC (ADVANCED RAGDOLL, UPRIGHT) ======
+  class NPC {
+    constructor(x, y) {
+      this.id = entityIdCounter++;
+      this.type = "npc";
+      this.mode = "wander";
+      this.timer = 0;
+      this.hp = 100;
+      this.maxHp = 100;
+      this.limbs = [];
+      this.alive = true;
 
-    // ——— A* PATHFINDING ———
-    function findPathForNPC(npc, targetCell) {
-      const startCenter = {
-        x: npc.x + npc.w / 2,
-        y: npc.y + npc.h / 2,
-      };
-      const startGrid = worldToGrid(startCenter.x, startCenter.y);
-      const cols = Math.floor(canvas.width / GRID_SIZE);
-      const rows = Math.floor(canvas.height / GRID_SIZE);
+      const rootX = x;
+      const rootY = y;
 
-      const inBounds = (x, y) => x >= 0 && y >= 0 && x < cols && y < rows;
+      const torsoW = 18;
+      const upperTorsoH = 22;
+      const lowerTorsoH = 14;
+      const limbW = 6;
+      const limbH = 16;
 
-      const startKey = `${startGrid.gx},${startGrid.gy}`;
-      const targetKey = `${targetCell.x},${targetCell.y}`;
+      const lowerTorso = new Limb(rootX, rootY, torsoW, lowerTorsoH, "#38bdf8", this, "lowerTorso");
+      const upperTorso = new Limb(rootX, rootY - upperTorsoH, torsoW, upperTorsoH, "#38bdf8", this, "upperTorso");
+      const head = new Limb(rootX + 2, rootY - upperTorsoH - 14, torsoW - 4, 14, "#e5e7eb", this, "head");
 
-      const open = new Set([startKey]);
-      const cameFrom = new Map();
-      const gScore = new Map();
-      const fScore = new Map();
+      const upperArmL = new Limb(rootX - limbW, rootY - upperTorsoH + 4, limbW, limbH, "#38bdf8", this, "upperArmL");
+      const lowerArmL = new Limb(rootX - limbW, rootY - upperTorsoH + 4 + limbH, limbW, limbH, "#38bdf8", this, "lowerArmL");
 
-      gScore.set(startKey, 0);
-      fScore.set(startKey, heuristic(startGrid.gx, startGrid.gy, targetCell.x, targetCell.y));
+      const upperArmR = new Limb(rootX + torsoW, rootY - upperTorsoH + 4, limbW, limbH, "#38bdf8", this, "upperArmR");
+      const lowerArmR = new Limb(rootX + torsoW, rootY - upperTorsoH + 4 + limbH, limbW, limbH, "#38bdf8", this, "lowerArmR");
 
-      function heuristic(x1, y1, x2, y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+      const upperLegL = new Limb(rootX + 2, rootY + lowerTorsoH, limbW, limbH, "#1f2937", this, "upperLegL");
+      const lowerLegL = new Limb(rootX + 2, rootY + lowerTorsoH + limbH, limbW, limbH, "#1f2937", this, "lowerLegL");
+
+      const upperLegR = new Limb(rootX + torsoW - limbW - 2, rootY + lowerTorsoH, limbW, limbH, "#1f2937", this, "upperLegR");
+      const lowerLegR = new Limb(rootX + torsoW - limbW - 2, rootY + lowerTorsoH + limbH, limbW, limbH, "#1f2937", this, "lowerLegR");
+
+      this.limbs.push(
+        head, upperTorso, lowerTorso,
+        upperArmL, lowerArmL,
+        upperArmR, lowerArmR,
+        upperLegL, lowerLegL,
+        upperLegR, lowerLegR
+      );
+      limbs.push(...this.limbs);
+
+      function joint(a, b, stiffness, breakForce) {
+        a.joint = { other: b, stiffness, breakForce };
       }
 
-      function lowestFScore() {
-        let best = null;
-        let bestScore = Infinity;
-        for (const key of open) {
-          const score = fScore.get(key) ?? Infinity;
-          if (score < bestScore) {
-            bestScore = score;
-            best = key;
-          }
+      joint(head, upperTorso, 0.4, 18);
+      joint(upperTorso, lowerTorso, 0.8, 40); // strong torso
+      joint(upperArmL, upperTorso, 0.4, 20);
+      joint(upperArmR, upperTorso, 0.4, 20);
+      joint(lowerArmL, upperArmL, 0.3, 18);
+      joint(lowerArmR, upperArmR, 0.3, 18);
+      joint(upperLegL, lowerTorso, 0.6, 35);
+      joint(upperLegR, lowerTorso, 0.6, 35);
+      joint(lowerLegL, upperLegL, 0.3, 20);
+      joint(lowerLegR, upperLegR, 0.3, 20);
+
+      this.rootLimb = lowerTorso;
+    }
+
+    get centerX() {
+      return this.rootLimb.x + this.rootLimb.w / 2;
+    }
+
+    get centerY() {
+      return this.rootLimb.y + this.rootLimb.h / 2;
+    }
+
+    setMode(mode) {
+      this.mode = mode;
+      this.timer = 0;
+    }
+
+    updateBehavior(dt) {
+      if (!this.alive) return;
+
+      if (this.mode === "wander") {
+        this.timer -= dt;
+        if (this.timer <= 0) {
+          const impulse = (Math.random() - 0.5) * 2;
+          this.rootLimb.vx += impulse;
+          this.timer = 60 + Math.random() * 120;
         }
-        return best;
-      }
-
-      while (open.size > 0) {
-        const currentKey = lowestFScore();
-        if (!currentKey) break;
-        if (currentKey === targetKey) {
-          // reconstruct
-          const path = [];
-          let ck = currentKey;
-          while (ck) {
-            const [x, y] = ck.split(",").map(Number);
-            path.push({ x, y });
-            ck = cameFrom.get(ck);
-          }
-          path.reverse();
-          return path;
-        }
-
-        open.delete(currentKey);
-        const [cx, cy] = currentKey.split(",").map(Number);
-
-        const neighbors = [
-          [cx + 1, cy],
-          [cx - 1, cy],
-          [cx, cy + 1],
-          [cx, cy - 1],
-        ];
-
-        for (const [nx, ny] of neighbors) {
-          if (!inBounds(nx, ny) || isBlocked(nx, ny)) continue;
-          const nk = `${nx},${ny}`;
-          const tentativeG = (gScore.get(currentKey) ?? Infinity) + 1;
-          if (tentativeG < (gScore.get(nk) ?? Infinity)) {
-            cameFrom.set(nk, currentKey);
-            gScore.set(nk, tentativeG);
-            fScore.set(nk, tentativeG + heuristic(nx, ny, targetCell.x, targetCell.y));
-            if (!open.has(nk)) open.add(nk);
-          }
+      } else if (this.mode === "pathfind") {
+        this.timer -= dt;
+        if (this.timer <= 0) {
+          const targetX = randRange(0, canvas.width);
+          const dx = targetX - this.centerX;
+          this.rootLimb.vx += clamp(dx * 0.002, -1.5, 1.5);
+          this.timer = 90 + Math.random() * 120;
         }
       }
-
-      return [];
     }
 
-    // ——— SPAWN HELPERS ———
-    function spawnBox(x, y) {
-      const e = new Entity(x ?? 100, y ?? 20, 40, 40, "#f87171");
-      e.type = "box";
-      objects.push(e);
-      return e;
+    applyDamage(amount) {
+      this.hp -= amount;
+      if (this.hp <= 0 && this.alive) {
+        this.alive = false;
+      }
     }
 
-    function spawnBall(x, y) {
-      const e = new Entity(x ?? 200, y ?? 20, 30, 30, "#facc15");
-      e.type = "ball";
-      objects.push(e);
-      return e;
+    breakApart() {
+      for (const limb of this.limbs) {
+        limb.joint = null;
+        limb.isDetached = true;
+      }
+      this.alive = false;
     }
 
-    function spawnNPC(x, y) {
-      const n = new NPC(x ?? 300, y ?? 20);
-      npcs.push(n);
-      return n;
+    draw() {
+      if (this.hp < this.maxHp) {
+        const ratio = clamp(this.hp / this.maxHp, 0, 1);
+        const barW = 40;
+        const barH = 4;
+        const x = this.centerX - barW / 2;
+        const y = this.centerY - 40;
+        ctx.fillStyle = "#020617";
+        ctx.fillRect(x, y, barW, barH);
+        ctx.fillStyle = ratio > 0.5 ? "#4ade80" : ratio > 0.25 ? "#facc15" : "#f97373";
+        ctx.fillRect(x, y, barW * ratio, barH);
+      }
+    }
+  }
+
+  function spawnNPC(x, y) {
+    const npc = new NPC(x ?? 300, y ?? 40);
+    npcs.push(npc);
+    return npc;
+  }
+
+  // ====== JOINT / RAGDOLL CONSTRAINTS ======
+  function updateLimbJoints(dt) {
+    for (const limb of limbs) {
+      if (!limb.joint || !limb.joint.other) continue;
+      const other = limb.joint.other;
+
+      const c1 = limb.center();
+      const c2 = other.center();
+      const dx = c2.x - c1.x;
+      const dy = c2.y - c1.y;
+      const dist = Math.hypot(dx, dy) || 0.0001;
+
+      const rest = (limb.h + other.h) * 0.4;
+      const diff = dist - rest;
+      const force = diff * limb.joint.stiffness;
+
+      if (Math.abs(force) > limb.joint.breakForce) {
+        limb.joint = null;
+        continue;
+      }
+
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      const fx = nx * force * dt;
+      const fy = ny * force * dt;
+
+      limb.vx += fx;
+      limb.vy += fy;
+      other.vx -= fx;
+      other.vy -= fy;
+    }
+  }
+
+  // ====== PROJECTILES ======
+  class Projectile {
+    constructor(x, y, vx, vy, damage = 20) {
+      this.id = entityIdCounter++;
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+      this.radius = 4;
+      this.life = 180;
+      this.damage = damage;
     }
 
-    function placeTerrainAt(gx, gy) {
-      if (isBlocked(gx, gy)) return;
-      terrainBlocks.push(new TerrainBlock(gx, gy));
+    update(dt) {
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.vy += 0.2 * dt;
+      this.life -= dt;
+
+      for (const t of terrainBlocks) {
+        if (
+          this.x > t.x &&
+          this.x < t.x + t.w &&
+          this.y > t.y &&
+          this.y < t.y + t.h
+        ) {
+          this.life = 0;
+          spawnImpactParticles(this.x, this.y, "#f97316");
+          break;
+        }
+      }
+
+      // objects no longer take damage
+
+      for (const limb of limbs) {
+        if (
+          this.x > limb.x &&
+          this.x < limb.x + limb.w &&
+          this.y > limb.y &&
+          this.y < limb.y + limb.h
+        ) {
+          limb.hp -= this.damage;
+          if (limb.parentNpc) {
+            limb.parentNpc.applyDamage(this.damage * (limb.role === "head" ? 1.5 : 1));
+          }
+          spawnImpactParticles(this.x, this.y, "#f97316");
+          this.life = 0;
+          break;
+        }
+      }
     }
 
-    function eraseTerrainAt(gx, gy) {
-      const idx = terrainBlocks.findIndex((t) => t.gx === gx && t.gy === gy);
-      if (idx !== -1) terrainBlocks.splice(idx, 1);
+    draw() {
+      ctx.fillStyle = "#f97316";
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
     }
+  }
 
-    // ——— TOOL STATE ———
-    let currentTool = "spawn-box";
-    const toolButtons = document.querySelectorAll(".tool-btn");
-    toolButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        toolButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentTool = btn.dataset.tool;
+  function shootProjectileFromPoint(x, y) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 6;
+    const p = new Projectile(
+      x,
+      y,
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed
+    );
+    projectiles.push(p);
+  }
+
+  function shootFromSelectedNPC() {
+    let originX, originY;
+    if (selectedEntity && selectedEntity.type === "npc") {
+      originX = selectedEntity.centerX;
+      originY = selectedEntity.centerY;
+    } else {
+      originX = canvas.width / 2;
+      originY = canvas.height / 2;
+    }
+    const p = new Projectile(originX, originY, 0, -8, 25);
+    projectiles.push(p);
+  }
+
+  // ====== PARTICLES / EXPLOSIONS ======
+  function spawnImpactParticles(x, y, color) {
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        x,
+        y,
+        vx: randRange(-2, 2),
+        vy: randRange(-2, 0),
+        life: randRange(15, 30),
+        color,
+        size: randRange(1, 2),
       });
-    });
+    }
+  }
 
-    // ——— INPUT / SELECTION ———
-    let selectedEntity = null;
-    let dragging = false;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
+  function spawnExplosion(x, y, radius = 90, force = 18, damage = 60) {
+    cinematicSlowmoTimer = 30;
 
-    function getMousePos(evt) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      return {
-        x: (evt.clientX - rect.left) * (canvas.width / rect.width) / window.devicePixelRatio,
-        y: (evt.clientY - rect.top) * (canvas.height / rect.height) / window.devicePixelRatio,
-      };
+    for (let i = 0; i < 40; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = randRange(2, 6);
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp,
+        life: randRange(30, 60),
+        color: i % 2 === 0 ? "#f97316" : "#facc15",
+        size: randRange(2, 4),
+      });
     }
 
-    function pickEntityAt(x, y) {
-      const all = [...objects, ...npcs];
-      for (let i = all.length - 1; i >= 0; i--) {
-        const e = all[i];
+    for (let i = 0; i < 20; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = randRange(1, 3);
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp,
+        life: randRange(40, 80),
+        color: "#111827",
+        size: randRange(3, 6),
+      });
+    }
+
+    function applyExplosionToBody(body, massFactor = 1) {
+      const cx = body.x + body.w / 2;
+      const cy = body.y + body.h / 2;
+      const dist = distance(x, y, cx, cy);
+      if (dist > radius) return;
+      const falloff = 1 - dist / radius;
+      const ang = Math.atan2(cy - y, cx - x);
+      const f = force * falloff * massFactor;
+      body.vx += Math.cos(ang) * f;
+      body.vy += Math.sin(ang) * f;
+
+      // only limbs/NPCs take damage
+      if (body.type === "limb") {
+        body.hp -= damage * falloff;
+        if (body.parentNpc) {
+          body.parentNpc.applyDamage(damage * falloff * (body.role === "head" ? 1.5 : 1));
+        }
+      }
+    }
+
+    for (const obj of objects) applyExplosionToBody(obj, 0.8); // force only
+    for (const limb of limbs) applyExplosionToBody(limb, 1.0);
+  }
+
+  // ====== ROPE / WELD ======
+  class Rope {
+    constructor(a, b) {
+      this.id = entityIdCounter++;
+      this.a = a;
+      this.b = b;
+      const ac = a.center ? a.center() : { x: a.x + a.w / 2, y: a.y + a.h / 2 };
+      const bc = b.center ? b.center() : { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+      this.restLength = distance(ac.x, ac.y, bc.x, bc.y);
+      this.breakForce = 40;
+    }
+
+    update(dt) {
+      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
+      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
+      const dx = bc.x - ac.x;
+      const dy = bc.y - ac.y;
+      const dist = Math.hypot(dx, dy) || 0.0001;
+      const diff = dist - this.restLength;
+      const force = diff * 0.4;
+      if (Math.abs(force) > this.breakForce) {
+        this.broken = true;
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const fx = nx * force * dt;
+      const fy = ny * force * dt;
+
+      this.a.vx += fx;
+      this.a.vy += fy;
+      this.b.vx -= fx;
+      this.b.vy -= fy;
+    }
+
+    draw() {
+      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
+      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
+      ctx.strokeStyle = "#4ade80";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ac.x, ac.y);
+      ctx.lineTo(bc.x, bc.y);
+      ctx.stroke();
+    }
+  }
+
+  class Weld {
+    constructor(a, b) {
+      this.id = entityIdCounter++;
+      this.a = a;
+      this.b = b;
+    }
+
+    update(dt) {
+      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
+      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
+      const midX = (ac.x + bc.x) / 2;
+      const midY = (ac.y + bc.y) / 2;
+
+      const dxA = midX - ac.x;
+      const dyA = midY - ac.y;
+      const dxB = midX - bc.x;
+      const dyB = midY - bc.y;
+
+      this.a.vx += dxA * 0.3 * dt;
+      this.a.vy += dyA * 0.3 * dt;
+      this.b.vx += dxB * 0.3 * dt;
+      this.b.vy += dyB * 0.3 * dt;
+    }
+
+    draw() {
+      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
+      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ac.x, ac.y);
+      ctx.lineTo(bc.x, bc.y);
+      ctx.stroke();
+    }
+  }
+
+  // ====== GRAVITY GUN ======
+  let gravityGunActive = false;
+  let gravityTarget = null;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+
+  function updateGravityGun(dt, mouseX, mouseY) {
+    if (!gravityGunActive || !gravityTarget) return;
+    const target = gravityTarget;
+    const cx = target.x + target.w / 2;
+    const cy = target.y + target.h / 2;
+    const dx = mouseX - cx;
+    const dy = mouseY - cy;
+    target.vx += dx * 0.3 * dt;
+    target.vy += dy * 0.3 * dt;
+  }
+
+  // ====== SPAWN HELPERS ======
+  function spawnBox(x, y) {
+    const e = new Entity(x ?? 100, y ?? 20, 40, 40, "#f97373", "box");
+    e.type = "box";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnBall(x, y) {
+    const e = new Entity(x ?? 200, y ?? 20, 32, 32, "#facc15", "ball");
+    e.type = "ball";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnTriangle(x, y) {
+    const e = new Entity(x ?? 260, y ?? 20, 40, 40, "#4ade80", "triangle");
+    e.type = "triangle";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnCapsule(x, y) {
+    const e = new Entity(x ?? 320, y ?? 20, 50, 24, "#a855f7", "capsule");
+    e.type = "capsule";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnCylinder(x, y) {
+    const e = new Entity(x ?? 380, y ?? 20, 30, 50, "#22c55e", "cylinder");
+    e.type = "cylinder";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnPlank(x, y) {
+    const e = new Entity(x ?? 440, y ?? 20, 80, 20, "#60a5fa", "plank");
+    e.type = "plank";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnRamp(x, y) {
+    const e = new Entity(x ?? 520, y ?? 20, 60, 40, "#fbbf24", "ramp");
+    e.type = "ramp";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnSpike(x, y) {
+    const e = new Entity(x ?? 580, y ?? 20, 30, 40, "#ef4444", "spike");
+    e.type = "spike";
+    objects.push(e);
+    return e;
+  }
+
+  function spawnCustom(x, y) {
+    const e = new Entity(x ?? 640, y ?? 20, 50, 40, "#38bdf8", "custom");
+    e.type = "custom";
+    objects.push(e);
+    return e;
+  }
+
+  // ====== INPUT / TOOLS ======
+  let currentTool = "spawn-box";
+  const toolButtons = document.querySelectorAll(".tool-btn");
+  toolButtons.forEach((btn) => {
+    if (!btn.dataset.tool) return;
+    btn.addEventListener("click", () => {
+      toolButtons.forEach((b) => {
+        if (b.dataset.tool) b.classList.remove("active");
+      });
+      btn.classList.add("active");
+      currentTool = btn.dataset.tool;
+
+      if (currentTool !== "gravity-gun") {
+        gravityGunActive = false;
+        gravityTarget = null;
+      } else {
+        gravityGunActive = true;
+      }
+    });
+  });
+
+  const advToggle = document.getElementById("adv-tools-toggle");
+  const advContent = document.getElementById("adv-tools-content");
+  advToggle.addEventListener("click", () => {
+    const open = advContent.style.maxHeight && advContent.style.maxHeight !== "0px";
+    if (open) {
+      advContent.style.maxHeight = "0px";
+      advContent.classList.remove("open");
+      advToggle.classList.remove("active");
+      advToggle.textContent = "Advanced Tools ▼";
+    } else {
+      advContent.style.maxHeight = advContent.scrollHeight + "px";
+      advContent.classList.add("open");
+      advToggle.classList.add("active");
+      advToggle.textContent = "Advanced Tools ▲";
+    }
+  });
+
+  const clearAllBtn = document.getElementById("clear-all-btn");
+  clearAllBtn.addEventListener("click", () => {
+    objects.length = 0;
+    npcs.length = 0;
+    limbs.length = 0;
+    projectiles.length = 0;
+    terrainBlocks.length = 0;
+    ropes.length = 0;
+    welds.length = 0;
+    selectedEntity = null;
+    updateInspector();
+  });
+
+  let selectedEntity = null;
+  let dragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  function getMousePos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (evt.clientX - rect.left) * (canvas.width / rect.width) / window.devicePixelRatio,
+      y: (evt.clientY - rect.top) * (canvas.height / rect.height) / window.devicePixelRatio,
+    };
+  }
+
+  function pickEntityAt(x, y) {
+    const all = [...objects, ...limbs, ...npcs];
+    for (let i = all.length - 1; i >= 0; i--) {
+      const e = all[i];
+      if (e.type === "npc") {
+        const cx = e.centerX;
+        const cy = e.centerY;
+        if (distance(x, y, cx, cy) < 30) return e;
+      } else {
         if (x >= e.x && x <= e.x + e.w && y >= e.y && y <= e.y + e.h) {
           return e;
         }
       }
-      return null;
+    }
+    return null;
+  }
+
+  let ropeFirst = null;
+  let weldFirst = null;
+
+  canvas.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    const pos = getMousePos(e);
+    const { x, y } = pos;
+    lastMouseX = x;
+    lastMouseY = y;
+    const { gx, gy } = worldToGrid(x, y);
+
+    if (e.button === 2) {
+      if (currentTool === "terrain-erase") {
+        eraseTerrainAt(gx, gy);
+      } else {
+        placeTerrainAt(gx, gy);
+      }
+      return;
     }
 
-    canvas.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      const pos = getMousePos(e);
-      const { x, y } = pos;
-      const { gx, gy } = worldToGrid(x, y);
-
-      if (e.button === 2) {
-        // right click: quick terrain
-        if (currentTool === "terrain-erase") {
-          eraseTerrainAt(gx, gy);
-        } else {
-          placeTerrainAt(gx, gy);
-        }
-        return;
-      }
-
-      if (currentTool === "select" || currentTool === "npc-wander" || currentTool === "npc-pathfind") {
-        const ent = pickEntityAt(x, y);
-        if (ent) {
-          selectedEntity = ent;
-          if (currentTool === "npc-wander" && ent.type === "npc") {
-            ent.setMode("wander");
-          } else if (currentTool === "npc-pathfind" && ent.type === "npc") {
-            ent.setMode("pathfind");
+    if (currentTool === "select" || currentTool === "npc-wander" || currentTool === "npc-pathfind" || currentTool === "delete" || currentTool === "gravity-gun" || currentTool === "break-npc" || currentTool === "rope" || currentTool === "weld") {
+      const ent = pickEntityAt(x, y);
+      if (ent) {
+        if (currentTool === "delete") {
+          if (ent.type === "npc") {
+            const idx = npcs.indexOf(ent);
+            if (idx !== -1) npcs.splice(idx, 1);
+            for (let i = limbs.length - 1; i >= 0; i--) {
+              if (limbs[i].parentNpc === ent) limbs.splice(i, 1);
+            }
+          } else if (ent.type === "limb") {
+            const idx = limbs.indexOf(ent);
+            if (idx !== -1) limbs.splice(idx, 1);
           } else {
-            dragging = true;
-            dragOffsetX = x - ent.x;
-            dragOffsetY = y - ent.y;
+            const idx = objects.indexOf(ent);
+            if (idx !== -1) objects.splice(idx, 1);
           }
+          if (selectedEntity === ent) selectedEntity = null;
           updateInspector();
-        } else {
+          return;
+        }
+
+        if (currentTool === "npc-wander" && ent.type === "npc") {
+          ent.setMode("wander");
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "npc-pathfind" && ent.type === "npc") {
+          ent.setMode("pathfind");
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "break-npc") {
+          if (ent.type === "npc") {
+            ent.breakApart();
+          } else if (ent.type === "limb" && ent.parentNpc) {
+            ent.parentNpc.breakApart();
+          }
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "gravity-gun") {
+          gravityGunActive = true;
+          gravityTarget = ent;
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "rope") {
+          if (!ropeFirst) {
+            ropeFirst = ent;
+          } else {
+            if (ropeFirst !== ent) {
+              const r = new Rope(ropeFirst, ent);
+              ropes.push(r);
+            }
+            ropeFirst = null;
+          }
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "weld") {
+          if (!weldFirst) {
+            weldFirst = ent;
+          } else {
+            if (weldFirst !== ent) {
+              const w = new Weld(weldFirst, ent);
+              welds.push(w);
+            }
+            weldFirst = null;
+          }
+          selectedEntity = ent;
+          updateInspector();
+          return;
+        }
+
+        if (currentTool === "select") {
+          selectedEntity = ent;
+          dragging = true;
+          dragOffsetX = x - ent.x;
+          dragOffsetY = y - ent.y;
+          updateInspector();
+          return;
+        }
+      } else {
+        if (currentTool !== "rope" && currentTool !== "weld") {
           selectedEntity = null;
           dragging = false;
           updateInspector();
         }
-      } else if (currentTool === "spawn-box") {
-        selectedEntity = spawnBox(x - 20, y - 20);
-        updateInspector();
-      } else if (currentTool === "spawn-ball") {
-        selectedEntity = spawnBall(x - 15, y - 15);
-        updateInspector();
-      } else if (currentTool === "spawn-npc") {
-        selectedEntity = spawnNPC(x - 14, y - 19);
-        updateInspector();
-      } else if (currentTool === "terrain-place") {
-        placeTerrainAt(gx, gy);
-      } else if (currentTool === "terrain-erase") {
-        eraseTerrainAt(gx, gy);
-      } else if (currentTool === "shoot") {
-        shootProjectileFromPoint(x, y);
       }
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      if (!dragging || !selectedEntity) return;
-      const pos = getMousePos(e);
-      selectedEntity.x = pos.x - dragOffsetX;
-      selectedEntity.y = pos.y - dragOffsetY;
-      selectedEntity.vx = 0;
-      selectedEntity.vy = 0;
+    } else if (currentTool === "spawn-box") {
+      selectedEntity = spawnBox(x - 20, y - 20);
       updateInspector();
-    });
+    } else if (currentTool === "spawn-ball") {
+      selectedEntity = spawnBall(x - 16, y - 16);
+      updateInspector();
+    } else if (currentTool === "spawn-triangle") {
+      selectedEntity = spawnTriangle(x - 20, y - 20);
+      updateInspector();
+    } else if (currentTool === "spawn-capsule") {
+      selectedEntity = spawnCapsule(x - 25, y - 12);
+      updateInspector();
+    } else if (currentTool === "spawn-cylinder") {
+      selectedEntity = spawnCylinder(x - 15, y - 25);
+      updateInspector();
+    } else if (currentTool === "spawn-plank") {
+      selectedEntity = spawnPlank(x - 40, y - 10);
+      updateInspector();
+    } else if (currentTool === "spawn-ramp") {
+      selectedEntity = spawnRamp(x - 30, y - 20);
+      updateInspector();
+    } else if (currentTool === "spawn-spike") {
+      selectedEntity = spawnSpike(x - 15, y - 20);
+      updateInspector();
+    } else if (currentTool === "spawn-custom") {
+      selectedEntity = spawnCustom(x - 25, y - 20);
+      updateInspector();
+    } else if (currentTool === "spawn-npc") {
+      selectedEntity = spawnNPC(x - 10, y - 40);
+      updateInspector();
+    } else if (currentTool === "terrain-place") {
+      placeTerrainAt(gx, gy);
+    } else if (currentTool === "terrain-erase") {
+      eraseTerrainAt(gx, gy);
+    } else if (currentTool === "shoot") {
+      shootProjectileFromPoint(x, y);
+    } else if (currentTool === "explosion") {
+      spawnExplosion(x, y);
+    }
+  });
 
-    canvas.addEventListener("mouseup", () => {
-      dragging = false;
-    });
+  canvas.addEventListener("mousemove", (e) => {
+    const pos = getMousePos(e);
+    lastMouseX = pos.x;
+    lastMouseY = pos.y;
+    if (!dragging || !selectedEntity) return;
+    selectedEntity.x = pos.x - dragOffsetX;
+    selectedEntity.y = pos.y - dragOffsetY;
+    selectedEntity.vx = 0;
+    selectedEntity.vy = 0;
+    updateInspector();
+  });
 
-    canvas.addEventListener("mouseleave", () => {
-      dragging = false;
-    });
+  canvas.addEventListener("mouseup", () => {
+    dragging = false;
+  });
 
-    canvas.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
+  canvas.addEventListener("mouseleave", () => {
+    dragging = false;
+  });
 
-    // ——— PROJECTILE SHOOTING ———
-    function shootProjectileFromPoint(x, y) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 6;
-      const p = new Projectile(
-        x,
-        y,
-        Math.cos(angle) * speed,
-        Math.sin(angle) * speed
-      );
-      projectiles.push(p);
+  canvas.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+      shootFromSelectedNPC();
+    }
+    if (e.key === "Shift") {
+      slowmoHeld = true;
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    if (e.key === "Shift") {
+      slowmoHeld = false;
+    }
+  });
+
+  // ====== SAVE / LOAD ======
+  function serializeWorld() {
+    return JSON.stringify({
+      objects: objects.map((o) => ({
+        id: o.id,
+        x: o.x,
+        y: o.y,
+        w: o.w,
+        h: o.h,
+        vx: o.vx,
+        vy: o.vy,
+        color: o.color,
+        shape: o.shape,
+        type: o.type,
+      })),
+      terrain: terrainBlocks.map((t) => ({
+        gx: t.gx,
+        gy: t.gy,
+      })),
+      npcs: npcs.map((n) => ({
+        id: n.id,
+        hp: n.hp,
+        mode: n.mode,
+        limbs: n.limbs.map((l) => ({
+          id: l.id,
+          role: l.role,
+          x: l.x,
+          y: l.y,
+          w: l.w,
+          h: l.h,
+          vx: l.vx,
+          vy: l.vy,
+          color: l.color,
+          hp: l.hp,
+          maxHp: l.maxHp,
+          isDetached: l.isDetached,
+        })),
+      })),
+    });
+  }
+
+  function deserializeWorld(json) {
+    try {
+      const data = JSON.parse(json);
+      objects.length = 0;
+      npcs.length = 0;
+      limbs.length = 0;
+      terrainBlocks.length = 0;
+      ropes.length = 0;
+      welds.length = 0;
+      projectiles.length = 0;
+      selectedEntity = null;
+
+      for (const o of data.objects || []) {
+        const e = new Entity(o.x, o.y, o.w, o.h, o.color, o.shape);
+        e.vx = o.vx;
+        e.vy = o.vy;
+        e.type = o.type;
+        objects.push(e);
+      }
+
+      for (const t of data.terrain || []) {
+        terrainBlocks.push(new TerrainBlock(t.gx, t.gy));
+      }
+
+      for (const n of data.npcs || []) {
+        const npc = new NPC(0, 0);
+        npc.hp = n.hp;
+        npc.mode = n.mode;
+        npc.limbs.length = 0;
+        for (const l of n.limbs || []) {
+          const limb = new Limb(l.x, l.y, l.w, l.h, l.color, npc, l.role);
+          limb.vx = l.vx;
+          limb.vy = l.vy;
+          limb.hp = l.hp;
+          limb.maxHp = l.maxHp;
+          limb.isDetached = l.isDetached;
+          npc.limbs.push(limb);
+          limbs.push(limb);
+        }
+        npc.rootLimb = npc.limbs.find((l) => l.role === "lowerTorso") || npc.limbs[0];
+        npcs.push(npc);
+      }
+    } catch (e) {
+      console.error("Failed to load world:", e);
+    }
+  }
+
+  const saveBtn = document.querySelector('[data-tool="save-world"]');
+  const loadBtn = document.querySelector('[data-tool="load-world"]');
+
+  saveBtn.addEventListener("click", () => {
+    const data = serializeWorld();
+    localStorage.setItem("miniPlaygroundWorld", data);
+  });
+
+  loadBtn.addEventListener("click", () => {
+    const data = localStorage.getItem("miniPlaygroundWorld");
+    if (data) deserializeWorld(data);
+  });
+
+  let autoSaveTimer = 0;
+
+  // ====== INSPECTOR + STATS ======
+  const inspType = document.getElementById("insp-type");
+  const inspShape = document.getElementById("insp-shape");
+  const inspHp = document.getElementById("insp-hp");
+  const inspLimbHp = document.getElementById("insp-limbhp");
+  const inspPos = document.getElementById("insp-pos");
+  const inspVel = document.getElementById("insp-vel");
+  const inspMode = document.getElementById("insp-mode");
+  const inspId = document.getElementById("insp-id");
+
+  const statObjects = document.getElementById("stat-objects");
+  const statNPCs = document.getElementById("stat-npcs");
+  const statLimbs = document.getElementById("stat-limbs");
+  const statProjectiles = document.getElementById("stat-projectiles");
+  const statTerrain = document.getElementById("stat-terrain");
+  const statRopes = document.getElementById("stat-ropes");
+  const statWelds = document.getElementById("stat-welds");
+
+  function updateInspector() {
+    if (!selectedEntity) {
+      inspType.textContent = "None";
+      inspShape.textContent = "-";
+      inspHp.textContent = "-";
+      inspLimbHp.textContent = "-";
+      inspPos.textContent = "-";
+      inspVel.textContent = "-";
+      inspMode.textContent = "-";
+      inspId.textContent = "-";
+      return;
     }
 
-    function shootFromSelectedNPC() {
-      let originX, originY;
-      if (selectedEntity && selectedEntity.type === "npc") {
-        originX = selectedEntity.x + selectedEntity.w / 2;
-        originY = selectedEntity.y + selectedEntity.h / 2;
-      } else {
-        originX = canvas.width / 2;
-        originY = canvas.height / 2;
-      }
-      const p = new Projectile(originX, originY, 0, -6);
-      projectiles.push(p);
-    }
+    inspType.textContent = selectedEntity.type ?? "object";
+    inspShape.textContent =
+      selectedEntity.shape ??
+      (selectedEntity.type === "npc"
+        ? "ragdoll"
+        : selectedEntity.type === "limb"
+        ? selectedEntity.role
+        : "-");
 
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        shootFromSelectedNPC();
-      }
-    });
-
-    // ——— INSPECTOR + STATS ———
-    const inspType = document.getElementById("insp-type");
-    const inspPos = document.getElementById("insp-pos");
-    const inspVel = document.getElementById("insp-vel");
-    const inspMode = document.getElementById("insp-mode");
-    const inspId = document.getElementById("insp-id");
-
-    const statObjects = document.getElementById("stat-objects");
-    const statNPCs = document.getElementById("stat-npcs");
-    const statProjectiles = document.getElementById("stat-projectiles");
-    const statTerrain = document.getElementById("stat-terrain");
-
-    function updateInspector() {
-      if (!selectedEntity) {
-        inspType.textContent = "None";
-        inspPos.textContent = "-";
-        inspVel.textContent = "-";
-        inspMode.textContent = "-";
-        inspId.textContent = "-";
-        return;
-      }
-      inspType.textContent = selectedEntity.type ?? "object";
+    if (selectedEntity.type === "npc") {
+      inspHp.textContent = `${selectedEntity.hp.toFixed(1)} / ${selectedEntity.maxHp.toFixed(1)}`;
+      const limbInfo = selectedEntity.limbs
+        .map((l) => `${l.role}:${l.hp.toFixed(0)}`)
+        .join(", ");
+      inspLimbHp.textContent = limbInfo || "-";
+      inspPos.textContent = `${selectedEntity.centerX.toFixed(1)}, ${selectedEntity.centerY.toFixed(1)}`;
+      inspVel.textContent = "-";
+      inspMode.textContent = selectedEntity.mode;
+    } else if (selectedEntity.type === "limb") {
+      inspHp.textContent = `${selectedEntity.hp.toFixed(1)} / ${selectedEntity.maxHp.toFixed(1)}`;
+      inspLimbHp.textContent = selectedEntity.role;
       inspPos.textContent = `${selectedEntity.x.toFixed(1)}, ${selectedEntity.y.toFixed(1)}`;
       inspVel.textContent = `${(selectedEntity.vx ?? 0).toFixed(2)}, ${(selectedEntity.vy ?? 0).toFixed(2)}`;
-      inspMode.textContent =
-        selectedEntity.type === "npc" ? selectedEntity.mode : "-";
-      inspId.textContent = selectedEntity.id;
+      inspMode.textContent = selectedEntity.parentNpc ? selectedEntity.parentNpc.mode : "-";
+    } else {
+      inspHp.textContent = "-";
+      inspLimbHp.textContent = "-";
+      inspPos.textContent = `${selectedEntity.x.toFixed(1)}, ${selectedEntity.y.toFixed(1)}`;
+      inspVel.textContent = `${(selectedEntity.vx ?? 0).toFixed(2)}, ${(selectedEntity.vy ?? 0).toFixed(2)}`;
+      inspMode.textContent = "-";
     }
 
-    function updateStats() {
-      statObjects.textContent = objects.length;
-      statNPCs.textContent = npcs.length;
-      statProjectiles.textContent = projectiles.length;
-      statTerrain.textContent = terrainBlocks.length;
+    inspId.textContent = selectedEntity.id;
+  }
+
+  function updateStats() {
+    statObjects.textContent = objects.length;
+    statNPCs.textContent = npcs.length;
+    statLimbs.textContent = limbs.length;
+    statProjectiles.textContent = projectiles.length;
+    statTerrain.textContent = terrainBlocks.length;
+    statRopes.textContent = ropes.length;
+    statWelds.textContent = welds.length;
+  }
+
+  // ====== MAIN LOOP ======
+  let lastTime = performance.now();
+
+  function drawGrid() {
+    ctx.strokeStyle = "#020617";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += GRID_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += GRID_SIZE) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+  }
+
+  function update(dt) {
+    if (slowmoHeld || cinematicSlowmoTimer > 0) {
+      timeScale = 0.25;
+      if (cinematicSlowmoTimer > 0) cinematicSlowmoTimer -= dt;
+    } else {
+      timeScale = 1;
     }
 
-    // ——— MAIN LOOP ———
-    function update() {
-      // NPC behavior
-      for (const n of npcs) {
-        n.updateBehavior();
-      }
+    const scaledDt = dt * timeScale;
 
-      // physics for objects + npcs
-      const dynamicEntities = [...objects, ...npcs];
-      for (const e of dynamicEntities) {
-        e.applyPhysics();
-      }
-
-      // simple object-object collisions
-      for (let i = 0; i < dynamicEntities.length; i++) {
-        for (let j = i + 1; j < dynamicEntities.length; j++) {
-          const a = dynamicEntities[i];
-          const b = dynamicEntities[j];
-          if (aabbOverlap(a, b)) {
-            const overlapX =
-              a.x + a.w / 2 < b.x + b.w / 2
-                ? a.x + a.w - b.x
-                : b.x + b.w - a.x;
-            const overlapY =
-              a.y + a.h / 2 < b.y + b.h / 2
-                ? a.y + a.h - b.y
-                : b.y + b.h - a.y;
-
-            if (overlapX < overlapY) {
-              const dir = a.x < b.x ? -1 : 1;
-              a.x += (overlapX / 2) * dir;
-              b.x -= (overlapX / 2) * dir;
-              const temp = a.vx;
-              a.vx = b.vx * 0.5;
-              b.vx = temp * 0.5;
-            } else {
-              const dir = a.y < b.y ? -1 : 1;
-              a.y += (overlapY / 2) * dir;
-              b.y -= (overlapY / 2) * dir;
-              const temp = a.vy;
-              a.vy = b.vy * 0.5;
-              b.vy = temp * 0.5;
-            }
-          }
-        }
-      }
-
-      // projectiles
-      for (let i = projectiles.length - 1; i >= 0; i--) {
-        const p = projectiles[i];
-        p.update();
-        if (p.life <= 0) {
-          projectiles.splice(i, 1);
-        }
-      }
-
-      updateStats();
-      updateInspector();
+    for (const n of npcs) {
+      n.updateBehavior(scaledDt);
     }
 
-    function drawGrid() {
-      ctx.strokeStyle = "#020617";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < canvas.height; y += GRID_SIZE) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
+    for (const o of objects) {
+      o.applyPhysics(scaledDt);
+    }
+    for (const l of limbs) {
+      l.applyPhysics(scaledDt);
     }
 
-    function render() {
-      ctx.fillStyle = "#020617";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    updateLimbJoints(scaledDt);
 
-      drawGrid();
-
-      // terrain
-      for (const t of terrainBlocks) {
-        t.draw();
-      }
-
-      // objects
-      for (const o of objects) {
-        o.draw();
-      }
-
-      // npcs
-      for (const n of npcs) {
-        n.draw();
-      }
-
-      // projectiles
-      for (const p of projectiles) {
-        p.draw();
-      }
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+      const p = projectiles[i];
+      p.update(scaledDt);
+      if (p.life <= 0) projectiles.splice(i, 1);
     }
 
-    function loop() {
-      update();
-      render();
-      requestAnimationFrame(loop);
+    for (let i = ropes.length - 1; i >= 0; i--) {
+      const r = ropes[i];
+      r.update(scaledDt);
+      if (r.broken) ropes.splice(i, 1);
     }
 
-    // seed a little world
-    for (let i = 0; i < 4; i++) spawnBox(80 + i * 50, 40);
-    spawnNPC(260, 40);
+    for (const w of welds) {
+      w.update(scaledDt);
+    }
 
-    loop();
-  </script>
-</body>
-</html>
+    updateGravityGun(scaledDt, lastMouseX, lastMouseY);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * scaledDt;
+      p.y += p.vy * scaledDt;
+      p.vy += 0.05 * scaledDt;
+      p.life -= scaledDt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    autoSaveTimer += dt;
+    if (autoSaveTimer > 600) {
+      autoSaveTimer = 0;
+      const data = serializeWorld();
+      localStorage.setItem("miniPlaygroundWorld", data);
+    }
+
+    updateStats();
+    updateInspector();
+  }
+
+  function render() {
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawGrid();
+
+    for (const t of terrainBlocks) t.draw();
+    for (const o of objects) o.draw();
+    for (const l of limbs) l.draw();
+    for (const n of npcs) n.draw();
+    for (const r of ropes) r.draw();
+    for (const w of welds) w.draw();
+    for (const p of projectiles) p.draw();
+
+    for (const p of particles) {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function loop(now) {
+    const dt = (now - lastTime) / (1000 / 60);
+    lastTime = now;
+    update(dt);
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  // Seed world
+  spawnBox(80, 40);
+  spawnBall(140, 40);
+  spawnTriangle(200, 40);
+  spawnCapsule(260, 40);
+  spawnCylinder(320, 40);
+  spawnPlank(380, 40);
+  spawnRamp(460, 40);
+  spawnSpike(520, 40);
+  spawnCustom(580, 40);
+  spawnNPC(260, 80);
+
+  requestAnimationFrame(loop);
+</script>
