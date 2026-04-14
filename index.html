@@ -88,6 +88,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-top: auto;
+  margin-bottom: 10px; /* moved slightly up */
 }
 
 .settings-icon:hover {
@@ -145,7 +146,8 @@ body {
 /* -------------------------------------------------- */
 /* FULLSCREEN SETTINGS PAGE                           */
 /* -------------------------------------------------- */
-.settings-page {
+.settings-page,
+.category-page {
   display: none;
   position: absolute;
   top: 70px;
@@ -159,12 +161,14 @@ body {
   transition: 0.3s ease;
 }
 
-.sidebar.closed ~ .settings-page {
+.sidebar.closed ~ .settings-page,
+.sidebar.closed ~ .category-page {
   left: 0;
   width: 100%;
 }
 
-.settings-page h2 {
+.settings-page h2,
+.category-page h2 {
   margin-top: 0;
 }
 
@@ -188,9 +192,9 @@ body {
 <div class="sidebar" id="sidebar">
   <h2>homewrk</h2>
 
-  <button class="nav-btn" onclick="openPage('games.html')">Games</button>
-  <button class="nav-btn" onclick="openPage('tools.html')">Tools</button>
-  <button class="nav-btn" onclick="openPage('other.html')">Other</button>
+  <button class="nav-btn" onclick="openCategory('games')">Games</button>
+  <button class="nav-btn" onclick="openCategory('tools')">Tools</button>
+  <button class="nav-btn" onclick="openCategory('other')">Other</button>
 
   <div class="settings-icon" onclick="openSettings()">⚙️</div>
 </div>
@@ -201,7 +205,23 @@ body {
   <div class="topbar-title">homewrk</div>
 </div>
 
-<!-- FULLSCREEN SETTINGS PAGE -->
+<!-- CATEGORY PAGES -->
+<div class="category-page" id="gamesPage">
+  <h2>Games</h2>
+  <p style="color:var(--muted)">Your games content goes here.</p>
+</div>
+
+<div class="category-page" id="toolsPage">
+  <h2>Tools</h2>
+  <p style="color:var(--muted)">Your tools content goes here.</p>
+</div>
+
+<div class="category-page" id="otherPage">
+  <h2>Other</h2>
+  <p style="color:var(--muted)">Your other content goes here.</p>
+</div>
+
+<!-- SETTINGS PAGE -->
 <div class="settings-page" id="settingsPage">
   <h2>Settings</h2>
 
@@ -226,13 +246,19 @@ function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("closed");
 }
 
-/* OPEN PAGE */
-function openPage(url) {
-  window.location.href = url;
+/* OPEN CATEGORY */
+function openCategory(name) {
+  document.getElementById("settingsPage").style.display = "none";
+
+  document.querySelectorAll(".category-page").forEach(p => p.style.display = "none");
+
+  document.getElementById(name + "Page").style.display = "block";
 }
 
-/* OPEN SETTINGS PAGE */
+/* OPEN SETTINGS */
 function openSettings() {
+  document.querySelectorAll(".category-page").forEach(p => p.style.display = "none");
+
   const page = document.getElementById("settingsPage");
   page.style.display = page.style.display === "block" ? "none" : "block";
 }
