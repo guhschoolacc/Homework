@@ -3,12 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Website</title>
+<title>Smooth Dashboard</title>
 
 <style>
+    :root {
+        --bg: #f4f6fa;
+        --sidebar-bg: #1f1f1f;
+        --sidebar-accent: #2c2c2c;
+        --text-light: #ffffff;
+        --text-dark: #333;
+        --highlight: #4a90e2;
+        --radius: 14px;
+        --shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", sans-serif;
+        background: var(--bg);
         display: flex;
         height: 100vh;
         overflow: hidden;
@@ -16,51 +28,47 @@
 
     /* Sidebar */
     #sidebar {
-        width: 250px;
-        background: #222;
-        color: white;
-        transition: 0.3s;
-        padding-top: 20px;
+        width: 260px;
+        background: var(--sidebar-bg);
+        color: var(--text-light);
         position: fixed;
-        left: 0;
         top: 0;
         bottom: 0;
+        left: 0;
+        padding: 25px 0;
+        transition: 0.35s ease;
+        box-shadow: var(--shadow);
+        border-radius: 0 var(--radius) var(--radius) 0;
     }
 
     #sidebar.closed {
-        left: -250px;
+        left: -260px;
     }
 
     #sidebar h2 {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        font-weight: 500;
+        letter-spacing: 1px;
     }
 
     #sidebar button {
-        width: 100%;
-        padding: 15px;
-        background: #333;
+        width: 85%;
+        margin: 8px auto;
+        padding: 14px;
+        background: var(--sidebar-accent);
         border: none;
-        color: white;
+        border-radius: var(--radius);
+        color: var(--text-light);
         font-size: 16px;
         cursor: pointer;
-        text-align: left;
+        display: block;
+        transition: 0.25s;
     }
 
     #sidebar button:hover {
-        background: #444;
-    }
-
-    /* Main content */
-    #content {
-        margin-left: 250px;
-        padding: 20px;
-        width: 100%;
-        transition: 0.3s;
-    }
-
-    #content.full {
-        margin-left: 0;
+        background: var(--highlight);
+        transform: translateX(4px);
     }
 
     /* Toggle button */
@@ -68,21 +76,53 @@
         position: absolute;
         top: 15px;
         left: 15px;
-        padding: 10px 15px;
-        background: #222;
-        color: white;
+        padding: 10px 14px;
+        background: var(--sidebar-bg);
+        color: var(--text-light);
         border: none;
+        border-radius: var(--radius);
         cursor: pointer;
         z-index: 1000;
+        box-shadow: var(--shadow);
+        transition: 0.3s;
     }
 
-    /* Category sections */
+    #toggleBtn:hover {
+        background: var(--highlight);
+    }
+
+    /* Main content */
+    #content {
+        margin-left: 260px;
+        padding: 30px;
+        width: 100%;
+        transition: 0.35s ease;
+    }
+
+    #content.full {
+        margin-left: 0;
+    }
+
+    h1, h2 {
+        color: var(--text-dark);
+    }
+
     .section {
         display: none;
+        background: white;
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        animation: fadeIn 0.4s ease;
     }
 
     .active {
         display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 </head>
@@ -92,9 +132,9 @@
 
 <div id="sidebar">
     <h2>Dashboard</h2>
-    <button onclick="showSection('games')">Games</button>
-    <button onclick="showSection('tools')">Tools</button>
-    <button onclick="showSection('other')">Other</button>
+    <button onclick="showSection('games')">🎮 Games</button>
+    <button onclick="showSection('tools')">🛠️ Tools</button>
+    <button onclick="showSection('other')">📁 Other</button>
 </div>
 
 <div id="content">
