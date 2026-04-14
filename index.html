@@ -19,94 +19,14 @@
   --transition: 0.25s ease;
 }
 
-/* LIGHT THEME */
-body.light {
-  --bg: #f5f5f5;
-  --card: #ffffff;
-  --text: #111;
-  --muted: #555;
-  --accent: #4f46e5;
-  --border: #ddd;
-}
-
-/* NEON THEME */
-body.neon {
-  --bg: #000000;
-  --card: #0a0a0a;
-  --text: #00ffea;
-  --muted: #00b3a4;
-  --accent: #ff00ff;
-  --border: #222;
-}
-
-/* SOLARIZED */
-body.solarized {
-  --bg: #002b36;
-  --card: #073642;
-  --text: #eee8d5;
-  --muted: #93a1a1;
-  --accent: #b58900;
-  --border: #0f3a44;
-}
-
-/* MIDNIGHT PURPLE */
-body.midnight {
-  --bg: #0b0014;
-  --card: #1a0b2e;
-  --text: #e3d7ff;
-  --muted: #a88cd9;
-  --accent: #b26bff;
-  --border: #2d1a47;
-}
-
-/* GRADIENT THEMES */
-body.gradient1 {
-  --bg: linear-gradient(135deg, #1e3a8a, #6d28d9);
-  --card: rgba(0,0,0,0.35);
-  --text: #ffffff;
-  --muted: #d1d5db;
-  --accent: #a78bfa;
-  --border: rgba(255,255,255,0.12);
-}
-
-body.gradient2 {
-  --bg: linear-gradient(135deg, #f97316, #db2777);
-  --card: rgba(0,0,0,0.35);
-  --text: #ffffff;
-  --muted: #ffe4e6;
-  --accent: #fb7185;
-  --border: rgba(255,255,255,0.12);
-}
-
-body.gradient3 {
-  --bg: linear-gradient(135deg, #0f172a, #00ff95);
-  --card: rgba(0,0,0,0.35);
-  --text: #eafff5;
-  --muted: #94fbd1;
-  --accent: #00ff95;
-  --border: rgba(255,255,255,0.12);
-}
-
-/* CUSTOM THEME */
-body.custom {
-  --bg: var(--custom-bg);
-  --card: var(--custom-card);
-  --text: var(--custom-text);
-  --muted: var(--custom-muted);
-  --accent: var(--custom-accent);
-  --border: var(--custom-border);
-}
-
-/* -------------------------------------------------- */
-/* GLOBAL STYLES                                      */
-/* -------------------------------------------------- */
+/* GLOBAL */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: background var(--transition), color var(--transition);
   display: flex;
+  transition: background var(--transition), color var(--transition);
 }
 
 /* -------------------------------------------------- */
@@ -199,9 +119,7 @@ body {
   width: 100%;
 }
 
-/* -------------------------------------------------- */
-/* SECTION CARDS                                      */
-/* -------------------------------------------------- */
+/* SECTION CARDS */
 .section-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -235,28 +153,6 @@ body {
   border-color: var(--accent);
   transform: translateY(-4px);
 }
-
-/* -------------------------------------------------- */
-/* CUSTOM THEME PANEL                                 */
-/* -------------------------------------------------- */
-.custom-panel {
-  display: none;
-  margin-top: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-.custom-panel input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-}
 </style>
 </head>
 
@@ -266,50 +162,20 @@ body {
 <div class="sidebar" id="sidebar">
   <h2>homewrk</h2>
 
-  <button class="nav-btn" onclick="openPage('ai.html')">AI Tools</button>
-  <button class="nav-btn" onclick="openPage('music.html')">Music & Audio</button>
-  <button class="nav-btn" onclick="openPage('games.html')">Games & Coding</button>
-  <button class="nav-btn" onclick="openPage('system.html')">System Tools</button>
-
-  <hr style="border-color:var(--border);margin:20px 0;">
-
-  <select id="themeSelect" class="nav-btn" onchange="onThemeChange(this.value)">
-    <option value="dark">Dark</option>
-    <option value="light">Light</option>
-    <option value="neon">Neon</option>
-    <option value="solarized">Solarized</option>
-    <option value="midnight">Midnight</option>
-    <option value="gradient1">Blue‑Purple Gradient</option>
-    <option value="gradient2">Sunset Gradient</option>
-    <option value="gradient3">Cyber Green Gradient</option>
-    <option value="custom">Custom</option>
-  </select>
-
-  <div class="custom-panel" id="customPanel">
-    <label>Background</label><input type="color" id="c-bg">
-    <label>Card</label><input type="color" id="c-card">
-    <label>Text</label><input type="color" id="c-text">
-    <label>Muted Text</label><input type="color" id="c-muted">
-    <label>Accent</label><input type="color" id="c-accent">
-    <label>Border</label><input type="color" id="c-border">
-    <button onclick="applyCustomTheme()" class="nav-btn" style="margin-top:10px;">Apply</button>
-  </div>
+  <button class="nav-btn" onclick="openPage('games.html')">Games</button>
+  <button class="nav-btn" onclick="openPage('tools.html')">Tools</button>
+  <button class="nav-btn" onclick="openPage('other.html')">Other</button>
 </div>
 
 <!-- TOP BAR -->
 <div class="topbar" id="topbar">
   <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
-  <div class="topbar-title">Dashboard</div>
+  <div class="topbar-title">homewrk</div>
 </div>
 
 <!-- MAIN CONTENT -->
 <div class="main">
-  <div class="section-card">
-    <h2>Welcome</h2>
-    <p style="color:var(--muted);font-size:15px;">
-      Select a category from the left to begin.
-    </p>
-  </div>
+  <!-- EMPTY MAIN AREA (you asked to remove welcome/dashboard) -->
 </div>
 
 <script>
@@ -319,59 +185,10 @@ function toggleSidebar() {
   sidebar.classList.toggle("closed");
 }
 
-/* THEME SWITCHING */
-function applyThemeClass(theme) {
-  document.body.className = '';
-  if (!theme || theme === 'dark') {
-    document.body.className = 'dark';
-    return;
-  }
-  document.body.className = theme;
-}
-
-function onThemeChange(value) {
-  if (value === 'custom') {
-    document.getElementById('customPanel').style.display = 'block';
-  } else {
-    document.getElementById('customPanel').style.display = 'none';
-  }
-  localStorage.setItem('guh_theme', value);
-  applyThemeClass(value);
-}
-
-/* APPLY CUSTOM THEME */
-function applyCustomTheme() {
-  const bg = document.getElementById('c-bg').value;
-  const card = document.getElementById('c-card').value;
-  const text = document.getElementById('c-text').value;
-  const muted = document.getElementById('c-muted').value;
-  const accent = document.getElementById('c-accent').value;
-  const border = document.getElementById('c-border').value;
-
-  document.documentElement.style.setProperty('--custom-bg', bg);
-  document.documentElement.style.setProperty('--custom-card', card);
-  document.documentElement.style.setProperty('--custom-text', text);
-  document.documentElement.style.setProperty('--custom-muted', muted);
-  document.documentElement.style.setProperty('--custom-accent', accent);
-  document.documentElement.style.setProperty('--custom-border', border);
-
-  localStorage.setItem('guh_theme', 'custom');
-  document.getElementById('themeSelect').value = 'custom';
-  applyThemeClass('custom');
-}
-
 /* OPEN PAGE */
 function openPage(url) {
   window.location.href = url;
 }
-
-/* LOAD SAVED THEME */
-(function(){
-  const saved = localStorage.getItem('guh_theme') || 'dark';
-  document.getElementById('themeSelect').value = saved;
-  if (saved === 'custom') document.getElementById('customPanel').style.display = 'block';
-  applyThemeClass(saved);
-})();
 </script>
 
 </body>
