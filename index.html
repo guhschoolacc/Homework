@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Guh Website Slop</title>
+<title>homewrk</title>
 
 <style>
 /* -------------------------------------------------- */
@@ -106,72 +106,97 @@ body {
   background: var(--bg);
   color: var(--text);
   transition: background var(--transition), color var(--transition);
-}
-
-.page {
-  max-width: 1350px;
-  margin: auto;
-  padding: 30px;
+  display: flex;
 }
 
 /* -------------------------------------------------- */
-/* GLASS HEADER                                       */
+/* COLLAPSIBLE SIDEBAR                                */
 /* -------------------------------------------------- */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 24px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-logo {
-  width: 48px;
-  height: 48px;
-  background: var(--accent);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: #fff;
-  font-size: 20px;
-}
-
-.theme-dropdown {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
+.sidebar {
+  width: 240px;
   background: var(--card);
-  color: var(--muted);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: transform 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+}
+
+.sidebar.closed {
+  transform: translateX(-260px);
+}
+
+.sidebar h2 {
+  margin: 0 0 20px 0;
+  font-size: 22px;
+}
+
+.nav-btn {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  transition: 0.2s;
+  text-align: left;
+  color: var(--text);
+}
+
+.nav-btn:hover {
+  border-color: var(--accent);
+  transform: translateX(4px);
 }
 
 /* -------------------------------------------------- */
-/* DASHBOARD GRID                                     */
+/* TOP BAR                                            */
 /* -------------------------------------------------- */
-.dashboard {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
+.topbar {
+  height: 70px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
-@media (max-width: 900px) {
-  .dashboard {
-    grid-template-columns: 1fr;
-  }
+.sidebar.closed + .topbar {
+  margin-left: 0;
+  width: 100%;
+}
+
+.menu-toggle {
+  margin-right: 16px;
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.topbar-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------- */
+/* MAIN CONTENT                                       */
+/* -------------------------------------------------- */
+.main {
+  margin-left: 240px;
+  padding: 30px;
+  width: calc(100% - 240px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.sidebar.closed ~ .main {
+  margin-left: 0;
+  width: 100%;
 }
 
 /* -------------------------------------------------- */
@@ -183,6 +208,7 @@ header {
   padding: 26px;
   border-radius: 20px;
   box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  margin-bottom: 28px;
 }
 
 .section-card h2 {
@@ -190,9 +216,6 @@ header {
   font-size: 22px;
 }
 
-/* -------------------------------------------------- */
-/* TOOL GRID + CARDS                                  */
-/* -------------------------------------------------- */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -206,22 +229,11 @@ header {
   border-radius: 14px;
   cursor: pointer;
   transition: 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 15px;
 }
 
 .tool-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-}
-
-.tool-icon {
-  width: 22px;
-  height: 22px;
-  opacity: 0.8;
 }
 
 /* -------------------------------------------------- */
@@ -249,18 +261,19 @@ header {
 </head>
 
 <body>
-<div class="page">
 
-<header>
-  <div class="brand">
-    <div class="brand-logo">GW</div>
-    <div>
-      <h2 style="margin:0;">Guh Website Slop</h2>
-      <p style="margin:0;color:var(--muted);font-size:13px;">All‑in‑one Slop Studio</p>
-    </div>
-  </div>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h2>homewrk</h2>
 
-  <select id="themeSelect" class="theme-dropdown" onchange="onThemeChange(this.value)">
+  <button class="nav-btn" onclick="openPage('ai.html')">AI Tools</button>
+  <button class="nav-btn" onclick="openPage('music.html')">Music & Audio</button>
+  <button class="nav-btn" onclick="openPage('games.html')">Games & Coding</button>
+  <button class="nav-btn" onclick="openPage('system.html')">System Tools</button>
+
+  <hr style="border-color:var(--border);margin:20px 0;">
+
+  <select id="themeSelect" class="nav-btn" onchange="onThemeChange(this.value)">
     <option value="dark">Dark</option>
     <option value="light">Light</option>
     <option value="neon">Neon</option>
@@ -271,93 +284,41 @@ header {
     <option value="gradient3">Cyber Green Gradient</option>
     <option value="custom">Custom</option>
   </select>
-</header>
 
-<!-- CUSTOM THEME PANEL -->
-<div class="custom-panel" id="customPanel">
-  <label>Background</label><input type="color" id="c-bg">
-  <label>Card</label><input type="color" id="c-card">
-  <label>Text</label><input type="color" id="c-text">
-  <label>Muted Text</label><input type="color" id="c-muted">
-  <label>Accent</label><input type="color" id="c-accent">
-  <label>Border</label><input type="color" id="c-border">
-  <button onclick="applyCustomTheme()" class="theme-dropdown" style="margin-top:10px;">Apply</button>
+  <div class="custom-panel" id="customPanel">
+    <label>Background</label><input type="color" id="c-bg">
+    <label>Card</label><input type="color" id="c-card">
+    <label>Text</label><input type="color" id="c-text">
+    <label>Muted Text</label><input type="color" id="c-muted">
+    <label>Accent</label><input type="color" id="c-accent">
+    <label>Border</label><input type="color" id="c-border">
+    <button onclick="applyCustomTheme()" class="nav-btn" style="margin-top:10px;">Apply</button>
+  </div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="dashboard">
-
-  <!-- LEFT -->
-  <div>
-    <div class="section-card">
-      <h2>AI Tools</h2>
-      <div class="tools-grid">
-        <div class="tool-card" onclick="openPage('image-generator.html')">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/image.png" class="tool-icon">
-          Image Generator
-        </div>
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/edit.png" class="tool-icon">
-          Image Editor
-        </div>
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/video.png" class="tool-icon">
-          Video Generator
-        </div>
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/code.png" class="tool-icon">
-          AI Coder
-        </div>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <h2>Music & Audio</h2>
-      <div class="tools-grid">
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/musical-notes.png" class="tool-icon">
-          Music Generator
-        </div>
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/mixer.png" class="tool-icon">
-          FL Studio Clone
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT -->
-  <div>
-    <div class="section-card">
-      <h2>Games & Coding</h2>
-      <div class="tools-grid">
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/controller.png" class="tool-icon">
-          Game Builder
-        </div>
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/arcade-cabinet.png" class="tool-icon">
-          Arcade
-        </div>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <h2>System Tools</h2>
-      <div class="tools-grid">
-        <div class="tool-card">
-          <img src="https://img.icons8.com/ios-filled/50/ffffff/export.png" class="tool-icon">
-          Project Export
-        </div>
-      </div>
-    </div>
-  </div>
-
+<!-- TOP BAR -->
+<div class="topbar" id="topbar">
+  <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+  <div class="topbar-title">Dashboard</div>
 </div>
 
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="section-card">
+    <h2>Welcome</h2>
+    <p style="color:var(--muted);font-size:15px;">
+      Select a category from the left to begin.
+    </p>
+  </div>
 </div>
 
 <script>
+/* SIDEBAR TOGGLE */
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.toggle("closed");
+}
+
 /* THEME SWITCHING */
 function applyThemeClass(theme) {
   document.body.className = '';
