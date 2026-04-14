@@ -1,168 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Core</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homewrk – Launch Deck</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: "Inter", sans-serif;
-            background: radial-gradient(circle at top, #1a1a1d, #0b0b0d 70%);
-            color: white;
-            overflow-x: hidden;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0d0d0d;
+        color: white;
+        overflow: hidden;
+    }
 
-        /* Floating Glow Background */
-        .glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(120,0,255,0.35), transparent 70%);
-            top: -150px;
-            left: -150px;
-            filter: blur(80px);
-            animation: drift 12s infinite alternate ease-in-out;
-            z-index: -2;
-        }
+    .slide {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px;
+        box-sizing: border-box;
+        transition: opacity 0.6s ease;
+    }
 
-        @keyframes drift {
-            from { transform: translate(0,0); }
-            to { transform: translate(80px, 60px); }
-        }
+    h1 {
+        font-size: 3.5rem;
+        margin-bottom: 10px;
+    }
 
-        /* Navigation */
-        .navbar {
-            width: 100%;
-            height: 75px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 50px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: rgba(20,20,25,0.35);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            z-index: 10;
-        }
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
 
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+    p {
+        max-width: 700px;
+        font-size: 1.2rem;
+        opacity: 0.85;
+    }
 
-        .nav-links a {
-            margin-left: 25px;
-            text-decoration: none;
-            color: #dcdcdc;
-            font-size: 17px;
-            transition: 0.2s;
-        }
+    .nav {
+        position: fixed;
+        bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
 
-        .nav-links a:hover {
-            color: white;
-        }
+    .btn {
+        padding: 12px 22px;
+        background: #ffffff15;
+        border: 1px solid #ffffff30;
+        border-radius: 8px;
+        cursor: pointer;
+        color: white;
+        font-size: 1rem;
+        transition: 0.2s;
+    }
 
-        /* Hero Section */
-        .hero {
-            margin-top: 180px;
-            text-align: center;
-            padding: 0 20px;
-        }
+    .btn:hover {
+        background: #ffffff25;
+    }
 
-        .hero h1 {
-            font-size: 60px;
-            font-weight: 800;
-            background: linear-gradient(90deg, #b57cff, #7f5bff, #caa8ff);
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        .hero p {
-            margin-top: -10px;
-            font-size: 20px;
-            color: #cfcfcf;
-            opacity: 0.85;
-        }
-
-        /* Category Grid */
-        .grid {
-            margin-top: 60px;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            flex-wrap: wrap;
-            padding: 0 20px;
-        }
-
-        .card {
-            width: 260px;
-            height: 150px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 22px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.25s;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 0 25px rgba(150,80,255,0.25);
-        }
-
-        footer {
-            margin-top: 140px;
-            text-align: center;
-            color: #777;
-            font-size: 14px;
-            padding-bottom: 40px;
-        }
-    </style>
+    .hidden {
+        display: none;
+    }
+</style>
 </head>
 
 <body>
 
-    <div class="glow"></div>
+<!-- Slide 1 -->
+<div class="slide" id="slide1">
+    <h1>Homewrk</h1>
+    <h2>Your Unblocked Game Hub</h2>
+    <p>Fast, clean, and loaded with hundreds of unblocked games — all in one place.</p>
+</div>
 
-    <!-- Navigation -->
-    <div class="navbar">
-        <div class="logo">Nebula Core</div>
-        <div class="nav-links">
-            <a href="#">Dashboard</a>
-            <a href="#">Games</a>
-            <a href="#">AI Tools</a>
-            <a href="#">Settings</a>
-        </div>
-    </div>
+<!-- Slide 2 -->
+<div class="slide hidden" id="slide2">
+    <h1>The Problem</h1>
+    <p>Most game sites are slow, cluttered, or blocked. Students need a fast, simple, reliable place to play.</p>
+</div>
 
-    <!-- Hero -->
-    <div class="hero">
-        <h1>Welcome to Nebula Core</h1>
-        <p>Your gateway to tools, games, and creativity.</p>
-    </div>
+<!-- Slide 3 -->
+<div class="slide hidden" id="slide3">
+    <h1>The Solution</h1>
+    <p>Homewrk delivers a clean dashboard, instant‑load game cards, and a massive library of unblocked ports.</p>
+</div>
 
-    <!-- Category Grid -->
-    <div class="grid">
-        <div class="card">Games</div>
-        <div class="card">AI Tools</div>
-        <div class="card">Utilities</div>
-        <div class="card">Creative</div>
-    </div>
+<!-- Slide 4 -->
+<div class="slide hidden" id="slide4">
+    <h1>Features</h1>
+    <p>• Hundreds of unblocked games<br>
+       • Fast-loading grid layout<br>
+       • Clean left dashboard<br>
+       • Mobile-friendly<br>
+       • Zero ads</p>
+</div>
 
-    <footer>
-        © 2026 Nebula Core — Designed for Exploration
-    </footer>
+<!-- Slide 5 -->
+<div class="slide hidden" id="slide5">
+    <h1>Launch Plan</h1>
+    <p>Phase 1: Core games + dashboard<br>
+       Phase 2: Tools section<br>
+       Phase 3: Entertainment section<br>
+       Phase 4: Custom themes + profiles</p>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide hidden" id="slide6">
+    <h1>Ready to Play</h1>
+    <h2>Homewrk launches soon</h2>
+    <p>Clean. Fast. Unblocked.</p>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+    <button class="btn" onclick="prevSlide()">Previous</button>
+    <button class="btn" onclick="nextSlide()">Next</button>
+</div>
+
+<script>
+let current = 1;
+const total = 6;
+
+function showSlide(n) {
+    for (let i = 1; i <= total; i++) {
+        document.getElementById("slide" + i).classList.add("hidden");
+    }
+    document.getElementById("slide" + n).classList.remove("hidden");
+}
+
+function nextSlide() {
+    current = current === total ? total : current + 1;
+    showSlide(current);
+}
+
+function prevSlide() {
+    current = current === 1 ? 1 : current - 1;
+    showSlide(current);
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") nextSlide();
+    if (e.key === "ArrowLeft") prevSlide();
+});
+</script>
 
 </body>
 </html>
