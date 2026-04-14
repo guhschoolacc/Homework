@@ -36,6 +36,29 @@
       color: var(--text);
     }
 
+    /* Back to dashboard button */
+    .back-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #f7fafc;
+      font-size: 0.85rem;
+      text-decoration: none;
+      backdrop-filter: blur(6px);
+      transition: 0.15s ease;
+      z-index: 9999;
+    }
+
+    .back-btn:hover {
+      background: rgba(79, 209, 197, 0.25);
+      border-color: rgba(79, 209, 197, 0.6);
+      color: #4fd1c5;
+    }
+
     .calculator-shell {
       width: min(420px, 100vw - 24px);
       background: radial-gradient(circle at top left, #1a202c 0, #050712 55%);
@@ -395,21 +418,6 @@
       text-align: right;
     }
 
-    .key.kbd {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .key.kbd span {
-      opacity: 0.9;
-    }
-
-    .key.kbd strong {
-      color: var(--accent);
-      font-weight: 600;
-      margin-right: 3px;
-    }
-
     .key:focus-visible {
       outline: 2px solid #63b3ed;
       outline-offset: 1px;
@@ -417,6 +425,8 @@
   </style>
 </head>
 <body>
+  <a href="index.html" class="back-btn">← Back to Dashboard</a>
+
   <div class="calculator-shell" aria-label="Advanced scientific calculator">
     <div class="calc-header">
       <div class="calc-title">
@@ -795,36 +805,6 @@
         }
       }
 
-      function handleMemory(action) {
-        const current = expression
-          ? Number(evaluateSilent(expression))
-          : lastResult !== null
-          ? Number(lastResult)
-          : 0;
-
-        switch (action) {
-          case "mc":
-            memory = 0;
-            setStatus("Memory cleared");
-            break;
-          case "mr":
-            if (memory !== 0) {
-              appendToExpression(String(memory));
-              setStatus("Memory recalled");
-            }
-            break;
-          case "mplus":
-            memory += current || 0;
-            setStatus("Added to memory");
-            break;
-          case "mminus":
-            memory -= current || 0;
-            setStatus("Subtracted from memory");
-            break;
-        }
-        updateMemoryDisplay();
-      }
-
       function evaluateSilent(expr) {
         try {
           let open = (expr.match(/\(/g) || []).length;
@@ -854,6 +834,36 @@
         } catch {
           return NaN;
         }
+      }
+
+      function handleMemory(action) {
+        const current = expression
+          ? Number(evaluateSilent(expression))
+          : lastResult !== null
+          ? Number(lastResult)
+          : 0;
+
+        switch (action) {
+          case "mc":
+            memory = 0;
+            setStatus("Memory cleared");
+            break;
+          case "mr":
+            if (memory !== 0) {
+              appendToExpression(String(memory));
+              setStatus("Memory recalled");
+            }
+            break;
+          case "mplus":
+            memory += current || 0;
+            setStatus("Added to memory");
+            break;
+          case "mminus":
+            memory -= current || 0;
+            setStatus("Subtracted from memory");
+            break;
+        }
+        updateMemoryDisplay();
       }
 
       keypad.addEventListener("click", (e) => {
