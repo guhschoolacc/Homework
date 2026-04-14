@@ -1,193 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToolHub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Website</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: #0d0d0f;
-            color: #dcdcdc;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
 
-        /* ===== NAVBAR ===== */
-        nav {
-            background: #1a1a1f;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #2e2e38;
-        }
+    /* Sidebar */
+    #sidebar {
+        width: 250px;
+        background: #222;
+        color: white;
+        transition: 0.3s;
+        padding-top: 20px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+    }
 
-        nav h1 {
-            margin: 0;
-            font-size: 26px;
-            font-weight: 700;
-            color: #ffffff;
-        }
+    #sidebar.closed {
+        left: -250px;
+    }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 25px;
-            margin: 0;
-            padding: 0;
-        }
+    #sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        nav ul li a {
-            color: #b5b5b5;
-            text-decoration: none;
-            font-size: 16px;
-            transition: 0.2s;
-        }
+    #sidebar button {
+        width: 100%;
+        padding: 15px;
+        background: #333;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: left;
+    }
 
-        nav ul li a:hover {
-            color: white;
-        }
+    #sidebar button:hover {
+        background: #444;
+    }
 
-        /* ===== HERO ===== */
-        .hero {
-            padding: 70px 30px;
-            background: url('https://i.imgur.com/8fKQZQp.jpeg') center/cover no-repeat;
-            background-blend-mode: multiply;
-            background-color: #111;
-            text-align: left;
-            color: white;
-        }
+    /* Main content */
+    #content {
+        margin-left: 250px;
+        padding: 20px;
+        width: 100%;
+        transition: 0.3s;
+    }
 
-        .hero h2 {
-            font-size: 48px;
-            margin: 0 0 10px 0;
-        }
+    #content.full {
+        margin-left: 0;
+    }
 
-        .hero p {
-            font-size: 20px;
-            opacity: 0.9;
-        }
+    /* Toggle button */
+    #toggleBtn {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 10px 15px;
+        background: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        z-index: 1000;
+    }
 
-        .hero .btn {
-            margin-top: 25px;
-            display: inline-block;
-            padding: 14px 28px;
-            background: #2e2e38;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            border: 2px solid #444;
-            border-radius: 6px;
-            transition: 0.2s;
-        }
+    /* Category sections */
+    .section {
+        display: none;
+    }
 
-        .hero .btn:hover {
-            background: #3a3a45;
-        }
-
-        /* ===== TOOL GRID ===== */
-        .tools-section {
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-
-        .tools-section h3 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            border-left: 6px solid #444;
-            padding-left: 12px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 25px;
-        }
-
-        .tool-card {
-            background: #1a1a1f;
-            padding: 25px;
-            border-radius: 8px;
-            border: 2px solid #2e2e38;
-            transition: 0.2s;
-        }
-
-        .tool-card:hover {
-            border-color: #555;
-            transform: translateY(-4px);
-        }
-
-        .tool-card h4 {
-            margin-top: 0;
-            font-size: 20px;
-            color: white;
-        }
-
-        .tool-card p {
-            opacity: 0.85;
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: #111;
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
-            color: #777;
-            font-size: 14px;
-        }
-    </style>
+    .active {
+        display: block;
+    }
+</style>
 </head>
 <body>
 
-    <nav>
-        <h1>ToolHub</h1>
-        <ul>
-            <li><a href="#tools">Tools</a></li>
-            <li><a href="#">Updates</a></li>
-            <li><a href="#">Community</a></li>
-        </ul>
-    </nav>
+<button id="toggleBtn">☰</button>
 
-    <section class="hero">
-        <h2>Welcome to ToolHub</h2>
-        <p>Your game‑style dashboard for all your tools.</p>
-        <a href="#tools" class="btn">Open Tools</a>
-    </section>
+<div id="sidebar">
+    <h2>Dashboard</h2>
+    <button onclick="showSection('games')">Games</button>
+    <button onclick="showSection('tools')">Tools</button>
+    <button onclick="showSection('other')">Other</button>
+</div>
 
-    <section id="tools" class="tools-section">
-        <h3>Tools</h3>
+<div id="content">
+    <h1>Welcome</h1>
+    <p>Select a category from the dashboard.</p>
 
-        <div class="tools-grid">
+    <div id="games" class="section">
+        <h2>Games</h2>
+        <p>Game content goes here.</p>
+    </div>
 
-            <div class="tool-card">
-                <h4>QR Code Generator</h4>
-                <p>Create QR codes for links, text, WiFi, and more.</p>
-            </div>
+    <div id="tools" class="section">
+        <h2>Tools</h2>
+        <p>Tools content goes here.</p>
+    </div>
 
-            <div class="tool-card">
-                <h4>File Converter</h4>
-                <p>Convert images, documents, audio, and video formats.</p>
-            </div>
+    <div id="other" class="section">
+        <h2>Other</h2>
+        <p>Other content goes here.</p>
+    </div>
+</div>
 
-            <div class="tool-card">
-                <h4>Image Compressor</h4>
-                <p>Reduce image size without losing quality.</p>
-            </div>
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const content = document.getElementById("content");
+    const toggleBtn = document.getElementById("toggleBtn");
 
-            <div class="tool-card">
-                <h4>Text Analyzer</h4>
-                <p>Analyze text for keywords, readability, and more.</p>
-            </div>
+    toggleBtn.onclick = () => {
+        sidebar.classList.toggle("closed");
+        content.classList.toggle("full");
+    };
 
-        </div>
-    </section>
-
-    <footer>
-        © 2026 ToolHub — Game‑style utilities for everyone
-    </footer>
+    function showSection(id) {
+        document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+    }
+</script>
 
 </body>
 </html>
