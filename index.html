@@ -16,7 +16,6 @@
   --muted: #bbbbbb;
   --accent: #6366f1;
   --border: #222;
-  --accent-rgb: 99,102,241; /* auto-updated by JS */
 }
 
 /* -------------------------------------------------- */
@@ -34,11 +33,12 @@ body.light {
 }
 
 body.neon {
-  --bg: #000;
-  --card: #0a0a0a;
+  --bg: #000000;
+  --card: #050509;
   --text: #00ffee;
   --muted: #00b3a4;
   --accent: #ff00ff;
+  --border: #262626;
 }
 
 body.midnight {
@@ -47,6 +47,7 @@ body.midnight {
   --text: #e3d7ff;
   --muted: #a88cd9;
   --accent: #b26bff;
+  --border: #2b1744;
 }
 
 body.solarized {
@@ -55,21 +56,34 @@ body.solarized {
   --text: #eee8d5;
   --muted: #93a1a1;
   --accent: #b58900;
+  --border: #0f3b46;
 }
 
 body.gradient1 {
   --bg: linear-gradient(135deg, #1e3a8a, #6d28d9);
-  --card: rgba(0,0,0,0.35);
+  --card: rgba(15, 23, 42, 0.85);
+  --text: #e5e7ff;
+  --muted: #a5b4fc;
+  --accent: #a855f7;
+  --border: rgba(148, 163, 184, 0.6);
 }
 
 body.gradient2 {
   --bg: linear-gradient(135deg, #f97316, #db2777);
-  --card: rgba(0,0,0,0.35);
+  --card: rgba(15, 23, 42, 0.85);
+  --text: #fff7ed;
+  --muted: #fed7aa;
+  --accent: #fb7185;
+  --border: rgba(248, 250, 252, 0.35);
 }
 
 body.gradient3 {
   --bg: linear-gradient(135deg, #0f172a, #00ff95);
-  --card: rgba(0,0,0,0.35);
+  --card: rgba(15, 23, 42, 0.9);
+  --text: #e0fdf4;
+  --muted: #6ee7b7;
+  --accent: #22c55e;
+  --border: rgba(148, 163, 184, 0.6);
 }
 
 /* -------------------------------------------------- */
@@ -106,7 +120,7 @@ body {
   margin: 0 0 20px 0;
 }
 
-/* THEME-MATCHING CATEGORY BUTTONS */
+/* NAV BUTTONS (THEME MATCHING) */
 .nav-btn {
   padding: 12px;
   margin-bottom: 10px;
@@ -116,12 +130,12 @@ body {
   cursor: pointer;
   text-align: left;
   color: var(--text);
-  transition: 0.25s ease;
+  transition: 0.2s ease;
 }
 
 .nav-btn:hover {
   border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.15);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .settings-icon {
@@ -169,22 +183,22 @@ body {
   margin-top: 0;
 }
 
-/* THEME-MATCHING ACTION BUTTONS */
+/* CATEGORY ACTION BUTTONS (THEME MATCHING) */
 .action-btn {
   padding: 14px;
-  background: var(--accent);
+  background: var(--card);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
   margin-top: 15px;
   font-size: 16px;
-  transition: 0.25s ease;
+  transition: 0.2s ease;
 }
 
 .action-btn:hover {
-  opacity: 0.85;
-  transform: translateY(-2px);
+  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.35);
 }
 
 /* Theme option styling */
@@ -281,32 +295,14 @@ function openPage(name) {
 function setTheme(theme) {
   document.body.className = theme;
   localStorage.setItem("homewrk_theme", theme);
-  updateAccentRGB();
 }
 
 (function(){
   const saved = localStorage.getItem("homewrk_theme") || "dark";
   document.body.className = saved;
+  // default page
+  openPage('games');
 })();
-
-/* Convert hex → rgb for hover effects */
-function hexToRgb(hex) {
-  const c = hex.replace('#', '');
-  const bigint = parseInt(c, 16);
-  return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
-}
-
-function updateAccentRGB() {
-  const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-  if (accent.startsWith('#')) {
-    document.documentElement.style.setProperty('--accent-rgb', hexToRgb(accent));
-  } else {
-    document.documentElement.style.setProperty('--accent-rgb', "99,102,241");
-  }
-}
-
-new MutationObserver(updateAccentRGB).observe(document.body, { attributes: true });
-updateAccentRGB();
 </script>
 
 </body>
