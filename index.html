@@ -16,7 +16,41 @@
       --danger:#ef4444;
       --success:#10b981;
       --notif-dot:#ef4444;
+      --radius:12px;
+      --shadow:0 6px 18px rgba(0,0,0,0.5);
+      --font-scale:1;
     }
+
+    /* Theme presets classes (toggle by adding class to <html>) */
+    .theme-light{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent-1:#2563eb;
+      --accent-2:#7c3aed;
+    }
+    .theme-solar{
+      --bg:#fdf6e3;
+      --card:#fffaf0;
+      --muted:#6b6b4f;
+      --accent-1:#b58900;
+      --accent-2:#268bd2;
+    }
+    .theme-neon{
+      --bg:#0b0b10;
+      --card:#0f0f14;
+      --muted:#9ca3ff;
+      --accent-1:#ff6ec7;
+      --accent-2:#00ffd5;
+    }
+    .theme-high-contrast{
+      --bg:#000000;
+      --card:#000000;
+      --muted:#ffffff;
+      --accent-1:#ffff00;
+      --accent-2:#00ff00;
+    }
+
     *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
     html,body{height:100%}
     body{
@@ -25,6 +59,9 @@
       color:#fff;
       display:flex;
       align-items:stretch;
+      font-size:calc(14px * var(--font-scale));
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
 
     /* Layout */
@@ -47,7 +84,7 @@
     .header{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .page-title{font-size:20px;font-weight:600;color:#e6e9ef;display:flex;align-items:center;gap:12px}
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:20px;border-radius:12px;color:#e6e7eb}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:20px;border-radius:var(--radius);color:#e6e7eb;box-shadow:var(--shadow)}
 
     .games-row{display:flex;gap:12px;align-items:center;overflow-x:auto;padding:8px}
     .game-btn{min-width:120px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#111217,#0b0b10);color:#dfe6ff;border:1px solid rgba(255,255,255,0.03);cursor:pointer;text-align:center;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.5);transition:transform .12s ease, box-shadow .12s ease, background .12s ease;white-space:nowrap}
@@ -92,9 +129,9 @@
     .notif-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px}
     .btn.small{padding:6px 8px;font-size:13px}
 
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:80}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:90}
     .modal-backdrop.show{display:flex}
-    .modal{width:720px;max-width:96%;background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);max-height:86vh;overflow:auto}
+    .modal{width:820px;max-width:96%;background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);max-height:86vh;overflow:auto}
     .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
     .form-row input[type="text"], .form-row input[type="password"], .form-row input[type="file"], .form-row select, .form-row textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:#0b0b10;color:#fff}
     .form-actions{display:flex;gap:8px;justify-content:space-between;align-items:center}
@@ -106,25 +143,22 @@
     .avatar-preview img{width:100%;height:100%;object-fit:cover}
     .muted{color:var(--muted);font-size:13px}
 
-    /* Tab masking preview */
     .tab-mask-preview{display:flex;align-items:center;gap:10px}
     .tab-mask-preview img{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);object-fit:cover}
     .tab-mask-preview .title{font-weight:700;color:#e6e7eb}
 
-    /* Admin table */
-    .admin-table{width:100%;border-collapse:collapse;margin-top:12px}
-    .admin-table th, .admin-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:14px}
-    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{padding:6px 8px;border-radius:8px;background:#0f1724;border:1px solid rgba(255,255,255,0.03);font-weight:600;color:var(--muted)}
-    .danger{background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff}
-    .success{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
+    .theme-preset-grid{display:flex;gap:8px;flex-wrap:wrap}
+    .theme-preset{width:120px;height:72px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;font-weight:700}
+    .theme-preset small{font-size:12px;color:var(--muted);margin-top:6px}
 
+    @media (max-width:920px){
+      .modal{width:94%}
+    }
     @media (max-width:720px){
       .sidebar{width:64px;padding:18px}
       .logo{font-size:14px;display:none}
       .nav-item{font-size:13px;padding:8px}
       .tools-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-      .modal{width:94%}
       .notif-panel{right:8px;left:8px;width:auto}
     }
   </style>
@@ -146,13 +180,12 @@
           <div class="page-title" id="pageTitle">Games</div>
         </div>
 
-        <!-- Right side: file path + notifications bell -->
         <div style="display:flex;align-items:center;gap:12px">
-          <div style="opacity:0.7;font-size:13px">file:///C:/Users/stiev/Desktop/gws/index.html</div>
+          <div style="opacity:0.7;font-size:13px" id="filePathLabel">file:///C:/Users/stiev/Desktop/gws/index.html</div>
 
           <!-- Notification bell -->
           <div style="position:relative">
-            <button id="notifBell" class="notif-bell" title="Notifications" aria-haspopup="true" aria-expanded="false">
+            <button id="notifBell" class="notif-bell" title="Notifications" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#cfd3dc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 0 0-5-5.917V4a1 1 0 0 0-2 0v1.083A6 6 0 0 0 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -160,7 +193,6 @@
             </button>
             <div id="notifDot" class="notif-dot" style="display:none" aria-hidden="true"></div>
 
-            <!-- Notifications panel -->
             <div id="notifPanel" class="notif-panel" role="dialog" aria-modal="false" aria-hidden="true">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                 <div style="font-weight:700">Notifications</div>
@@ -178,7 +210,7 @@
         </div>
       </div>
 
-      <!-- Games card (visible by default) -->
+      <!-- Games -->
       <section class="card" id="gamesCard">
         <div class="games-row" id="gamesRow" role="list" aria-label="Games list">
           <button class="game-btn" id="sandboxBtn" title="Open Sandbox">Sandbox</button>
@@ -186,7 +218,7 @@
         </div>
       </section>
 
-      <!-- Tools card (hidden by default) -->
+      <!-- Tools -->
       <section class="card hidden" id="toolsCard">
         <div style="font-size:16px;font-weight:600;margin-bottom:10px">Tools</div>
         <div class="tools-grid" id="toolsGrid" role="list" aria-label="Tools list">
@@ -207,7 +239,7 @@
         </div>
       </section>
 
-      <!-- Other card (hidden by default) -->
+      <!-- Other -->
       <section class="card hidden" id="otherCard">
         <div style="font-size:16px;font-weight:600">Other</div>
         <div style="margin-top:12px;color:var(--muted)">No items in Other yet.</div>
@@ -217,7 +249,7 @@
 
   <!-- Profile UI -->
   <div class="profile-wrap" aria-hidden="false">
-    <div class="profile-btn" id="profileBtn" title="Profile">
+    <div class="profile-btn" id="profileBtn" title="Profile" aria-label="Profile">
       <img id="profileAvatar" src="" alt="avatar">
     </div>
     <div class="profile-label" id="profileLabel">Not signed in</div>
@@ -233,18 +265,18 @@
 
   <script>
     /* =========================
-       Account system + notifications + webhook + tab masking
-       - Adds a Tab Masking feature in Settings:
-         * Change tab title (document.title)
-         * Change tab icon (favicon) via URL or file upload
-         * Saved to localStorage (hw_tab_title, hw_tab_icon)
-       - All other features retained (users, admin, notifications, webhook)
-       - Client-side demo only
+       Full index.html script
+       - Local-only demo auth (localStorage)
+       - Notifications for additions (not for visits)
+       - Webhook support (client-side best-effort)
+       - Admin panel features
+       - Tab masking (title + favicon) and theme presets + custom theme editor
+       - Theme persistence and accessibility options
+       - Snake game button and FL Studio link
        ========================= */
 
-    /* ---------- CONFIG: set your webhook URL here ---------- */
-    // Replace with your webhook URL or set to empty string to disable.
-    const WEBHOOK_URL = ''; // e.g. 'https://discord.com/api/webhooks/12345/abcdef'
+    /* ---------- CONFIG ---------- */
+    const WEBHOOK_URL = ''; // set webhook URL if desired
 
     /* ---------- Storage helpers ---------- */
     function getUsers(){ try { return JSON.parse(localStorage.getItem('hw_users') || '{}'); } catch(e){ return {}; } }
@@ -256,44 +288,34 @@
     function getLogs(){ try { return JSON.parse(localStorage.getItem('hw_logs') || '[]'); } catch(e){ return []; } }
     function saveLogs(logs){ localStorage.setItem('hw_logs', JSON.stringify(logs)); }
 
-    /* Notifications storage */
     function getNotifications(){ try { return JSON.parse(localStorage.getItem('hw_notifications') || '[]'); } catch(e){ return []; } }
     function saveNotifications(list){ localStorage.setItem('hw_notifications', JSON.stringify(list)); }
-    function isNotifEnabled(){ return localStorage.getItem('hw_notif_enabled') !== 'false'; } // default true
+    function isNotifEnabled(){ return localStorage.getItem('hw_notif_enabled') !== 'false'; }
     function setNotifEnabled(v){ localStorage.setItem('hw_notif_enabled', v ? 'true' : 'false'); }
 
-    /* Webhook pending storage */
     function getPendingWebhooks(){ try { return JSON.parse(localStorage.getItem('hw_webhook_pending') || '[]'); } catch(e){ return []; } }
     function savePendingWebhooks(list){ localStorage.setItem('hw_webhook_pending', JSON.stringify(list)); }
 
-    /* Tab masking storage */
+    function saveVerification(username, codeObj){ try { localStorage.setItem('hw_verif_' + username, JSON.stringify(codeObj)); } catch(e){} }
+    function getVerification(username){ try { return JSON.parse(localStorage.getItem('hw_verif_' + username) || 'null'); } catch(e){ return null; } }
+    function clearVerification(username){ try { localStorage.removeItem('hw_verif_' + username); } catch(e){} }
+
+    /* Tab masking and theme storage */
     function getTabTitle(){ return localStorage.getItem('hw_tab_title') || ''; }
     function saveTabTitle(t){ if(t) localStorage.setItem('hw_tab_title', t); else localStorage.removeItem('hw_tab_title'); }
     function getTabIcon(){ return localStorage.getItem('hw_tab_icon') || ''; }
     function saveTabIcon(url){ if(url) localStorage.setItem('hw_tab_icon', url); else localStorage.removeItem('hw_tab_icon'); }
 
-    /* Verification codes storage (short-lived) */
-    function saveVerification(username, codeObj){
-      try {
-        const key = 'hw_verif_' + username;
-        localStorage.setItem(key, JSON.stringify(codeObj));
-      } catch(e){}
-    }
-    function getVerification(username){
-      try {
-        const key = 'hw_verif_' + username;
-        return JSON.parse(localStorage.getItem(key) || 'null');
-      } catch(e){ return null; }
-    }
-    function clearVerification(username){
-      try { localStorage.removeItem('hw_verif_' + username); } catch(e){}
-    }
+    function getThemeName(){ return localStorage.getItem('hw_theme_name') || ''; }
+    function saveThemeName(name){ if(name) localStorage.setItem('hw_theme_name', name); else localStorage.removeItem('hw_theme_name'); }
+    function getCustomThemes(){ try { return JSON.parse(localStorage.getItem('hw_custom_themes') || '[]'); } catch(e){ return []; } }
+    function saveCustomThemes(list){ localStorage.setItem('hw_custom_themes', JSON.stringify(list)); }
 
-    /* Simple password encoding for demo (not secure) */
+    /* ---------- Simple password encoding (demo only) ---------- */
     function encodePassword(p){ return btoa(p); }
     function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
 
-    /* Defaults */
+    /* ---------- Defaults ---------- */
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cfcfd6' stroke-width='1.2'><circle cx='12' cy='8' r='3.2'/><path d='M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5'/></svg>`);
     const DEFAULT_FAVICON = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfcfd6' stroke-width='1.6'><circle cx='12' cy='12' r='9'/><path d='M8 12h8'/></svg>`);
 
@@ -305,12 +327,11 @@
         users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
         saveUsers(users);
       }
-      // ensure favicon link exists
       const link = document.getElementById('siteFavicon');
       if(link && !link.href) link.href = DEFAULT_FAVICON;
     })();
 
-    /* Logging utility */
+    /* ---------- Logging & webhooks ---------- */
     function logAction(actor, action, details){
       const logs = getLogs();
       logs.unshift({ ts: Date.now(), actor: actor || null, action, details: details || null });
@@ -318,25 +339,20 @@
       saveLogs(logs);
     }
 
-    /* ---------- Webhook helpers ---------- */
-    async function postToWebhook(payload) {
-      if (!WEBHOOK_URL) return;
+    async function postToWebhook(payload){
+      if(!WEBHOOK_URL) return;
       try {
-        await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      } catch (err) {
+        await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      } catch(err){
         const pending = getPendingWebhooks();
         pending.unshift({ ts: Date.now(), payload });
-        if (pending.length > 200) pending.length = 200;
+        if(pending.length > 200) pending.length = 200;
         savePendingWebhooks(pending);
-        console.warn('Webhook POST failed (client-side). Stored pending payload.', err);
+        console.warn('Webhook POST failed; stored pending payload.', err);
       }
     }
 
-    function buildWebhookPayload(eventType, username, details) {
+    function buildWebhookPayload(eventType, username, details){
       const userField = username || 'anonymous';
       const embed = {
         title: `Site event: ${eventType}`,
@@ -347,25 +363,21 @@
         ],
         timestamp: new Date().toISOString(),
       };
-      if (details) {
+      if(details){
         const d = typeof details === 'string' ? details : JSON.stringify(details);
-        embed.fields.push({ name: 'Details', value: d.length > 200 ? d.slice(0, 200) + '…' : d });
+        embed.fields.push({ name: 'Details', value: d.length > 200 ? d.slice(0,200) + '…' : d });
       }
       return { embeds: [embed] };
     }
 
-    async function flushPendingWebhooks() {
-      if (!WEBHOOK_URL) return;
+    async function flushPendingWebhooks(){
+      if(!WEBHOOK_URL) return;
       const pending = getPendingWebhooks();
-      if (!pending.length) return;
-      for (const item of pending.slice(0, 50)) {
+      if(!pending.length) return;
+      for(const item of pending.slice(0,50)){
         try {
-          await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(item.payload),
-          });
-        } catch (e) {
+          await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(item.payload) });
+        } catch(e){
           console.warn('Failed to flush pending webhook item', e);
           return;
         }
@@ -373,21 +385,41 @@
       localStorage.removeItem('hw_webhook_pending');
     }
 
-    /* ---------- Tab masking helpers ---------- */
+    /* ---------- Notifications (only for additions) ---------- */
+    function createNotification(title, message, meta){
+      if(!isNotifEnabled()) return;
+      if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')){
+        const list = getNotifications();
+        const item = { id: 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), title, message, meta, ts: Date.now(), read:false };
+        list.unshift(item);
+        if(list.length > 500) list.length = 500;
+        saveNotifications(list);
+        renderNotifUI();
+        const username = getCurrentUser();
+        const payload = buildWebhookPayload(meta.type === 'tool' ? 'tool_added' : meta.type === 'game' ? 'game_added' : 'admin_action', username, { title, message, meta });
+        postToWebhook(payload);
+      }
+    }
+
+    function markAllNotificationsRead(){ const list = getNotifications(); list.forEach(n=>n.read=true); saveNotifications(list); renderNotifUI(); }
+    function clearAllNotifications(){ saveNotifications([]); renderNotifUI(); }
+    function markNotificationRead(id){ const list = getNotifications(); const n = list.find(x=>x.id===id); if(n) n.read=true; saveNotifications(list); renderNotifUI(); }
+
+    /* ---------- Tab masking & theme helpers ---------- */
     function applyTabMasking(){
       const title = getTabTitle();
       const icon = getTabIcon();
       if(title) document.title = title;
-      if(icon){
-        setFavicon(icon);
-      } else {
-        // ensure default favicon if none set
-        const link = document.getElementById('siteFavicon');
-        if(link && (!link.href || link.href.endsWith('about:blank'))) link.href = DEFAULT_FAVICON;
-      }
+      else document.title = 'homewrk';
+      if(icon) setFavicon(icon);
+      else setFavicon(DEFAULT_FAVICON);
+      // apply theme class if saved
+      const themeName = getThemeName();
+      document.documentElement.classList.remove('theme-light','theme-solar','theme-neon','theme-high-contrast');
+      if(themeName) document.documentElement.classList.add(themeName);
     }
 
-    function setFavicon(url){
+    function setFavicon(href){
       try {
         let link = document.getElementById('siteFavicon');
         if(!link){
@@ -396,58 +428,11 @@
           link.rel = 'icon';
           document.head.appendChild(link);
         }
-        link.href = url || DEFAULT_FAVICON;
-      } catch(e){
-        console.warn('Failed to set favicon', e);
-      }
+        link.setAttribute('href', href || DEFAULT_FAVICON);
+      } catch(e){ console.warn('Failed to set favicon', e); }
     }
 
-    /* ---------- Notifications utility (only for additions) ---------- */
-    function createNotification(title, message, meta){
-      if(!isNotifEnabled()) return;
-      if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')) {
-        const list = getNotifications();
-        const item = {
-          id: 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
-          title: title,
-          message: message,
-          meta: meta || null,
-          ts: Date.now(),
-          read: false
-        };
-        list.unshift(item);
-        if(list.length > 500) list.length = 500;
-        saveNotifications(list);
-        renderNotifUI();
-
-        // send webhook for additions and admin events
-        const username = getCurrentUser();
-        const payload = buildWebhookPayload(meta.type === 'tool' ? 'tool_added' : meta.type === 'game' ? 'game_added' : 'admin_action', username, { title, message, meta });
-        postToWebhook(payload);
-      }
-    }
-
-    function markAllNotificationsRead(){
-      const list = getNotifications();
-      list.forEach(n => n.read = true);
-      saveNotifications(list);
-      renderNotifUI();
-    }
-
-    function clearAllNotifications(){
-      saveNotifications([]);
-      renderNotifUI();
-    }
-
-    function markNotificationRead(id){
-      const list = getNotifications();
-      const n = list.find(x => x.id === id);
-      if(n) n.read = true;
-      saveNotifications(list);
-      renderNotifUI();
-    }
-
-    /* ---------- UI elements ---------- */
+    /* ---------- UI references ---------- */
     const navItems = document.querySelectorAll('.nav-item');
     const pageTitle = document.getElementById('pageTitle');
     const gamesCard = document.getElementById('gamesCard');
@@ -472,12 +457,8 @@
     const clearAllBtn = document.getElementById('clearAll');
     const notifSettingsBtn = document.getElementById('notifSettings');
 
-    /* ---------- Navigation (only one section visible) ---------- */
-    function hideAllSections(){
-      gamesCard.classList.add('hidden');
-      toolsCard.classList.add('hidden');
-      otherCard.classList.add('hidden');
-    }
+    /* ---------- Navigation ---------- */
+    function hideAllSections(){ gamesCard.classList.add('hidden'); toolsCard.classList.add('hidden'); otherCard.classList.add('hidden'); }
     function showSection(category){
       navItems.forEach(n => n.classList.toggle('active', n.dataset.category === category));
       pageTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
@@ -491,7 +472,7 @@
       item.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }});
     });
 
-    /* ---------- Tools & FL Studio handling ---------- */
+    /* ---------- Tools & additions ---------- */
     function addTool(name, href){
       const toolsGrid = document.getElementById('toolsGrid');
       const a = document.createElement('a');
@@ -499,7 +480,6 @@
       a.href = href || '#';
       a.textContent = name;
       toolsGrid.appendChild(a);
-
       createNotification('Tool added', `${name} was added to Tools`, { type: 'tool', name, href });
       logAction(getCurrentUser(), 'add_tool', { name });
     }
@@ -523,12 +503,8 @@
       const list = getNotifications();
       const unread = list.filter(n => !n.read).length;
       notifDot.style.display = unread > 0 ? 'block' : 'none';
-
       notifList.innerHTML = '';
-      if(list.length === 0){
-        notifList.innerHTML = `<div class="muted" style="text-align:center;padding:12px">No notifications</div>`;
-        return;
-      }
+      if(list.length === 0){ notifList.innerHTML = `<div class="muted" style="text-align:center;padding:12px">No notifications</div>`; return; }
       list.forEach(n => {
         const el = document.createElement('div');
         el.className = 'notif-item' + (n.read ? '' : ' unread');
@@ -580,19 +556,10 @@
     });
 
     markAllReadBtn.addEventListener('click', () => markAllNotificationsRead());
-    clearAllBtn.addEventListener('click', () => {
-      if(confirm('Clear all notifications?')) clearAllNotifications();
-    });
+    clearAllBtn.addEventListener('click', () => { if(confirm('Clear all notifications?')) clearAllNotifications(); });
+    notifSettingsBtn.addEventListener('click', () => { openModal('settings'); setTimeout(()=>{ const el = document.getElementById('notifPrefCheckbox'); if(el) el.scrollIntoView({behavior:'smooth', block:'center'}); },120); });
 
-    notifSettingsBtn.addEventListener('click', () => {
-      openModal('settings');
-      setTimeout(() => {
-        const el = document.getElementById('notifPrefCheckbox');
-        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 120);
-    });
-
-    /* ---------- Profile & account system ---------- */
+    /* ---------- Profile & account UI ---------- */
     function renderProfile(){
       const username = getCurrentUser();
       const users = getUsers();
@@ -605,6 +572,7 @@
       }
       renderPopover();
     }
+
     function renderPopover(){
       const username = getCurrentUser();
       popoverContent.innerHTML = '';
@@ -654,41 +622,19 @@
         popoverContent.appendChild(logoutBtn);
       }
     }
+
     function togglePopover(show){
-      if(show){
-        profilePopover.classList.add('show');
-        profilePopover.setAttribute('aria-hidden','false');
-      } else {
-        profilePopover.classList.remove('show');
-        profilePopover.setAttribute('aria-hidden','true');
-      }
+      if(show){ profilePopover.classList.add('show'); profilePopover.setAttribute('aria-hidden','false'); }
+      else { profilePopover.classList.remove('show'); profilePopover.setAttribute('aria-hidden','true'); }
     }
-    profileBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isShown = profilePopover.classList.contains('show');
-      togglePopover(!isShown);
-    });
-    document.addEventListener('click', (e) => {
-      if(!profilePopover.contains(e.target) && !profileBtn.contains(e.target)) togglePopover(false);
-    });
+    profileBtn.addEventListener('click', (e) => { e.stopPropagation(); const isShown = profilePopover.classList.contains('show'); togglePopover(!isShown); });
+    document.addEventListener('click', (e) => { if(!profilePopover.contains(e.target) && !profileBtn.contains(e.target)) togglePopover(false); });
 
-    /* ---------- Modal flows: signup, login, settings (with tab masking) ---------- */
-    function openModal(mode){
-      modalBackdrop.classList.add('show');
-      modalBackdrop.setAttribute('aria-hidden','false');
-      modal.innerHTML = '';
-      if(mode === 'signup') renderSignupModal();
-      else if(mode === 'login') renderLoginModal();
-      else if(mode === 'settings') renderSettingsModal();
-      else if(mode === 'verify_change') renderVerifyChangeModal();
-    }
-    function closeModal(){
-      modalBackdrop.classList.remove('show');
-      modalBackdrop.setAttribute('aria-hidden','true');
-      modal.innerHTML = '';
-    }
+    /* ---------- Modal flows ---------- */
+    function openModal(mode){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); modal.innerHTML = ''; if(mode === 'signup') renderSignupModal(); else if(mode === 'login') renderLoginModal(); else if(mode === 'settings') renderSettingsModal(); else if(mode === 'verify_change') renderVerifyChangeModal(); }
+    function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
 
-    /* Signup (optional email) */
+    /* Signup */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -730,7 +676,6 @@
         if(p !== p2){ alert('Passwords do not match'); return; }
         const users = getUsers();
         if(users[u]){ alert('Username already exists'); return; }
-        // ensure email uniqueness if provided
         if(email){
           const existing = Object.keys(users).find(k => users[k].email && users[k].email.toLowerCase() === email.toLowerCase());
           if(existing){ alert('Email already in use by another account'); return; }
@@ -744,7 +689,7 @@
       };
     }
 
-    /* Login (accept username or email) */
+    /* Login */
     function renderLoginModal(){
       modal.innerHTML = `
         <h3>Log In</h3>
@@ -766,35 +711,26 @@
         const p = document.getElementById('loginPassword').value;
         if(!id || !p){ alert('Please provide username/email and password'); return; }
         const users = getUsers();
-
-        // Try username exact match first
         let matchedUser = null;
         if(users[id]) matchedUser = id;
         else {
-          // try email match (case-insensitive)
           const lower = id.toLowerCase();
           matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
         }
-
         if(!matchedUser || !users[matchedUser] || typeof users[matchedUser].password !== 'string' || !verifyPassword(users[matchedUser].password, p)){
           alert('Invalid username/email or password');
           return;
         }
-
-        // login success
         setCurrentUser(matchedUser);
         logAction(matchedUser, 'login', { ts: Date.now() });
-
-        // send webhook for login events
         const payload = buildWebhookPayload('login', matchedUser, { ts: Date.now() });
         postToWebhook(payload);
-
         renderProfile();
         closeModal();
       };
     }
 
-    /* Settings (email optional, tab masking controls, password change options) */
+    /* Settings (themes, tab masking, accessibility, admin tools) */
     function renderSettingsModal(){
       const username = getCurrentUser();
       if(!username){ alert('Not signed in'); closeModal(); return; }
@@ -802,12 +738,11 @@
       const user = users[username];
       const whitelist = getWhitelist();
       const isAdmin = whitelist.includes(username);
-
       const notifEnabled = isNotifEnabled();
-
-      // current tab mask values
       const currentTabTitle = getTabTitle();
       const currentTabIcon = getTabIcon();
+      const currentTheme = getThemeName();
+      const customThemes = getCustomThemes();
 
       modal.innerHTML = `
         <h3>Settings</h3>
@@ -844,24 +779,72 @@
 
         <div class="form-row">
           <label class="muted">Tab icon (URL)</label>
-          <input id="tabIconUrl" type="text" placeholder="https://example.com/favicon.png" value="${escapeHtml(currentTabIcon && currentTabIcon.startsWith('data:') ? '' : currentTabIcon)}">
+          <input id="tabIconUrlInput" type="text" placeholder="https://example.com/icon.png" value="${escapeHtml(currentTabIcon && currentTabIcon.startsWith('data:') ? '' : currentTabIcon || '')}">
         </div>
 
         <div class="form-row">
-          <label class="muted">Or upload an icon file (PNG, SVG)</label>
-          <input id="tabIconFile" type="file" accept="image/*">
-        </div>
-
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div class="tab-mask-preview" id="tabMaskPreview">
-            <img id="tabMaskPreviewImg" src="${escapeHtml(currentTabIcon || DEFAULT_FAVICON)}" alt="icon preview">
-            <div class="title" id="tabMaskPreviewTitle">${escapeHtml(currentTabTitle || document.title)}</div>
+          <label class="muted">Or upload an icon (PNG, ICO, SVG)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="tabIconFileInput" type="file" accept="image/*">
+            <div class="tab-mask-preview" id="tabIconPreview" style="margin-left:8px">
+              <img id="tabIconPreviewImg" src="${escapeHtml(currentTabIcon || DEFAULT_FAVICON)}" alt="preview">
+              <div class="title" id="tabIconPreviewTitle">${escapeHtml(currentTabTitle || document.title)}</div>
+            </div>
+            <button class="btn ghost" id="resetTabMasking" style="margin-left:auto">Reset tab masking</button>
           </div>
         </div>
 
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <button class="btn primary" id="applyTabMask">Apply</button>
-          <button class="btn ghost" id="clearTabMask">Clear</button>
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
+        <div class="muted" style="margin-bottom:8px">Choose a preset or create a custom theme. Changes preview live.</div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <div class="theme-preset" data-theme="theme-light" title="Light" style="background:linear-gradient(180deg,#fff,#f3f4f6);color:#111">
+            Light
+            <small>Bright</small>
+          </div>
+          <div class="theme-preset" data-theme="theme-solar" title="Solarized" style="background:linear-gradient(180deg,#fffaf0,#fdf6e3);color:#111">
+            Solar
+            <small>Warm</small>
+          </div>
+          <div class="theme-preset" data-theme="theme-neon" title="Neon" style="background:linear-gradient(180deg,#0f0f14,#0b0b10);color:#fff">
+            Neon
+            <small>Vibrant</small>
+          </div>
+          <div class="theme-preset" data-theme="theme-high-contrast" title="High Contrast" style="background:linear-gradient(180deg,#000,#111);color:#fff">
+            High Contrast
+            <small>Accessible</small>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <label class="muted">Custom accent color</label>
+          <input id="customAccent" type="color" value="#3b82f6">
+          <button class="btn ghost" id="saveCustomTheme">Save custom theme</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <label class="muted">Saved custom themes</label>
+          <select id="customThemesSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff"></select>
+          <button class="btn ghost" id="applyCustomTheme">Apply</button>
+          <button class="btn ghost" id="exportCustomTheme">Export</button>
+          <input id="importCustomThemeFile" type="file" accept="application/json" style="display:none">
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Accessibility & Layout</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <label class="muted">Font size</label>
+          <input id="fontSizeRange" type="range" min="0.8" max="1.4" step="0.05" value="${parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-scale') || 1)}">
+          <span id="fontSizeLabel" class="muted">${(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-scale') || 1)).toFixed(2)}x</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <label class="muted">Reduced motion</label>
+          <input id="reducedMotionCheckbox" type="checkbox">
+          <label class="muted" style="margin-left:8px">High contrast</label>
+          <input id="highContrastCheckbox" type="checkbox">
         </div>
 
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
@@ -952,58 +935,193 @@
         reader.readAsDataURL(f);
       });
 
-      // Tab masking controls
+      // Tab masking inputs
       const tabTitleInput = document.getElementById('tabTitleInput');
-      const tabIconUrl = document.getElementById('tabIconUrl');
-      const tabIconFile = document.getElementById('tabIconFile');
-      const tabMaskPreviewImg = document.getElementById('tabMaskPreviewImg');
-      const tabMaskPreviewTitle = document.getElementById('tabMaskPreviewTitle');
+      const tabIconUrlInput = document.getElementById('tabIconUrlInput');
+      const tabIconFileInput = document.getElementById('tabIconFileInput');
+      const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
+      const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
+      const resetTabMaskingBtn = document.getElementById('resetTabMasking');
 
-      // preview updates
-      tabTitleInput.addEventListener('input', () => {
-        tabMaskPreviewTitle.textContent = tabTitleInput.value || document.title;
+      if(getTabIcon()) tabIconPreviewImg.src = getTabIcon();
+      tabIconPreviewTitle.textContent = tabTitleInput.value || document.title;
+
+      tabTitleInput.addEventListener('input', () => { tabIconPreviewTitle.textContent = tabTitleInput.value || document.title; });
+
+      tabIconUrlInput.addEventListener('input', () => {
+        const v = tabIconUrlInput.value.trim();
+        if(v) tabIconPreviewImg.src = v;
+        else tabIconPreviewImg.src = getTabIcon() || DEFAULT_FAVICON;
       });
-      tabIconUrl.addEventListener('input', () => {
-        const v = tabIconUrl.value.trim();
-        if(v) tabMaskPreviewImg.src = v;
-        else {
-          const stored = getTabIcon();
-          tabMaskPreviewImg.src = stored || DEFAULT_FAVICON;
-        }
-      });
-      tabIconFile.addEventListener('change', (e) => {
+
+      tabIconFileInput.addEventListener('change', (e) => {
         const f = e.target.files[0];
         if(!f) return;
         const reader = new FileReader();
         reader.onload = () => {
-          tabMaskPreviewImg.src = reader.result;
-          // set the URL input blank to indicate file used
-          tabIconUrl.value = '';
+          tabIconPreviewImg.src = reader.result;
+          tabIconUrlInput.value = '';
+          tabIconPreviewImg.dataset.pending = reader.result;
         };
         reader.readAsDataURL(f);
       });
 
-      // Apply button: set title and icon but don't persist until Save
+      resetTabMaskingBtn.addEventListener('click', () => {
+        if(!confirm('Reset tab title and icon to defaults?')) return;
+        saveTabTitle('');
+        saveTabIcon('');
+        document.title = 'homewrk';
+        setFavicon(DEFAULT_FAVICON);
+        tabTitleInput.value = '';
+        tabIconUrlInput.value = '';
+        tabIconPreviewImg.src = DEFAULT_FAVICON;
+        tabIconPreviewTitle.textContent = document.title;
+        alert('Tab masking reset to defaults.');
+      });
+
+      // Theme presets
+      document.querySelectorAll('.theme-preset').forEach(el => {
+        el.addEventListener('click', () => {
+          const theme = el.dataset.theme;
+          document.documentElement.classList.remove('theme-light','theme-solar','theme-neon','theme-high-contrast');
+          if(theme) document.documentElement.classList.add(theme);
+          saveThemeName(theme);
+        });
+      });
+
+      // Custom accent color live preview
+      const customAccent = document.getElementById('customAccent');
+      customAccent.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--accent-1', customAccent.value);
+      });
+
+      // Save custom theme
+      document.getElementById('saveCustomTheme').onclick = () => {
+        const name = prompt('Name for your custom theme:', 'My Theme');
+        if(!name) return;
+        const vars = {
+          '--accent-1': getComputedStyle(document.documentElement).getPropertyValue('--accent-1').trim(),
+          '--accent-2': getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim(),
+          '--bg': getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+          '--card': getComputedStyle(document.documentElement).getPropertyValue('--card').trim(),
+          '--muted': getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()
+        };
+        const themes = getCustomThemes();
+        themes.unshift({ name, vars, createdAt: Date.now() });
+        saveCustomThemes(themes);
+        populateCustomThemesSelect();
+        alert('Custom theme saved locally.');
+      };
+
+      function populateCustomThemesSelect(){
+        const sel = document.getElementById('customThemesSelect');
+        sel.innerHTML = '<option value="">Select saved theme</option>';
+        getCustomThemes().forEach((t, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = t.name;
+          sel.appendChild(opt);
+        });
+      }
+      populateCustomThemesSelect();
+
+      document.getElementById('applyCustomTheme').onclick = () => {
+        const sel = document.getElementById('customThemesSelect');
+        if(!sel.value){ alert('Choose a saved theme first'); return; }
+        const t = getCustomThemes()[parseInt(sel.value,10)];
+        if(!t) return;
+        Object.keys(t.vars).forEach(k => document.documentElement.style.setProperty(k, t.vars[k]));
+        alert('Custom theme applied (local preview). Save to persist.');
+      };
+
+      document.getElementById('exportCustomTheme').onclick = () => {
+        const sel = document.getElementById('customThemesSelect');
+        if(!sel.value){ alert('Choose a saved theme first'); return; }
+        const t = getCustomThemes()[parseInt(sel.value,10)];
+        if(!t) return;
+        const blob = new Blob([JSON.stringify(t, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${t.name || 'theme'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      document.getElementById('customThemesSelect').addEventListener('change', (e) => {
+        // preview on select
+        const idx = e.target.value;
+        if(idx === '') return;
+        const t = getCustomThemes()[parseInt(idx,10)];
+        if(!t) return;
+        Object.keys(t.vars).forEach(k => document.documentElement.style.setProperty(k, t.vars[k]));
+      });
+
+      // Import custom theme
+      document.getElementById('exportCustomTheme').insertAdjacentElement('afterend', (() => {
+        const btn = document.createElement('button');
+        btn.className = 'btn ghost';
+        btn.textContent = 'Import';
+        btn.onclick = () => document.getElementById('importCustomThemeFile').click();
+        return btn;
+      })());
+      document.getElementById('importCustomThemeFile').addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const obj = JSON.parse(reader.result);
+            const themes = getCustomThemes();
+            themes.unshift(obj);
+            saveCustomThemes(themes);
+            populateCustomThemesSelect();
+            alert('Theme imported.');
+          } catch(err){ alert('Invalid theme file'); }
+        };
+        reader.readAsText(f);
+      });
+
+      // Accessibility controls
+      const fontSizeRange = document.getElementById('fontSizeRange');
+      const fontSizeLabel = document.getElementById('fontSizeLabel');
+      fontSizeRange.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--font-scale', fontSizeRange.value);
+        fontSizeLabel.textContent = fontSizeRange.value + 'x';
+      });
+
+      const reducedMotionCheckbox = document.getElementById('reducedMotionCheckbox');
+      reducedMotionCheckbox.addEventListener('change', () => {
+        if(reducedMotionCheckbox.checked) document.documentElement.style.setProperty('transition-duration','0s');
+        else document.documentElement.style.removeProperty('transition-duration');
+      });
+
+      const highContrastCheckbox = document.getElementById('highContrastCheckbox');
+      highContrastCheckbox.addEventListener('change', () => {
+        if(highContrastCheckbox.checked) document.documentElement.classList.add('theme-high-contrast');
+        else document.documentElement.classList.remove('theme-high-contrast');
+      });
+
+      // Apply button: immediate preview (Apply)
       document.getElementById('applyTabMask').onclick = () => {
         const titleVal = tabTitleInput.value.trim();
-        const iconUrlVal = tabIconUrl.value.trim();
-        if(tabIconFile.files && tabIconFile.files[0]){
-          const f = tabIconFile.files[0];
+        const iconUrlVal = tabIconUrlInput.value.trim();
+        if(tabIconFileInput.files && tabIconFileInput.files[0]){
+          const f = tabIconFileInput.files[0];
           const reader = new FileReader();
           reader.onload = () => {
             setFavicon(reader.result);
             if(titleVal) document.title = titleVal;
-            tabMaskPreviewTitle.textContent = titleVal || document.title;
+            tabIconPreviewTitle.textContent = titleVal || document.title;
           };
           reader.readAsDataURL(f);
         } else if(iconUrlVal){
           setFavicon(iconUrlVal);
           if(titleVal) document.title = titleVal;
-          tabMaskPreviewTitle.textContent = titleVal || document.title;
+          tabIconPreviewTitle.textContent = titleVal || document.title;
         } else {
-          // only title change
           if(titleVal) document.title = titleVal;
-          tabMaskPreviewTitle.textContent = titleVal || document.title;
+          tabIconPreviewTitle.textContent = titleVal || document.title;
         }
       };
 
@@ -1014,14 +1132,14 @@
         document.title = 'homewrk';
         setFavicon(DEFAULT_FAVICON);
         tabTitleInput.value = '';
-        tabIconUrl.value = '';
-        tabIconFile.value = '';
-        tabMaskPreviewImg.src = DEFAULT_FAVICON;
-        tabMaskPreviewTitle.textContent = document.title;
+        tabIconUrlInput.value = '';
+        tabIconFileInput.value = '';
+        tabIconPreviewImg.src = DEFAULT_FAVICON;
+        tabIconPreviewTitle.textContent = document.title;
         alert('Tab masking cleared (local only).');
       };
 
-      // Save changes (username/email + persist tab mask)
+      // Save changes (username/email + persist tab mask + theme + accessibility)
       document.getElementById('settingsSave').onclick = () => {
         const newUsername = document.getElementById('settingsUsername').value.trim();
         const newEmail = document.getElementById('settingsEmail').value.trim();
@@ -1031,7 +1149,6 @@
         if(!newUsername){ alert('Username cannot be empty'); return; }
         if(newUsername !== current && users[newUsername]){ alert('Username already taken'); return; }
 
-        // ensure email uniqueness if provided
         if(newEmail){
           const existing = Object.keys(users).find(k => k !== current && users[k].email && users[k].email.toLowerCase() === newEmail.toLowerCase());
           if(existing){ alert('Email already in use by another account'); return; }
@@ -1040,77 +1157,71 @@
         const data = users[current];
         delete users[current];
         users[newUsername] = data;
-
         users[newUsername].avatar = newAvatar || users[newUsername].avatar || DEFAULT_AVATAR;
         users[newUsername].email = newEmail || '';
-        // password unchanged here
         saveUsers(users);
         setCurrentUser(newUsername);
         logAction(current, 'update_profile', { newUsername, newEmail });
         createNotification('Profile updated', `User ${current} updated profile`, { type: 'admin', user: newUsername });
 
-        // persist tab masking if provided
+        // persist tab masking
         const titleVal = tabTitleInput.value.trim();
-        const iconUrlVal = tabIconUrl.value.trim();
-        if(tabIconFile.files && tabIconFile.files[0]){
-          const f = tabIconFile.files[0];
+        const iconUrlVal = tabIconUrlInput.value.trim();
+        if(tabIconFileInput.files && tabIconFileInput.files[0]){
+          const f = tabIconFileInput.files[0];
           const reader = new FileReader();
           reader.onload = () => {
             saveTabIcon(reader.result);
             if(titleVal) saveTabTitle(titleVal);
             applyTabMasking();
-            alert('Settings saved.');
-            renderProfile();
-            closeModal();
+            finalizeSave();
           };
           reader.readAsDataURL(f);
-          return; // wait for reader
+          return;
         } else {
           if(iconUrlVal) saveTabIcon(iconUrlVal);
           else {
-            // if user cleared both fields, keep existing or clear if empty
             if(!iconUrlVal && !getTabIcon()) saveTabIcon('');
           }
           if(titleVal) saveTabTitle(titleVal);
           else saveTabTitle('');
         }
 
+        // theme persistence
+        const themeClass = Array.from(document.documentElement.classList).find(c => c.startsWith('theme-')) || '';
+        saveThemeName(themeClass);
+
+        // accessibility persistence
+        const fontScale = getComputedStyle(document.documentElement).getPropertyValue('--font-scale') || '1';
+        localStorage.setItem('hw_font_scale', fontScale);
+
         applyTabMasking();
-        renderProfile();
-        closeModal();
+        finalizeSave();
+
+        function finalizeSave(){
+          renderProfile();
+          closeModal();
+          alert('Settings saved.');
+        }
       };
 
       // Notification preference
       const notifCheckbox = document.getElementById('notifPrefCheckbox');
-      notifCheckbox.addEventListener('change', (e) => {
-        setNotifEnabled(e.target.checked);
-        renderNotifUI();
-      });
+      notifCheckbox.addEventListener('change', (e) => { setNotifEnabled(e.target.checked); renderNotifUI(); });
 
       // Change password with current password
-      document.getElementById('changePasswordWithCurrent').onclick = () => {
-        renderChangeWithCurrentModal();
-      };
+      document.getElementById('changePasswordWithCurrent').onclick = () => { renderChangeWithCurrentModal(); };
 
       // Change password via email verification
       document.getElementById('changePasswordViaEmail').onclick = () => {
-        // require email on account
         const u = getCurrentUser();
         const users = getUsers();
-        if(!users[u] || !users[u].email){
-          alert('No email configured for this account. Add an email in Settings first.');
-          return;
-        }
-        // generate and send code
+        if(!users[u] || !users[u].email){ alert('No email configured for this account. Add an email in Settings first.'); return; }
         const code = generateVerificationCode();
-        const codeObj = { code, ts: Date.now(), expiresAt: Date.now() + 1000 * 60 * 15 }; // 15 minutes
+        const codeObj = { code, ts: Date.now(), expiresAt: Date.now() + 1000 * 60 * 15 };
         saveVerification(u, codeObj);
-
-        // send code via webhook (demo) with minimal info
-        const payload = buildWebhookPayload('email_verification_code', u, { email: users[u].email, code: code, note: 'Deliver this code to the user email in production' });
+        const payload = buildWebhookPayload('email_verification_code', u, { email: users[u].email, code, note: 'Deliver this code to the user email in production' });
         postToWebhook(payload);
-
-        // show modal to enter code and new password
         renderVerifyChangeModal(u);
       };
 
@@ -1122,7 +1233,7 @@
         navigator.clipboard.writeText(payload).then(() => alert('Profile JSON copied to clipboard'));
       };
 
-      // Clear local data (danger)
+      // Clear local data
       document.getElementById('clearLocalData').onclick = () => {
         if(!confirm('Clear all local data (users, logs, whitelist, notifications)? This will sign you out.')) return;
         localStorage.removeItem('hw_users');
@@ -1134,7 +1245,9 @@
         localStorage.removeItem('hw_notif_enabled');
         localStorage.removeItem('hw_tab_title');
         localStorage.removeItem('hw_tab_icon');
-        // re-add default whitelist and admin user
+        localStorage.removeItem('hw_theme_name');
+        localStorage.removeItem('hw_custom_themes');
+        localStorage.removeItem('hw_font_scale');
         saveWhitelist(['anotheryear']);
         const users = {};
         users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
@@ -1176,7 +1289,6 @@
             const actions = document.createElement('div');
             actions.className = 'admin-actions';
 
-            // Impersonate
             const imp = document.createElement('button');
             imp.className = 'pill';
             imp.textContent = 'Impersonate';
@@ -1190,7 +1302,6 @@
             };
             actions.appendChild(imp);
 
-            // Toggle whitelist
             const wlBtn = document.createElement('button');
             wlBtn.className = 'pill';
             wlBtn.textContent = wl.includes(u) ? 'Remove admin' : 'Make admin';
@@ -1210,7 +1321,6 @@
             };
             actions.appendChild(wlBtn);
 
-            // Reset password (admin quick reset)
             const reset = document.createElement('button');
             reset.className = 'pill';
             reset.textContent = 'Reset password';
@@ -1226,7 +1336,6 @@
             };
             actions.appendChild(reset);
 
-            // Delete user
             const del = document.createElement('button');
             del.className = 'pill danger';
             del.textContent = 'Delete';
@@ -1250,21 +1359,10 @@
 
         refreshUsersBtn.onclick = () => renderUsersTable(adminSearch.value);
         adminSearch.addEventListener('input', () => renderUsersTable(adminSearch.value));
-        copyUsersJSON.onclick = () => {
-          const users = getUsers();
-          navigator.clipboard.writeText(JSON.stringify(users, null, 2)).then(() => alert('Users JSON copied to clipboard'));
-        };
+        copyUsersJSON.onclick = () => { const users = getUsers(); navigator.clipboard.writeText(JSON.stringify(users, null, 2)).then(() => alert('Users JSON copied to clipboard')); };
 
-        viewLogsBtn.onclick = () => {
-          adminLogs.style.display = adminLogs.style.display === 'none' ? 'block' : 'none';
-          renderLogs();
-        };
-        clearLogsBtn.onclick = () => {
-          if(!confirm('Clear all logs?')) return;
-          saveLogs([]);
-          renderLogs();
-          alert('Logs cleared');
-        };
+        viewLogsBtn.onclick = () => { adminLogs.style.display = adminLogs.style.display === 'none' ? 'block' : 'none'; renderLogs(); };
+        clearLogsBtn.onclick = () => { if(!confirm('Clear all logs?')) return; saveLogs([]); renderLogs(); alert('Logs cleared'); };
 
         function renderLogs(){
           const logs = getLogs();
@@ -1280,7 +1378,6 @@
           });
         }
 
-        // Admin: add sample tool (creates a tool and a notification)
         adminAddSampleTool.onclick = () => {
           const name = prompt('Tool name to add (example: "Synth Lab"):', 'Synth Lab');
           if(!name) return;
@@ -1295,10 +1392,7 @@
           renderNotifUI();
         };
 
-        flushWebhooksBtn.onclick = async () => {
-          await flushPendingWebhooks();
-          alert('Attempted to flush pending webhooks.');
-        };
+        flushWebhooksBtn.onclick = async () => { await flushPendingWebhooks(); alert('Attempted to flush pending webhooks.'); };
 
         viewPendingBtn.onclick = () => {
           pendingPanel.style.display = pendingPanel.style.display === 'none' ? 'block' : 'none';
@@ -1323,12 +1417,9 @@
       } // end isAdmin
     }
 
-    /* Close modal on backdrop click */
-    modalBackdrop.addEventListener('click', (e) => {
-      if(e.target === modalBackdrop) closeModal();
-    });
+    modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-    /* ---------- Change password with current password modal ---------- */
+    /* ---------- Password change modals ---------- */
     function renderChangeWithCurrentModal(){
       modal.innerHTML = `
         <h3>Change Password</h3>
@@ -1359,10 +1450,7 @@
       };
     }
 
-    /* ---------- Email verification flow for password change ---------- */
-    function generateVerificationCode(){
-      return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
-    }
+    function generateVerificationCode(){ return Math.floor(100000 + Math.random() * 900000).toString(); }
 
     function renderVerifyChangeModal(prefilledUsername){
       const u = prefilledUsername || getCurrentUser();
@@ -1391,7 +1479,6 @@
         if(!ver){ alert('No verification code found or it expired'); return; }
         if(Date.now() > ver.expiresAt){ clearVerification(username); alert('Code expired'); return; }
         if(ver.code !== code){ alert('Invalid code'); return; }
-        // success
         const users = getUsers();
         if(!users[username]){ alert('User not found'); return; }
         users[username].password = encodePassword(n1);
@@ -1406,21 +1493,14 @@
     }
 
     /* ---------- Utilities ---------- */
-    function escapeHtml(s){
-      if(!s) return '';
-      return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
-    }
+    function escapeHtml(s){ if(s === undefined || s === null) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; }); }
 
-    /* ---------- Session flag for "already opened" detection ---------- */
-    (function markSessionOpened(){
-      try { localStorage.setItem('hw_session_opened', 'true'); } catch(e) {}
-    })();
+    /* ---------- Session flag ---------- */
+    (function markSessionOpened(){ try { localStorage.setItem('hw_session_opened', 'true'); } catch(e) {} })();
 
     /* ---------- Initialize ---------- */
     document.addEventListener('DOMContentLoaded', () => {
-      // Apply tab masking from storage first
       applyTabMasking();
-
       profileAvatar.src = DEFAULT_AVATAR;
       const active = document.querySelector('.nav-item.active');
       const initial = active ? active.dataset.category : 'games';
@@ -1428,14 +1508,12 @@
       renderProfile();
       renderNotifUI();
 
-      // Wire up the Snake button to open snake.html
+      // Wire up Snake button
       if(snakeBtn){
-        snakeBtn.addEventListener('click', () => {
-          window.location.href = 'snake.html';
-        });
+        snakeBtn.addEventListener('click', () => { window.location.href = 'snake.html'; });
       }
 
-      // Flush pending webhooks in background (best-effort)
+      // Flush pending webhooks
       flushPendingWebhooks().catch(()=>{});
 
       // Keep UI in sync across tabs
@@ -1443,12 +1521,10 @@
         if(e.key && e.key.startsWith('hw_')) {
           renderProfile();
           renderNotifUI();
-          // if tab mask changed in another tab, reapply
-          if(e.key === 'hw_tab_title' || e.key === 'hw_tab_icon') applyTabMasking();
+          if(e.key === 'hw_tab_title' || e.key === 'hw_tab_icon' || e.key === 'hw_theme_name') applyTabMasking();
         }
       });
     });
   </script>
 </body>
 </html>
-```
