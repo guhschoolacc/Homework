@@ -215,6 +215,7 @@
         <div class="games-row" id="gamesRow" role="list" aria-label="Games list">
           <button class="game-btn" id="sandboxBtn" title="Open Sandbox">Sandbox</button>
           <button class="game-btn" id="snakeBtn" title="Open Snake Game Ripoff" aria-label="Open Snake Game Ripoff">Snake Game Ripoff</button>
+          <button class="game-btn" id="ticTacBtn" title="Tic Tac Toe" aria-label="Tic Tac Toe">Tic Tac Toe</button>
         </div>
       </section>
 
@@ -242,7 +243,15 @@
       <!-- Other -->
       <section class="card hidden" id="otherCard">
         <div style="font-size:16px;font-weight:600">Other</div>
-        <div style="margin-top:12px;color:var(--muted)">No items in Other yet.</div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <a class="tool-btn" href="soundboard.html">Soundboard</a>
+          <a class="tool-btn" href="color-picker.html">Color Picker</a>
+          <a class="tool-btn" href="idea-generator.html">Idea Generator</a>
+          <a class="tool-btn" href="ascii-art.html">ASCII Art</a>
+          <a class="tool-btn" href="meme-maker.html">Meme Maker</a>
+          <a class="tool-btn" href="random-fact.html">Random Fact</a>
+          <a class="tool-btn" href="easter-eggs.html">Easter Eggs</a>
+        </div>
       </section>
     </main>
   </div>
@@ -265,14 +274,11 @@
 
   <script>
     /* =========================
-       Full index.html script
-       - Local-only demo auth (localStorage)
-       - Notifications for additions (not for visits)
-       - Webhook support (client-side best-effort)
-       - Admin panel features
-       - Tab masking (title + favicon) and theme presets + custom theme editor
-       - Theme persistence and accessibility options
-       - Snake game button and FL Studio link
+       Updated index.html script
+       - Added: revert-to-default-theme option
+       - Fixed: Sandbox button opens sandbox.html
+       - Added: Soundboard and extra items in Other category
+       - Theme presets, custom themes, accessibility, notifications, admin, webhooks retained
        ========================= */
 
     /* ---------- CONFIG ---------- */
@@ -417,6 +423,9 @@
       const themeName = getThemeName();
       document.documentElement.classList.remove('theme-light','theme-solar','theme-neon','theme-high-contrast');
       if(themeName) document.documentElement.classList.add(themeName);
+      // apply font scale if saved
+      const fs = localStorage.getItem('hw_font_scale');
+      if(fs) document.documentElement.style.setProperty('--font-scale', fs);
     }
 
     function setFavicon(href){
@@ -430,6 +439,22 @@
         }
         link.setAttribute('href', href || DEFAULT_FAVICON);
       } catch(e){ console.warn('Failed to set favicon', e); }
+    }
+
+    function revertToDefaultTheme(){
+      // remove theme classes and clear saved theme
+      document.documentElement.classList.remove('theme-light','theme-solar','theme-neon','theme-high-contrast');
+      saveThemeName('');
+      // reset CSS variables to defaults defined in :root
+      document.documentElement.style.removeProperty('--accent-1');
+      document.documentElement.style.removeProperty('--accent-2');
+      document.documentElement.style.removeProperty('--bg');
+      document.documentElement.style.removeProperty('--card');
+      document.documentElement.style.removeProperty('--muted');
+      // reset font scale
+      localStorage.removeItem('hw_font_scale');
+      document.documentElement.style.setProperty('--font-scale', '1');
+      applyTabMasking(); // ensures favicon/title remain as-is
     }
 
     /* ---------- UI references ---------- */
@@ -797,7 +822,7 @@
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
 
         <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
-        <div class="muted" style="margin-bottom:8px">Choose a preset or create a custom theme. Changes preview live.</div>
+        <div class="muted" style="margin-bottom:8px">Choose a preset, revert to default, or create a custom theme. Changes preview live.</div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
           <div class="theme-preset" data-theme="theme-light" title="Light" style="background:linear-gradient(180deg,#fff,#f3f4f6);color:#111">
@@ -816,6 +841,7 @@
             High Contrast
             <small>Accessible</small>
           </div>
+          <button class="btn ghost" id="revertDefaultTheme" title="Revert to default theme">Revert to default theme</button>
         </div>
 
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
@@ -989,6 +1015,14 @@
         });
       });
 
+      // Revert to default theme button
+      const revertBtn = document.getElementById('revertDefaultTheme');
+      revertBtn.addEventListener('click', () => {
+        if(!confirm('Revert to the default theme? This will remove any saved theme preferences.')) return;
+        revertToDefaultTheme();
+        alert('Reverted to default theme.');
+      });
+
       // Custom accent color live preview
       const customAccent = document.getElementById('customAccent');
       customAccent.addEventListener('input', () => {
@@ -1049,7 +1083,6 @@
       };
 
       document.getElementById('customThemesSelect').addEventListener('change', (e) => {
-        // preview on select
         const idx = e.target.value;
         if(idx === '') return;
         const t = getCustomThemes()[parseInt(idx,10)];
@@ -1058,13 +1091,12 @@
       });
 
       // Import custom theme
-      document.getElementById('exportCustomTheme').insertAdjacentElement('afterend', (() => {
-        const btn = document.createElement('button');
-        btn.className = 'btn ghost';
-        btn.textContent = 'Import';
-        btn.onclick = () => document.getElementById('importCustomThemeFile').click();
-        return btn;
-      })());
+      const importBtn = document.createElement('button');
+      importBtn.className = 'btn ghost';
+      importBtn.textContent = 'Import';
+      importBtn.onclick = () => document.getElementById('importCustomThemeFile').click();
+      document.getElementById('exportCustomTheme').insertAdjacentElement('afterend', importBtn);
+
       document.getElementById('importCustomThemeFile').addEventListener('change', (e) => {
         const f = e.target.files[0];
         if(!f) return;
@@ -1103,7 +1135,7 @@
       });
 
       // Apply button: immediate preview (Apply)
-      document.getElementById('applyTabMask').onclick = () => {
+      document.getElementById('applyTabMask')?.addEventListener?.('click', () => {
         const titleVal = tabTitleInput.value.trim();
         const iconUrlVal = tabIconUrlInput.value.trim();
         if(tabIconFileInput.files && tabIconFileInput.files[0]){
@@ -1123,10 +1155,10 @@
           if(titleVal) document.title = titleVal;
           tabIconPreviewTitle.textContent = titleVal || document.title;
         }
-      };
+      });
 
       // Clear tab mask
-      document.getElementById('clearTabMask').onclick = () => {
+      document.getElementById('clearTabMask')?.addEventListener?.('click', () => {
         saveTabTitle('');
         saveTabIcon('');
         document.title = 'homewrk';
@@ -1137,7 +1169,7 @@
         tabIconPreviewImg.src = DEFAULT_FAVICON;
         tabIconPreviewTitle.textContent = document.title;
         alert('Tab masking cleared (local only).');
-      };
+      });
 
       // Save changes (username/email + persist tab mask + theme + accessibility)
       document.getElementById('settingsSave').onclick = () => {
@@ -1508,10 +1540,19 @@
       renderProfile();
       renderNotifUI();
 
+      // Wire up Sandbox button to open sandbox.html
+      if(sandboxBtn){
+        sandboxBtn.addEventListener('click', () => { window.location.href = 'sandbox.html'; });
+      }
+
       // Wire up Snake button
       if(snakeBtn){
         snakeBtn.addEventListener('click', () => { window.location.href = 'snake.html'; });
       }
+
+      // Example: wire up Tic Tac Toe (placeholder)
+      const ticTacBtn = document.getElementById('ticTacBtn');
+      if(ticTacBtn) ticTacBtn.addEventListener('click', () => { window.location.href = 'tictactoe.html'; });
 
       // Flush pending webhooks
       flushPendingWebhooks().catch(()=>{});
