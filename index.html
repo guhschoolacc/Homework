@@ -176,6 +176,8 @@
       <section class="card" id="gamesCard">
         <div class="games-row" id="gamesRow" role="list" aria-label="Games list">
           <button class="game-btn" id="sandboxBtn" title="Open Sandbox">Sandbox</button>
+          <!-- New Snake Game Ripoff button -->
+          <button class="game-btn" id="snakeBtn" title="Open Snake Game Ripoff" aria-label="Open Snake Game Ripoff">Snake Game Ripoff</button>
         </div>
       </section>
 
@@ -226,13 +228,16 @@
 
   <script>
     /* =========================
-       Local account + admin + notifications + Discord webhook
-       - Notifications only for additions (tools/games) and admin-created items
-       - Webhook sends messages for additions and login events (not visits)
-       - Admin panel expanded with more controls
+       Improved account system
+       - Login accepts username OR email (case-insensitive for email)
+       - Optional email on signup/settings
+       - Email verification flow for password changes:
+         * Generates a 6-digit code, stores it locally, and sends it to WEBHOOK_URL (if set)
+         * User must enter the code to confirm password change
+       - Forgot-password flow removed (per request)
+       - Admin panel and notifications retained
        - All data stored in localStorage under hw_* keys
-       - Forgot-password / reset flow removed for security per request
-       - Demo-only client-side implementation
+       - Client-side demo only; real email delivery requires a server
        ========================= */
 
     /* ---------- CONFIG: set your webhook URL here ---------- */
@@ -259,6 +264,23 @@
     function getPendingWebhooks(){ try { return JSON.parse(localStorage.getItem('hw_webhook_pending') || '[]'); } catch(e){ return []; } }
     function savePendingWebhooks(list){ localStorage.setItem('hw_webhook_pending', JSON.stringify(list)); }
 
+    /* Verification codes storage (short-lived) */
+    function saveVerification(username, codeObj){
+      try {
+        const key = 'hw_verif_' + username;
+        localStorage.setItem(key, JSON.stringify(codeObj));
+      } catch(e){}
+    }
+    function getVerification(username){
+      try {
+        const key = 'hw_verif_' + username;
+        return JSON.parse(localStorage.getItem(key) || 'null');
+      } catch(e){ return null; }
+    }
+    function clearVerification(username){
+      try { localStorage.removeItem('hw_verif_' + username); } catch(e){}
+    }
+
     /* Simple password encoding for demo (not secure) */
     function encodePassword(p){ return btoa(p); }
     function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
@@ -271,7 +293,7 @@
       if(!wl.includes('anotheryear')){ wl.push('anotheryear'); saveWhitelist(wl); }
       const users = getUsers();
       if(!users['anotheryear']){
-        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
+        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
         saveUsers(users);
       }
     })();
@@ -284,7 +306,7 @@
       saveLogs(logs);
     }
 
-    /* ---------- Webhook notifier helpers ---------- */
+    /* ---------- Webhook helpers ---------- */
     async function postToWebhook(payload) {
       if (!WEBHOOK_URL) return;
       try {
@@ -294,7 +316,6 @@
           body: JSON.stringify(payload),
         });
       } catch (err) {
-        // store pending
         const pending = getPendingWebhooks();
         pending.unshift({ ts: Date.now(), payload });
         if (pending.length > 200) pending.length = 200;
@@ -343,7 +364,6 @@
     /* ---------- Notifications utility (only for additions) ---------- */
     function createNotification(title, message, meta){
       if(!isNotifEnabled()) return;
-      // Only create notifications for additions (meta.type === 'tool' or 'game' or admin actions)
       if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')) {
         const list = getNotifications();
         const item = {
@@ -360,11 +380,9 @@
         renderNotifUI();
 
         // send webhook for additions and admin events
-        if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')) {
-          const username = getCurrentUser();
-          const payload = buildWebhookPayload(meta.type === 'tool' ? 'tool_added' : meta.type === 'game' ? 'game_added' : 'admin_action', username, { title, message, meta });
-          postToWebhook(payload);
-        }
+        const username = getCurrentUser();
+        const payload = buildWebhookPayload(meta.type === 'tool' ? 'tool_added' : meta.type === 'game' ? 'game_added' : 'admin_action', username, { title, message, meta });
+        postToWebhook(payload);
       }
     }
 
@@ -395,6 +413,7 @@
     const toolsCard = document.getElementById('toolsCard');
     const otherCard = document.getElementById('otherCard');
     const sandboxBtn = document.getElementById('sandboxBtn');
+    const snakeBtn = document.getElementById('snakeBtn');
 
     const profileBtn = document.getElementById('profileBtn');
     const profileAvatar = document.getElementById('profileAvatar');
@@ -444,7 +463,6 @@
       logAction(getCurrentUser(), 'add_tool', { name });
     }
 
-    // Ensure FL Studio button exists and create a one-time "added" notification if not seen
     (function ensureFLStudio(){
       const fl = document.getElementById('flStudioBtn');
       if(fl){
@@ -613,7 +631,7 @@
       if(!profilePopover.contains(e.target) && !profileBtn.contains(e.target)) togglePopover(false);
     });
 
-    /* ---------- Modal flows: signup, login, settings (with admin) ---------- */
+    /* ---------- Modal flows: signup, login, settings (with email & verification) ---------- */
     function openModal(mode){
       modalBackdrop.classList.add('show');
       modalBackdrop.setAttribute('aria-hidden','false');
@@ -621,6 +639,7 @@
       if(mode === 'signup') renderSignupModal();
       else if(mode === 'login') renderLoginModal();
       else if(mode === 'settings') renderSettingsModal();
+      else if(mode === 'verify_change') renderVerifyChangeModal();
     }
     function closeModal(){
       modalBackdrop.classList.remove('show');
@@ -628,7 +647,7 @@
       modal.innerHTML = '';
     }
 
-    /* Signup */
+    /* Signup (optional email) */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -638,6 +657,7 @@
           <input type="file" id="signupAvatarFile" accept="image/*">
         </div>
         <div class="form-row"><input id="signupUsername" type="text" placeholder="Username"></div>
+        <div class="form-row"><input id="signupEmail" type="text" placeholder="Email (optional)"></div>
         <div class="form-row"><input id="signupPassword" type="password" placeholder="Password"></div>
         <div class="form-row"><input id="signupPassword2" type="password" placeholder="Confirm password"></div>
         <div class="form-actions">
@@ -662,13 +682,19 @@
 
       document.getElementById('signupSubmit').onclick = () => {
         const u = document.getElementById('signupUsername').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
         const p = document.getElementById('signupPassword').value;
         const p2 = document.getElementById('signupPassword2').value;
         if(!u || !p){ alert('Please provide username and password'); return; }
         if(p !== p2){ alert('Passwords do not match'); return; }
         const users = getUsers();
         if(users[u]){ alert('Username already exists'); return; }
-        users[u] = { password: encodePassword(p), avatar: avatarData, createdAt: Date.now() };
+        // ensure email uniqueness if provided
+        if(email){
+          const existing = Object.keys(users).find(k => users[k].email && users[k].email.toLowerCase() === email.toLowerCase());
+          if(existing){ alert('Email already in use by another account'); return; }
+        }
+        users[u] = { password: encodePassword(p), avatar: avatarData, email: email || '', createdAt: Date.now() };
         saveUsers(users);
         setCurrentUser(u);
         logAction(u, 'signup', { createdAt: Date.now() });
@@ -677,11 +703,11 @@
       };
     }
 
-    /* Login (forgot-password removed) */
+    /* Login (accept username or email) */
     function renderLoginModal(){
       modal.innerHTML = `
         <h3>Log In</h3>
-        <div class="form-row"><input id="loginUsername" type="text" placeholder="Username"></div>
+        <div class="form-row"><input id="loginIdentifier" type="text" placeholder="Username or email"></div>
         <div class="form-row"><input id="loginPassword" type="password" placeholder="Password"></div>
         <div class="form-actions">
           <button class="btn ghost" id="loginCancel">Cancel</button>
@@ -695,21 +721,31 @@
       document.getElementById('toSignup').onclick = () => { renderSignupModal(); };
 
       document.getElementById('loginSubmit').onclick = () => {
-        const u = document.getElementById('loginUsername').value.trim();
+        const id = document.getElementById('loginIdentifier').value.trim();
         const p = document.getElementById('loginPassword').value;
-        if(!u || !p){ alert('Please provide username and password'); return; }
+        if(!id || !p){ alert('Please provide username/email and password'); return; }
         const users = getUsers();
-        if(!users[u] || typeof users[u].password !== 'string' || !verifyPassword(users[u].password, p)){
-          alert('Invalid username or password');
+
+        // Try username exact match first
+        let matchedUser = null;
+        if(users[id]) matchedUser = id;
+        else {
+          // try email match (case-insensitive)
+          const lower = id.toLowerCase();
+          matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
+        }
+
+        if(!matchedUser || !users[matchedUser] || typeof users[matchedUser].password !== 'string' || !verifyPassword(users[matchedUser].password, p)){
+          alert('Invalid username/email or password');
           return;
         }
 
         // login success
-        setCurrentUser(u);
-        logAction(u, 'login', { ts: Date.now() });
+        setCurrentUser(matchedUser);
+        logAction(matchedUser, 'login', { ts: Date.now() });
 
         // send webhook for login events
-        const payload = buildWebhookPayload('login', u, { ts: Date.now() });
+        const payload = buildWebhookPayload('login', matchedUser, { ts: Date.now() });
         postToWebhook(payload);
 
         renderProfile();
@@ -717,7 +753,7 @@
       };
     }
 
-    /* Settings (includes notification preference and admin panel) */
+    /* Settings (email optional, password change options) */
     function renderSettingsModal(){
       const username = getCurrentUser();
       if(!username){ alert('Not signed in'); closeModal(); return; }
@@ -740,7 +776,16 @@
         </div>
 
         <div class="form-row"><label class="muted">Username</label><input id="settingsUsername" type="text" value="${username}"></div>
-        <div class="form-row"><label class="muted">New password (leave blank to keep)</label><input id="settingsPassword" type="password" placeholder="New password"></div>
+        <div class="form-row"><label class="muted">Email (optional)</label><input id="settingsEmail" type="text" value="${user.email || ''}" placeholder="you@example.com"></div>
+
+        <div style="margin-top:8px;margin-bottom:8px">
+          <div style="font-weight:700;margin-bottom:6px">Change password</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button>
+            <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
+          </div>
+          <div class="muted" style="margin-top:8px">Email verification requires an email on your account. A 6-digit code will be sent to the configured email (delivered via webhook in this demo).</div>
+        </div>
 
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <label class="muted">Enable notifications</label>
@@ -830,26 +875,32 @@
         reader.readAsDataURL(f);
       });
 
-      // Save changes
+      // Save changes (username/email)
       document.getElementById('settingsSave').onclick = () => {
         const newUsername = document.getElementById('settingsUsername').value.trim();
-        const newPassword = document.getElementById('settingsPassword').value;
+        const newEmail = document.getElementById('settingsEmail').value.trim();
         const users = getUsers();
         const current = getCurrentUser();
 
         if(!newUsername){ alert('Username cannot be empty'); return; }
         if(newUsername !== current && users[newUsername]){ alert('Username already taken'); return; }
 
+        // ensure email uniqueness if provided
+        if(newEmail){
+          const existing = Object.keys(users).find(k => k !== current && users[k].email && users[k].email.toLowerCase() === newEmail.toLowerCase());
+          if(existing){ alert('Email already in use by another account'); return; }
+        }
+
         const data = users[current];
         delete users[current];
         users[newUsername] = data;
 
         users[newUsername].avatar = newAvatar || users[newUsername].avatar || DEFAULT_AVATAR;
-        if(newPassword) users[newUsername].password = encodePassword(newPassword);
-
+        users[newUsername].email = newEmail || '';
+        // password unchanged here
         saveUsers(users);
         setCurrentUser(newUsername);
-        logAction(current, 'update_profile', { newUsername });
+        logAction(current, 'update_profile', { newUsername, newEmail });
         createNotification('Profile updated', `User ${current} updated profile`, { type: 'admin', user: newUsername });
         renderProfile();
         closeModal();
@@ -861,6 +912,33 @@
         setNotifEnabled(e.target.checked);
         renderNotifUI();
       });
+
+      // Change password with current password
+      document.getElementById('changePasswordWithCurrent').onclick = () => {
+        renderChangeWithCurrentModal();
+      };
+
+      // Change password via email verification
+      document.getElementById('changePasswordViaEmail').onclick = () => {
+        // require email on account
+        const u = getCurrentUser();
+        const users = getUsers();
+        if(!users[u] || !users[u].email){
+          alert('No email configured for this account. Add an email in Settings first.');
+          return;
+        }
+        // generate and send code
+        const code = generateVerificationCode();
+        const codeObj = { code, ts: Date.now(), expiresAt: Date.now() + 1000 * 60 * 15 }; // 15 minutes
+        saveVerification(u, codeObj);
+
+        // send code via webhook (demo) with minimal info
+        const payload = buildWebhookPayload('email_verification_code', u, { email: users[u].email, code: code, note: 'Deliver this code to the user email in production' });
+        postToWebhook(payload);
+
+        // show modal to enter code and new password
+        renderVerifyChangeModal(u);
+      };
 
       // Copy profile JSON
       document.getElementById('copyProfileJSON').onclick = () => {
@@ -883,7 +961,7 @@
         // re-add default whitelist and admin user
         saveWhitelist(['anotheryear']);
         const users = {};
-        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
+        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
         saveUsers(users);
         setCurrentUser(null);
         renderProfile();
@@ -916,7 +994,7 @@
             if(filter && !u.toLowerCase().includes(filter.toLowerCase())) return;
             const tr = document.createElement('tr');
             const created = users[u].createdAt ? new Date(users[u].createdAt).toLocaleString() : '-';
-            tr.innerHTML = `<td style="min-width:160px"><strong>${u}</strong></td><td>${created}</td><td></td>`;
+            tr.innerHTML = `<td style="min-width:160px"><strong>${u}</strong><div class="muted" style="font-size:12px">${users[u].email || ''}</div></td><td>${created}</td><td></td>`;
             const actionsTd = tr.querySelector('td:last-child');
             const actions = document.createElement('div');
             actions.className = 'admin-actions';
@@ -1073,6 +1151,83 @@
       if(e.target === modalBackdrop) closeModal();
     });
 
+    /* ---------- Change password with current password modal ---------- */
+    function renderChangeWithCurrentModal(){
+      modal.innerHTML = `
+        <h3>Change Password</h3>
+        <div class="form-row"><label class="muted">Current password</label><input id="curPass" type="password"></div>
+        <div class="form-row"><label class="muted">New password</label><input id="newPass" type="password"></div>
+        <div class="form-row"><label class="muted">Confirm new password</label><input id="newPass2" type="password"></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="changeCancel">Cancel</button>
+          <button class="btn primary" id="changeSubmit">Change password</button>
+        </div>
+      `;
+      document.getElementById('changeCancel').onclick = closeModal;
+      document.getElementById('changeSubmit').onclick = () => {
+        const cur = document.getElementById('curPass').value;
+        const n1 = document.getElementById('newPass').value;
+        const n2 = document.getElementById('newPass2').value;
+        const u = getCurrentUser();
+        if(!u){ alert('Not signed in'); return; }
+        const users = getUsers();
+        if(!verifyPassword(users[u].password, cur)){ alert('Current password incorrect'); return; }
+        if(!n1){ alert('Enter a new password'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        users[u].password = encodePassword(n1);
+        saveUsers(users);
+        logAction(u, 'change_password', { method: 'current_password' });
+        alert('Password changed successfully');
+        closeModal();
+      };
+    }
+
+    /* ---------- Email verification flow for password change ---------- */
+    function generateVerificationCode(){
+      return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+    }
+
+    function renderVerifyChangeModal(prefilledUsername){
+      const u = prefilledUsername || getCurrentUser();
+      if(!u){ alert('No user specified'); return; }
+      modal.innerHTML = `
+        <h3>Verify Email to Change Password</h3>
+        <div class="form-row"><label class="muted">Username</label><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div>
+        <div class="form-row"><label class="muted">Enter 6-digit code sent to your email</label><input id="verCode" type="text" placeholder="123456"></div>
+        <div class="form-row"><label class="muted">New password</label><input id="verNewPass" type="password"></div>
+        <div class="form-row"><label class="muted">Confirm new password</label><input id="verNewPass2" type="password"></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="verCancel">Cancel</button>
+          <button class="btn primary" id="verSubmit">Verify & change</button>
+        </div>
+        <div style="margin-top:8px" class="muted">If you did not receive a code, ask an admin to view pending webhooks or resend the code from the admin panel.</div>
+      `;
+      document.getElementById('verCancel').onclick = closeModal;
+      document.getElementById('verSubmit').onclick = () => {
+        const username = document.getElementById('verUsername').value.trim();
+        const code = document.getElementById('verCode').value.trim();
+        const n1 = document.getElementById('verNewPass').value;
+        const n2 = document.getElementById('verNewPass2').value;
+        if(!username || !code || !n1){ alert('Please fill all fields'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        const ver = getVerification(username);
+        if(!ver){ alert('No verification code found or it expired'); return; }
+        if(Date.now() > ver.expiresAt){ clearVerification(username); alert('Code expired'); return; }
+        if(ver.code !== code){ alert('Invalid code'); return; }
+        // success
+        const users = getUsers();
+        if(!users[username]){ alert('User not found'); return; }
+        users[username].password = encodePassword(n1);
+        saveUsers(users);
+        clearVerification(username);
+        logAction(username, 'change_password', { method: 'email_verification' });
+        alert('Password changed successfully. You are now signed in as ' + username);
+        setCurrentUser(username);
+        renderProfile();
+        closeModal();
+      };
+    }
+
     /* ---------- Utilities ---------- */
     function escapeHtml(s){
       if(!s) return '';
@@ -1092,6 +1247,14 @@
       showSection(initial);
       renderProfile();
       renderNotifUI();
+
+      // Wire up the Snake button to open snake.html
+      if(snakeBtn){
+        snakeBtn.addEventListener('click', () => {
+          // navigate to snake.html in the same directory
+          window.location.href = 'snake.html';
+        });
+      }
 
       // Flush pending webhooks in background (best-effort)
       flushPendingWebhooks().catch(()=>{});
