@@ -231,6 +231,7 @@
        - Webhook sends messages for additions and login events (not visits)
        - Admin panel expanded with more controls
        - All data stored in localStorage under hw_* keys
+       - Forgot-password / reset flow removed for security per request
        - Demo-only client-side implementation
        ========================= */
 
@@ -676,7 +677,7 @@
       };
     }
 
-    /* Login (with Forgot password link) */
+    /* Login (forgot-password removed) */
     function renderLoginModal(){
       modal.innerHTML = `
         <h3>Log In</h3>
@@ -688,17 +689,10 @@
         </div>
         <div style="margin-top:10px;text-align:center" class="muted">
           Don't have an account? <button class="link-like" id="toSignup">Sign up</button>
-          &nbsp;·&nbsp;
-          <button class="link-like" id="forgotPassword">Forgot password?</button>
         </div>
       `;
       document.getElementById('loginCancel').onclick = closeModal;
       document.getElementById('toSignup').onclick = () => { renderSignupModal(); };
-
-      document.getElementById('forgotPassword').onclick = () => {
-        closeModal();
-        renderResetPasswordModal();
-      };
 
       document.getElementById('loginSubmit').onclick = () => {
         const u = document.getElementById('loginUsername').value.trim();
@@ -711,7 +705,6 @@
         }
 
         // login success
-        const hadOpened = localStorage.getItem('hw_session_opened') === 'true';
         setCurrentUser(u);
         logAction(u, 'login', { ts: Date.now() });
 
@@ -719,72 +712,6 @@
         const payload = buildWebhookPayload('login', u, { ts: Date.now() });
         postToWebhook(payload);
 
-        // If they had opened the site earlier in this browser, create an admin notification (not a visit)
-        if(hadOpened){
-          createNotification('User logged in', `User ${u} logged in`, { type: 'admin', user: u });
-        }
-
-        renderProfile();
-        closeModal();
-      };
-    }
-
-    /* Reset password modal (local-only) */
-    function renderResetPasswordModal(prefilledUsername){
-      modalBackdrop.classList.add('show');
-      modalBackdrop.setAttribute('aria-hidden','false');
-      modal.innerHTML = `
-        <h3>Reset Password</h3>
-        <div class="form-row">
-          <label class="muted">Username</label>
-          <input id="resetUsername" type="text" placeholder="Username" value="${prefilledUsername ? escapeHtml(prefilledUsername) : ''}">
-        </div>
-        <div class="form-row">
-          <label class="muted">New password</label>
-          <input id="resetPassword" type="password" placeholder="New password">
-        </div>
-        <div class="form-row">
-          <label class="muted">Confirm new password</label>
-          <input id="resetPassword2" type="password" placeholder="Confirm new password">
-        </div>
-        <div class="form-actions">
-          <button class="btn ghost" id="resetCancel">Cancel</button>
-          <button class="btn primary" id="resetSubmit">Set new password</button>
-        </div>
-        <div style="margin-top:10px;text-align:center" class="muted">This resets the password locally in your browser only.</div>
-      `;
-
-      document.getElementById('resetCancel').onclick = closeModal;
-
-      document.getElementById('resetSubmit').onclick = () => {
-        const u = document.getElementById('resetUsername').value.trim();
-        const p = document.getElementById('resetPassword').value;
-        const p2 = document.getElementById('resetPassword2').value;
-        if(!u){ alert('Please enter the username to reset'); return; }
-        if(!p){ alert('Please enter a new password'); return; }
-        if(p !== p2){ alert('Passwords do not match'); return; }
-
-        const users = getUsers();
-        if(!users[u]){
-          if(!confirm(`User "${u}" does not exist. Create a new account with this username and password?`)) return;
-          users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
-          saveUsers(users);
-          setCurrentUser(u);
-          logAction(u, 'signup_via_reset', { ts: Date.now() });
-          renderProfile();
-          alert(`Account "${u}" created and signed in.`);
-          closeModal();
-          return;
-        }
-
-        users[u].password = encodePassword(p);
-        saveUsers(users);
-        logAction(getCurrentUser() || u, 'reset_password_via_modal', { user: u, ts: Date.now() });
-
-        // sign in as that user
-        setCurrentUser(u);
-
-        alert('Password updated locally. You are now signed in as ' + u);
         renderProfile();
         closeModal();
       };
@@ -1028,7 +955,7 @@
             };
             actions.appendChild(wlBtn);
 
-            // Reset password
+            // Reset password (admin quick reset)
             const reset = document.createElement('button');
             reset.className = 'pill';
             reset.textContent = 'Reset password';
