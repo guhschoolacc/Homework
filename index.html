@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>homewrk</title>
+  <link id="siteFavicon" rel="icon" href="">
   <style>
     :root{
       --bg:#050509;
@@ -105,6 +106,11 @@
     .avatar-preview img{width:100%;height:100%;object-fit:cover}
     .muted{color:var(--muted);font-size:13px}
 
+    /* Tab masking preview */
+    .tab-mask-preview{display:flex;align-items:center;gap:10px}
+    .tab-mask-preview img{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);object-fit:cover}
+    .tab-mask-preview .title{font-weight:700;color:#e6e7eb}
+
     /* Admin table */
     .admin-table{width:100%;border-collapse:collapse;margin-top:12px}
     .admin-table th, .admin-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:14px}
@@ -176,7 +182,6 @@
       <section class="card" id="gamesCard">
         <div class="games-row" id="gamesRow" role="list" aria-label="Games list">
           <button class="game-btn" id="sandboxBtn" title="Open Sandbox">Sandbox</button>
-          <!-- New Snake Game Ripoff button -->
           <button class="game-btn" id="snakeBtn" title="Open Snake Game Ripoff" aria-label="Open Snake Game Ripoff">Snake Game Ripoff</button>
         </div>
       </section>
@@ -228,16 +233,13 @@
 
   <script>
     /* =========================
-       Improved account system
-       - Login accepts username OR email (case-insensitive for email)
-       - Optional email on signup/settings
-       - Email verification flow for password changes:
-         * Generates a 6-digit code, stores it locally, and sends it to WEBHOOK_URL (if set)
-         * User must enter the code to confirm password change
-       - Forgot-password flow removed (per request)
-       - Admin panel and notifications retained
-       - All data stored in localStorage under hw_* keys
-       - Client-side demo only; real email delivery requires a server
+       Account system + notifications + webhook + tab masking
+       - Adds a Tab Masking feature in Settings:
+         * Change tab title (document.title)
+         * Change tab icon (favicon) via URL or file upload
+         * Saved to localStorage (hw_tab_title, hw_tab_icon)
+       - All other features retained (users, admin, notifications, webhook)
+       - Client-side demo only
        ========================= */
 
     /* ---------- CONFIG: set your webhook URL here ---------- */
@@ -264,6 +266,12 @@
     function getPendingWebhooks(){ try { return JSON.parse(localStorage.getItem('hw_webhook_pending') || '[]'); } catch(e){ return []; } }
     function savePendingWebhooks(list){ localStorage.setItem('hw_webhook_pending', JSON.stringify(list)); }
 
+    /* Tab masking storage */
+    function getTabTitle(){ return localStorage.getItem('hw_tab_title') || ''; }
+    function saveTabTitle(t){ if(t) localStorage.setItem('hw_tab_title', t); else localStorage.removeItem('hw_tab_title'); }
+    function getTabIcon(){ return localStorage.getItem('hw_tab_icon') || ''; }
+    function saveTabIcon(url){ if(url) localStorage.setItem('hw_tab_icon', url); else localStorage.removeItem('hw_tab_icon'); }
+
     /* Verification codes storage (short-lived) */
     function saveVerification(username, codeObj){
       try {
@@ -287,6 +295,7 @@
 
     /* Defaults */
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cfcfd6' stroke-width='1.2'><circle cx='12' cy='8' r='3.2'/><path d='M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5'/></svg>`);
+    const DEFAULT_FAVICON = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfcfd6' stroke-width='1.6'><circle cx='12' cy='12' r='9'/><path d='M8 12h8'/></svg>`);
 
     (function ensureDefaults(){
       const wl = getWhitelist();
@@ -296,6 +305,9 @@
         users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
         saveUsers(users);
       }
+      // ensure favicon link exists
+      const link = document.getElementById('siteFavicon');
+      if(link && !link.href) link.href = DEFAULT_FAVICON;
     })();
 
     /* Logging utility */
@@ -359,6 +371,35 @@
         }
       }
       localStorage.removeItem('hw_webhook_pending');
+    }
+
+    /* ---------- Tab masking helpers ---------- */
+    function applyTabMasking(){
+      const title = getTabTitle();
+      const icon = getTabIcon();
+      if(title) document.title = title;
+      if(icon){
+        setFavicon(icon);
+      } else {
+        // ensure default favicon if none set
+        const link = document.getElementById('siteFavicon');
+        if(link && (!link.href || link.href.endsWith('about:blank'))) link.href = DEFAULT_FAVICON;
+      }
+    }
+
+    function setFavicon(url){
+      try {
+        let link = document.getElementById('siteFavicon');
+        if(!link){
+          link = document.createElement('link');
+          link.id = 'siteFavicon';
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.href = url || DEFAULT_FAVICON;
+      } catch(e){
+        console.warn('Failed to set favicon', e);
+      }
     }
 
     /* ---------- Notifications utility (only for additions) ---------- */
@@ -631,7 +672,7 @@
       if(!profilePopover.contains(e.target) && !profileBtn.contains(e.target)) togglePopover(false);
     });
 
-    /* ---------- Modal flows: signup, login, settings (with email & verification) ---------- */
+    /* ---------- Modal flows: signup, login, settings (with tab masking) ---------- */
     function openModal(mode){
       modalBackdrop.classList.add('show');
       modalBackdrop.setAttribute('aria-hidden','false');
@@ -753,7 +794,7 @@
       };
     }
 
-    /* Settings (email optional, password change options) */
+    /* Settings (email optional, tab masking controls, password change options) */
     function renderSettingsModal(){
       const username = getCurrentUser();
       if(!username){ alert('Not signed in'); closeModal(); return; }
@@ -763,6 +804,10 @@
       const isAdmin = whitelist.includes(username);
 
       const notifEnabled = isNotifEnabled();
+
+      // current tab mask values
+      const currentTabTitle = getTabTitle();
+      const currentTabIcon = getTabIcon();
 
       modal.innerHTML = `
         <h3>Settings</h3>
@@ -785,6 +830,38 @@
             <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
           </div>
           <div class="muted" style="margin-top:8px">Email verification requires an email on your account. A 6-digit code will be sent to the configured email (delivered via webhook in this demo).</div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Tab Masking</div>
+        <div class="muted" style="margin-bottom:8px">Change how the site appears in browser tabs. Saved locally for this browser.</div>
+
+        <div class="form-row">
+          <label class="muted">Tab title</label>
+          <input id="tabTitleInput" type="text" placeholder="Custom tab title" value="${escapeHtml(currentTabTitle)}">
+        </div>
+
+        <div class="form-row">
+          <label class="muted">Tab icon (URL)</label>
+          <input id="tabIconUrl" type="text" placeholder="https://example.com/favicon.png" value="${escapeHtml(currentTabIcon && currentTabIcon.startsWith('data:') ? '' : currentTabIcon)}">
+        </div>
+
+        <div class="form-row">
+          <label class="muted">Or upload an icon file (PNG, SVG)</label>
+          <input id="tabIconFile" type="file" accept="image/*">
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div class="tab-mask-preview" id="tabMaskPreview">
+            <img id="tabMaskPreviewImg" src="${escapeHtml(currentTabIcon || DEFAULT_FAVICON)}" alt="icon preview">
+            <div class="title" id="tabMaskPreviewTitle">${escapeHtml(currentTabTitle || document.title)}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn primary" id="applyTabMask">Apply</button>
+          <button class="btn ghost" id="clearTabMask">Clear</button>
         </div>
 
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
@@ -875,7 +952,76 @@
         reader.readAsDataURL(f);
       });
 
-      // Save changes (username/email)
+      // Tab masking controls
+      const tabTitleInput = document.getElementById('tabTitleInput');
+      const tabIconUrl = document.getElementById('tabIconUrl');
+      const tabIconFile = document.getElementById('tabIconFile');
+      const tabMaskPreviewImg = document.getElementById('tabMaskPreviewImg');
+      const tabMaskPreviewTitle = document.getElementById('tabMaskPreviewTitle');
+
+      // preview updates
+      tabTitleInput.addEventListener('input', () => {
+        tabMaskPreviewTitle.textContent = tabTitleInput.value || document.title;
+      });
+      tabIconUrl.addEventListener('input', () => {
+        const v = tabIconUrl.value.trim();
+        if(v) tabMaskPreviewImg.src = v;
+        else {
+          const stored = getTabIcon();
+          tabMaskPreviewImg.src = stored || DEFAULT_FAVICON;
+        }
+      });
+      tabIconFile.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          tabMaskPreviewImg.src = reader.result;
+          // set the URL input blank to indicate file used
+          tabIconUrl.value = '';
+        };
+        reader.readAsDataURL(f);
+      });
+
+      // Apply button: set title and icon but don't persist until Save
+      document.getElementById('applyTabMask').onclick = () => {
+        const titleVal = tabTitleInput.value.trim();
+        const iconUrlVal = tabIconUrl.value.trim();
+        if(tabIconFile.files && tabIconFile.files[0]){
+          const f = tabIconFile.files[0];
+          const reader = new FileReader();
+          reader.onload = () => {
+            setFavicon(reader.result);
+            if(titleVal) document.title = titleVal;
+            tabMaskPreviewTitle.textContent = titleVal || document.title;
+          };
+          reader.readAsDataURL(f);
+        } else if(iconUrlVal){
+          setFavicon(iconUrlVal);
+          if(titleVal) document.title = titleVal;
+          tabMaskPreviewTitle.textContent = titleVal || document.title;
+        } else {
+          // only title change
+          if(titleVal) document.title = titleVal;
+          tabMaskPreviewTitle.textContent = titleVal || document.title;
+        }
+      };
+
+      // Clear tab mask
+      document.getElementById('clearTabMask').onclick = () => {
+        saveTabTitle('');
+        saveTabIcon('');
+        document.title = 'homewrk';
+        setFavicon(DEFAULT_FAVICON);
+        tabTitleInput.value = '';
+        tabIconUrl.value = '';
+        tabIconFile.value = '';
+        tabMaskPreviewImg.src = DEFAULT_FAVICON;
+        tabMaskPreviewTitle.textContent = document.title;
+        alert('Tab masking cleared (local only).');
+      };
+
+      // Save changes (username/email + persist tab mask)
       document.getElementById('settingsSave').onclick = () => {
         const newUsername = document.getElementById('settingsUsername').value.trim();
         const newEmail = document.getElementById('settingsEmail').value.trim();
@@ -902,6 +1048,34 @@
         setCurrentUser(newUsername);
         logAction(current, 'update_profile', { newUsername, newEmail });
         createNotification('Profile updated', `User ${current} updated profile`, { type: 'admin', user: newUsername });
+
+        // persist tab masking if provided
+        const titleVal = tabTitleInput.value.trim();
+        const iconUrlVal = tabIconUrl.value.trim();
+        if(tabIconFile.files && tabIconFile.files[0]){
+          const f = tabIconFile.files[0];
+          const reader = new FileReader();
+          reader.onload = () => {
+            saveTabIcon(reader.result);
+            if(titleVal) saveTabTitle(titleVal);
+            applyTabMasking();
+            alert('Settings saved.');
+            renderProfile();
+            closeModal();
+          };
+          reader.readAsDataURL(f);
+          return; // wait for reader
+        } else {
+          if(iconUrlVal) saveTabIcon(iconUrlVal);
+          else {
+            // if user cleared both fields, keep existing or clear if empty
+            if(!iconUrlVal && !getTabIcon()) saveTabIcon('');
+          }
+          if(titleVal) saveTabTitle(titleVal);
+          else saveTabTitle('');
+        }
+
+        applyTabMasking();
         renderProfile();
         closeModal();
       };
@@ -958,6 +1132,8 @@
         localStorage.removeItem('hw_webhook_pending');
         localStorage.removeItem('hw_notifications');
         localStorage.removeItem('hw_notif_enabled');
+        localStorage.removeItem('hw_tab_title');
+        localStorage.removeItem('hw_tab_icon');
         // re-add default whitelist and admin user
         saveWhitelist(['anotheryear']);
         const users = {};
@@ -966,6 +1142,7 @@
         setCurrentUser(null);
         renderProfile();
         renderNotifUI();
+        applyTabMasking();
         alert('Local data cleared. Defaults restored.');
       };
 
@@ -1231,7 +1408,7 @@
     /* ---------- Utilities ---------- */
     function escapeHtml(s){
       if(!s) return '';
-      return s.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+      return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
     }
 
     /* ---------- Session flag for "already opened" detection ---------- */
@@ -1241,6 +1418,9 @@
 
     /* ---------- Initialize ---------- */
     document.addEventListener('DOMContentLoaded', () => {
+      // Apply tab masking from storage first
+      applyTabMasking();
+
       profileAvatar.src = DEFAULT_AVATAR;
       const active = document.querySelector('.nav-item.active');
       const initial = active ? active.dataset.category : 'games';
@@ -1251,7 +1431,6 @@
       // Wire up the Snake button to open snake.html
       if(snakeBtn){
         snakeBtn.addEventListener('click', () => {
-          // navigate to snake.html in the same directory
           window.location.href = 'snake.html';
         });
       }
@@ -1264,9 +1443,12 @@
         if(e.key && e.key.startsWith('hw_')) {
           renderProfile();
           renderNotifUI();
+          // if tab mask changed in another tab, reapply
+          if(e.key === 'hw_tab_title' || e.key === 'hw_tab_icon') applyTabMasking();
         }
       });
     });
   </script>
 </body>
 </html>
+```
