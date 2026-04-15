@@ -2,83 +2,204 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Soundboard</title>
+  <title>Soundboard — Uploads & Mic Mixer</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; }
-    header { position:fixed; top:10px; left:10px; }
-    .grid { display:grid; grid-template-columns:repeat(3,140px); gap:12px; margin-top:80px; }
-    button.sound { padding:12px; font-size:16px; cursor:pointer; }
-    .controls { margin-top:20px; display:flex; gap:12px; align-items:center; }
-    label { font-weight:600; }
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#7c3aed; --muted:#94a3b8; --glass: rgba(255,255,255,0.03);
+      --radius:12px; --gap:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:
+      linear-gradient(180deg,#071024 0%, #071a2a 60%); color:#e6eef8; min-height:100vh;
+      display:flex; align-items:flex-start; justify-content:center; padding:28px;
+    }
+
+    .container{width:100%; max-width:1100px;}
+    header.top{
+      position:fixed; top:18px; left:18px;
+    }
+    header.top a{ text-decoration:none; }
+    .dash-btn{
+      background:linear-gradient(180deg,#0b1220,#071024); color:#cfe8ff; border:1px solid rgba(255,255,255,0.06);
+      padding:10px 14px; border-radius:10px; font-weight:600; box-shadow:0 6px 18px rgba(2,6,23,0.6);
+      cursor:pointer;
+    }
+
+    .card{
+      margin:40px auto 80px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius); padding:22px; border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
+
+    .top-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+    h1{margin:0; font-size:20px; letter-spacing:0.2px}
+    p.lead{margin:6px 0 0; color:var(--muted); font-size:13px}
+
+    .controls{display:flex; gap:12px; align-items:center; margin-top:18px; flex-wrap:wrap}
+    .control{background:var(--glass); padding:10px 12px; border-radius:10px; display:flex; gap:8px; align-items:center; border:1px solid rgba(255,255,255,0.02)}
+    .control label{font-size:13px; color:var(--muted)}
+    input[type=range]{width:140px}
+
+    .main{
+      display:grid; grid-template-columns: 1fr 420px; gap:18px; margin-top:18px;
+    }
+
+    /* left: sound buttons */
+    .grid{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    }
+    .sound-btn{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03); padding:18px; border-radius:12px; cursor:pointer;
+      display:flex; flex-direction:column; gap:8px; align-items:flex-start; min-height:84px;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .sound-btn:hover{ transform:translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.6) }
+    .sound-title{font-weight:700}
+    .sound-sub{font-size:12px; color:var(--muted)}
+
+    /* right: uploads */
+    .uploads{
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+      border-radius:12px; padding:12px; border:1px solid rgba(255,255,255,0.02);
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .drop{
+      border:2px dashed rgba(255,255,255,0.04); border-radius:10px; padding:18px; text-align:center;
+      color:var(--muted); background:rgba(255,255,255,0.01); cursor:pointer;
+    }
+    .files{display:flex; flex-direction:column; gap:8px; max-height:320px; overflow:auto; padding-right:6px}
+    .file-row{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.02)}
+    .file-info{display:flex; gap:10px; align-items:center}
+    .file-name{font-size:13px}
+    .file-meta{font-size:12px; color:var(--muted)}
+
+    .small-btn{background:transparent; border:1px solid rgba(255,255,255,0.04); padding:6px 8px; border-radius:8px; color:#dbeafe; cursor:pointer}
+    .assign-btn{background:linear-gradient(90deg,var(--accent),#4f46e5); border:none; color:white; padding:8px 10px; border-radius:8px; cursor:pointer}
+
+    footer.status{margin-top:12px; color:var(--muted); font-size:13px}
+    @media (max-width:980px){ .main{grid-template-columns:1fr} .grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:560px){ .grid{grid-template-columns:1fr} header.top{left:10px} }
   </style>
 </head>
 <body>
-  <header><a href="index.html"><button>Return to dashboard</button></a></header>
+  <div class="container">
+    <header class="top">
+      <a href="index.html"><button class="dash-btn">Return to dashboard</button></a>
+    </header>
 
-  <h1>Web Soundboard + Mic Mixer</h1>
+    <div class="card" role="application" aria-label="Soundboard">
+      <div class="top-row">
+        <div>
+          <h1>Soundboard — Upload your sounds</h1>
+          <p class="lead">Upload files, assign them to buttons, and mix with your microphone.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center">
+          <div class="control">
+            <label for="micToggle">Mic</label>
+            <input id="micToggle" type="checkbox" checked aria-label="Toggle microphone" style="margin-left:6px">
+          </div>
+          <div class="control">
+            <label for="shareBtn">Mixed stream</label>
+            <button id="shareBtn" class="small-btn" style="margin-left:6px">Use mixed stream</button>
+          </div>
+        </div>
+      </div>
 
-  <div class="controls">
-    <label>Mic: <input id="micToggle" type="checkbox" checked></label>
-    <label>Sound Volume: <input id="sVol" type="range" min="0" max="1" step="0.01" value="0.8"></label>
-    <label>Mic Volume: <input id="mVol" type="range" min="0" max="1" step="0.01" value="1"></label>
-    <button id="shareBtn">Use mixed stream (for WebRTC)</button>
+      <div class="controls" style="margin-top:14px">
+        <div class="control"><label>Sound Vol</label><input id="sVol" type="range" min="0" max="1" step="0.01" value="0.85"></div>
+        <div class="control"><label>Mic Vol</label><input id="mVol" type="range" min="0" max="1" step="0.01" value="1"></div>
+        <div class="control"><label>Monitor</label><input id="monitor" type="checkbox" checked style="margin-left:6px"></div>
+      </div>
+
+      <div class="main">
+        <div>
+          <div class="grid" id="buttons">
+            <!-- 9 buttons generated by JS -->
+          </div>
+        </div>
+
+        <aside class="uploads" aria-label="Uploads and file manager">
+          <div id="drop" class="drop" tabindex="0">
+            <div style="font-weight:700; margin-bottom:6px">Drag & drop files here</div>
+            <div style="font-size:13px; color:var(--muted)">Or click to select files. All file types accepted; audio files will be playable.</div>
+            <input id="fileInput" type="file" multiple style="display:none" />
+          </div>
+
+          <div style="display:flex; gap:8px; align-items:center; justify-content:space-between">
+            <div style="color:var(--muted); font-size:13px">Uploaded files</div>
+            <button id="clearFiles" class="small-btn">Clear</button>
+          </div>
+
+          <div class="files" id="fileList" aria-live="polite"></div>
+
+          <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px">
+            <button id="previewBtn" class="small-btn">Preview selected</button>
+          </div>
+
+        </aside>
+      </div>
+
+      <footer class="status" id="status">No files uploaded yet.</footer>
+    </div>
   </div>
-
-  <div class="grid" id="buttons">
-    <button class="sound" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Sound 1</button>
-    <button class="sound" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Sound 2</button>
-    <button class="sound" data-src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">Sound 3</button>
-  </div>
-
-  <p id="status"></p>
 
 <script>
 (async function(){
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const dest = audioCtx.createMediaStreamDestination(); // mixed output stream
+  // UI refs
+  const buttonsEl = document.getElementById('buttons');
+  const drop = document.getElementById('drop');
+  const fileInput = document.getElementById('fileInput');
+  const fileListEl = document.getElementById('fileList');
+  const status = document.getElementById('status');
   const sVol = document.getElementById('sVol');
   const mVol = document.getElementById('mVol');
   const micToggle = document.getElementById('micToggle');
-  const status = document.getElementById('status');
+  const monitor = document.getElementById('monitor');
+  const shareBtn = document.getElementById('shareBtn');
+  const clearFilesBtn = document.getElementById('clearFiles');
+  const previewBtn = document.getElementById('previewBtn');
 
-  // Gain nodes
-  const soundGain = audioCtx.createGain(); soundGain.gain.value = sVol.value;
-  const micGain = audioCtx.createGain(); micGain.gain.value = mVol.value;
+  // Create 9 sound buttons
+  const NUM_BUTTONS = 9;
+  const buttonState = Array.from({length:NUM_BUTTONS}, ()=>({fileId:null, title:'Empty'}));
+  for(let i=0;i<NUM_BUTTONS;i++){
+    const btn = document.createElement('button');
+    btn.className = 'sound-btn';
+    btn.dataset.index = i;
+    btn.innerHTML = `<div class="sound-title">Button ${i+1}</div><div class="sound-sub">No file assigned</div>`;
+    btn.addEventListener('click', ()=> playAssigned(i));
+    buttonsEl.appendChild(btn);
+  }
 
-  // Hook up sliders
-  sVol.addEventListener('input', ()=> soundGain.gain.value = sVol.value);
-  mVol.addEventListener('input', ()=> micGain.gain.value = mVol.value);
+  // File storage (in-memory)
+  const files = new Map(); // id -> {file, url, name, mime}
+  let idCounter = 1;
 
-  // Load and play sound via <audio> elements routed into WebAudio
-  document.querySelectorAll('.sound').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const url = btn.dataset.src;
-      const audio = new Audio(url);
-      audio.crossOrigin = "anonymous";
-      await audio.play().catch(()=>{}); // start playback
-      const src = audioCtx.createMediaElementSource(audio);
-      src.connect(soundGain).connect(dest);
-      src.connect(audioCtx.destination); // also play to speakers
-      // auto-stop after ended
-      audio.addEventListener('ended', ()=> {
-        try { src.disconnect(); } catch(e){}
-      });
-    });
-  });
+  // Web Audio setup
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const dest = audioCtx.createMediaStreamDestination();
+  const soundGain = audioCtx.createGain(); soundGain.gain.value = parseFloat(sVol.value);
+  const micGain = audioCtx.createGain(); micGain.gain.value = parseFloat(mVol.value);
 
-  // Get microphone and route into destination
+  sVol.addEventListener('input', ()=> soundGain.gain.value = parseFloat(sVol.value));
+  mVol.addEventListener('input', ()=> micGain.gain.value = parseFloat(mVol.value));
+
+  // Microphone
   let micStream = null;
+  let micSource = null;
   async function enableMic(){
     try {
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const micSource = audioCtx.createMediaStreamSource(micStream);
+      micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      micSource = audioCtx.createMediaStreamSource(micStream);
       micSource.connect(micGain).connect(dest);
-      // Also optionally monitor to speakers
-      micSource.connect(audioCtx.destination);
+      if (monitor.checked) micSource.connect(audioCtx.destination);
       status.textContent = 'Microphone connected.';
-    } catch (e) {
-      status.textContent = 'Microphone access denied or unavailable.';
+    } catch(e){
+      status.textContent = 'Microphone unavailable.';
       console.error(e);
     }
   }
@@ -87,23 +208,205 @@
     if (micToggle.checked) await enableMic();
     else {
       if (micStream) micStream.getTracks().forEach(t=>t.stop());
+      micStream = null; micSource = null;
       status.textContent = 'Microphone disconnected.';
     }
   });
+  monitor.addEventListener('change', ()=> {
+    // reconnect or disconnect monitoring
+    if (!micSource) return;
+    try {
+      if (monitor.checked) micSource.connect(audioCtx.destination);
+      else micSource.disconnect(audioCtx.destination);
+    } catch(e){}
+  });
 
-  // Expose mixed stream for WebRTC or recording
-  document.getElementById('shareBtn').addEventListener('click', ()=>{
-    const mixed = dest.stream; // MediaStream with mixed audio tracks
-    // Example: open a new window that plays the mixed stream (for testing)
+  // Drag & drop and file input
+  drop.addEventListener('click', ()=> fileInput.click());
+  drop.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+
+  ['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, (e)=>{ e.preventDefault(); drop.style.borderColor = 'rgba(124,58,237,0.9)'; }));
+  ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, (e)=>{ e.preventDefault(); drop.style.borderColor = ''; }));
+  drop.addEventListener('drop', (e)=> {
+    const dt = e.dataTransfer;
+    if (dt && dt.files) handleFiles(dt.files);
+  });
+  fileInput.addEventListener('change', ()=> handleFiles(fileInput.files));
+
+  function handleFiles(fileList){
+    const arr = Array.from(fileList);
+    arr.forEach(f=>{
+      const id = 'f'+(idCounter++);
+      const url = URL.createObjectURL(f);
+      files.set(id, {file:f, url, name:f.name, mime:f.type});
+      addFileRow(id);
+    });
+    updateStatus();
+  }
+
+  function addFileRow(id){
+    const info = files.get(id);
+    const row = document.createElement('div');
+    row.className = 'file-row';
+    row.dataset.id = id;
+    row.innerHTML = `
+      <div class="file-info">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted)">F</div>
+        <div>
+          <div class="file-name">${escapeHtml(info.name)}</div>
+          <div class="file-meta">${info.mime || 'unknown type'}</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <button class="small-btn preview" title="Preview">▶</button>
+        <button class="assign-btn assign" title="Assign to button">Assign</button>
+        <button class="small-btn remove" title="Remove">✕</button>
+      </div>
+    `;
+    fileListEl.prepend(row);
+
+    row.querySelector('.preview').addEventListener('click', ()=> previewFile(id));
+    row.querySelector('.remove').addEventListener('click', ()=> {
+      files.delete(id);
+      URL.revokeObjectURL(info.url);
+      row.remove();
+      // unassign from buttons if assigned
+      for(let i=0;i<buttonState.length;i++){
+        if (buttonState[i].fileId === id) {
+          buttonState[i].fileId = null;
+          buttonState[i].title = 'Empty';
+          updateButtonUI(i);
+        }
+      }
+      updateStatus();
+    });
+    row.querySelector('.assign').addEventListener('click', ()=> openAssignMenu(id));
+  }
+
+  // Assign UI: simple prompt to choose button
+  function openAssignMenu(fileId){
+    const names = buttonState.map((b,i)=>`[${i+1}] ${b.title}`);
+    const choice = prompt('Assign to which button? Enter number 1-'+NUM_BUTTONS+'\nCurrent: '+names.join(' | '));
+    if (!choice) return;
+    const idx = parseInt(choice,10)-1;
+    if (isNaN(idx) || idx<0 || idx>=NUM_BUTTONS){ alert('Invalid button number'); return; }
+    const info = files.get(fileId);
+    buttonState[idx].fileId = fileId;
+    buttonState[idx].title = info.name;
+    updateButtonUI(idx);
+    status.textContent = `Assigned "${info.name}" to Button ${idx+1}.`;
+  }
+
+  function updateButtonUI(i){
+    const btn = buttonsEl.querySelector(`button[data-index="${i}"]`);
+    const state = buttonState[i];
+    btn.querySelector('.sound-title').textContent = `Button ${i+1}`;
+    btn.querySelector('.sound-sub').textContent = state.fileId ? state.title : 'No file assigned';
+  }
+
+  // Play assigned file
+  async function playAssigned(i){
+    const state = buttonState[i];
+    if (!state.fileId){ status.textContent = `Button ${i+1} has no file assigned.`; return; }
+    const info = files.get(state.fileId);
+    if (!info){ status.textContent = 'Assigned file missing.'; return; }
+
+    // Try to play via WebAudio: create an <audio> element and route into audioCtx
+    try {
+      const audio = new Audio(info.url);
+      audio.crossOrigin = 'anonymous';
+      await audio.play().catch(()=>{}); // start playback
+      const src = audioCtx.createMediaElementSource(audio);
+      src.connect(soundGain).connect(dest);
+      if (monitor.checked) src.connect(audioCtx.destination);
+      // auto cleanup when ended
+      audio.addEventListener('ended', ()=> {
+        try { src.disconnect(); } catch(e){}
+      });
+      status.textContent = `Playing "${info.name}" on Button ${i+1}.`;
+    } catch(e){
+      console.error(e);
+      status.textContent = `Cannot play file "${info.name}". It may not be an audio file.`;
+      alert('This file cannot be played in the browser as audio.');
+    }
+  }
+
+  // Preview single file in a popup audio element
+  function previewFile(id){
+    const info = files.get(id);
+    if (!info) return;
     const w = window.open('', '_blank');
-    w.document.body.innerHTML = '<h3>Mixed stream preview</h3>';
-    const audioEl = w.document.createElement('audio');
-    audioEl.autoplay = true;
-    audioEl.controls = true;
-    audioEl.srcObject = mixed;
-    w.document.body.appendChild(audioEl);
+    w.document.title = 'Preview: ' + info.name;
+    const h = w.document.createElement('div');
+    h.style.padding = '18px';
+    h.innerHTML = `<h3 style="font-family:Inter,Arial">${escapeHtml(info.name)}</h3>`;
+    const audio = w.document.createElement('audio');
+    audio.controls = true; audio.autoplay = true;
+    audio.src = info.url;
+    h.appendChild(audio);
+    w.document.body.appendChild(h);
+  }
+
+  // Clear files
+  clearFilesBtn.addEventListener('click', ()=> {
+    if (!confirm('Remove all uploaded files and unassign buttons?')) return;
+    files.forEach((v,k)=> URL.revokeObjectURL(v.url));
+    files.clear();
+    fileListEl.innerHTML = '';
+    for(let i=0;i<buttonState.length;i++){ buttonState[i].fileId = null; buttonState[i].title = 'Empty'; updateButtonUI(i); }
+    updateStatus();
+  });
+
+  // Share mixed stream (preview in new window)
+  shareBtn.addEventListener('click', ()=> {
+    const mixed = dest.stream;
+    const w = window.open('', '_blank');
+    w.document.title = 'Mixed stream preview';
+    const el = w.document.createElement('div');
+    el.style.padding = '18px';
+    el.innerHTML = '<h3 style="font-family:Inter,Arial">Mixed stream preview</h3>';
+    const audio = w.document.createElement('audio');
+    audio.controls = true; audio.autoplay = true;
+    audio.srcObject = mixed;
+    el.appendChild(audio);
+    w.document.body.appendChild(el);
     status.textContent = 'Mixed MediaStream created; preview opened in new tab.';
   });
+
+  // Utility: update status text
+  function updateStatus(){
+    const count = files.size;
+    status.textContent = count ? `${count} file(s) uploaded.` : 'No files uploaded yet.';
+  }
+
+  // Utility: escape HTML
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); }); }
+
+  // Keyboard shortcuts: 1-9 to trigger buttons
+  window.addEventListener('keydown', (e)=>{
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    const k = e.key;
+    if (/^[1-9]$/.test(k)){
+      const idx = parseInt(k,10)-1;
+      if (idx < NUM_BUTTONS) playAssigned(idx);
+    }
+  });
+
+  // Preview selected (if one file selected in UI, preview first)
+  previewBtn.addEventListener('click', ()=>{
+    const first = fileListEl.querySelector('.file-row');
+    if (!first){ alert('No files to preview'); return; }
+    const id = first.dataset.id;
+    previewFile(id);
+  });
+
+  // Initialize button UI
+  for(let i=0;i<NUM_BUTTONS;i++) updateButtonUI(i);
+
+  // Ensure audio context resumes on user gesture (some browsers require)
+  document.addEventListener('click', ()=> {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }, {once:true});
 
 })();
 </script>
