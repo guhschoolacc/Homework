@@ -240,17 +240,11 @@
         </div>
       </section>
 
-      <!-- Other -->
+      <!-- Other (only Soundboard per request) -->
       <section class="card hidden" id="otherCard">
         <div style="font-size:16px;font-weight:600">Other</div>
         <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <a class="tool-btn" href="soundboard.html">Soundboard</a>
-          <a class="tool-btn" href="color-picker.html">Color Picker</a>
-          <a class="tool-btn" href="idea-generator.html">Idea Generator</a>
-          <a class="tool-btn" href="ascii-art.html">ASCII Art</a>
-          <a class="tool-btn" href="meme-maker.html">Meme Maker</a>
-          <a class="tool-btn" href="random-fact.html">Random Fact</a>
-          <a class="tool-btn" href="easter-eggs.html">Easter Eggs</a>
         </div>
       </section>
     </main>
@@ -274,11 +268,13 @@
 
   <script>
     /* =========================
-       Updated index.html script
-       - Added: revert-to-default-theme option
-       - Fixed: Sandbox button opens sandbox.html
-       - Added: Soundboard and extra items in Other category
-       - Theme presets, custom themes, accessibility, notifications, admin, webhooks retained
+       index.html with:
+       - Panic key (configurable in Settings)
+       - Panic actions (default: close tab; other options: go to Drive/Gmail/Google/Education/mask presets/mute/hide)
+       - Tab masking presets for Google Drive, Gmail, Google, Education pages
+       - Only Soundboard in Other category
+       - Sandbox button fixed to open sandbox.html
+       - All other existing features retained (themes, custom themes, notifications, webhook, admin)
        ========================= */
 
     /* ---------- CONFIG ---------- */
@@ -316,6 +312,14 @@
     function saveThemeName(name){ if(name) localStorage.setItem('hw_theme_name', name); else localStorage.removeItem('hw_theme_name'); }
     function getCustomThemes(){ try { return JSON.parse(localStorage.getItem('hw_custom_themes') || '[]'); } catch(e){ return []; } }
     function saveCustomThemes(list){ localStorage.setItem('hw_custom_themes', JSON.stringify(list)); }
+
+    /* Panic key storage */
+    function getPanicKey(){ return localStorage.getItem('hw_panic_key') || "'"; } // default apostrophe
+    function savePanicKey(k){ if(k) localStorage.setItem('hw_panic_key', k); else localStorage.removeItem('hw_panic_key'); }
+    function getPanicRequiresCtrl(){ return localStorage.getItem('hw_panic_ctrl') === 'true'; }
+    function savePanicRequiresCtrl(v){ localStorage.setItem('hw_panic_ctrl', v ? 'true' : 'false'); }
+    function getPanicAction(){ return localStorage.getItem('hw_panic_action') || 'close_tab'; }
+    function savePanicAction(a){ if(a) localStorage.setItem('hw_panic_action', a); else localStorage.removeItem('hw_panic_action'); }
 
     /* ---------- Simple password encoding (demo only) ---------- */
     function encodePassword(p){ return btoa(p); }
@@ -442,19 +446,101 @@
     }
 
     function revertToDefaultTheme(){
-      // remove theme classes and clear saved theme
       document.documentElement.classList.remove('theme-light','theme-solar','theme-neon','theme-high-contrast');
       saveThemeName('');
-      // reset CSS variables to defaults defined in :root
       document.documentElement.style.removeProperty('--accent-1');
       document.documentElement.style.removeProperty('--accent-2');
       document.documentElement.style.removeProperty('--bg');
       document.documentElement.style.removeProperty('--card');
       document.documentElement.style.removeProperty('--muted');
-      // reset font scale
       localStorage.removeItem('hw_font_scale');
       document.documentElement.style.setProperty('--font-scale', '1');
-      applyTabMasking(); // ensures favicon/title remain as-is
+      applyTabMasking();
+    }
+
+    /* ---------- Panic actions ---------- */
+    const PANIC_PRESETS = {
+      'close_tab': { label: 'Close tab', desc: 'Attempt to close this browser tab (default).' },
+      'goto_drive': { label: 'Go to Google Drive', url: 'https://drive.google.com' },
+      'goto_gmail': { label: 'Go to Gmail', url: 'https://mail.google.com' },
+      'goto_google': { label: 'Go to Google', url: 'https://www.google.com' },
+      'goto_edu': { label: 'Open education page', url: 'https://classroom.google.com' },
+      'mask_drive': { label: 'Mask as Google Drive', mask: { title: 'My Drive - Google Drive', icon: 'https://drive.google.com/favicon.ico' } },
+      'mask_gmail': { label: 'Mask as Gmail', mask: { title: 'Inbox - Gmail', icon: 'https://mail.google.com/favicon.ico' } },
+      'mask_google': { label: 'Mask as Google', mask: { title: 'Google', icon: 'https://www.google.com/favicon.ico' } },
+      'mask_edu': { label: 'Mask as Course Materials', mask: { title: 'Course Materials - University', icon: 'https://classroom.google.com/favicon.ico' } },
+      'mute_audio': { label: 'Mute audio on page' },
+      'hide_content': { label: 'Hide page content (blank)' }
+    };
+
+    function performPanicAction(action){
+      // Log the action
+      logAction(getCurrentUser(), 'panic_trigger', { action });
+
+      if(action === 'close_tab'){
+        try { window.close(); } catch(e) {}
+        // If window.close() fails (browsers often block), navigate to about:blank as fallback
+        setTimeout(() => { try { window.location.href = 'about:blank'; } catch(e) {} }, 200);
+        return;
+      }
+
+      const preset = PANIC_PRESETS[action];
+      if(!preset) return;
+
+      if(preset.url){
+        // navigate to the URL (same tab)
+        window.location.href = preset.url;
+        return;
+      }
+
+      if(preset.mask){
+        // apply mask locally (title + favicon) and save to tab mask so it persists
+        saveTabTitle(preset.mask.title);
+        saveTabIcon(preset.mask.icon);
+        applyTabMasking();
+        return;
+      }
+
+      if(action === 'mute_audio'){
+        // mute all audio/video elements on the page
+        document.querySelectorAll('audio,video').forEach(el => { try { el.muted = true; } catch(e){} });
+        // also pause any playing audio via WebAudio detection (best-effort)
+        try {
+          // create a small overlay to indicate muted
+          showTemporaryOverlay('Audio muted');
+        } catch(e){}
+        return;
+      }
+
+      if(action === 'hide_content'){
+        // hide main content quickly
+        document.querySelectorAll('body > *').forEach(el => {
+          if(el.id === 'modalBackdrop') return;
+          try { el.style.visibility = 'hidden'; } catch(e){}
+        });
+        // set title and favicon to neutral
+        saveTabTitle('Documents - University');
+        saveTabIcon('https://www.google.com/favicon.ico');
+        applyTabMasking();
+        return;
+      }
+    }
+
+    function showTemporaryOverlay(text){
+      const o = document.createElement('div');
+      o.style.position = 'fixed';
+      o.style.inset = '0';
+      o.style.background = '#000';
+      o.style.opacity = '0.9';
+      o.style.zIndex = '99999';
+      o.style.display = 'flex';
+      o.style.alignItems = 'center';
+      o.style.justifyContent = 'center';
+      o.style.color = '#fff';
+      o.style.fontSize = '20px';
+      o.textContent = text;
+      document.body.appendChild(o);
+      setTimeout(() => { try { document.body.removeChild(o); } catch(e){} }, 1500);
     }
 
     /* ---------- UI references ---------- */
@@ -755,7 +841,7 @@
       };
     }
 
-    /* Settings (themes, tab masking, accessibility, admin tools) */
+    /* Settings (themes, tab masking, accessibility, panic key, admin tools) */
     function renderSettingsModal(){
       const username = getCurrentUser();
       if(!username){ alert('Not signed in'); closeModal(); return; }
@@ -768,6 +854,11 @@
       const currentTabIcon = getTabIcon();
       const currentTheme = getThemeName();
       const customThemes = getCustomThemes();
+
+      // Panic key defaults
+      const panicKey = getPanicKey();
+      const panicCtrl = getPanicRequiresCtrl();
+      const panicAction = getPanicAction();
 
       modal.innerHTML = `
         <h3>Settings</h3>
@@ -794,8 +885,37 @@
 
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
 
+        <div style="font-weight:700;margin-bottom:8px">Panic key</div>
+        <div class="muted" style="margin-bottom:8px">Set a quick panic key and choose what it does. Default key is an apostrophe ('). Use a single character or a named key like Escape.</div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <label class="muted">Panic key</label>
+          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(panicKey)}" style="width:80px">
+          <label class="muted">Require Ctrl</label>
+          <input id="panicCtrlCheckbox" type="checkbox" ${panicCtrl ? 'checked' : ''}>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <label class="muted">Panic action</label>
+          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
+            <option value="close_tab">Close tab (default)</option>
+            <option value="goto_drive">Go to Google Drive</option>
+            <option value="goto_gmail">Go to Gmail</option>
+            <option value="goto_google">Go to Google</option>
+            <option value="goto_edu">Open education page</option>
+            <option value="mask_drive">Mask as Google Drive</option>
+            <option value="mask_gmail">Mask as Gmail</option>
+            <option value="mask_google">Mask as Google</option>
+            <option value="mask_edu">Mask as Course Materials</option>
+            <option value="mute_audio">Mute audio on page</option>
+            <option value="hide_content">Hide page content (blank)</option>
+          </select>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
         <div style="font-weight:700;margin-bottom:8px">Tab Masking</div>
-        <div class="muted" style="margin-bottom:8px">Change how the site appears in browser tabs. Saved locally for this browser.</div>
+        <div class="muted" style="margin-bottom:8px">Change how the site appears in browser tabs. Saved locally for this browser. You can also choose quick masks for Drive/Gmail/Google/Education.</div>
 
         <div class="form-row">
           <label class="muted">Tab title</label>
@@ -819,10 +939,18 @@
           </div>
         </div>
 
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;margin-bottom:12px">
+          <button class="btn ghost" id="maskDriveBtn">Mask as Drive</button>
+          <button class="btn ghost" id="maskGmailBtn">Mask as Gmail</button>
+          <button class="btn ghost" id="maskGoogleBtn">Mask as Google</button>
+          <button class="btn ghost" id="maskEduBtn">Mask as Course Materials</button>
+          <button class="btn ghost" id="revertDefaultTheme">Revert to default theme</button>
+        </div>
+
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
 
         <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
-        <div class="muted" style="margin-bottom:8px">Choose a preset, revert to default, or create a custom theme. Changes preview live.</div>
+        <div class="muted" style="margin-bottom:8px">Choose a preset or create a custom theme. Changes preview live.</div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
           <div class="theme-preset" data-theme="theme-light" title="Light" style="background:linear-gradient(180deg,#fff,#f3f4f6);color:#111">
@@ -841,7 +969,6 @@
             High Contrast
             <small>Accessible</small>
           </div>
-          <button class="btn ghost" id="revertDefaultTheme" title="Revert to default theme">Revert to default theme</button>
         </div>
 
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
@@ -1005,6 +1132,32 @@
         alert('Tab masking reset to defaults.');
       });
 
+      // Quick mask buttons
+      document.getElementById('maskDriveBtn').addEventListener('click', () => {
+        saveTabTitle('My Drive - Google Drive');
+        saveTabIcon('https://drive.google.com/favicon.ico');
+        applyTabMasking();
+        alert('Tab masked as Google Drive (local only).');
+      });
+      document.getElementById('maskGmailBtn').addEventListener('click', () => {
+        saveTabTitle('Inbox - Gmail');
+        saveTabIcon('https://mail.google.com/favicon.ico');
+        applyTabMasking();
+        alert('Tab masked as Gmail (local only).');
+      });
+      document.getElementById('maskGoogleBtn').addEventListener('click', () => {
+        saveTabTitle('Google');
+        saveTabIcon('https://www.google.com/favicon.ico');
+        applyTabMasking();
+        alert('Tab masked as Google (local only).');
+      });
+      document.getElementById('maskEduBtn').addEventListener('click', () => {
+        saveTabTitle('Course Materials - University');
+        saveTabIcon('https://classroom.google.com/favicon.ico');
+        applyTabMasking();
+        alert('Tab masked as Course Materials (local only).');
+      });
+
       // Theme presets
       document.querySelectorAll('.theme-preset').forEach(el => {
         el.addEventListener('click', () => {
@@ -1134,44 +1287,15 @@
         else document.documentElement.classList.remove('theme-high-contrast');
       });
 
-      // Apply button: immediate preview (Apply)
-      document.getElementById('applyTabMask')?.addEventListener?.('click', () => {
-        const titleVal = tabTitleInput.value.trim();
-        const iconUrlVal = tabIconUrlInput.value.trim();
-        if(tabIconFileInput.files && tabIconFileInput.files[0]){
-          const f = tabIconFileInput.files[0];
-          const reader = new FileReader();
-          reader.onload = () => {
-            setFavicon(reader.result);
-            if(titleVal) document.title = titleVal;
-            tabIconPreviewTitle.textContent = titleVal || document.title;
-          };
-          reader.readAsDataURL(f);
-        } else if(iconUrlVal){
-          setFavicon(iconUrlVal);
-          if(titleVal) document.title = titleVal;
-          tabIconPreviewTitle.textContent = titleVal || document.title;
-        } else {
-          if(titleVal) document.title = titleVal;
-          tabIconPreviewTitle.textContent = titleVal || document.title;
-        }
-      });
+      // Panic key inputs
+      const panicKeyInput = document.getElementById('panicKeyInput');
+      const panicCtrlCheckbox = document.getElementById('panicCtrlCheckbox');
+      const panicActionSelect = document.getElementById('panicActionSelect');
 
-      // Clear tab mask
-      document.getElementById('clearTabMask')?.addEventListener?.('click', () => {
-        saveTabTitle('');
-        saveTabIcon('');
-        document.title = 'homewrk';
-        setFavicon(DEFAULT_FAVICON);
-        tabTitleInput.value = '';
-        tabIconUrlInput.value = '';
-        tabIconFileInput.value = '';
-        tabIconPreviewImg.src = DEFAULT_FAVICON;
-        tabIconPreviewTitle.textContent = document.title;
-        alert('Tab masking cleared (local only).');
-      });
+      // initialize select
+      panicActionSelect.value = panicAction;
 
-      // Save changes (username/email + persist tab mask + theme + accessibility)
+      // Save changes (username/email + persist tab mask + theme + accessibility + panic key)
       document.getElementById('settingsSave').onclick = () => {
         const newUsername = document.getElementById('settingsUsername').value.trim();
         const newEmail = document.getElementById('settingsEmail').value.trim();
@@ -1227,6 +1351,12 @@
         const fontScale = getComputedStyle(document.documentElement).getPropertyValue('--font-scale') || '1';
         localStorage.setItem('hw_font_scale', fontScale);
 
+        // panic key persistence
+        const pk = panicKeyInput.value.trim() || "'";
+        savePanicKey(pk);
+        savePanicRequiresCtrl(!!panicCtrlCheckbox.checked);
+        savePanicAction(panicActionSelect.value);
+
         applyTabMasking();
         finalizeSave();
 
@@ -1280,6 +1410,9 @@
         localStorage.removeItem('hw_theme_name');
         localStorage.removeItem('hw_custom_themes');
         localStorage.removeItem('hw_font_scale');
+        localStorage.removeItem('hw_panic_key');
+        localStorage.removeItem('hw_panic_ctrl');
+        localStorage.removeItem('hw_panic_action');
         saveWhitelist(['anotheryear']);
         const users = {};
         users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, email: '', createdAt: Date.now() };
@@ -1526,6 +1659,26 @@
 
     /* ---------- Utilities ---------- */
     function escapeHtml(s){ if(s === undefined || s === null) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; }); }
+
+    /* ---------- Panic key listener ---------- */
+    function handleGlobalKeydown(e){
+      try {
+        const active = document.activeElement;
+        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+        const storedKey = getPanicKey();
+        const requiresCtrl = getPanicRequiresCtrl();
+        const action = getPanicAction();
+        if(!storedKey) return;
+        // Compare key names: allow single character or named keys like Escape
+        const keyMatch = (storedKey.length === 1) ? (e.key === storedKey) : (e.key.toLowerCase() === storedKey.toLowerCase());
+        if(!keyMatch) return;
+        if(requiresCtrl && !e.ctrlKey) return;
+        // Prevent accidental triggers
+        e.preventDefault();
+        performPanicAction(action);
+      } catch(err){ console.warn('panic key handler error', err); }
+    }
+    window.addEventListener('keydown', handleGlobalKeydown);
 
     /* ---------- Session flag ---------- */
     (function markSessionOpened(){ try { localStorage.setItem('hw_session_opened', 'true'); } catch(e) {} })();
