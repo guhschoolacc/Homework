@@ -1,1826 +1,861 @@
-<!DOCTYPE html>
+<!-- Save this file as sandbox.html -->
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mini Playground Sandbox — Advanced Edition</title>
-  <style>
-    :root {
-      --bg: #05060a;
-      --text: #f9fafb;
-      --text-soft: #9ca3af;
-      --panel: #0b0f18;
-      --border: #1f2933;
-      --accent: #38bdf8;
-      --danger: #f87171;
-      --good: #4ade80;
-      --warn: #facc15;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, sans-serif;
-    }
-
-    body {
-      background: #020617;
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .top-bar {
-      height: 55px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      background: #0f172a;
-      border-bottom: 1px solid #1e293b;
-    }
-
-    .brand {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .return-btn {
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #e2e8f0;
-      cursor: pointer;
-      font-size: 13px;
-      transition: 0.15s;
-    }
-
-    .return-btn:hover {
-      background: #334155;
-      border-color: #60a5fa;
-      color: white;
-    }
-
-    .layout {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 260px 1fr 260px;
-      gap: 10px;
-      padding: 10px;
-      height: calc(100vh - 55px);
-    }
-
-    .panel {
-      background: #0b0f18;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 10px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      font-size: 13px;
-    }
-
-    .panel h3 {
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .panel-subtitle {
-      font-size: 11px;
-      color: #94a3b8;
-      margin-bottom: 8px;
-    }
-
-    .tool-group {
-      margin-bottom: 10px;
-      border-top: 1px solid #1e293b;
-      padding-top: 8px;
-    }
-
-    .tool-label {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .tool-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .tool-btn {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid #1e293b;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 11px;
-      cursor: pointer;
-      transition: 0.12s;
-    }
-
-    .tool-btn.active {
-      border-color: var(--accent);
-      background: #0b1120;
-      color: #f9fafb;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
-    }
-
-    .tool-btn.danger {
-      border-color: var(--danger);
-      color: #fecaca;
-    }
-
-    .tool-btn.good {
-      border-color: var(--good);
-      color: #bbf7d0;
-    }
-
-    .tool-btn.warn {
-      border-color: var(--warn);
-      color: #fef9c3;
-    }
-
-    .tool-btn:hover {
-      border-color: #334155;
-      background: #020617;
-    }
-
-    .canvas-wrapper {
-      flex: 1;
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #1e293b;
-      background: #020617;
-      min-height: 400px;
-    }
-
-    #gameCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: #020617;
-      cursor: crosshair;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: #64748b;
-      margin-top: 6px;
-      line-height: 1.4;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      padding: 2px 0;
-      color: #e5e7eb;
-    }
-
-    .stat-label {
-      color: #9ca3af;
-    }
-
-    .inspector-field {
-      margin-bottom: 4px;
-      font-size: 12px;
-    }
-
-    .inspector-label {
-      color: #9ca3af;
-      margin-right: 4px;
-    }
-
-    .inspector-value {
-      color: #e5e7eb;
-    }
-
-    .section-divider {
-      margin: 8px 0;
-      border-top: 1px solid #1e293b;
-    }
-
-    /* Collapsible Advanced Tools */
-    .collapsible {
-      background: #0b0f18;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 6px 8px;
-      cursor: pointer;
-      font-size: 12px;
-      margin-bottom: 6px;
-      user-select: none;
-    }
-
-    .collapsible:hover {
-      background: #111827;
-    }
-
-    .collapsible.active {
-      border-color: var(--accent);
-      background: #0f172a;
-    }
-
-    .collapsible-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.25s ease;
-      padding-left: 4px;
-    }
-
-    .collapsible-content.open {
-      padding-top: 6px;
-      padding-bottom: 6px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sandbox (buggy)</title>
+<style>
+  :root{
+    --bg:#071021;
+    --panel:#0b1220cc;
+    --accent:#22c1c3;
+    --muted:#9aa7b2;
+    --glass: rgba(255,255,255,0.04);
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;}
+  body{background:linear-gradient(180deg,var(--bg) 0%, #071827 60%);color:#e6eef3;overflow:hidden}
+  .topbar{position:fixed;left:12px;top:12px;z-index:60;display:flex;gap:10px;align-items:center}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--accent);border:1px solid var(--glass);padding:8px 12px;border-radius:8px;font-weight:700;text-decoration:none;box-shadow:0 8px 24px rgba(2,6,23,0.6);backdrop-filter:blur(6px)}
+  .toolbar{position:fixed;left:12px;top:64px;z-index:50;width:320px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid var(--glass);box-shadow:0 12px 40px rgba(2,6,23,0.6);color:var(--muted)}
+  .toolbar h2{margin:0 0 8px 0;color:#dff7f6;font-size:15px}
+  .row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+  select, button, input[type="range"]{background:#071226;color:#dff7f6;border:1px solid var(--glass);padding:8px;border-radius:8px;cursor:pointer;font-weight:600}
+  .small{padding:6px 8px;font-size:13px}
+  .toggle{background:linear-gradient(90deg,#0b2b2b,#072b3a);color:#bff0ef}
+  .danger{background:linear-gradient(90deg,#3b0f0f,#5b1b1b);color:#ffd6d6}
+  .panel{position:fixed;right:12px;top:12px;z-index:50;width:320px;padding:12px;border-radius:12px;background:var(--panel);box-shadow:0 10px 30px rgba(2,6,23,0.6);color:var(--muted)}
+  .panel h3{margin:0 0 8px 0;color:#dff7f6;font-size:14px}
+  .stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+  canvas{display:block;width:100vw;height:100vh;cursor:crosshair}
+  .footer{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;color:var(--muted);font-size:12px;z-index:30;background:transparent;padding:6px 10px;border-radius:6px}
+  .muted{color:var(--muted);font-size:13px}
+  .mini{font-size:12px;padding:6px 8px}
+</style>
 </head>
-
 <body>
-  <header class="top-bar">
-    <div class="brand">Mini Playground — Advanced Edition</div>
-    <button class="return-btn" onclick="window.location.href='index.html'">
-      ⬅ Return to Dashboard
-    </button>
-  </header>
+  <div class="topbar">
+    <a class="back-btn" href="index.html">Back to dashboard</a>
+    <div class="brand">Sandbox — Fixed Ragdolls</div>
+  </div>
 
-  <main class="layout">
-    <!-- LEFT PANEL -->
-    <aside class="panel">
-      <h3>Tools</h3>
-      <div class="panel-subtitle">
-        Click canvas to use selected tool. Right‑click for terrain. Drag entities with mouse.
+  <div class="toolbar" id="toolbar">
+    <h2>Tools & Spawn</h2>
+    <div class="row">
+      <select id="spawnType">
+        <option value="circle">Circle</option>
+        <option value="box">Box</option>
+        <option value="ragdoll">Ragdoll NPC</option>
+        <option value="bomb">Bomb</option>
+        <option value="platform">Platform</option>
+        <option value="gun">Gun</option>
+      </select>
+      <button id="spawnBtn" class="small">Spawn</button>
+    </div>
+
+    <div class="row">
+      <button id="spawnMany" class="small">Spawn 10</button>
+      <button id="spawnNPCs" class="small">Spawn NPCs</button>
+    </div>
+
+    <div class="row">
+      <button id="toolSelect" class="mini">Select</button>
+      <button id="toolForce" class="mini">Force</button>
+      <button id="toolShoot" class="mini">Shoot</button>
+      <button id="toolDelete" class="mini danger">Delete</button>
+    </div>
+
+    <div style="margin-top:8px">
+      <div class="muted">Simulation</div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="pauseBtn" class="small">Pause</button>
+        <button id="clearBtn" class="small">Clear</button>
       </div>
+    </div>
 
-      <!-- BASIC OBJECTS -->
-      <div class="tool-group">
-        <div class="tool-label">Spawn Objects</div>
-        <div class="tool-buttons">
-          <button class="tool-btn active" data-tool="spawn-box">Box</button>
-          <button class="tool-btn" data-tool="spawn-ball">Ball</button>
-          <button class="tool-btn" data-tool="spawn-triangle">Triangle</button>
-          <button class="tool-btn" data-tool="spawn-capsule">Capsule</button>
-          <button class="tool-btn" data-tool="spawn-cylinder">Cylinder</button>
-          <button class="tool-btn" data-tool="spawn-plank">Plank</button>
-          <button class="tool-btn" data-tool="spawn-ramp">Ramp</button>
-          <button class="tool-btn" data-tool="spawn-spike">Spike</button>
-          <button class="tool-btn" data-tool="spawn-custom">Custom</button>
-        </div>
-      </div>
+    <div style="margin-top:10px" class="muted">This build fixes the flying issue. Ragdolls use Verlet, soft muscles, and clamped corrections so they stand naturally.</div>
+  </div>
 
-      <!-- NPC -->
-      <div class="tool-group">
-        <div class="tool-label">NPCs</div>
-        <div class="tool-buttons">
-          <button class="tool-btn" data-tool="spawn-npc">Spawn NPC</button>
-          <button class="tool-btn" data-tool="npc-wander">Set Wander</button>
-          <button class="tool-btn" data-tool="npc-pathfind">Set Pathfind</button>
-        </div>
-      </div>
+  <div class="panel" id="panel">
+    <h3>Scene</h3>
+    <div class="stat"><div>Bodies</div><div id="statBodies">0</div></div>
+    <div class="stat"><div>Ragdolls</div><div id="statRagdolls">0</div></div>
+    <div class="stat"><div>Bullets</div><div id="statBullets">0</div></div>
+    <div class="stat"><div>FPS</div><div id="statFPS">0</div></div>
+  </div>
 
-      <!-- WORLD -->
-      <div class="tool-group">
-        <div class="tool-label">World</div>
-        <div class="tool-buttons">
-          <button class="tool-btn" data-tool="terrain-place">Place Terrain</button>
-          <button class="tool-btn" data-tool="terrain-erase">Erase Terrain</button>
-        </div>
-      </div>
-
-      <!-- INTERACTION -->
-      <div class="tool-group">
-        <div class="tool-label">Interaction</div>
-        <div class="tool-buttons">
-          <button class="tool-btn" data-tool="select">Select / Drag</button>
-          <button class="tool-btn" data-tool="shoot">Shoot</button>
-          <button class="tool-btn danger" data-tool="delete">Delete</button>
-        </div>
-      </div>
-
-      <!-- ADVANCED TOOLS COLLAPSIBLE -->
-      <div class="section-divider"></div>
-      <div class="collapsible" id="adv-tools-toggle">Advanced Tools ▼</div>
-      <div class="collapsible-content" id="adv-tools-content">
-        <div class="tool-group">
-          <div class="tool-label">Physics Tools</div>
-          <div class="tool-buttons">
-            <button class="tool-btn good" data-tool="rope">Rope</button>
-            <button class="tool-btn good" data-tool="weld">Weld</button>
-            <button class="tool-btn warn" data-tool="gravity-gun">Gravity Gun</button>
-            <button class="tool-btn danger" data-tool="break-npc">Break NPC</button>
-          </div>
-        </div>
-
-        <div class="tool-group">
-          <div class="tool-label">Explosives</div>
-          <div class="tool-buttons">
-            <button class="tool-btn danger" data-tool="explosion">Explosion</button>
-          </div>
-        </div>
-
-        <div class="tool-group">
-          <div class="tool-label">World State</div>
-          <div class="tool-buttons">
-            <button class="tool-btn" data-tool="save-world">Save</button>
-            <button class="tool-btn" data-tool="load-world">Load</button>
-            <button class="tool-btn danger" id="clear-all-btn">Clear All</button>
-          </div>
-        </div>
-
-        <div class="tool-group">
-          <div class="tool-label">Time</div>
-          <div class="tool-buttons">
-            <button class="tool-btn warn" data-tool="slowmo">Slow Motion</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="hint">
-        • Left click: use current tool<br>
-        • Right click: quick terrain<br>
-        • Drag: move selected entity<br>
-        • Shift: slow motion<br>
-        • Space: fire projectile<br>
-      </div>
-    </aside>
-
-    <!-- CANVAS -->
-    <section class="panel canvas-wrapper">
-      <canvas id="gameCanvas"></canvas>
-    </section>
-
-    <!-- RIGHT PANEL -->
-    <aside class="panel">
-      <h3>Stats</h3>
-      <div class="panel-subtitle">Live sandbox metrics</div>
-
-      <div id="stats">
-        <div class="stat-row"><span class="stat-label">Objects:</span><span id="stat-objects">0</span></div>
-        <div class="stat-row"><span class="stat-label">NPCs:</span><span id="stat-npcs">0</span></div>
-        <div class="stat-row"><span class="stat-label">Limbs:</span><span id="stat-limbs">0</span></div>
-        <div class="stat-row"><span class="stat-label">Projectiles:</span><span id="stat-projectiles">0</span></div>
-        <div class="stat-row"><span class="stat-label">Terrain:</span><span id="stat-terrain">0</span></div>
-        <div class="stat-row"><span class="stat-label">Ropes:</span><span id="stat-ropes">0</span></div>
-        <div class="stat-row"><span class="stat-label">Welds:</span><span id="stat-welds">0</span></div>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <h3>Inspector</h3>
-      <div class="panel-subtitle">Click an entity with “Select / Drag”</div>
-
-      <div id="inspector">
-        <div class="inspector-field"><span class="inspector-label">Type:</span><span class="inspector-value" id="insp-type">None</span></div>
-        <div class="inspector-field"><span class="inspector-label">Shape:</span><span class="inspector-value" id="insp-shape">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">HP:</span><span class="inspector-value" id="insp-hp">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">Limb HP:</span><span class="inspector-value" id="insp-limbhp">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">Position:</span><span class="inspector-value" id="insp-pos">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">Velocity:</span><span class="inspector-value" id="insp-vel">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">Mode:</span><span class="inspector-value" id="insp-mode">-</span></div>
-        <div class="inspector-field"><span class="inspector-label">ID:</span><span class="inspector-value" id="insp-id">-</span></div>
-      </div>
-
-      <div class="section-divider"></div>
-
-      <div class="hint">
-        Advanced ragdoll NPCs use hybrid joints: stable torso + soft limbs.
-      </div>
-    </aside>
-  </main>
+  <canvas id="c"></canvas>
+  <div class="footer">Improved physics sandbox — ragdolls stand up and behave.</div>
 
 <script>
-  // ====== CORE SETUP ======
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
+/* Fixed physics sandbox
+   Key fixes:
+   - Verlet integration uses both ax and ay (gravity applied correctly)
+   - makePoint supports fixed points (invMass = 0)
+   - Muscles are frame-rate scaled and clamped to avoid explosive corrections
+*/
 
-  function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * window.devicePixelRatio;
-    canvas.height = rect.height * window.devicePixelRatio;
-    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+/* Utilities */
+const rand = (a,b)=>a + Math.random()*(b-a);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const nowMs = ()=>performance.now();
+
+/* Canvas */
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d', { alpha: false });
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+function resize(){
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.floor(window.innerWidth * DPR);
+  canvas.height = Math.floor(window.innerHeight * DPR);
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* World */
+const world = {
+  gravity: { x: 0, y: 1200 },
+  points: [],
+  constraints: [],
+  rigidBoxes: [],
+  bullets: [],
+  particles: [],
+  bounds: { w: window.innerWidth, h: window.innerHeight }
+};
+function updateBounds(){ world.bounds.w = window.innerWidth; world.bounds.h = window.innerHeight; }
+window.addEventListener('resize', updateBounds);
+
+/* ID */
+let idCounter = 1;
+
+/* Point factory with fixed support */
+function makePoint(x,y, opts={}){
+  const fixed = !!opts.fixed;
+  const mass = ('mass' in opts) ? opts.mass : 1;
+  const invMass = fixed ? 0 : (mass > 0 ? 1 / mass : 1);
+  return {
+    id: idCounter++,
+    x, y,
+    px: x, py: y,
+    ax: 0, ay: 0,
+    invMass,
+    radius: opts.radius || 4,
+    color: opts.color || '#9ad7ff',
+    tags: opts.tags || [],
+    // ragdoll metadata (optional)
+    ragdoll: !!opts.ragdoll,
+    parts: opts.parts || null,
+    health: ('health' in opts) ? opts.health : 100,
+    gun: null,
+    ai: opts.ai || null,
+    standPose: opts.standPose || null
+  };
+}
+
+/* Constraint factory */
+function makeConstraint(a, b, rest, stiffness=1, tear=Infinity){
+  return { id: idCounter++, a, b, rest: rest || Math.hypot(b.x-a.x, b.y-a.y), stiffness, tear };
+}
+
+/* Rigid box */
+function makeBox(x,y,w,h,opts={}){
+  return {
+    id: idCounter++,
+    x,y,w,h,
+    vx: opts.vx||0, vy: opts.vy||0,
+    mass: opts.mass || 1,
+    invMass: 1 / (opts.mass || 1),
+    fixed: !!opts.fixed,
+    color: opts.color || '#2b3b4b',
+    tags: opts.tags || [],
+    owner: null,
+    fireRate: opts.fireRate || 220,
+    lastFired: 0
+  };
+}
+
+/* Bullet and particle helpers */
+function spawnBullet(x,y,vx,vy,owner){ world.bullets.push({ id: idCounter++, x,y,vx,vy,r:4,life:2000,age:0,owner }); }
+function spawnParticle(x,y,vx,vy,life,color){ world.particles.push({ x,y,vx,vy,age:0,life,color }); }
+
+/* Ragdoll builder using points + constraints */
+function createRagdoll(x,y, opts={}){
+  const scale = opts.scale || 1;
+  const color = opts.color || '#9ad7ff';
+  // points
+  const head = makePoint(x, y - 36*scale, { radius:8*scale, color:'#ffd9c7' });
+  const neck = makePoint(x, y - 20*scale, { radius:5*scale, color });
+  const torsoTop = makePoint(x, y - 6*scale, { radius:7*scale, color, ragdoll:true });
+  const torsoBot = makePoint(x, y + 18*scale, { radius:8*scale, color });
+  const lUpperArm = makePoint(x - 20*scale, y - 8*scale, { radius:6*scale, color });
+  const lLowerArm = makePoint(x - 36*scale, y + 6*scale, { radius:5*scale, color });
+  const rUpperArm = makePoint(x + 20*scale, y - 8*scale, { radius:6*scale, color });
+  const rLowerArm = makePoint(x + 36*scale, y + 6*scale, { radius:5*scale, color });
+  const lUpperLeg = makePoint(x - 8*scale, y + 36*scale, { radius:7*scale, color });
+  const lLowerLeg = makePoint(x - 8*scale, y + 64*scale, { radius:7*scale, color });
+  const rUpperLeg = makePoint(x + 8*scale, y + 36*scale, { radius:7*scale, color });
+  const rLowerLeg = makePoint(x + 8*scale, y + 64*scale, { radius:7*scale, color });
+
+  const pts = [head, neck, torsoTop, torsoBot, lUpperArm, lLowerArm, rUpperArm, rLowerArm, lUpperLeg, lLowerLeg, rUpperLeg, rLowerLeg];
+  for (let p of pts) world.points.push(p);
+
+  // store parts on root
+  torsoTop.parts = pts;
+  torsoTop.health = 100;
+  torsoTop.gun = null;
+  torsoTop.ai = { targetId: null, shootCooldown: rand(800,2200), lastShot: 0, standTarget: true, standTimer: 0 };
+
+  // constraints
+  const cons = [];
+  cons.push(makeConstraint(head, neck, 18*scale, 0.9));
+  cons.push(makeConstraint(neck, torsoTop, 14*scale, 0.9));
+  cons.push(makeConstraint(torsoTop, torsoBot, 24*scale, 0.95));
+  cons.push(makeConstraint(torsoTop, lUpperArm, 22*scale, 0.9));
+  cons.push(makeConstraint(lUpperArm, lLowerArm, 22*scale, 0.9));
+  cons.push(makeConstraint(torsoTop, rUpperArm, 22*scale, 0.9));
+  cons.push(makeConstraint(rUpperArm, rLowerArm, 22*scale, 0.9));
+  cons.push(makeConstraint(torsoBot, lUpperLeg, 26*scale, 0.95));
+  cons.push(makeConstraint(lUpperLeg, lLowerLeg, 28*scale, 0.95));
+  cons.push(makeConstraint(torsoBot, rUpperLeg, 26*scale, 0.95));
+  cons.push(makeConstraint(rUpperLeg, rLowerLeg, 28*scale, 0.95));
+  cons.push(makeConstraint(lUpperArm, rUpperArm, 44*scale, 0.2));
+  cons.push(makeConstraint(lUpperLeg, rUpperLeg, 20*scale, 0.2));
+  for (let c of cons) world.constraints.push(c);
+
+  // store stand pose relative to torsoTop (local offsets)
+  torsoTop.standPose = {};
+  for (let p of pts){
+    torsoTop.standPose[p.id] = { dx: p.x - torsoTop.x, dy: p.y - torsoTop.y };
   }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
 
-  const GRID_SIZE = 32;
-  const GRAVITY = 0.5;
-  const FRICTION = 0.9;
-  const FLOOR_BOUNCE = -0.25;
+  return torsoTop;
+}
 
-  let timeScale = 1;
-  let slowmoHeld = false;
-  let cinematicSlowmoTimer = 0;
-
-  let entityIdCounter = 1;
-
-  const objects = [];
-  const npcs = [];
-  const limbs = [];
-  const projectiles = [];
-  const terrainBlocks = [];
-  const ropes = [];
-  const welds = [];
-  const particles = [];
-
-  // ====== UTILS ======
-  function randRange(min, max) {
-    return Math.random() * (max - min) + min;
+/* Verlet integration (fixed) */
+function verlet(dt){
+  const g = world.gravity;
+  const dt2 = dt*dt;
+  const damping = 0.995;
+  for (let p of world.points){
+    if (p.invMass === 0){ p.ax = 0; p.ay = 0; continue; }
+    // accumulate gravity into acceleration
+    p.ax += g.x;
+    p.ay += g.y;
+    // verlet step using both ax and ay
+    const nx = p.x + (p.x - p.px) * damping + p.ax * dt2;
+    const ny = p.y + (p.y - p.py) * damping + p.ay * dt2;
+    p.px = p.x; p.py = p.y;
+    p.x = nx; p.y = ny;
+    // reset accelerations
+    p.ax = 0; p.ay = 0;
   }
+}
 
-  function aabbOverlap(a, b) {
-    return (
-      a.x < b.x + b.w &&
-      a.x + a.w > b.x &&
-      a.y < b.y + b.h &&
-      a.y + a.h > b.y
-    );
-  }
-
-  function worldToGrid(x, y) {
-    return {
-      gx: Math.floor(x / GRID_SIZE),
-      gy: Math.floor(y / GRID_SIZE),
-    };
-  }
-
-  function gridToWorld(gx, gy) {
-    return {
-      x: gx * GRID_SIZE,
-      y: gy * GRID_SIZE,
-    };
-  }
-
-  function distance(x1, y1, x2, y2) {
-    return Math.hypot(x2 - x1, y2 - y1);
-  }
-
-  function clamp(v, min, max) {
-    return v < min ? min : v > max ? max : v;
-  }
-
-  // ====== TERRAIN ======
-  class TerrainBlock {
-    constructor(gx, gy) {
-      const { x, y } = gridToWorld(gx, gy);
-      this.gx = gx;
-      this.gy = gy;
-      this.x = x;
-      this.y = y;
-      this.w = GRID_SIZE;
-      this.h = GRID_SIZE;
+/* Constraint solver */
+function solveConstraints(iterations=8){
+  for (let k=0;k<iterations;k++){
+    // distance constraints
+    for (let i = world.constraints.length-1; i>=0; i--){
+      const c = world.constraints[i];
+      const A = c.a, B = c.b;
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const dist = Math.hypot(dx,dy) || 0.0001;
+      const diff = (dist - c.rest) / dist;
+      const invA = A.invMass, invB = B.invMass;
+      const w = invA + invB;
+      if (w === 0) continue;
+      const corr = diff * c.stiffness;
+      const ax = dx * corr * (invA / w);
+      const ay = dy * corr * (invA / w);
+      const bx = -dx * corr * (invB / w);
+      const by = -dy * corr * (invB / w);
+      if (A.invMass) { A.x += ax; A.y += ay; }
+      if (B.invMass) { B.x += bx; B.y += by; }
+      // tearing
+      if (Math.abs(dist - c.rest) > (c.tear || Infinity)){
+        world.constraints.splice(i,1);
+      }
     }
 
-    draw() {
-      ctx.fillStyle = "#111827";
-      ctx.fillRect(this.x, this.y, this.w, this.h);
-      ctx.strokeStyle = "#1f2937";
-      ctx.strokeRect(this.x, this.y, this.w, this.h);
-    }
-  }
-
-  function isBlocked(gx, gy) {
-    return terrainBlocks.some((t) => t.gx === gx && t.gy === gy);
-  }
-
-  function placeTerrainAt(gx, gy) {
-    if (isBlocked(gx, gy)) return;
-    terrainBlocks.push(new TerrainBlock(gx, gy));
-  }
-
-  function eraseTerrainAt(gx, gy) {
-    const idx = terrainBlocks.findIndex((t) => t.gx === gx && t.gy === gy);
-    if (idx !== -1) terrainBlocks.splice(idx, 1);
-  }
-
-  // ====== BASE ENTITY (OBJECTS, NO HEALTH) ======
-  class Entity {
-    constructor(x, y, w, h, color, shape = "box") {
-      this.id = entityIdCounter++;
-      this.x = x;
-      this.y = y;
-      this.w = w;
-      this.h = h;
-      this.vx = 0;
-      this.vy = 0;
-      this.color = color;
-      this.shape = shape;
-      this.type = "object";
-      this.isStatic = false;
-    }
-
-    applyPhysics(dt) {
-      if (this.isStatic) return;
-
-      this.vy += GRAVITY * dt;
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
-
-      const floor = canvas.height - this.h;
-      if (this.y > floor) {
-        this.y = floor;
-        this.vy *= FLOOR_BOUNCE;
-        this.vx *= FRICTION;
-      }
-
-      if (this.x < 0) {
-        this.x = 0;
-        this.vx *= -0.4;
-      }
-      if (this.x + this.w > canvas.width) {
-        this.x = canvas.width - this.w;
-        this.vx *= -0.4;
-      }
-
-      for (const t of terrainBlocks) {
-        if (aabbOverlap(this, t)) {
-          if (this.y + this.h - this.vy * dt <= t.y) {
-            this.y = t.y - this.h;
-            this.vy *= FLOOR_BOUNCE;
-            this.vx *= FRICTION;
-          } else if (this.y - this.vy * dt >= t.y + t.h) {
-            this.y = t.y + t.h;
-            this.vy *= -0.2;
-          } else if (this.x + this.w - this.vx * dt <= t.x) {
-            this.x = t.x - this.w;
-            this.vx *= -0.3;
-          } else if (this.x - this.vx * dt >= t.x + t.w) {
-            this.x = t.x + t.w;
-            this.vx *= -0.3;
-          }
+    // collisions point <-> rigid boxes
+    for (let p of world.points){
+      for (let b of world.rigidBoxes){
+        const halfW = b.w/2, halfH = b.h/2;
+        const left = b.x - halfW, right = b.x + halfW, top = b.y - halfH, bottom = b.y + halfH;
+        const cx = clamp(p.x, left, right);
+        const cy = clamp(p.y, top, bottom);
+        const dx = p.x - cx, dy = p.y - cy;
+        const dist2 = dx*dx + dy*dy;
+        const r = p.radius;
+        if (dist2 < r*r){
+          const dist = Math.sqrt(dist2) || 0.0001;
+          const nx = dx / dist, ny = dy / dist;
+          const push = r - dist;
+          if (p.invMass){ p.x += nx * push; p.y += ny * push; }
+          // damp previous position to remove energy
+          p.px += nx * push * 0.5;
+          p.py += ny * push * 0.5;
         }
       }
     }
 
-    draw() {
-      ctx.fillStyle = this.color;
-      ctx.strokeStyle = "rgba(15,23,42,0.9)";
-      ctx.lineWidth = 1.2;
-
-      switch (this.shape) {
-        case "ball": {
-          const r = Math.min(this.w, this.h) / 2;
-          ctx.beginPath();
-          ctx.arc(this.x + this.w / 2, this.y + this.h / 2, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "triangle": {
-          ctx.beginPath();
-          ctx.moveTo(this.x + this.w / 2, this.y);
-          ctx.lineTo(this.x + this.w, this.y + this.h);
-          ctx.lineTo(this.x, this.y + this.h);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "capsule": {
-          const r = this.h / 2;
-          const left = this.x;
-          const right = this.x + this.w;
-          const cy = this.y + this.h / 2;
-          ctx.beginPath();
-          ctx.arc(left + r, cy, r, 0.5 * Math.PI, 1.5 * Math.PI);
-          ctx.lineTo(right - r, this.y);
-          ctx.arc(right - r, cy, r, 1.5 * Math.PI, 0.5 * Math.PI);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "cylinder": {
-          const r = this.w / 2;
-          const cx = this.x + this.w / 2;
-          ctx.beginPath();
-          ctx.ellipse(cx, this.y + 6, r, 6, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          ctx.fillRect(this.x, this.y + 6, this.w, this.h - 12);
-          ctx.strokeRect(this.x, this.y + 6, this.w, this.h - 12);
-          ctx.beginPath();
-          ctx.ellipse(cx, this.y + this.h - 6, r, 6, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "plank": {
-          ctx.fillRect(this.x, this.y + this.h / 3, this.w, this.h / 3);
-          ctx.strokeRect(this.x, this.y + this.h / 3, this.w, this.h / 3);
-          break;
-        }
-        case "ramp": {
-          ctx.beginPath();
-          ctx.moveTo(this.x, this.y + this.h);
-          ctx.lineTo(this.x + this.w, this.y + this.h);
-          ctx.lineTo(this.x + this.w, this.y);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "spike": {
-          ctx.beginPath();
-          ctx.moveTo(this.x + this.w / 2, this.y);
-          ctx.lineTo(this.x + this.w, this.y + this.h);
-          ctx.lineTo(this.x, this.y + this.h);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        case "custom": {
-          ctx.beginPath();
-          ctx.moveTo(this.x, this.y + this.h * 0.4);
-          ctx.lineTo(this.x + this.w * 0.3, this.y);
-          ctx.lineTo(this.x + this.w * 0.7, this.y + this.h * 0.3);
-          ctx.lineTo(this.x + this.w, this.y + this.h * 0.1);
-          ctx.lineTo(this.x + this.w * 0.8, this.y + this.h);
-          ctx.lineTo(this.x + this.w * 0.2, this.y + this.h * 0.8);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-        default: {
-          ctx.fillRect(this.x, this.y, this.w, this.h);
-          ctx.strokeRect(this.x, this.y, this.w, this.h);
+    // soft point-point collisions to avoid overlap
+    for (let i=0;i<world.points.length;i++){
+      const A = world.points[i];
+      for (let j=i+1;j<world.points.length;j++){
+        const B = world.points[j];
+        const dx = B.x - A.x, dy = B.y - A.y;
+        const dist = Math.hypot(dx,dy) || 0.0001;
+        const minD = A.radius + B.radius;
+        if (dist < minD){
+          const overlap = minD - dist;
+          const nx = dx/dist, ny = dy/dist;
+          const invA = A.invMass, invB = B.invMass;
+          const w = invA + invB;
+          if (w === 0) continue;
+          const ax = nx * overlap * (invA / w);
+          const ay = ny * overlap * (invA / w);
+          const bx = -nx * overlap * (invB / w);
+          const by = -ny * overlap * (invB / w);
+          if (A.invMass){ A.x += ax; A.y += ay; }
+          if (B.invMass){ B.x += bx; B.y += by; }
         }
       }
     }
   }
+}
 
-  // ====== RAGDOLL LIMB ======
-  class Limb {
-    constructor(x, y, w, h, color, parentNpc, role) {
-      this.id = entityIdCounter++;
-      this.x = x;
-      this.y = y;
-      this.w = w;
-      this.h = h;
-      this.vx = 0;
-      this.vy = 0;
-      this.color = color;
-      this.type = "limb";
-      this.role = role;
-      this.parentNpc = parentNpc;
-      this.isDetached = false;
-      this.hp = 30;
-      this.maxHp = 30;
-      this.joint = null;
+/* Muscles with frame-rate scaling and clamping */
+function applyMuscles(dt){
+  // muscle strength scaled by dt (frame-rate independent)
+  const baseK = 0.06; // base strength
+  const k = baseK * Math.min(1, dt * 60); // scale by dt*60
+  const maxCorrection = 6; // pixels per frame max
+  for (let root of world.points){
+    if (!root.ragdoll || !root.standPose || !root.parts) continue;
+    const ai = root.ai || { standTarget: true };
+    // decide whether to try to stand
+    ai.standTimer = (ai.standTimer || 0) - dt*1000;
+    if (ai.standTimer <= 0){ ai.standTarget = Math.random() < 0.6; ai.standTimer = 1500 + Math.random()*2500; }
+    if (!ai.standTarget) continue;
+    // for each part, compute desired world position from stored local offsets
+    for (let p of root.parts){
+      const pose = root.standPose[p.id];
+      if (!pose) continue;
+      const tx = root.x + pose.dx;
+      const ty = root.y + pose.dy;
+      const dx = tx - p.x, dy = ty - p.y;
+      // clamp correction to avoid explosive jumps
+      const corrX = clamp(dx * k, -maxCorrection, maxCorrection);
+      const corrY = clamp(dy * k, -maxCorrection, maxCorrection);
+      if (p.invMass){
+        p.x += corrX;
+        p.y += corrY;
+        // nudge previous position to damp velocity (helps settle)
+        p.px += corrX * 0.5;
+        p.py += corrY * 0.5;
+      }
     }
+  }
+}
 
-    center() {
-      return { x: this.x + this.w / 2, y: this.y + this.h / 2 };
+/* Rigid boxes integration */
+function integrateRigid(dt){
+  for (let b of world.rigidBoxes){
+    if (b.fixed) continue;
+    b.vy += world.gravity.y * dt;
+    b.vx *= 0.995; b.vy *= 0.995;
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    const halfW = b.w/2, halfH = b.h/2;
+    if (b.y + halfH > world.bounds.h){ b.y = world.bounds.h - halfH; if (b.vy > 0) b.vy = -b.vy * 0.3; b.vx *= 0.9; }
+    if (b.y - halfH < 0){ b.y = halfH; if (b.vy < 0) b.vy = -b.vy * 0.3; }
+    if (b.x - halfW < 0){ b.x = halfW; if (b.vx < 0) b.vx = -b.vx * 0.3; }
+    if (b.x + halfW > world.bounds.w){ b.x = world.bounds.w - halfW; if (b.vx > 0) b.vx = -b.vx * 0.3; }
+  }
+}
+
+/* Bullets update and collisions */
+function updateBullets(dt){
+  for (let i = world.bullets.length-1; i>=0; i--){
+    const bl = world.bullets[i];
+    bl.x += bl.vx * dt;
+    bl.y += bl.vy * dt;
+    bl.age += dt*1000;
+    let removed = false;
+    // rigid boxes
+    for (let j = world.rigidBoxes.length-1; j>=0; j--){
+      const b = world.rigidBoxes[j];
+      if (bl.x >= b.x - b.w/2 && bl.x <= b.x + b.w/2 && bl.y >= b.y - b.h/2 && bl.y <= b.y + b.h/2){
+        const speed = Math.hypot(bl.vx, bl.vy) || 1;
+        const nx = bl.vx / speed, ny = bl.vy / speed;
+        if (!b.fixed){ b.vx += nx * 120 / b.mass; b.vy += ny * 120 / b.mass; }
+        severConstraintsNear(bl.x, bl.y, 24);
+        for (let p=0;p<6;p++) spawnParticle(bl.x, bl.y, nx*rand(40,160)+rand(-40,40), ny*rand(40,160)+rand(-40,40), 600+rand(0,600), '#ffcc88');
+        world.bullets.splice(i,1);
+        removed = true;
+        break;
+      }
     }
-
-    applyPhysics(dt) {
-      this.vy += GRAVITY * dt;
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
-
-      const floor = canvas.height - this.h;
-      if (this.y > floor) {
-        this.y = floor;
-        this.vy *= FLOOR_BOUNCE;
-        this.vx *= FRICTION;
-      }
-
-      if (this.x < 0) {
-        this.x = 0;
-        this.vx *= -0.4;
-      }
-      if (this.x + this.w > canvas.width) {
-        this.x = canvas.width - this.w;
-        this.vx *= -0.4;
-      }
-
-      for (const t of terrainBlocks) {
-        if (aabbOverlap(this, t)) {
-          if (this.y + this.h - this.vy * dt <= t.y) {
-            this.y = t.y - this.h;
-            this.vy *= FLOOR_BOUNCE;
-            this.vx *= FRICTION;
-          } else if (this.y - this.vy * dt >= t.y + t.h) {
-            this.y = t.y + t.h;
-            this.vy *= -0.2;
-          } else if (this.x + this.w - this.vx * dt <= t.x) {
-            this.x = t.x - this.w;
-            this.vx *= -0.3;
-          } else if (this.x - this.vx * dt >= t.x + t.w) {
-            this.x = t.x + t.w;
-            this.vx *= -0.3;
-          }
+    if (removed) continue;
+    // points
+    for (let j = world.points.length-1; j>=0; j--){
+      const pt = world.points[j];
+      const dx = bl.x - pt.x, dy = bl.y - pt.y;
+      if (dx*dx + dy*dy <= (bl.r + pt.radius)*(bl.r + pt.radius)){
+        const speed = Math.hypot(bl.vx, bl.vy) || 1;
+        const nx = bl.vx / speed, ny = bl.vy / speed;
+        if (pt.invMass){
+          pt.x += nx * 8; pt.y += ny * 8;
+          pt.px += nx * 4; pt.py += ny * 4;
         }
+        const root = findRagdollRoot(pt);
+        if (root){ root.health -= 8; if (Math.random() < 0.25) severConstraintsNear(pt.x, pt.y, 28); }
+        for (let p=0;p<6;p++) spawnParticle(bl.x, bl.y, nx*rand(40,160)+rand(-40,40), ny*rand(40,160)+rand(-40,40), 600+rand(0,600), '#ffcc88');
+        world.bullets.splice(i,1);
+        removed = true;
+        break;
       }
     }
-
-    draw() {
-      ctx.fillStyle = this.color;
-      ctx.strokeStyle = "#020617";
-      ctx.lineWidth = 1.2;
-      ctx.fillRect(this.x, this.y, this.w, this.h);
-      ctx.strokeRect(this.x, this.y, this.w, this.h);
-
-      if (this.role === "head") {
-        ctx.fillStyle = "#0f172a";
-        const cx = this.x + this.w / 2;
-        const cy = this.y + this.h / 2;
-        ctx.beginPath();
-        ctx.arc(cx - 3, cy - 2, 1.4, 0, Math.PI * 2);
-        ctx.arc(cx + 3, cy - 2, 1.4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      if (this.hp < this.maxHp) {
-        const ratio = clamp(this.hp / this.maxHp, 0, 1);
-        const barW = this.w;
-        const barH = 2;
-        ctx.fillStyle = "#1f2937";
-        ctx.fillRect(this.x, this.y - 4, barW, barH);
-        ctx.fillStyle = ratio > 0.5 ? "#4ade80" : ratio > 0.25 ? "#facc15" : "#f97373";
-        ctx.fillRect(this.x, this.y - 4, barW * ratio, barH);
-      }
-    }
+    if (removed) continue;
+    if (bl.age > bl.life) world.bullets.splice(i,1);
   }
-
-  // ====== NPC (ADVANCED RAGDOLL, UPRIGHT) ======
-  class NPC {
-    constructor(x, y) {
-      this.id = entityIdCounter++;
-      this.type = "npc";
-      this.mode = "wander";
-      this.timer = 0;
-      this.hp = 100;
-      this.maxHp = 100;
-      this.limbs = [];
-      this.alive = true;
-
-      const rootX = x;
-      const rootY = y;
-
-      const torsoW = 18;
-      const upperTorsoH = 22;
-      const lowerTorsoH = 14;
-      const limbW = 6;
-      const limbH = 16;
-
-      const lowerTorso = new Limb(rootX, rootY, torsoW, lowerTorsoH, "#38bdf8", this, "lowerTorso");
-      const upperTorso = new Limb(rootX, rootY - upperTorsoH, torsoW, upperTorsoH, "#38bdf8", this, "upperTorso");
-      const head = new Limb(rootX + 2, rootY - upperTorsoH - 14, torsoW - 4, 14, "#e5e7eb", this, "head");
-
-      const upperArmL = new Limb(rootX - limbW, rootY - upperTorsoH + 4, limbW, limbH, "#38bdf8", this, "upperArmL");
-      const lowerArmL = new Limb(rootX - limbW, rootY - upperTorsoH + 4 + limbH, limbW, limbH, "#38bdf8", this, "lowerArmL");
-
-      const upperArmR = new Limb(rootX + torsoW, rootY - upperTorsoH + 4, limbW, limbH, "#38bdf8", this, "upperArmR");
-      const lowerArmR = new Limb(rootX + torsoW, rootY - upperTorsoH + 4 + limbH, limbW, limbH, "#38bdf8", this, "lowerArmR");
-
-      const upperLegL = new Limb(rootX + 2, rootY + lowerTorsoH, limbW, limbH, "#1f2937", this, "upperLegL");
-      const lowerLegL = new Limb(rootX + 2, rootY + lowerTorsoH + limbH, limbW, limbH, "#1f2937", this, "lowerLegL");
-
-      const upperLegR = new Limb(rootX + torsoW - limbW - 2, rootY + lowerTorsoH, limbW, limbH, "#1f2937", this, "upperLegR");
-      const lowerLegR = new Limb(rootX + torsoW - limbW - 2, rootY + lowerTorsoH + limbH, limbW, limbH, "#1f2937", this, "lowerLegR");
-
-      this.limbs.push(
-        head, upperTorso, lowerTorso,
-        upperArmL, lowerArmL,
-        upperArmR, lowerArmR,
-        upperLegL, lowerLegL,
-        upperLegR, lowerLegR
-      );
-      limbs.push(...this.limbs);
-
-      function joint(a, b, stiffness, breakForce) {
-        a.joint = { other: b, stiffness, breakForce };
-      }
-
-      joint(head, upperTorso, 0.4, 18);
-      joint(upperTorso, lowerTorso, 0.8, 40); // strong torso
-      joint(upperArmL, upperTorso, 0.4, 20);
-      joint(upperArmR, upperTorso, 0.4, 20);
-      joint(lowerArmL, upperArmL, 0.3, 18);
-      joint(lowerArmR, upperArmR, 0.3, 18);
-      joint(upperLegL, lowerTorso, 0.6, 35);
-      joint(upperLegR, lowerTorso, 0.6, 35);
-      joint(lowerLegL, upperLegL, 0.3, 20);
-      joint(lowerLegR, upperLegR, 0.3, 20);
-
-      this.rootLimb = lowerTorso;
-    }
-
-    get centerX() {
-      return this.rootLimb.x + this.rootLimb.w / 2;
-    }
-
-    get centerY() {
-      return this.rootLimb.y + this.rootLimb.h / 2;
-    }
-
-    setMode(mode) {
-      this.mode = mode;
-      this.timer = 0;
-    }
-
-    updateBehavior(dt) {
-      if (!this.alive) return;
-
-      if (this.mode === "wander") {
-        this.timer -= dt;
-        if (this.timer <= 0) {
-          const impulse = (Math.random() - 0.5) * 2;
-          this.rootLimb.vx += impulse;
-          this.timer = 60 + Math.random() * 120;
-        }
-      } else if (this.mode === "pathfind") {
-        this.timer -= dt;
-        if (this.timer <= 0) {
-          const targetX = randRange(0, canvas.width);
-          const dx = targetX - this.centerX;
-          this.rootLimb.vx += clamp(dx * 0.002, -1.5, 1.5);
-          this.timer = 90 + Math.random() * 120;
-        }
-      }
-    }
-
-    applyDamage(amount) {
-      this.hp -= amount;
-      if (this.hp <= 0 && this.alive) {
-        this.alive = false;
-      }
-    }
-
-    breakApart() {
-      for (const limb of this.limbs) {
-        limb.joint = null;
-        limb.isDetached = true;
-      }
-      this.alive = false;
-    }
-
-    draw() {
-      if (this.hp < this.maxHp) {
-        const ratio = clamp(this.hp / this.maxHp, 0, 1);
-        const barW = 40;
-        const barH = 4;
-        const x = this.centerX - barW / 2;
-        const y = this.centerY - 40;
-        ctx.fillStyle = "#020617";
-        ctx.fillRect(x, y, barW, barH);
-        ctx.fillStyle = ratio > 0.5 ? "#4ade80" : ratio > 0.25 ? "#facc15" : "#f97373";
-        ctx.fillRect(x, y, barW * ratio, barH);
-      }
-    }
-  }
-
-  function spawnNPC(x, y) {
-    const npc = new NPC(x ?? 300, y ?? 40);
-    npcs.push(npc);
-    return npc;
-  }
-
-  // ====== JOINT / RAGDOLL CONSTRAINTS ======
-  function updateLimbJoints(dt) {
-    for (const limb of limbs) {
-      if (!limb.joint || !limb.joint.other) continue;
-      const other = limb.joint.other;
-
-      const c1 = limb.center();
-      const c2 = other.center();
-      const dx = c2.x - c1.x;
-      const dy = c2.y - c1.y;
-      const dist = Math.hypot(dx, dy) || 0.0001;
-
-      const rest = (limb.h + other.h) * 0.4;
-      const diff = dist - rest;
-      const force = diff * limb.joint.stiffness;
-
-      if (Math.abs(force) > limb.joint.breakForce) {
-        limb.joint = null;
-        continue;
-      }
-
-      const nx = dx / dist;
-      const ny = dy / dist;
-
-      const fx = nx * force * dt;
-      const fy = ny * force * dt;
-
-      limb.vx += fx;
-      limb.vy += fy;
-      other.vx -= fx;
-      other.vy -= fy;
-    }
-  }
-
-  // ====== PROJECTILES ======
-  class Projectile {
-    constructor(x, y, vx, vy, damage = 20) {
-      this.id = entityIdCounter++;
-      this.x = x;
-      this.y = y;
-      this.vx = vx;
-      this.vy = vy;
-      this.radius = 4;
-      this.life = 180;
-      this.damage = damage;
-    }
-
-    update(dt) {
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
-      this.vy += 0.2 * dt;
-      this.life -= dt;
-
-      for (const t of terrainBlocks) {
-        if (
-          this.x > t.x &&
-          this.x < t.x + t.w &&
-          this.y > t.y &&
-          this.y < t.y + t.h
-        ) {
-          this.life = 0;
-          spawnImpactParticles(this.x, this.y, "#f97316");
-          break;
-        }
-      }
-
-      // objects no longer take damage
-
-      for (const limb of limbs) {
-        if (
-          this.x > limb.x &&
-          this.x < limb.x + limb.w &&
-          this.y > limb.y &&
-          this.y < limb.y + limb.h
-        ) {
-          limb.hp -= this.damage;
-          if (limb.parentNpc) {
-            limb.parentNpc.applyDamage(this.damage * (limb.role === "head" ? 1.5 : 1));
-          }
-          spawnImpactParticles(this.x, this.y, "#f97316");
-          this.life = 0;
-          break;
-        }
-      }
-    }
-
-    draw() {
-      ctx.fillStyle = "#f97316";
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function shootProjectileFromPoint(x, y) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 6;
-    const p = new Projectile(
-      x,
-      y,
-      Math.cos(angle) * speed,
-      Math.sin(angle) * speed
-    );
-    projectiles.push(p);
-  }
-
-  function shootFromSelectedNPC() {
-    let originX, originY;
-    if (selectedEntity && selectedEntity.type === "npc") {
-      originX = selectedEntity.centerX;
-      originY = selectedEntity.centerY;
-    } else {
-      originX = canvas.width / 2;
-      originY = canvas.height / 2;
-    }
-    const p = new Projectile(originX, originY, 0, -8, 25);
-    projectiles.push(p);
-  }
-
-  // ====== PARTICLES / EXPLOSIONS ======
-  function spawnImpactParticles(x, y, color) {
-    for (let i = 0; i < 8; i++) {
-      particles.push({
-        x,
-        y,
-        vx: randRange(-2, 2),
-        vy: randRange(-2, 0),
-        life: randRange(15, 30),
-        color,
-        size: randRange(1, 2),
-      });
-    }
-  }
-
-  function spawnExplosion(x, y, radius = 90, force = 18, damage = 60) {
-    cinematicSlowmoTimer = 30;
-
-    for (let i = 0; i < 40; i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const sp = randRange(2, 6);
-      particles.push({
-        x,
-        y,
-        vx: Math.cos(ang) * sp,
-        vy: Math.sin(ang) * sp,
-        life: randRange(30, 60),
-        color: i % 2 === 0 ? "#f97316" : "#facc15",
-        size: randRange(2, 4),
-      });
-    }
-
-    for (let i = 0; i < 20; i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const sp = randRange(1, 3);
-      particles.push({
-        x,
-        y,
-        vx: Math.cos(ang) * sp,
-        vy: Math.sin(ang) * sp,
-        life: randRange(40, 80),
-        color: "#111827",
-        size: randRange(3, 6),
-      });
-    }
-
-    function applyExplosionToBody(body, massFactor = 1) {
-      const cx = body.x + body.w / 2;
-      const cy = body.y + body.h / 2;
-      const dist = distance(x, y, cx, cy);
-      if (dist > radius) return;
-      const falloff = 1 - dist / radius;
-      const ang = Math.atan2(cy - y, cx - x);
-      const f = force * falloff * massFactor;
-      body.vx += Math.cos(ang) * f;
-      body.vy += Math.sin(ang) * f;
-
-      // only limbs/NPCs take damage
-      if (body.type === "limb") {
-        body.hp -= damage * falloff;
-        if (body.parentNpc) {
-          body.parentNpc.applyDamage(damage * falloff * (body.role === "head" ? 1.5 : 1));
-        }
-      }
-    }
-
-    for (const obj of objects) applyExplosionToBody(obj, 0.8); // force only
-    for (const limb of limbs) applyExplosionToBody(limb, 1.0);
-  }
-
-  // ====== ROPE / WELD ======
-  class Rope {
-    constructor(a, b) {
-      this.id = entityIdCounter++;
-      this.a = a;
-      this.b = b;
-      const ac = a.center ? a.center() : { x: a.x + a.w / 2, y: a.y + a.h / 2 };
-      const bc = b.center ? b.center() : { x: b.x + b.w / 2, y: b.y + b.h / 2 };
-      this.restLength = distance(ac.x, ac.y, bc.x, bc.y);
-      this.breakForce = 40;
-    }
-
-    update(dt) {
-      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
-      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
-      const dx = bc.x - ac.x;
-      const dy = bc.y - ac.y;
-      const dist = Math.hypot(dx, dy) || 0.0001;
-      const diff = dist - this.restLength;
-      const force = diff * 0.4;
-      if (Math.abs(force) > this.breakForce) {
-        this.broken = true;
-        return;
-      }
-      const nx = dx / dist;
-      const ny = dy / dist;
-      const fx = nx * force * dt;
-      const fy = ny * force * dt;
-
-      this.a.vx += fx;
-      this.a.vy += fy;
-      this.b.vx -= fx;
-      this.b.vy -= fy;
-    }
-
-    draw() {
-      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
-      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
-      ctx.strokeStyle = "#4ade80";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(ac.x, ac.y);
-      ctx.lineTo(bc.x, bc.y);
-      ctx.stroke();
-    }
-  }
-
-  class Weld {
-    constructor(a, b) {
-      this.id = entityIdCounter++;
-      this.a = a;
-      this.b = b;
-    }
-
-    update(dt) {
-      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
-      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
-      const midX = (ac.x + bc.x) / 2;
-      const midY = (ac.y + bc.y) / 2;
-
-      const dxA = midX - ac.x;
-      const dyA = midY - ac.y;
-      const dxB = midX - bc.x;
-      const dyB = midY - bc.y;
-
-      this.a.vx += dxA * 0.3 * dt;
-      this.a.vy += dyA * 0.3 * dt;
-      this.b.vx += dxB * 0.3 * dt;
-      this.b.vy += dyB * 0.3 * dt;
-    }
-
-    draw() {
-      const ac = this.a.center ? this.a.center() : { x: this.a.x + this.a.w / 2, y: this.a.y + this.a.h / 2 };
-      const bc = this.b.center ? this.b.center() : { x: this.b.x + this.b.w / 2, y: this.b.y + this.b.h / 2 };
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(ac.x, ac.y);
-      ctx.lineTo(bc.x, bc.y);
-      ctx.stroke();
-    }
-  }
-
-  // ====== GRAVITY GUN ======
-  let gravityGunActive = false;
-  let gravityTarget = null;
-  let lastMouseX = 0;
-  let lastMouseY = 0;
-
-  function updateGravityGun(dt, mouseX, mouseY) {
-    if (!gravityGunActive || !gravityTarget) return;
-    const target = gravityTarget;
-    const cx = target.x + target.w / 2;
-    const cy = target.y + target.h / 2;
-    const dx = mouseX - cx;
-    const dy = mouseY - cy;
-    target.vx += dx * 0.3 * dt;
-    target.vy += dy * 0.3 * dt;
-  }
-
-  // ====== SPAWN HELPERS ======
-  function spawnBox(x, y) {
-    const e = new Entity(x ?? 100, y ?? 20, 40, 40, "#f97373", "box");
-    e.type = "box";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnBall(x, y) {
-    const e = new Entity(x ?? 200, y ?? 20, 32, 32, "#facc15", "ball");
-    e.type = "ball";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnTriangle(x, y) {
-    const e = new Entity(x ?? 260, y ?? 20, 40, 40, "#4ade80", "triangle");
-    e.type = "triangle";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnCapsule(x, y) {
-    const e = new Entity(x ?? 320, y ?? 20, 50, 24, "#a855f7", "capsule");
-    e.type = "capsule";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnCylinder(x, y) {
-    const e = new Entity(x ?? 380, y ?? 20, 30, 50, "#22c55e", "cylinder");
-    e.type = "cylinder";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnPlank(x, y) {
-    const e = new Entity(x ?? 440, y ?? 20, 80, 20, "#60a5fa", "plank");
-    e.type = "plank";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnRamp(x, y) {
-    const e = new Entity(x ?? 520, y ?? 20, 60, 40, "#fbbf24", "ramp");
-    e.type = "ramp";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnSpike(x, y) {
-    const e = new Entity(x ?? 580, y ?? 20, 30, 40, "#ef4444", "spike");
-    e.type = "spike";
-    objects.push(e);
-    return e;
-  }
-
-  function spawnCustom(x, y) {
-    const e = new Entity(x ?? 640, y ?? 20, 50, 40, "#38bdf8", "custom");
-    e.type = "custom";
-    objects.push(e);
-    return e;
-  }
-
-  // ====== INPUT / TOOLS ======
-  let currentTool = "spawn-box";
-  const toolButtons = document.querySelectorAll(".tool-btn");
-  toolButtons.forEach((btn) => {
-    if (!btn.dataset.tool) return;
-    btn.addEventListener("click", () => {
-      toolButtons.forEach((b) => {
-        if (b.dataset.tool) b.classList.remove("active");
-      });
-      btn.classList.add("active");
-      currentTool = btn.dataset.tool;
-
-      if (currentTool !== "gravity-gun") {
-        gravityGunActive = false;
-        gravityTarget = null;
-      } else {
-        gravityGunActive = true;
-      }
-    });
-  });
-
-  const advToggle = document.getElementById("adv-tools-toggle");
-  const advContent = document.getElementById("adv-tools-content");
-  advToggle.addEventListener("click", () => {
-    const open = advContent.style.maxHeight && advContent.style.maxHeight !== "0px";
-    if (open) {
-      advContent.style.maxHeight = "0px";
-      advContent.classList.remove("open");
-      advToggle.classList.remove("active");
-      advToggle.textContent = "Advanced Tools ▼";
-    } else {
-      advContent.style.maxHeight = advContent.scrollHeight + "px";
-      advContent.classList.add("open");
-      advToggle.classList.add("active");
-      advToggle.textContent = "Advanced Tools ▲";
-    }
-  });
-
-  const clearAllBtn = document.getElementById("clear-all-btn");
-  clearAllBtn.addEventListener("click", () => {
-    objects.length = 0;
-    npcs.length = 0;
-    limbs.length = 0;
-    projectiles.length = 0;
-    terrainBlocks.length = 0;
-    ropes.length = 0;
-    welds.length = 0;
-    selectedEntity = null;
-    updateInspector();
-  });
-
-  let selectedEntity = null;
-  let dragging = false;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
-
-  function getMousePos(evt) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: (evt.clientX - rect.left) * (canvas.width / rect.width) / window.devicePixelRatio,
-      y: (evt.clientY - rect.top) * (canvas.height / rect.height) / window.devicePixelRatio,
-    };
-  }
-
-  function pickEntityAt(x, y) {
-    const all = [...objects, ...limbs, ...npcs];
-    for (let i = all.length - 1; i >= 0; i--) {
-      const e = all[i];
-      if (e.type === "npc") {
-        const cx = e.centerX;
-        const cy = e.centerY;
-        if (distance(x, y, cx, cy) < 30) return e;
-      } else {
-        if (x >= e.x && x <= e.x + e.w && y >= e.y && y <= e.y + e.h) {
-          return e;
-        }
-      }
-    }
-    return null;
-  }
-
-  let ropeFirst = null;
-  let weldFirst = null;
-
-  canvas.addEventListener("mousedown", (e) => {
-    e.preventDefault();
-    const pos = getMousePos(e);
-    const { x, y } = pos;
-    lastMouseX = x;
-    lastMouseY = y;
-    const { gx, gy } = worldToGrid(x, y);
-
-    if (e.button === 2) {
-      if (currentTool === "terrain-erase") {
-        eraseTerrainAt(gx, gy);
-      } else {
-        placeTerrainAt(gx, gy);
-      }
+}
+
+/* Sever constraints near a point */
+function severConstraintsNear(x,y,radius){
+  for (let i = world.constraints.length-1; i>=0; i--){
+    const c = world.constraints[i];
+    const mx = (c.a.x + c.b.x)/2, my = (c.a.y + c.b.y)/2;
+    if (Math.hypot(mx - x, my - y) <= radius){
+      world.constraints.splice(i,1);
       return;
     }
+  }
+}
 
-    if (currentTool === "select" || currentTool === "npc-wander" || currentTool === "npc-pathfind" || currentTool === "delete" || currentTool === "gravity-gun" || currentTool === "break-npc" || currentTool === "rope" || currentTool === "weld") {
-      const ent = pickEntityAt(x, y);
-      if (ent) {
-        if (currentTool === "delete") {
-          if (ent.type === "npc") {
-            const idx = npcs.indexOf(ent);
-            if (idx !== -1) npcs.splice(idx, 1);
-            for (let i = limbs.length - 1; i >= 0; i--) {
-              if (limbs[i].parentNpc === ent) limbs.splice(i, 1);
-            }
-          } else if (ent.type === "limb") {
-            const idx = limbs.indexOf(ent);
-            if (idx !== -1) limbs.splice(idx, 1);
-          } else {
-            const idx = objects.indexOf(ent);
-            if (idx !== -1) objects.splice(idx, 1);
-          }
-          if (selectedEntity === ent) selectedEntity = null;
-          updateInspector();
-          return;
-        }
+/* Find ragdoll root for a point */
+function findRagdollRoot(pt){
+  if (pt.ragdoll) return pt;
+  for (let p of world.points){
+    if (p.ragdoll && p.parts && p.parts.includes(pt)) return p;
+  }
+  return null;
+}
 
-        if (currentTool === "npc-wander" && ent.type === "npc") {
-          ent.setMode("wander");
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
+/* Simple AI */
+function updateAI(dt){
+  const now = nowMs();
+  const roots = world.points.filter(p => p.ragdoll);
+  for (let root of roots){
+    const ai = root.ai;
+    if (!ai) continue;
+    let target = null, best = 1e9;
+    for (let other of roots){
+      if (other === root) continue;
+      const d = Math.hypot(other.x - root.x, other.y - root.y);
+      if (d < best){ best = d; target = other; }
+    }
+    ai.targetId = target ? target.id : null;
+    // gun pickup/shoot handled elsewhere; small random nudge to simulate walking
+    if (Math.random() < 0.002) root.px -= rand(-20,20);
+  }
+}
 
-        if (currentTool === "npc-pathfind" && ent.type === "npc") {
-          ent.setMode("pathfind");
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
+/* Rendering */
+function draw(now){
+  ctx.fillStyle = '#071021';
+  ctx.fillRect(0,0,canvas.width/DPR,canvas.height/DPR);
 
-        if (currentTool === "break-npc") {
-          if (ent.type === "npc") {
-            ent.breakApart();
-          } else if (ent.type === "limb" && ent.parentNpc) {
-            ent.parentNpc.breakApart();
-          }
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+  ctx.lineWidth = 1;
+  const step = 40;
+  for (let x=0;x<world.bounds.w;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,world.bounds.h); ctx.stroke(); }
+  for (let y=0;y<world.bounds.h;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(world.bounds.w,y); ctx.stroke(); }
 
-        if (currentTool === "gravity-gun") {
-          gravityGunActive = true;
-          gravityTarget = ent;
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
+  // constraints
+  ctx.lineWidth = 2;
+  for (let c of world.constraints){
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(200,200,255,0.12)';
+    ctx.moveTo(c.a.x, c.a.y);
+    ctx.lineTo(c.b.x, c.b.y);
+    ctx.stroke();
+  }
 
-        if (currentTool === "rope") {
-          if (!ropeFirst) {
-            ropeFirst = ent;
-          } else {
-            if (ropeFirst !== ent) {
-              const r = new Rope(ropeFirst, ent);
-              ropes.push(r);
-            }
-            ropeFirst = null;
-          }
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
-
-        if (currentTool === "weld") {
-          if (!weldFirst) {
-            weldFirst = ent;
-          } else {
-            if (weldFirst !== ent) {
-              const w = new Weld(weldFirst, ent);
-              welds.push(w);
-            }
-            weldFirst = null;
-          }
-          selectedEntity = ent;
-          updateInspector();
-          return;
-        }
-
-        if (currentTool === "select") {
-          selectedEntity = ent;
-          dragging = true;
-          dragOffsetX = x - ent.x;
-          dragOffsetY = y - ent.y;
-          updateInspector();
-          return;
-        }
-      } else {
-        if (currentTool !== "rope" && currentTool !== "weld") {
-          selectedEntity = null;
-          dragging = false;
-          updateInspector();
-        }
+  // rigid boxes
+  for (let b of world.rigidBoxes){
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.fillStyle = b.color;
+    ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.strokeRect(-b.w/2, -b.h/2, b.w, b.h);
+    if (b.tags && b.tags.includes('gun')){
+      ctx.fillStyle = '#222';
+      ctx.fillRect(b.w/2 - 6, -4, 12, 8);
+      if (b.owner){
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(-b.w/2, b.h/2 + 4, b.w, 12);
+        ctx.fillStyle = '#dff7f6';
+        ctx.font = '11px Inter, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(b.owner === 'player' ? 'Held' : 'Held', 0, b.h/2 + 14);
       }
-    } else if (currentTool === "spawn-box") {
-      selectedEntity = spawnBox(x - 20, y - 20);
-      updateInspector();
-    } else if (currentTool === "spawn-ball") {
-      selectedEntity = spawnBall(x - 16, y - 16);
-      updateInspector();
-    } else if (currentTool === "spawn-triangle") {
-      selectedEntity = spawnTriangle(x - 20, y - 20);
-      updateInspector();
-    } else if (currentTool === "spawn-capsule") {
-      selectedEntity = spawnCapsule(x - 25, y - 12);
-      updateInspector();
-    } else if (currentTool === "spawn-cylinder") {
-      selectedEntity = spawnCylinder(x - 15, y - 25);
-      updateInspector();
-    } else if (currentTool === "spawn-plank") {
-      selectedEntity = spawnPlank(x - 40, y - 10);
-      updateInspector();
-    } else if (currentTool === "spawn-ramp") {
-      selectedEntity = spawnRamp(x - 30, y - 20);
-      updateInspector();
-    } else if (currentTool === "spawn-spike") {
-      selectedEntity = spawnSpike(x - 15, y - 20);
-      updateInspector();
-    } else if (currentTool === "spawn-custom") {
-      selectedEntity = spawnCustom(x - 25, y - 20);
-      updateInspector();
-    } else if (currentTool === "spawn-npc") {
-      selectedEntity = spawnNPC(x - 10, y - 40);
-      updateInspector();
-    } else if (currentTool === "terrain-place") {
-      placeTerrainAt(gx, gy);
-    } else if (currentTool === "terrain-erase") {
-      eraseTerrainAt(gx, gy);
-    } else if (currentTool === "shoot") {
-      shootProjectileFromPoint(x, y);
-    } else if (currentTool === "explosion") {
-      spawnExplosion(x, y);
     }
-  });
-
-  canvas.addEventListener("mousemove", (e) => {
-    const pos = getMousePos(e);
-    lastMouseX = pos.x;
-    lastMouseY = pos.y;
-    if (!dragging || !selectedEntity) return;
-    selectedEntity.x = pos.x - dragOffsetX;
-    selectedEntity.y = pos.y - dragOffsetY;
-    selectedEntity.vx = 0;
-    selectedEntity.vy = 0;
-    updateInspector();
-  });
-
-  canvas.addEventListener("mouseup", () => {
-    dragging = false;
-  });
-
-  canvas.addEventListener("mouseleave", () => {
-    dragging = false;
-  });
-
-  canvas.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-  });
-
-  window.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
-      shootFromSelectedNPC();
-    }
-    if (e.key === "Shift") {
-      slowmoHeld = true;
-    }
-  });
-
-  window.addEventListener("keyup", (e) => {
-    if (e.key === "Shift") {
-      slowmoHeld = false;
-    }
-  });
-
-  // ====== SAVE / LOAD ======
-  function serializeWorld() {
-    return JSON.stringify({
-      objects: objects.map((o) => ({
-        id: o.id,
-        x: o.x,
-        y: o.y,
-        w: o.w,
-        h: o.h,
-        vx: o.vx,
-        vy: o.vy,
-        color: o.color,
-        shape: o.shape,
-        type: o.type,
-      })),
-      terrain: terrainBlocks.map((t) => ({
-        gx: t.gx,
-        gy: t.gy,
-      })),
-      npcs: npcs.map((n) => ({
-        id: n.id,
-        hp: n.hp,
-        mode: n.mode,
-        limbs: n.limbs.map((l) => ({
-          id: l.id,
-          role: l.role,
-          x: l.x,
-          y: l.y,
-          w: l.w,
-          h: l.h,
-          vx: l.vx,
-          vy: l.vy,
-          color: l.color,
-          hp: l.hp,
-          maxHp: l.maxHp,
-          isDetached: l.isDetached,
-        })),
-      })),
-    });
+    ctx.restore();
   }
 
-  function deserializeWorld(json) {
-    try {
-      const data = JSON.parse(json);
-      objects.length = 0;
-      npcs.length = 0;
-      limbs.length = 0;
-      terrainBlocks.length = 0;
-      ropes.length = 0;
-      welds.length = 0;
-      projectiles.length = 0;
-      selectedEntity = null;
-
-      for (const o of data.objects || []) {
-        const e = new Entity(o.x, o.y, o.w, o.h, o.color, o.shape);
-        e.vx = o.vx;
-        e.vy = o.vy;
-        e.type = o.type;
-        objects.push(e);
-      }
-
-      for (const t of data.terrain || []) {
-        terrainBlocks.push(new TerrainBlock(t.gx, t.gy));
-      }
-
-      for (const n of data.npcs || []) {
-        const npc = new NPC(0, 0);
-        npc.hp = n.hp;
-        npc.mode = n.mode;
-        npc.limbs.length = 0;
-        for (const l of n.limbs || []) {
-          const limb = new Limb(l.x, l.y, l.w, l.h, l.color, npc, l.role);
-          limb.vx = l.vx;
-          limb.vy = l.vy;
-          limb.hp = l.hp;
-          limb.maxHp = l.maxHp;
-          limb.isDetached = l.isDetached;
-          npc.limbs.push(limb);
-          limbs.push(limb);
-        }
-        npc.rootLimb = npc.limbs.find((l) => l.role === "lowerTorso") || npc.limbs[0];
-        npcs.push(npc);
-      }
-    } catch (e) {
-      console.error("Failed to load world:", e);
-    }
+  // points
+  for (let p of world.points){
+    ctx.beginPath();
+    ctx.fillStyle = p.color;
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x + (p.x - p.px)*0.5, p.y + (p.y - p.py)*0.5);
+    ctx.stroke();
   }
 
-  const saveBtn = document.querySelector('[data-tool="save-world"]');
-  const loadBtn = document.querySelector('[data-tool="load-world"]');
-
-  saveBtn.addEventListener("click", () => {
-    const data = serializeWorld();
-    localStorage.setItem("miniPlaygroundWorld", data);
-  });
-
-  loadBtn.addEventListener("click", () => {
-    const data = localStorage.getItem("miniPlaygroundWorld");
-    if (data) deserializeWorld(data);
-  });
-
-  let autoSaveTimer = 0;
-
-  // ====== INSPECTOR + STATS ======
-  const inspType = document.getElementById("insp-type");
-  const inspShape = document.getElementById("insp-shape");
-  const inspHp = document.getElementById("insp-hp");
-  const inspLimbHp = document.getElementById("insp-limbhp");
-  const inspPos = document.getElementById("insp-pos");
-  const inspVel = document.getElementById("insp-vel");
-  const inspMode = document.getElementById("insp-mode");
-  const inspId = document.getElementById("insp-id");
-
-  const statObjects = document.getElementById("stat-objects");
-  const statNPCs = document.getElementById("stat-npcs");
-  const statLimbs = document.getElementById("stat-limbs");
-  const statProjectiles = document.getElementById("stat-projectiles");
-  const statTerrain = document.getElementById("stat-terrain");
-  const statRopes = document.getElementById("stat-ropes");
-  const statWelds = document.getElementById("stat-welds");
-
-  function updateInspector() {
-    if (!selectedEntity) {
-      inspType.textContent = "None";
-      inspShape.textContent = "-";
-      inspHp.textContent = "-";
-      inspLimbHp.textContent = "-";
-      inspPos.textContent = "-";
-      inspVel.textContent = "-";
-      inspMode.textContent = "-";
-      inspId.textContent = "-";
-      return;
-    }
-
-    inspType.textContent = selectedEntity.type ?? "object";
-    inspShape.textContent =
-      selectedEntity.shape ??
-      (selectedEntity.type === "npc"
-        ? "ragdoll"
-        : selectedEntity.type === "limb"
-        ? selectedEntity.role
-        : "-");
-
-    if (selectedEntity.type === "npc") {
-      inspHp.textContent = `${selectedEntity.hp.toFixed(1)} / ${selectedEntity.maxHp.toFixed(1)}`;
-      const limbInfo = selectedEntity.limbs
-        .map((l) => `${l.role}:${l.hp.toFixed(0)}`)
-        .join(", ");
-      inspLimbHp.textContent = limbInfo || "-";
-      inspPos.textContent = `${selectedEntity.centerX.toFixed(1)}, ${selectedEntity.centerY.toFixed(1)}`;
-      inspVel.textContent = "-";
-      inspMode.textContent = selectedEntity.mode;
-    } else if (selectedEntity.type === "limb") {
-      inspHp.textContent = `${selectedEntity.hp.toFixed(1)} / ${selectedEntity.maxHp.toFixed(1)}`;
-      inspLimbHp.textContent = selectedEntity.role;
-      inspPos.textContent = `${selectedEntity.x.toFixed(1)}, ${selectedEntity.y.toFixed(1)}`;
-      inspVel.textContent = `${(selectedEntity.vx ?? 0).toFixed(2)}, ${(selectedEntity.vy ?? 0).toFixed(2)}`;
-      inspMode.textContent = selectedEntity.parentNpc ? selectedEntity.parentNpc.mode : "-";
-    } else {
-      inspHp.textContent = "-";
-      inspLimbHp.textContent = "-";
-      inspPos.textContent = `${selectedEntity.x.toFixed(1)}, ${selectedEntity.y.toFixed(1)}`;
-      inspVel.textContent = `${(selectedEntity.vx ?? 0).toFixed(2)}, ${(selectedEntity.vy ?? 0).toFixed(2)}`;
-      inspMode.textContent = "-";
-    }
-
-    inspId.textContent = selectedEntity.id;
+  // bullets
+  for (let bl of world.bullets){
+    ctx.beginPath();
+    ctx.fillStyle = '#ffd88a';
+    ctx.arc(bl.x, bl.y, bl.r, 0, Math.PI*2);
+    ctx.fill();
   }
 
-  function updateStats() {
-    statObjects.textContent = objects.length;
-    statNPCs.textContent = npcs.length;
-    statLimbs.textContent = limbs.length;
-    statProjectiles.textContent = projectiles.length;
-    statTerrain.textContent = terrainBlocks.length;
-    statRopes.textContent = ropes.length;
-    statWelds.textContent = welds.length;
+  // particles
+  for (let p of world.particles){
+    ctx.beginPath();
+    ctx.globalAlpha = 1 - (p.age / p.life);
+    ctx.fillStyle = p.color;
+    ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
   }
 
-  // ====== MAIN LOOP ======
-  let lastTime = performance.now();
-
-  function drawGrid() {
-    ctx.strokeStyle = "#020617";
-    ctx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += GRID_SIZE) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += GRID_SIZE) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
+  // ragdoll health bars
+  for (let p of world.points){
+    if (p.ragdoll){
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(p.x - 28, p.y - 60, 56, 8);
+      ctx.fillStyle = p.health > 50 ? 'limegreen' : (p.health > 20 ? 'orange' : 'red');
+      ctx.fillRect(p.x - 28, p.y - 60, 56 * clamp(p.health/100,0,1), 8);
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.strokeRect(p.x - 28, p.y - 60, 56, 8);
     }
   }
+}
 
-  function update(dt) {
-    if (slowmoHeld || cinematicSlowmoTimer > 0) {
-      timeScale = 0.25;
-      if (cinematicSlowmoTimer > 0) cinematicSlowmoTimer -= dt;
-    } else {
-      timeScale = 1;
-    }
+/* Main loop */
+let last = performance.now();
+let paused = false;
+let fpsCounter = { last: performance.now(), frames: 0, fps: 0 };
+function loop(){
+  const now = performance.now();
+  let dt = (now - last) / 1000;
+  last = now;
+  if (paused) dt = 0;
+  dt = clamp(dt, 0, 0.033);
 
-    const scaledDt = dt * timeScale;
+  verlet(dt);
+  applyMuscles(dt);
+  solveConstraints(8);
+  integrateRigid(dt);
+  updateBullets(dt);
+  updateAI(dt);
 
-    for (const n of npcs) {
-      n.updateBehavior(scaledDt);
-    }
-
-    for (const o of objects) {
-      o.applyPhysics(scaledDt);
-    }
-    for (const l of limbs) {
-      l.applyPhysics(scaledDt);
-    }
-
-    updateLimbJoints(scaledDt);
-
-    for (let i = projectiles.length - 1; i >= 0; i--) {
-      const p = projectiles[i];
-      p.update(scaledDt);
-      if (p.life <= 0) projectiles.splice(i, 1);
-    }
-
-    for (let i = ropes.length - 1; i >= 0; i--) {
-      const r = ropes[i];
-      r.update(scaledDt);
-      if (r.broken) ropes.splice(i, 1);
-    }
-
-    for (const w of welds) {
-      w.update(scaledDt);
-    }
-
-    updateGravityGun(scaledDt, lastMouseX, lastMouseY);
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.x += p.vx * scaledDt;
-      p.y += p.vy * scaledDt;
-      p.vy += 0.05 * scaledDt;
-      p.life -= scaledDt;
-      if (p.life <= 0) particles.splice(i, 1);
-    }
-
-    autoSaveTimer += dt;
-    if (autoSaveTimer > 600) {
-      autoSaveTimer = 0;
-      const data = serializeWorld();
-      localStorage.setItem("miniPlaygroundWorld", data);
-    }
-
-    updateStats();
-    updateInspector();
+  // update particles
+  for (let i = world.particles.length-1; i>=0; i--){
+    const p = world.particles[i];
+    p.age += dt*1000;
+    if (p.age > p.life) world.particles.splice(i,1);
+    p.vy += world.gravity.y * 0.001 * dt * 60;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
   }
 
-  function render() {
-    ctx.fillStyle = "#020617";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  draw(now);
 
-    drawGrid();
-
-    for (const t of terrainBlocks) t.draw();
-    for (const o of objects) o.draw();
-    for (const l of limbs) l.draw();
-    for (const n of npcs) n.draw();
-    for (const r of ropes) r.draw();
-    for (const w of welds) w.draw();
-    for (const p of projectiles) p.draw();
-
-    for (const p of particles) {
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
+  // fps & stats
+  fpsCounter.frames++;
+  if (performance.now() - fpsCounter.last >= 500){
+    fpsCounter.fps = Math.round((fpsCounter.frames * 1000) / (performance.now() - fpsCounter.last));
+    fpsCounter.last = performance.now();
+    fpsCounter.frames = 0;
+    document.getElementById('statFPS').textContent = fpsCounter.fps;
   }
-
-  function loop(now) {
-    const dt = (now - lastTime) / (1000 / 60);
-    lastTime = now;
-    update(dt);
-    render();
-    requestAnimationFrame(loop);
-  }
-
-  // Seed world
-  spawnBox(80, 40);
-  spawnBall(140, 40);
-  spawnTriangle(200, 40);
-  spawnCapsule(260, 40);
-  spawnCylinder(320, 40);
-  spawnPlank(380, 40);
-  spawnRamp(460, 40);
-  spawnSpike(520, 40);
-  spawnCustom(580, 40);
-  spawnNPC(260, 80);
+  document.getElementById('statBodies').textContent = world.points.length + world.rigidBoxes.length;
+  document.getElementById('statRagdolls').textContent = world.points.filter(p=>p.ragdoll).length;
+  document.getElementById('statBullets').textContent = world.bullets.length;
 
   requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* UI wiring */
+const spawnType = document.getElementById('spawnType');
+const spawnBtn = document.getElementById('spawnBtn');
+const spawnMany = document.getElementById('spawnMany');
+const spawnNPCs = document.getElementById('spawnNPCs');
+const toolSelect = document.getElementById('toolSelect');
+const toolForce = document.getElementById('toolForce');
+const toolShoot = document.getElementById('toolShoot');
+const toolDelete = document.getElementById('toolDelete');
+const pauseBtn = document.getElementById('pauseBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+let currentTool = 'select';
+let grabbed = null;
+let grabOffset = {x:0,y:0};
+let mouse = { x:0, y:0, down:false, right:false };
+
+spawnBtn.addEventListener('click', ()=> spawnAt(rand(120, world.bounds.w-120), rand(40, 120), spawnType.value));
+spawnMany.addEventListener('click', ()=> { for (let i=0;i<10;i++) spawnAt(rand(120, world.bounds.w-120), rand(40, 120), Math.random()<0.6 ? 'circle' : 'box'); });
+spawnNPCs.addEventListener('click', ()=> { for (let i=0;i<6;i++) createRagdoll(rand(160, world.bounds.w-160), rand(80, world.bounds.h-160)); });
+
+toolSelect.addEventListener('click', ()=> setTool('select'));
+toolForce.addEventListener('click', ()=> setTool('force'));
+toolShoot.addEventListener('click', ()=> setTool('shoot'));
+toolDelete.addEventListener('click', ()=> setTool('delete'));
+
+pauseBtn.addEventListener('click', ()=> { paused = !paused; pauseBtn.textContent = paused ? 'Resume' : 'Pause'; });
+clearBtn.addEventListener('click', ()=> { world.points.length = 0; world.constraints.length = 0; world.rigidBoxes.length = 0; world.bullets.length = 0; world.particles.length = 0; });
+
+function setTool(t){
+  currentTool = t;
+  [toolSelect, toolForce, toolShoot, toolDelete].forEach(btn=>btn.style.opacity = '0.6');
+  if (t === 'select') toolSelect.style.opacity = '1';
+  if (t === 'force') toolForce.style.opacity = '1';
+  if (t === 'shoot') toolShoot.style.opacity = '1';
+  if (t === 'delete') toolDelete.style.opacity = '1';
+}
+
+/* spawn helper */
+function spawnAt(x,y,type){
+  if (type === 'circle'){
+    const p = makePoint(x,y,{ radius: rand(6,14), color: `hsl(${rand(0,360)}deg 60% 60%)` });
+    world.points.push(p);
+  } else if (type === 'box'){
+    world.rigidBoxes.push(makeBox(x,y, rand(20,80), rand(12,48), { color: `hsl(${rand(0,360)}deg 60% 60%)` }));
+  } else if (type === 'ragdoll'){
+    createRagdoll(x,y);
+  } else if (type === 'bomb'){
+    const b = makeBox(x,y, 20,20, { mass: 1, color:'#ffb86b' });
+    b.tags.push('bomb');
+    b.timer = nowMs() + 2000 + Math.random()*2000;
+    world.rigidBoxes.push(b);
+  } else if (type === 'platform'){
+    world.rigidBoxes.push(makeBox(x,y, rand(80,320), 18, { fixed:true, color:'#223344' }));
+  } else if (type === 'gun'){
+    const g = makeBox(x,y, 36,12, { mass: 1, color:'#b8b8ff' });
+    g.tags.push('gun');
+    world.rigidBoxes.push(g);
+  }
+}
+
+/* Mouse interactions */
+canvas.addEventListener('mousemove', (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = (e.clientX - rect.left);
+  mouse.y = (e.clientY - rect.top);
+  if (grabbed && mouse.down && currentTool === 'select'){
+    if (grabbed.invMass !== undefined){
+      grabbed.x = mouse.x - grabOffset.x;
+      grabbed.y = mouse.y - grabOffset.y;
+      grabbed.px = grabbed.x; grabbed.py = grabbed.y;
+    } else {
+      grabbed.x = mouse.x - grabOffset.x;
+      grabbed.y = mouse.y - grabOffset.y;
+      grabbed.vx = 0; grabbed.vy = 0;
+    }
+  }
+});
+canvas.addEventListener('mousedown', (e)=>{
+  e.preventDefault();
+  mouse.down = true;
+  mouse.right = (e.button === 2);
+  const mx = mouse.x, my = mouse.y;
+  if (currentTool === 'select'){
+    for (let i = world.rigidBoxes.length-1; i>=0; i--){
+      const b = world.rigidBoxes[i];
+      if (mx >= b.x - b.w/2 && mx <= b.x + b.w/2 && my >= b.y - b.h/2 && my <= b.y + b.h/2){
+        grabbed = b;
+        grabOffset.x = mx - b.x; grabOffset.y = my - b.y;
+        if (b.tags && b.tags.includes('gun') && !b.owner){ b.owner = 'player'; }
+        return;
+      }
+    }
+    for (let i = world.points.length-1; i>=0; i--){
+      const p = world.points[i];
+      if (Math.hypot(mx - p.x, my - p.y) <= p.radius + 4){
+        grabbed = p;
+        grabOffset.x = mx - p.x; grabOffset.y = my - p.y;
+        return;
+      }
+    }
+  } else if (currentTool === 'force'){
+    for (let i = world.points.length-1; i>=0; i--){
+      const p = world.points[i];
+      if (Math.hypot(mx - p.x, my - p.y) <= p.radius + 6){
+        p.px -= rand(-40,40);
+        p.py -= rand(40,120);
+        return;
+      }
+    }
+    for (let i = world.rigidBoxes.length-1; i>=0; i--){
+      const b = world.rigidBoxes[i];
+      if (mx >= b.x - b.w/2 && mx <= b.x + b.w/2 && my >= b.y - b.h/2 && my <= b.y + b.h/2){
+        b.vx += rand(-200,200);
+        b.vy -= rand(80,320);
+        return;
+      }
+    }
+  } else if (currentTool === 'shoot'){
+    const gun = world.rigidBoxes.find(b => b.tags && b.tags.includes('gun') && b.owner === 'player');
+    if (gun){
+      const ang = Math.atan2(my - gun.y, mx - gun.x);
+      const speed = 900;
+      spawnBullet(gun.x + Math.cos(ang)*20, gun.y + Math.sin(ang)*20, Math.cos(ang)*speed, Math.sin(ang)*speed, 'player');
+      gun.lastFired = nowMs();
+      gun.vx -= Math.cos(ang) * 80 / gun.mass;
+      gun.vy -= Math.sin(ang) * 80 / gun.mass;
+      return;
+    }
+    for (let b of world.rigidBoxes){
+      if (b.tags && b.tags.includes('gun') && !b.owner){
+        if (mx >= b.x - b.w/2 && mx <= b.x + b.w/2 && my >= b.y - b.h/2 && my <= b.y + b.h/2){
+          b.owner = 'player';
+          return;
+        }
+      }
+    }
+  } else if (currentTool === 'delete'){
+    for (let i = world.rigidBoxes.length-1; i>=0; i--){
+      const b = world.rigidBoxes[i];
+      if (mx >= b.x - b.w/2 && mx <= b.x + b.w/2 && my >= b.y - b.h/2 && my <= b.y + b.h/2){
+        for (let p of world.points) if (p.ragdoll && p.gun === b.id) p.gun = null;
+        world.rigidBoxes.splice(i,1);
+        return;
+      }
+    }
+    for (let i = world.points.length-1; i>=0; i--){
+      const p = world.points[i];
+      if (Math.hypot(mx - p.x, my - p.y) <= p.radius + 6){
+        world.constraints = world.constraints.filter(c => c.a !== p && c.b !== p);
+        if (p.ragdoll && p.parts){
+          for (let part of p.parts){
+            const idx = world.points.indexOf(part);
+            if (idx >= 0) world.points.splice(idx,1);
+          }
+        }
+        const idx = world.points.indexOf(p);
+        if (idx >= 0) world.points.splice(idx,1);
+        return;
+      }
+    }
+  }
+});
+canvas.addEventListener('mouseup', (e)=>{
+  mouse.down = false;
+  grabbed = null;
+});
+canvas.addEventListener('dblclick', (e)=>{
+  spawnAt(mouse.x, mouse.y, spawnType.value);
+});
+canvas.addEventListener('contextmenu', (e)=>{
+  e.preventDefault();
+  const mx = mouse.x, my = mouse.y;
+  for (let i = world.rigidBoxes.length-1; i>=0; i--){
+    const b = world.rigidBoxes[i];
+    if (mx >= b.x - b.w/2 && mx <= b.x + b.w/2 && my >= b.y - b.h/2 && my <= b.y + b.h/2){
+      world.rigidBoxes.splice(i,1);
+      return;
+    }
+  }
+  for (let i = world.points.length-1; i>=0; i--){
+    const p = world.points[i];
+    if (Math.hypot(mx - p.x, my - p.y) <= p.radius + 6){
+      world.constraints = world.constraints.filter(c => c.a !== p && c.b !== p);
+      world.points.splice(i,1);
+      return;
+    }
+  }
+});
+
+/* Keyboard */
+window.addEventListener('keydown', (e)=>{
+  if (e.key === 'g') world.gravity.y = world.gravity.y ? 1200 : 0;
+  if (e.key === 'c') { world.points.length = 0; world.constraints.length = 0; world.rigidBoxes.length = 0; }
+  if (e.key === ' ') { paused = !paused; pauseBtn.textContent = paused ? 'Resume' : 'Pause'; e.preventDefault(); }
+  if (e.key === '1') setTool('select');
+  if (e.key === '2') setTool('force');
+  if (e.key === '3') setTool('shoot');
+  if (e.key === '4') setTool('delete');
+});
+
+/* Initial scene */
+(function init(){
+  world.rigidBoxes.push(makeBox(world.bounds.w/2, world.bounds.h - 20, world.bounds.w - 200, 24, { fixed:true, color:'#223344' }));
+  world.rigidBoxes.push(makeBox(220, world.bounds.h - 160, 240, 16, { fixed:true, color:'#2b3b4b' }));
+  world.rigidBoxes.push(makeBox(world.bounds.w - 260, world.bounds.h - 260, 200, 16, { fixed:true, color:'#2b3b4b' }));
+  for (let i=0;i<3;i++) createRagdoll(300 + i*80, world.bounds.h - 120);
+  const g = makeBox(160, world.bounds.h - 80, 36, 12, { mass:1, color:'#b8b8ff' });
+  g.tags.push('gun');
+  world.rigidBoxes.push(g);
+  for (let i=0;i<6;i++){
+    world.points.push(makePoint(120 + i*80, 80 + Math.random()*40, { radius: rand(6,12), color:`hsl(${rand(0,360)}deg 60% 60%)` }));
+    if (i%2===0) world.rigidBoxes.push(makeBox(120 + i*80, 40 + Math.random()*40, rand(20,60), rand(12,48)));
+  }
+})();
+
+/* Bomb timer check */
+setInterval(()=>{
+  const now = nowMs();
+  for (let i = world.rigidBoxes.length-1; i>=0; i--){
+    const b = world.rigidBoxes[i];
+    if (b.tags && b.tags.includes('bomb') && b.timer && now >= b.timer){
+      const blast = 1200;
+      const radius = 160;
+      for (let p of world.points){
+        const dx = p.x - b.x, dy = p.y - b.y;
+        const d = Math.hypot(dx,dy);
+        if (d < radius){
+          const fall = 1 - (d / radius);
+          if (p.invMass){
+            p.x += (dx/d) * fall * 40;
+            p.y += (dy/d) * fall * 40;
+            p.px += (dx/d) * fall * 20;
+            p.py += (dy/d) * fall * 20;
+          }
+        }
+      }
+      for (let rb of world.rigidBoxes){
+        const dx = rb.x - b.x, dy = rb.y - b.y;
+        const d = Math.hypot(dx,dy);
+        if (d < radius){
+          const fall = 1 - (d / radius);
+          if (!rb.fixed){
+            rb.vx += (dx/d) * fall * blast / rb.mass;
+            rb.vy += (dy/d) * fall * blast / rb.mass;
+          }
+        }
+      }
+      for (let p=0;p<60;p++) spawnParticle(b.x, b.y, rand(-400,400), rand(-400,400), 800+rand(0,800), '#ffb86b');
+      world.rigidBoxes.splice(i,1);
+    }
+  }
+}, 200);
+
+/* Prevent accidental drag */
+document.body.addEventListener('dragstart', e=>e.preventDefault());
 </script>
+</body>
+</html>
