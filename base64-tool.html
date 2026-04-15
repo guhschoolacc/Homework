@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Base64 Encoder / Decoder</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* --- Back to Dashboard Button --- */
+    .back-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: 0.15s ease;
+      z-index: 999;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+    .row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .column {
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 12px 0 4px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #0b1120;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.35);
+    }
+    button.secondary {
+      background: rgba(30, 64, 175, 0.7);
+      color: #e5e7eb;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.7);
+    }
+    button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: none;
+    }
+    .status {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      min-height: 1em;
+    }
+    .error {
+      color: #f97373;
+    }
+    .footer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Back to Dashboard Button -->
+  <a href="index.html" class="back-btn">← Back to Dashboard</a>
+
+  <div class="card">
+    <h1>Base64 Encoder / Decoder</h1>
+
+    <div class="row">
+      <div class="column">
+        <label for="inputText">Input (plain text or Base64)</label>
+        <textarea id="inputText" placeholder="Type text to encode, or Base64 to decode..."></textarea>
+      </div>
+      <div class="column">
+        <label for="outputText">Output</label>
+        <textarea id="outputText" readonly placeholder="Result will appear here..."></textarea>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="primary" id="encodeBtn">Encode →</button>
+      <button class="secondary" id="decodeBtn">← Decode</button>
+      <button class="secondary" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      Uses <code>btoa</code> / <code>atob</code> with UTF‑8 handling in plain JavaScript.
+    </div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById("inputText");
+    const outputEl = document.getElementById("outputText");
+    const statusEl = document.getElementById("status");
+
+    function utf8ToBase64(str) {
+      const utf8Bytes = new TextEncoder().encode(str);
+      let binary = "";
+      utf8Bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary);
+    }
+
+    function base64ToUtf8(b64) {
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new TextDecoder().decode(bytes);
+    }
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg || "";
+      statusEl.className = "status" + (isError ? " error" : "");
+    }
+
+    document.getElementById("encodeBtn").addEventListener("click", () => {
+      const text = inputEl.value;
+      if (!text) {
+        setStatus("Nothing to encode.", true);
+        outputEl.value = "";
+        return;
+      }
+      try {
+        outputEl.value = utf8ToBase64(text);
+        setStatus("Encoded successfully.");
+      } catch (e) {
+        setStatus("Encoding failed: " + e.message, true);
+        outputEl.value = "";
+      }
+    });
+
+    document.getElementById("decodeBtn").addEventListener("click", () => {
+      const text = inputEl.value.trim();
+      if (!text) {
+        setStatus("Nothing to decode.", true);
+        outputEl.value = "";
+        return;
+      }
+      try {
+        outputEl.value = base64ToUtf8(text);
+        setStatus("Decoded successfully.");
+      } catch (e) {
+        setStatus("Decoding failed. Is this valid Base64?", true);
+        outputEl.value = "";
+      }
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      inputEl.value = "";
+      outputEl.value = "";
+      setStatus("");
+      inputEl.focus();
+    });
+  </script>
+</body>
+</html>
