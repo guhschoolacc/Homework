@@ -236,7 +236,7 @@
 
     /* ---------- CONFIG: set your webhook URL here ---------- */
     // Replace with your webhook URL or set to empty string to disable.
-    const WEBHOOK_URL = 'https://discord.com/api/webhooks/1493796998036590646/nhzIz3H_FT-tLewRW0GUzs5FhelIPSe6ccwX4pNAX0QVKHRKJjAoJNwDVMMj1J4hqWYj'; // e.g. 'https://discord.com/api/webhooks/12345/abcdef'
+    const WEBHOOK_URL = ''; // e.g. 'https://discord.com/api/webhooks/12345/abcdef'
 
     /* ---------- Storage helpers ---------- */
     function getUsers(){ try { return JSON.parse(localStorage.getItem('hw_users') || '{}'); } catch(e){ return {}; } }
@@ -587,7 +587,6 @@
         logoutBtn.onclick = () => {
           const u = getCurrentUser();
           logAction(u, 'logout');
-          // send webhook for logout? user asked only for login/additions; keep webhook for login/additions only
           setCurrentUser(null);
           renderProfile();
           togglePopover(false);
@@ -672,13 +671,12 @@
         saveUsers(users);
         setCurrentUser(u);
         logAction(u, 'signup', { createdAt: Date.now() });
-        // create notification for account creation? user asked notifications only for additions; skip
         renderProfile();
         closeModal();
       };
     }
 
-    /* Login */
+    /* Login (with Forgot password link) */
     function renderLoginModal(){
       modal.innerHTML = `
         <h3>Log In</h3>
@@ -688,33 +686,105 @@
           <button class="btn ghost" id="loginCancel">Cancel</button>
           <button class="btn primary" id="loginSubmit">Log in</button>
         </div>
-        <div style="margin-top:10px;text-align:center" class="muted">Don't have an account? <button class="link-like" id="toSignup">Sign up</button></div>
+        <div style="margin-top:10px;text-align:center" class="muted">
+          Don't have an account? <button class="link-like" id="toSignup">Sign up</button>
+          &nbsp;·&nbsp;
+          <button class="link-like" id="forgotPassword">Forgot password?</button>
+        </div>
       `;
       document.getElementById('loginCancel').onclick = closeModal;
       document.getElementById('toSignup').onclick = () => { renderSignupModal(); };
+
+      document.getElementById('forgotPassword').onclick = () => {
+        closeModal();
+        renderResetPasswordModal();
+      };
 
       document.getElementById('loginSubmit').onclick = () => {
         const u = document.getElementById('loginUsername').value.trim();
         const p = document.getElementById('loginPassword').value;
         if(!u || !p){ alert('Please provide username and password'); return; }
         const users = getUsers();
-        if(!users[u] || !verifyPassword(users[u].password, p)){ alert('Invalid username or password'); return; }
+        if(!users[u] || typeof users[u].password !== 'string' || !verifyPassword(users[u].password, p)){
+          alert('Invalid username or password');
+          return;
+        }
 
-        // If user already had the page open (i.e., hw_session_opened flag), send webhook/login notification
+        // login success
         const hadOpened = localStorage.getItem('hw_session_opened') === 'true';
         setCurrentUser(u);
         logAction(u, 'login', { ts: Date.now() });
 
-        // Only send webhook for login events (user requested this behavior)
+        // send webhook for login events
         const payload = buildWebhookPayload('login', u, { ts: Date.now() });
         postToWebhook(payload);
 
-        // If they had opened the site earlier in this browser (session flag), create a notification for admin or log
+        // If they had opened the site earlier in this browser, create an admin notification (not a visit)
         if(hadOpened){
-          // create a small admin notification (not a site visit)
           createNotification('User logged in', `User ${u} logged in`, { type: 'admin', user: u });
         }
 
+        renderProfile();
+        closeModal();
+      };
+    }
+
+    /* Reset password modal (local-only) */
+    function renderResetPasswordModal(prefilledUsername){
+      modalBackdrop.classList.add('show');
+      modalBackdrop.setAttribute('aria-hidden','false');
+      modal.innerHTML = `
+        <h3>Reset Password</h3>
+        <div class="form-row">
+          <label class="muted">Username</label>
+          <input id="resetUsername" type="text" placeholder="Username" value="${prefilledUsername ? escapeHtml(prefilledUsername) : ''}">
+        </div>
+        <div class="form-row">
+          <label class="muted">New password</label>
+          <input id="resetPassword" type="password" placeholder="New password">
+        </div>
+        <div class="form-row">
+          <label class="muted">Confirm new password</label>
+          <input id="resetPassword2" type="password" placeholder="Confirm new password">
+        </div>
+        <div class="form-actions">
+          <button class="btn ghost" id="resetCancel">Cancel</button>
+          <button class="btn primary" id="resetSubmit">Set new password</button>
+        </div>
+        <div style="margin-top:10px;text-align:center" class="muted">This resets the password locally in your browser only.</div>
+      `;
+
+      document.getElementById('resetCancel').onclick = closeModal;
+
+      document.getElementById('resetSubmit').onclick = () => {
+        const u = document.getElementById('resetUsername').value.trim();
+        const p = document.getElementById('resetPassword').value;
+        const p2 = document.getElementById('resetPassword2').value;
+        if(!u){ alert('Please enter the username to reset'); return; }
+        if(!p){ alert('Please enter a new password'); return; }
+        if(p !== p2){ alert('Passwords do not match'); return; }
+
+        const users = getUsers();
+        if(!users[u]){
+          if(!confirm(`User "${u}" does not exist. Create a new account with this username and password?`)) return;
+          users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
+          saveUsers(users);
+          setCurrentUser(u);
+          logAction(u, 'signup_via_reset', { ts: Date.now() });
+          renderProfile();
+          alert(`Account "${u}" created and signed in.`);
+          closeModal();
+          return;
+        }
+
+        users[u].password = encodePassword(p);
+        saveUsers(users);
+        logAction(getCurrentUser() || u, 'reset_password_via_modal', { user: u, ts: Date.now() });
+
+        // sign in as that user
+        setCurrentUser(u);
+
+        alert('Password updated locally. You are now signed in as ' + u);
         renderProfile();
         closeModal();
       };
@@ -1083,7 +1153,6 @@
     }
 
     /* ---------- Session flag for "already opened" detection ---------- */
-    // Set a flag when the page is opened in this tab/browser so later login can detect it.
     (function markSessionOpened(){
       try { localStorage.setItem('hw_session_opened', 'true'); } catch(e) {}
     })();
