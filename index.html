@@ -1,309 +1,1113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>homewrk</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>homewrk</title>
+  <style>
+    :root{
+      --bg:#050509;
+      --sidebar:#0b0b12;
+      --muted:#cfd3dc;
+      --card:#0d0d12;
+      --accent-1:#3b82f6;
+      --accent-2:#6366f1;
+      --danger:#ef4444;
+      --success:#10b981;
+      --notif-dot:#ef4444;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%}
+    body{
+      min-height:100vh;
+      background:var(--bg);
+      color:#fff;
+      display:flex;
+      align-items:stretch;
+    }
 
-<style>
-/* -------------------------------------------------- */
-/* BASE THEME VARIABLES */
-/* -------------------------------------------------- */
-:root {
-  --bg: #0d0f16;
-  --card: #141622;
-  --text: #ffffff;
-  --muted: #bbbbbb;
-  --accent: #6366f1;
-  --border: #222;
-}
+    /* Layout */
+    .app{display:flex;flex:1;height:100%}
+    .sidebar{
+      width:220px;
+      background:var(--sidebar);
+      border-right:1px solid rgba(255,255,255,0.03);
+      padding:28px 18px;
+      display:flex;
+      flex-direction:column;
+    }
+    .logo{font-size:22px;font-weight:700;margin-bottom:36px;color:#f3f4f6}
+    .nav{display:flex;flex-direction:column;gap:10px}
+    .nav-item{padding:10px 12px;border-radius:8px;font-size:15px;color:var(--muted);cursor:pointer;user-select:none;transition:background .12s ease, transform .08s ease}
+    .nav-item:hover{background:#14141a; transform:translateX(4px)}
+    .nav-item.active{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:#fff;box-shadow:0 8px 24px rgba(59,130,246,0.12)}
 
-/* -------------------------------------------------- */
-/* THEMES */
-/* -------------------------------------------------- */
-body.dark {}
+    .main{flex:1;display:flex;flex-direction:column;background:radial-gradient(circle at top, #0b0b10 0%, #05050a 60%);padding:28px;gap:18px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .page-title{font-size:20px;font-weight:600;color:#e6e9ef;display:flex;align-items:center;gap:12px}
 
-body.light {
-  --bg: #f5f5f5;
-  --card: #ffffff;
-  --text: #111;
-  --muted: #555;
-  --accent: #4f46e5;
-  --border: #ddd;
-}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:20px;border-radius:12px;color:#e6e7eb}
 
-body.neon {
-  --bg: #000000;
-  --card: #050509;
-  --text: #00ffee;
-  --muted: #00b3a4;
-  --accent: #ff00ff;
-  --border: #262626;
-}
+    .games-row{display:flex;gap:12px;align-items:center;overflow-x:auto;padding:8px}
+    .game-btn{min-width:120px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#111217,#0b0b10);color:#dfe6ff;border:1px solid rgba(255,255,255,0.03);cursor:pointer;text-align:center;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.5);transition:transform .12s ease, box-shadow .12s ease, background .12s ease;white-space:nowrap}
+    .game-btn:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.6)}
 
-body.midnight {
-  --bg: #0b0014;
-  --card: #1a0b2e;
-  --text: #e3d7ff;
-  --muted: #a88cd9;
-  --accent: #b26bff;
-  --border: #2b1744;
-}
+    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:12px;margin-top:12px}
+    .tool-btn{display:flex;align-items:center;justify-content:center;padding:14px 12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);color:var(--muted);font-weight:600;cursor:pointer;transition:transform .12s ease, background .12s ease;text-align:center;text-decoration:none}
+    .tool-btn:hover{transform:translateY(-4px); background:#121217; color:#fff}
 
-body.solarized {
-  --bg: #002b36;
-  --card: #073642;
-  --text: #eee8d5;
-  --muted: #93a1a1;
-  --accent: #b58900;
-  --border: #0f3b46;
-}
+    .hidden{display:none}
 
-body.gradient1 {
-  --bg: linear-gradient(135deg, #1e3a8a, #6d28d9);
-  --card: rgba(15, 23, 42, 0.85);
-  --text: #e5e7ff;
-  --muted: #a5b4fc;
-  --accent: #a855f7;
-  --border: rgba(148, 163, 184, 0.6);
-}
+    /* Profile button bottom-left */
+    .profile-wrap{position:fixed;left:18px;bottom:18px;display:flex;align-items:center;gap:10px;z-index:60}
+    .profile-btn{width:48px;height:48px;border-radius:50%;background:#111217;border:1px solid rgba(255,255,255,0.06);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .profile-btn img{width:100%;height:100%;object-fit:cover;display:block}
+    .profile-label{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:600;color:var(--muted)}
 
-body.gradient2 {
-  --bg: linear-gradient(135deg, #f97316, #db2777);
-  --card: rgba(15, 23, 42, 0.85);
-  --text: #fff7ed;
-  --muted: #fed7aa;
-  --accent: #fb7185;
-  --border: rgba(248, 250, 252, 0.35);
-}
+    /* Popover */
+    .popover{position:fixed;left:18px;bottom:78px;width:320px;background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(0,0,0,0.6);display:none;z-index:70}
+    .popover.show{display:block}
+    .popover .row{display:flex;align-items:center;justify-content:space-between;padding:8px 6px}
+    .popover button{width:100%;padding:10px;border-radius:8px;border:0;background:#111217;color:#e6e7eb;cursor:pointer;font-weight:600}
+    .popover .small{font-size:13px;color:var(--muted);text-align:center;padding-top:6px}
 
-body.gradient3 {
-  --bg: linear-gradient(135deg, #0f172a, #00ff95);
-  --card: rgba(15, 23, 42, 0.9);
-  --text: #e0fdf4;
-  --muted: #6ee7b7;
-  --accent: #22c55e;
-  --border: rgba(148, 163, 184, 0.6);
-}
+    /* Notifications */
+    .notif-bell{
+      position:relative;
+      width:36px;height:36px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;
+      background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer;
+    }
+    .notif-dot{
+      position:absolute;right:6px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--notif-dot);box-shadow:0 0 0 3px rgba(239,68,68,0.08);
+    }
+    .notif-panel{
+      position:absolute;right:18px;top:56px;width:360px;max-height:420px;overflow:auto;background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(0,0,0,0.6);z-index:80;display:none;
+    }
+    .notif-panel.show{display:block}
+    .notif-item{padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+    .notif-item.unread{background:linear-gradient(90deg, rgba(59,130,246,0.06), rgba(99,102,241,0.03));}
+    .notif-item .time{font-size:12px;color:var(--muted);margin-top:6px}
 
-/* -------------------------------------------------- */
-/* GLOBAL GRID LAYOUT */
-/* -------------------------------------------------- */
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  grid-template-rows: 70px 1fr;
-  grid-template-areas:
-    "sidebar topbar"
-    "sidebar main";
-  overflow: hidden;
-}
+    .notif-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px}
+    .btn.small{padding:6px 8px;font-size:13px}
 
-/* -------------------------------------------------- */
-/* SIDEBAR */
-/* -------------------------------------------------- */
-.sidebar {
-  grid-area: sidebar;
-  background: var(--card);
-  border-right: 1px solid var(--border);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:80}
+    .modal-backdrop.show{display:flex}
+    .modal{width:720px;max-width:96%;background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);max-height:86vh;overflow:auto}
+    .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    .form-row input[type="text"], .form-row input[type="password"], .form-row input[type="file"], .form-row select, .form-row textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:#0b0b10;color:#fff}
+    .form-actions{display:flex;gap:8px;justify-content:space-between;align-items:center}
+    .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+    .btn.primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .link-like{background:none;border:none;color:var(--accent-1);cursor:pointer;font-weight:600;padding:0}
+    .avatar-preview{width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04);margin-bottom:6px}
+    .avatar-preview img{width:100%;height:100%;object-fit:cover}
+    .muted{color:var(--muted);font-size:13px}
 
-.sidebar h2 {
-  margin: 0 0 20px 0;
-}
+    /* Admin table */
+    .admin-table{width:100%;border-collapse:collapse;margin-top:12px}
+    .admin-table th, .admin-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:14px}
+    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{padding:6px 8px;border-radius:8px;background:#0f1724;border:1px solid rgba(255,255,255,0.03);font-weight:600;color:var(--muted)}
+    .danger{background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff}
+    .success{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
 
-/* NAV BUTTONS (THEME MATCHING) */
-.nav-btn {
-  padding: 12px;
-  margin-bottom: 10px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: left;
-  color: var(--text);
-  transition: 0.2s ease;
-}
-
-.nav-btn:hover {
-  border-color: var(--accent);
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.settings-icon {
-  margin-top: auto;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* -------------------------------------------------- */
-/* TOPBAR */
-/* -------------------------------------------------- */
-.topbar {
-  grid-area: topbar;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-
-/* -------------------------------------------------- */
-/* MAIN CONTENT */
-/* -------------------------------------------------- */
-.main {
-  grid-area: main;
-  overflow-y: auto;
-  padding: 30px;
-  background: var(--bg);
-}
-
-/* -------------------------------------------------- */
-/* PAGES */
-/* -------------------------------------------------- */
-.page {
-  display: none;
-}
-
-.page h2 {
-  margin-top: 0;
-}
-
-/* CATEGORY ACTION BUTTONS (THEME MATCHING) */
-.action-btn {
-  padding: 14px;
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 15px;
-  font-size: 16px;
-  transition: 0.2s ease;
-}
-
-.action-btn:hover {
-  border-color: var(--accent);
-  background: rgba(0, 0, 0, 0.35);
-}
-
-/* Theme option styling */
-.theme-option {
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-.theme-option:hover {
-  border-color: var(--accent);
-}
-</style>
+    @media (max-width:720px){
+      .sidebar{width:64px;padding:18px}
+      .logo{font-size:14px;display:none}
+      .nav-item{font-size:13px;padding:8px}
+      .tools-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+      .modal{width:94%}
+      .notif-panel{right:8px;left:8px;width:auto}
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <aside class="sidebar" role="navigation" aria-label="Main navigation">
+      <div class="logo">homewrk</div>
+      <nav class="nav" aria-label="Categories">
+        <div class="nav-item active" data-category="games" tabindex="0">Games</div>
+        <div class="nav-item" data-category="tools" tabindex="0">Tools</div>
+        <div class="nav-item" data-category="other" tabindex="0">Other</div>
+      </nav>
+    </aside>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h2>homewrk</h2>
-  <button class="nav-btn" onclick="openPage('games')">Games</button>
-  <button class="nav-btn" onclick="openPage('tools')">Tools</button>
-  <button class="nav-btn" onclick="openPage('other')">Other</button>
-  <div class="settings-icon" onclick="openPage('settings')">⚙️</div>
-</div>
+    <main class="main" role="main">
+      <div class="header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="page-title" id="pageTitle">Games</div>
+        </div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <span>☰</span>
-</div>
+        <!-- Right side: file path + notifications bell -->
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="opacity:0.7;font-size:13px">file:///C:/Users/stiev/Desktop/gws/index.html</div>
 
-<!-- MAIN -->
-<div class="main">
+          <!-- Notification bell -->
+          <div style="position:relative">
+            <button id="notifBell" class="notif-bell" title="Notifications" aria-haspopup="true" aria-expanded="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#cfd3dc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 0 0-5-5.917V4a1 1 0 0 0-2 0v1.083A6 6 0 0 0 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </button>
+            <div id="notifDot" class="notif-dot" style="display:none" aria-hidden="true"></div>
 
-  <!-- GAMES PAGE -->
-  <div class="page" id="gamesPage">
-    <h2>Games</h2>
-    <p>Games content goes here.</p>
+            <!-- Notifications panel -->
+            <div id="notifPanel" class="notif-panel" role="dialog" aria-modal="false" aria-hidden="true">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-weight:700">Notifications</div>
+                <div class="notif-actions">
+                  <button id="markAllRead" class="btn small">Mark all read</button>
+                  <button id="clearAll" class="btn small">Clear</button>
+                </div>
+              </div>
+              <div id="notifList"></div>
+              <div style="margin-top:8px;text-align:center">
+                <button id="notifSettings" class="btn ghost">Notification settings</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <button class="action-btn" onclick="location.href='sandbox.html'">
-      Open Sandbox
-    </button>
+      <!-- Games card (visible by default) -->
+      <section class="card" id="gamesCard">
+        <div class="games-row" id="gamesRow" role="list" aria-label="Games list">
+          <button class="game-btn" id="sandboxBtn" title="Open Sandbox">Sandbox</button>
+        </div>
+      </section>
+
+      <!-- Tools card (hidden by default) -->
+      <section class="card hidden" id="toolsCard">
+        <div style="font-size:16px;font-weight:600;margin-bottom:10px">Tools</div>
+        <div class="tools-grid" id="toolsGrid" role="list" aria-label="Tools list">
+          <a class="tool-btn" href="calculator.html">Calculator</a>
+          <a class="tool-btn" href="clock.html">Clock</a>
+          <a class="tool-btn" href="converter.html">File Converter</a>
+          <a class="tool-btn" href="notepad.html">Notepad</a>
+          <a class="tool-btn" href="json-formatter.html">JSON Formatter</a>
+          <a class="tool-btn" href="regex-tester.html">Regex Tester</a>
+          <a class="tool-btn" href="base64-tool.html">Base64 Encoder / Decoder</a>
+          <a class="tool-btn" href="localstorage-viewer.html">LocalStorage Viewer</a>
+          <a class="tool-btn" href="ip-lookup.html">IP Lookup</a>
+          <a class="tool-btn" href="image-resizer.html">Image Resizer</a>
+          <a class="tool-btn" href="image-cropper.html">Image Cropper</a>
+          <a class="tool-btn" href="qr-generator.html">QR Code Generator</a>
+          <a class="tool-btn" href="text-to-speech.html">Text To Speech</a>
+          <a class="tool-btn" href="fl-studio.html" id="flStudioBtn">FL Studio Recreation</a>
+        </div>
+      </section>
+
+      <!-- Other card (hidden by default) -->
+      <section class="card hidden" id="otherCard">
+        <div style="font-size:16px;font-weight:600">Other</div>
+        <div style="margin-top:12px;color:var(--muted)">No items in Other yet.</div>
+      </section>
+    </main>
   </div>
 
-  <!-- TOOLS PAGE -->
-  <div class="page" id="toolsPage">
-    <h2>Tools</h2>
-
-    <button class="action-btn" onclick="location.href='calculator.html'">
-      Calculator
-    </button>
-
-    <button class="action-btn" onclick="location.href='clock.html'">
-      Clock
-    </button>
-
-    <button class="action-btn" onclick="location.href='converter.html'">
-      File Converter
-    </button>
+  <!-- Profile UI -->
+  <div class="profile-wrap" aria-hidden="false">
+    <div class="profile-btn" id="profileBtn" title="Profile">
+      <img id="profileAvatar" src="" alt="avatar">
+    </div>
+    <div class="profile-label" id="profileLabel">Not signed in</div>
   </div>
 
-  <!-- OTHER PAGE -->
-  <div class="page" id="otherPage">
-    <h2>Other</h2>
-    <p>Other content goes here.</p>
+  <div class="popover" id="profilePopover" role="menu" aria-hidden="true">
+    <div id="popoverContent"></div>
   </div>
 
-  <!-- SETTINGS PAGE -->
-  <div class="page" id="settingsPage">
-    <h2>Settings</h2>
-
-    <h3>Theme Settings</h3>
-
-    <div class="theme-option" onclick="setTheme('dark')">Dark</div>
-    <div class="theme-option" onclick="setTheme('light')">Light</div>
-    <div class="theme-option" onclick="setTheme('neon')">Neon</div>
-    <div class="theme-option" onclick="setTheme('midnight')">Midnight</div>
-    <div class="theme-option" onclick="setTheme('solarized')">Solarized</div>
-    <div class="theme-option" onclick="setTheme('gradient1')">Blue‑Purple Gradient</div>
-    <div class="theme-option" onclick="setTheme('gradient2')">Sunset Gradient</div>
-    <div class="theme-option" onclick="setTheme('gradient3')">Cyber Green Gradient</div>
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" id="modal"></div>
   </div>
 
-</div>
+  <script>
+    /* =========================
+       Local account + admin + notifications + Discord webhook
+       - Notifications only for additions (tools/games) and admin-created items
+       - Webhook sends messages for additions and login events (not visits)
+       - Admin panel expanded with more controls
+       - All data stored in localStorage under hw_* keys
+       - Demo-only client-side implementation
+       ========================= */
 
-<script>
-function openPage(name) {
-  document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-  document.getElementById(name + "Page").style.display = "block";
-}
+    /* ---------- CONFIG: set your webhook URL here ---------- */
+    // Replace with your webhook URL or set to empty string to disable.
+    const WEBHOOK_URL = ''; // e.g. 'https://discord.com/api/webhooks/12345/abcdef'
 
-function setTheme(theme) {
-  document.body.className = theme;
-  localStorage.setItem("homewrk_theme", theme);
-}
+    /* ---------- Storage helpers ---------- */
+    function getUsers(){ try { return JSON.parse(localStorage.getItem('hw_users') || '{}'); } catch(e){ return {}; } }
+    function saveUsers(users){ localStorage.setItem('hw_users', JSON.stringify(users)); }
+    function getCurrentUser(){ return localStorage.getItem('hw_currentUser'); }
+    function setCurrentUser(username){ if(username) localStorage.setItem('hw_currentUser', username); else localStorage.removeItem('hw_currentUser'); }
+    function getWhitelist(){ try { return JSON.parse(localStorage.getItem('hw_whitelist') || '[]'); } catch(e){ return []; } }
+    function saveWhitelist(list){ localStorage.setItem('hw_whitelist', JSON.stringify(list)); }
+    function getLogs(){ try { return JSON.parse(localStorage.getItem('hw_logs') || '[]'); } catch(e){ return []; } }
+    function saveLogs(logs){ localStorage.setItem('hw_logs', JSON.stringify(logs)); }
 
-(function(){
-  const saved = localStorage.getItem("homewrk_theme") || "dark";
-  document.body.className = saved;
-  // default page
-  openPage('games');
-})();
-</script>
+    /* Notifications storage */
+    function getNotifications(){ try { return JSON.parse(localStorage.getItem('hw_notifications') || '[]'); } catch(e){ return []; } }
+    function saveNotifications(list){ localStorage.setItem('hw_notifications', JSON.stringify(list)); }
+    function isNotifEnabled(){ return localStorage.getItem('hw_notif_enabled') !== 'false'; } // default true
+    function setNotifEnabled(v){ localStorage.setItem('hw_notif_enabled', v ? 'true' : 'false'); }
 
+    /* Webhook pending storage */
+    function getPendingWebhooks(){ try { return JSON.parse(localStorage.getItem('hw_webhook_pending') || '[]'); } catch(e){ return []; } }
+    function savePendingWebhooks(list){ localStorage.setItem('hw_webhook_pending', JSON.stringify(list)); }
+
+    /* Simple password encoding for demo (not secure) */
+    function encodePassword(p){ return btoa(p); }
+    function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
+
+    /* Defaults */
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 24 24' fill='none' stroke='%23cfcfd6' stroke-width='1.2'><circle cx='12' cy='8' r='3.2'/><path d='M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5'/></svg>`);
+
+    (function ensureDefaults(){
+      const wl = getWhitelist();
+      if(!wl.includes('anotheryear')){ wl.push('anotheryear'); saveWhitelist(wl); }
+      const users = getUsers();
+      if(!users['anotheryear']){
+        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
+        saveUsers(users);
+      }
+    })();
+
+    /* Logging utility */
+    function logAction(actor, action, details){
+      const logs = getLogs();
+      logs.unshift({ ts: Date.now(), actor: actor || null, action, details: details || null });
+      if(logs.length > 500) logs.length = 500;
+      saveLogs(logs);
+    }
+
+    /* ---------- Webhook notifier helpers ---------- */
+    async function postToWebhook(payload) {
+      if (!WEBHOOK_URL) return;
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        // store pending
+        const pending = getPendingWebhooks();
+        pending.unshift({ ts: Date.now(), payload });
+        if (pending.length > 200) pending.length = 200;
+        savePendingWebhooks(pending);
+        console.warn('Webhook POST failed (client-side). Stored pending payload.', err);
+      }
+    }
+
+    function buildWebhookPayload(eventType, username, details) {
+      const userField = username || 'anonymous';
+      const embed = {
+        title: `Site event: ${eventType}`,
+        color: 3447003,
+        fields: [
+          { name: 'User', value: userField, inline: true },
+          { name: 'When', value: new Date().toLocaleString(), inline: true },
+        ],
+        timestamp: new Date().toISOString(),
+      };
+      if (details) {
+        const d = typeof details === 'string' ? details : JSON.stringify(details);
+        embed.fields.push({ name: 'Details', value: d.length > 200 ? d.slice(0, 200) + '…' : d });
+      }
+      return { embeds: [embed] };
+    }
+
+    async function flushPendingWebhooks() {
+      if (!WEBHOOK_URL) return;
+      const pending = getPendingWebhooks();
+      if (!pending.length) return;
+      for (const item of pending.slice(0, 50)) {
+        try {
+          await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item.payload),
+          });
+        } catch (e) {
+          console.warn('Failed to flush pending webhook item', e);
+          return;
+        }
+      }
+      localStorage.removeItem('hw_webhook_pending');
+    }
+
+    /* ---------- Notifications utility (only for additions) ---------- */
+    function createNotification(title, message, meta){
+      if(!isNotifEnabled()) return;
+      // Only create notifications for additions (meta.type === 'tool' or 'game' or admin actions)
+      if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')) {
+        const list = getNotifications();
+        const item = {
+          id: 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+          title: title,
+          message: message,
+          meta: meta || null,
+          ts: Date.now(),
+          read: false
+        };
+        list.unshift(item);
+        if(list.length > 500) list.length = 500;
+        saveNotifications(list);
+        renderNotifUI();
+
+        // send webhook for additions and admin events
+        if(meta && (meta.type === 'tool' || meta.type === 'game' || meta.type === 'admin')) {
+          const username = getCurrentUser();
+          const payload = buildWebhookPayload(meta.type === 'tool' ? 'tool_added' : meta.type === 'game' ? 'game_added' : 'admin_action', username, { title, message, meta });
+          postToWebhook(payload);
+        }
+      }
+    }
+
+    function markAllNotificationsRead(){
+      const list = getNotifications();
+      list.forEach(n => n.read = true);
+      saveNotifications(list);
+      renderNotifUI();
+    }
+
+    function clearAllNotifications(){
+      saveNotifications([]);
+      renderNotifUI();
+    }
+
+    function markNotificationRead(id){
+      const list = getNotifications();
+      const n = list.find(x => x.id === id);
+      if(n) n.read = true;
+      saveNotifications(list);
+      renderNotifUI();
+    }
+
+    /* ---------- UI elements ---------- */
+    const navItems = document.querySelectorAll('.nav-item');
+    const pageTitle = document.getElementById('pageTitle');
+    const gamesCard = document.getElementById('gamesCard');
+    const toolsCard = document.getElementById('toolsCard');
+    const otherCard = document.getElementById('otherCard');
+    const sandboxBtn = document.getElementById('sandboxBtn');
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileLabel = document.getElementById('profileLabel');
+    const profilePopover = document.getElementById('profilePopover');
+    const popoverContent = document.getElementById('popoverContent');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modal = document.getElementById('modal');
+
+    const notifBell = document.getElementById('notifBell');
+    const notifDot = document.getElementById('notifDot');
+    const notifPanel = document.getElementById('notifPanel');
+    const notifList = document.getElementById('notifList');
+    const markAllReadBtn = document.getElementById('markAllRead');
+    const clearAllBtn = document.getElementById('clearAll');
+    const notifSettingsBtn = document.getElementById('notifSettings');
+
+    /* ---------- Navigation (only one section visible) ---------- */
+    function hideAllSections(){
+      gamesCard.classList.add('hidden');
+      toolsCard.classList.add('hidden');
+      otherCard.classList.add('hidden');
+    }
+    function showSection(category){
+      navItems.forEach(n => n.classList.toggle('active', n.dataset.category === category));
+      pageTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+      hideAllSections();
+      if(category === 'games') gamesCard.classList.remove('hidden');
+      else if(category === 'tools') toolsCard.classList.remove('hidden');
+      else if(category === 'other') otherCard.classList.remove('hidden');
+    }
+    navItems.forEach(item => {
+      item.addEventListener('click', () => showSection(item.dataset.category));
+      item.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }});
+    });
+
+    /* ---------- Tools & FL Studio handling ---------- */
+    function addTool(name, href){
+      const toolsGrid = document.getElementById('toolsGrid');
+      const a = document.createElement('a');
+      a.className = 'tool-btn';
+      a.href = href || '#';
+      a.textContent = name;
+      toolsGrid.appendChild(a);
+
+      createNotification('Tool added', `${name} was added to Tools`, { type: 'tool', name, href });
+      logAction(getCurrentUser(), 'add_tool', { name });
+    }
+
+    // Ensure FL Studio button exists and create a one-time "added" notification if not seen
+    (function ensureFLStudio(){
+      const fl = document.getElementById('flStudioBtn');
+      if(fl){
+        const seenKey = 'hw_tool_added_flstudio';
+        if(!localStorage.getItem(seenKey)){
+          createNotification('Tool added', 'FL Studio Recreation was added to Tools', { type: 'tool', name: 'FL Studio Recreation', href: 'fl-studio.html' });
+          localStorage.setItem(seenKey, '1');
+        }
+        fl.addEventListener('click', () => {
+          createNotification('Tool opened', 'FL Studio Recreation was opened', { type: 'tool', name: 'FL Studio Recreation', href: 'fl-studio.html' });
+        });
+      }
+    })();
+
+    /* ---------- Notifications UI ---------- */
+    function renderNotifUI(){
+      const list = getNotifications();
+      const unread = list.filter(n => !n.read).length;
+      notifDot.style.display = unread > 0 ? 'block' : 'none';
+
+      notifList.innerHTML = '';
+      if(list.length === 0){
+        notifList.innerHTML = `<div class="muted" style="text-align:center;padding:12px">No notifications</div>`;
+        return;
+      }
+      list.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'notif-item' + (n.read ? '' : ' unread');
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="flex:1">
+              <div style="font-weight:700">${escapeHtml(n.title)}</div>
+              <div style="margin-top:6px;color:var(--muted);font-size:13px">${escapeHtml(n.message)}</div>
+              <div class="time">${new Date(n.ts).toLocaleString()}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px">
+              <button class="btn small" data-action="open" data-id="${n.id}">Open</button>
+              <button class="btn small" data-action="mark" data-id="${n.id}">${n.read ? 'Read' : 'Mark read'}</button>
+            </div>
+          </div>
+        `;
+        notifList.appendChild(el);
+      });
+    }
+
+    notifList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if(action === 'mark') markNotificationRead(id);
+      if(action === 'open'){
+        const list = getNotifications();
+        const n = list.find(x => x.id === id);
+        if(n){
+          if(n.meta && n.meta.type === 'tool' && n.meta.href) window.location.href = n.meta.href;
+          else if(n.meta && n.meta.type === 'game' && n.meta.href) window.location.href = n.meta.href;
+          else alert(n.title + '\n\n' + n.message);
+          markNotificationRead(id);
+        }
+      }
+    });
+
+    notifBell.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const shown = notifPanel.classList.toggle('show');
+      notifPanel.setAttribute('aria-hidden', shown ? 'false' : 'true');
+    });
+    document.addEventListener('click', (e) => {
+      if(!notifPanel.contains(e.target) && !notifBell.contains(e.target)) {
+        notifPanel.classList.remove('show');
+        notifPanel.setAttribute('aria-hidden','true');
+      }
+    });
+
+    markAllReadBtn.addEventListener('click', () => markAllNotificationsRead());
+    clearAllBtn.addEventListener('click', () => {
+      if(confirm('Clear all notifications?')) clearAllNotifications();
+    });
+
+    notifSettingsBtn.addEventListener('click', () => {
+      openModal('settings');
+      setTimeout(() => {
+        const el = document.getElementById('notifPrefCheckbox');
+        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 120);
+    });
+
+    /* ---------- Profile & account system ---------- */
+    function renderProfile(){
+      const username = getCurrentUser();
+      const users = getUsers();
+      if(username && users[username]){
+        profileAvatar.src = users[username].avatar || DEFAULT_AVATAR;
+        profileLabel.textContent = username;
+      } else {
+        profileAvatar.src = DEFAULT_AVATAR;
+        profileLabel.textContent = 'Not signed in';
+      }
+      renderPopover();
+    }
+    function renderPopover(){
+      const username = getCurrentUser();
+      popoverContent.innerHTML = '';
+      if(!username){
+        const signUpBtn = document.createElement('button');
+        signUpBtn.textContent = 'Sign Up';
+        signUpBtn.className = 'btn primary';
+        signUpBtn.onclick = () => { openModal('signup'); togglePopover(false); };
+
+        const loginBtn = document.createElement('button');
+        loginBtn.textContent = 'Log In';
+        loginBtn.className = 'btn ghost';
+        loginBtn.style.marginTop = '8px';
+        loginBtn.onclick = () => { openModal('login'); togglePopover(false); };
+
+        popoverContent.appendChild(signUpBtn);
+        popoverContent.appendChild(loginBtn);
+        const hint = document.createElement('div');
+        hint.className = 'small muted';
+        hint.style.marginTop = '8px';
+        hint.textContent = 'Create an account to save preferences locally';
+        popoverContent.appendChild(hint);
+      } else {
+        const nameRow = document.createElement('div');
+        nameRow.className = 'row';
+        nameRow.innerHTML = `<div style="font-weight:700">${username}</div><div class="muted">Signed in</div>`;
+        popoverContent.appendChild(nameRow);
+
+        const settingsBtn = document.createElement('button');
+        settingsBtn.textContent = 'Settings';
+        settingsBtn.className = 'btn';
+        settingsBtn.style.marginTop = '8px';
+        settingsBtn.onclick = () => { openModal('settings'); togglePopover(false); };
+        popoverContent.appendChild(settingsBtn);
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.textContent = 'Log out';
+        logoutBtn.className = 'btn ghost';
+        logoutBtn.style.marginTop = '8px';
+        logoutBtn.onclick = () => {
+          const u = getCurrentUser();
+          logAction(u, 'logout');
+          // send webhook for logout? user asked only for login/additions; keep webhook for login/additions only
+          setCurrentUser(null);
+          renderProfile();
+          togglePopover(false);
+        };
+        popoverContent.appendChild(logoutBtn);
+      }
+    }
+    function togglePopover(show){
+      if(show){
+        profilePopover.classList.add('show');
+        profilePopover.setAttribute('aria-hidden','false');
+      } else {
+        profilePopover.classList.remove('show');
+        profilePopover.setAttribute('aria-hidden','true');
+      }
+    }
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isShown = profilePopover.classList.contains('show');
+      togglePopover(!isShown);
+    });
+    document.addEventListener('click', (e) => {
+      if(!profilePopover.contains(e.target) && !profileBtn.contains(e.target)) togglePopover(false);
+    });
+
+    /* ---------- Modal flows: signup, login, settings (with admin) ---------- */
+    function openModal(mode){
+      modalBackdrop.classList.add('show');
+      modalBackdrop.setAttribute('aria-hidden','false');
+      modal.innerHTML = '';
+      if(mode === 'signup') renderSignupModal();
+      else if(mode === 'login') renderLoginModal();
+      else if(mode === 'settings') renderSettingsModal();
+    }
+    function closeModal(){
+      modalBackdrop.classList.remove('show');
+      modalBackdrop.setAttribute('aria-hidden','true');
+      modal.innerHTML = '';
+    }
+
+    /* Signup */
+    function renderSignupModal(){
+      modal.innerHTML = `
+        <h3>Sign Up</h3>
+        <div class="form-row">
+          <label class="muted">Profile picture</label>
+          <div class="avatar-preview" id="signupAvatarPreview"><img src="${DEFAULT_AVATAR}" alt="preview"></div>
+          <input type="file" id="signupAvatarFile" accept="image/*">
+        </div>
+        <div class="form-row"><input id="signupUsername" type="text" placeholder="Username"></div>
+        <div class="form-row"><input id="signupPassword" type="password" placeholder="Password"></div>
+        <div class="form-row"><input id="signupPassword2" type="password" placeholder="Confirm password"></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="signupCancel">Cancel</button>
+          <button class="btn primary" id="signupSubmit">Create account</button>
+        </div>
+        <div style="margin-top:10px;text-align:center" class="muted">Already have an account? <button class="link-like" id="toLogin">Log in</button></div>
+      `;
+      document.getElementById('signupCancel').onclick = closeModal;
+      document.getElementById('toLogin').onclick = () => { renderLoginModal(); };
+
+      const avatarFile = document.getElementById('signupAvatarFile');
+      const avatarPreviewImg = document.querySelector('#signupAvatarPreview img');
+      let avatarData = DEFAULT_AVATAR;
+      avatarFile.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => { avatarData = reader.result; avatarPreviewImg.src = avatarData; };
+        reader.readAsDataURL(f);
+      });
+
+      document.getElementById('signupSubmit').onclick = () => {
+        const u = document.getElementById('signupUsername').value.trim();
+        const p = document.getElementById('signupPassword').value;
+        const p2 = document.getElementById('signupPassword2').value;
+        if(!u || !p){ alert('Please provide username and password'); return; }
+        if(p !== p2){ alert('Passwords do not match'); return; }
+        const users = getUsers();
+        if(users[u]){ alert('Username already exists'); return; }
+        users[u] = { password: encodePassword(p), avatar: avatarData, createdAt: Date.now() };
+        saveUsers(users);
+        setCurrentUser(u);
+        logAction(u, 'signup', { createdAt: Date.now() });
+        // create notification for account creation? user asked notifications only for additions; skip
+        renderProfile();
+        closeModal();
+      };
+    }
+
+    /* Login */
+    function renderLoginModal(){
+      modal.innerHTML = `
+        <h3>Log In</h3>
+        <div class="form-row"><input id="loginUsername" type="text" placeholder="Username"></div>
+        <div class="form-row"><input id="loginPassword" type="password" placeholder="Password"></div>
+        <div class="form-actions">
+          <button class="btn ghost" id="loginCancel">Cancel</button>
+          <button class="btn primary" id="loginSubmit">Log in</button>
+        </div>
+        <div style="margin-top:10px;text-align:center" class="muted">Don't have an account? <button class="link-like" id="toSignup">Sign up</button></div>
+      `;
+      document.getElementById('loginCancel').onclick = closeModal;
+      document.getElementById('toSignup').onclick = () => { renderSignupModal(); };
+
+      document.getElementById('loginSubmit').onclick = () => {
+        const u = document.getElementById('loginUsername').value.trim();
+        const p = document.getElementById('loginPassword').value;
+        if(!u || !p){ alert('Please provide username and password'); return; }
+        const users = getUsers();
+        if(!users[u] || !verifyPassword(users[u].password, p)){ alert('Invalid username or password'); return; }
+
+        // If user already had the page open (i.e., hw_session_opened flag), send webhook/login notification
+        const hadOpened = localStorage.getItem('hw_session_opened') === 'true';
+        setCurrentUser(u);
+        logAction(u, 'login', { ts: Date.now() });
+
+        // Only send webhook for login events (user requested this behavior)
+        const payload = buildWebhookPayload('login', u, { ts: Date.now() });
+        postToWebhook(payload);
+
+        // If they had opened the site earlier in this browser (session flag), create a notification for admin or log
+        if(hadOpened){
+          // create a small admin notification (not a site visit)
+          createNotification('User logged in', `User ${u} logged in`, { type: 'admin', user: u });
+        }
+
+        renderProfile();
+        closeModal();
+      };
+    }
+
+    /* Settings (includes notification preference and admin panel) */
+    function renderSettingsModal(){
+      const username = getCurrentUser();
+      if(!username){ alert('Not signed in'); closeModal(); return; }
+      const users = getUsers();
+      const user = users[username];
+      const whitelist = getWhitelist();
+      const isAdmin = whitelist.includes(username);
+
+      const notifEnabled = isNotifEnabled();
+
+      modal.innerHTML = `
+        <h3>Settings</h3>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <div class="avatar-preview"><img id="settingsAvatarImg" src="${user.avatar || DEFAULT_AVATAR}" alt="avatar"></div>
+          <div style="flex:1">
+            <label class="muted">Change profile picture</label>
+            <input type="file" id="settingsAvatarFile" accept="image/*">
+          </div>
+        </div>
+
+        <div class="form-row"><label class="muted">Username</label><input id="settingsUsername" type="text" value="${username}"></div>
+        <div class="form-row"><label class="muted">New password (leave blank to keep)</label><input id="settingsPassword" type="password" placeholder="New password"></div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <label class="muted">Enable notifications</label>
+          <input id="notifPrefCheckbox" type="checkbox" ${notifEnabled ? 'checked' : ''}>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn ghost" id="settingsCancel">Cancel</button>
+          <button class="btn primary" id="settingsSave">Save changes</button>
+        </div>
+
+        <div style="margin-top:10px;text-align:center"><button class="btn ghost" id="deleteAccount">Delete account</button></div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Account tools</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="btn ghost" id="copyProfileJSON">Copy my profile JSON</button>
+          <button class="btn ghost" id="clearLocalData">Clear all local data</button>
+        </div>
+
+        ${isAdmin ? `
+          <hr style="margin:16px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+          <div style="font-weight:700;margin-bottom:8px">Admin panel</div>
+          <div class="muted">You are an admin. Use these tools carefully.</div>
+
+          <div style="margin-top:12px">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+              <input id="adminSearch" type="text" placeholder="Search users" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
+              <button class="btn ghost" id="refreshUsers">Refresh</button>
+            </div>
+
+            <table class="admin-table" id="adminUsersTable">
+              <thead><tr><th>User</th><th>Created</th><th>Actions</th></tr></thead>
+              <tbody id="adminUsersBody"></tbody>
+            </table>
+
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn ghost" id="copyUsersJSON">Copy users JSON</button>
+              <button class="btn ghost" id="viewLogs">View logs</button>
+              <button class="btn ghost" id="clearLogs">Clear logs</button>
+              <button class="btn ghost" id="adminAddSampleTool">Add sample tool</button>
+              <button class="btn ghost" id="toggleGlobalNotif">Toggle global notifications</button>
+              <button class="btn ghost" id="flushWebhooks">Flush pending webhooks</button>
+              <button class="btn ghost" id="viewPendingWebhooks">View pending webhooks</button>
+            </div>
+
+            <div id="adminLogs" style="margin-top:12px;display:none">
+              <div style="font-weight:700;margin-bottom:8px">Activity logs</div>
+              <div id="logsContainer" style="max-height:220px;overflow:auto;border-radius:8px;padding:8px;background:#07070a;border:1px solid rgba(255,255,255,0.02)"></div>
+            </div>
+
+            <div id="pendingWebhooksPanel" style="margin-top:12px;display:none">
+              <div style="font-weight:700;margin-bottom:8px">Pending webhooks</div>
+              <div id="pendingWebhooksContainer" style="max-height:220px;overflow:auto;border-radius:8px;padding:8px;background:#07070a;border:1px solid rgba(255,255,255,0.02)"></div>
+            </div>
+          </div>
+        ` : `
+          <div style="margin-top:12px" class="muted">Admin panel is hidden. Only whitelisted users can access admin tools.</div>
+        `}
+      `;
+
+      // Basic handlers
+      document.getElementById('settingsCancel').onclick = closeModal;
+      document.getElementById('deleteAccount').onclick = () => {
+        if(!confirm('Delete your account and all local data? This cannot be undone.')) return;
+        const users = getUsers();
+        const current = getCurrentUser();
+        delete users[current];
+        saveUsers(users);
+        setCurrentUser(null);
+        logAction(current, 'delete_account');
+        createNotification('Account deleted', `User ${current} deleted their account`, { type: 'admin', user: current });
+        renderProfile();
+        closeModal();
+      };
+
+      // Avatar change
+      const avatarFile = document.getElementById('settingsAvatarFile');
+      const settingsAvatarImg = document.getElementById('settingsAvatarImg');
+      let newAvatar = user.avatar || DEFAULT_AVATAR;
+      avatarFile.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => { newAvatar = reader.result; settingsAvatarImg.src = newAvatar; };
+        reader.readAsDataURL(f);
+      });
+
+      // Save changes
+      document.getElementById('settingsSave').onclick = () => {
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        const newPassword = document.getElementById('settingsPassword').value;
+        const users = getUsers();
+        const current = getCurrentUser();
+
+        if(!newUsername){ alert('Username cannot be empty'); return; }
+        if(newUsername !== current && users[newUsername]){ alert('Username already taken'); return; }
+
+        const data = users[current];
+        delete users[current];
+        users[newUsername] = data;
+
+        users[newUsername].avatar = newAvatar || users[newUsername].avatar || DEFAULT_AVATAR;
+        if(newPassword) users[newUsername].password = encodePassword(newPassword);
+
+        saveUsers(users);
+        setCurrentUser(newUsername);
+        logAction(current, 'update_profile', { newUsername });
+        createNotification('Profile updated', `User ${current} updated profile`, { type: 'admin', user: newUsername });
+        renderProfile();
+        closeModal();
+      };
+
+      // Notification preference
+      const notifCheckbox = document.getElementById('notifPrefCheckbox');
+      notifCheckbox.addEventListener('change', (e) => {
+        setNotifEnabled(e.target.checked);
+        renderNotifUI();
+      });
+
+      // Copy profile JSON
+      document.getElementById('copyProfileJSON').onclick = () => {
+        const u = getCurrentUser();
+        const users = getUsers();
+        const payload = users[u] ? JSON.stringify({ username: u, profile: users[u] }, null, 2) : '{}';
+        navigator.clipboard.writeText(payload).then(() => alert('Profile JSON copied to clipboard'));
+      };
+
+      // Clear local data (danger)
+      document.getElementById('clearLocalData').onclick = () => {
+        if(!confirm('Clear all local data (users, logs, whitelist, notifications)? This will sign you out.')) return;
+        localStorage.removeItem('hw_users');
+        localStorage.removeItem('hw_currentUser');
+        localStorage.removeItem('hw_whitelist');
+        localStorage.removeItem('hw_logs');
+        localStorage.removeItem('hw_webhook_pending');
+        localStorage.removeItem('hw_notifications');
+        localStorage.removeItem('hw_notif_enabled');
+        // re-add default whitelist and admin user
+        saveWhitelist(['anotheryear']);
+        const users = {};
+        users['anotheryear'] = { password: encodePassword('adminpass'), avatar: DEFAULT_AVATAR, createdAt: Date.now() };
+        saveUsers(users);
+        setCurrentUser(null);
+        renderProfile();
+        renderNotifUI();
+        alert('Local data cleared. Defaults restored.');
+      };
+
+      /* ---------- Admin-specific handlers ---------- */
+      if(isAdmin){
+        const adminBody = document.getElementById('adminUsersBody');
+        const adminSearch = document.getElementById('adminSearch');
+        const refreshUsersBtn = document.getElementById('refreshUsers');
+        const copyUsersJSON = document.getElementById('copyUsersJSON');
+        const viewLogsBtn = document.getElementById('viewLogs');
+        const clearLogsBtn = document.getElementById('clearLogs');
+        const adminLogs = document.getElementById('adminLogs');
+        const logsContainer = document.getElementById('logsContainer');
+        const adminAddSampleTool = document.getElementById('adminAddSampleTool');
+        const toggleGlobalNotifBtn = document.getElementById('toggleGlobalNotif');
+        const flushWebhooksBtn = document.getElementById('flushWebhooks');
+        const viewPendingBtn = document.getElementById('viewPendingWebhooks');
+        const pendingPanel = document.getElementById('pendingWebhooksPanel');
+        const pendingContainer = document.getElementById('pendingWebhooksContainer');
+
+        function renderUsersTable(filter){
+          const users = getUsers();
+          adminBody.innerHTML = '';
+          const wl = getWhitelist();
+          Object.keys(users).sort().forEach(u => {
+            if(filter && !u.toLowerCase().includes(filter.toLowerCase())) return;
+            const tr = document.createElement('tr');
+            const created = users[u].createdAt ? new Date(users[u].createdAt).toLocaleString() : '-';
+            tr.innerHTML = `<td style="min-width:160px"><strong>${u}</strong></td><td>${created}</td><td></td>`;
+            const actionsTd = tr.querySelector('td:last-child');
+            const actions = document.createElement('div');
+            actions.className = 'admin-actions';
+
+            // Impersonate
+            const imp = document.createElement('button');
+            imp.className = 'pill';
+            imp.textContent = 'Impersonate';
+            imp.onclick = () => {
+              if(!confirm(`Impersonate ${u}? You will be signed in as them.`)) return;
+              setCurrentUser(u);
+              logAction(getCurrentUser(), 'impersonate', { target: u });
+              renderProfile();
+              alert(`Signed in as ${u}`);
+              renderSettingsModal();
+            };
+            actions.appendChild(imp);
+
+            // Toggle whitelist
+            const wlBtn = document.createElement('button');
+            wlBtn.className = 'pill';
+            wlBtn.textContent = wl.includes(u) ? 'Remove admin' : 'Make admin';
+            wlBtn.onclick = () => {
+              const list = getWhitelist();
+              if(list.includes(u)){
+                const idx = list.indexOf(u); list.splice(idx,1);
+                saveWhitelist(list);
+                logAction(getCurrentUser(), 'remove_whitelist', { user: u });
+                alert(`${u} removed from whitelist`);
+              } else {
+                list.push(u); saveWhitelist(list);
+                logAction(getCurrentUser(), 'add_whitelist', { user: u });
+                alert(`${u} added to whitelist`);
+              }
+              renderUsersTable(adminSearch.value);
+            };
+            actions.appendChild(wlBtn);
+
+            // Reset password
+            const reset = document.createElement('button');
+            reset.className = 'pill';
+            reset.textContent = 'Reset password';
+            reset.onclick = () => {
+              const newPass = prompt(`Enter new password for ${u} (leave blank to cancel):`);
+              if(newPass === null) return;
+              if(newPass === ''){ alert('Cancelled'); return; }
+              const users = getUsers();
+              users[u].password = encodePassword(newPass);
+              saveUsers(users);
+              logAction(getCurrentUser(), 'reset_password', { user: u });
+              alert('Password updated');
+            };
+            actions.appendChild(reset);
+
+            // Delete user
+            const del = document.createElement('button');
+            del.className = 'pill danger';
+            del.textContent = 'Delete';
+            del.onclick = () => {
+              if(!confirm(`Delete user ${u}? This cannot be undone.`)) return;
+              const users = getUsers();
+              delete users[u];
+              saveUsers(users);
+              const list = getWhitelist();
+              const idx = list.indexOf(u);
+              if(idx !== -1){ list.splice(idx,1); saveWhitelist(list); }
+              logAction(getCurrentUser(), 'delete_user', { user: u });
+              renderUsersTable(adminSearch.value);
+            };
+            actions.appendChild(del);
+
+            actionsTd.appendChild(actions);
+            adminBody.appendChild(tr);
+          });
+        }
+
+        refreshUsersBtn.onclick = () => renderUsersTable(adminSearch.value);
+        adminSearch.addEventListener('input', () => renderUsersTable(adminSearch.value));
+        copyUsersJSON.onclick = () => {
+          const users = getUsers();
+          navigator.clipboard.writeText(JSON.stringify(users, null, 2)).then(() => alert('Users JSON copied to clipboard'));
+        };
+
+        viewLogsBtn.onclick = () => {
+          adminLogs.style.display = adminLogs.style.display === 'none' ? 'block' : 'none';
+          renderLogs();
+        };
+        clearLogsBtn.onclick = () => {
+          if(!confirm('Clear all logs?')) return;
+          saveLogs([]);
+          renderLogs();
+          alert('Logs cleared');
+        };
+
+        function renderLogs(){
+          const logs = getLogs();
+          logsContainer.innerHTML = '';
+          if(logs.length === 0){ logsContainer.textContent = 'No logs yet.'; return; }
+          logs.forEach(l => {
+            const el = document.createElement('div');
+            const time = new Date(l.ts).toLocaleString();
+            el.style.padding = '6px 0';
+            el.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+            el.innerHTML = `<div style="font-size:12px;color:var(--muted)">${time} — <strong>${l.actor || 'system'}</strong></div><div style="font-size:13px;margin-top:4px">${l.action}${l.details ? ' — ' + JSON.stringify(l.details) : ''}</div>`;
+            logsContainer.appendChild(el);
+          });
+        }
+
+        // Admin: add sample tool (creates a tool and a notification)
+        adminAddSampleTool.onclick = () => {
+          const name = prompt('Tool name to add (example: "Synth Lab"):', 'Synth Lab');
+          if(!name) return;
+          addTool(name, '#');
+          alert(`${name} added to Tools and a notification was created.`);
+        };
+
+        toggleGlobalNotifBtn.onclick = () => {
+          const current = isNotifEnabled();
+          setNotifEnabled(!current);
+          alert(`Global notifications ${!current ? 'enabled' : 'disabled'}.`);
+          renderNotifUI();
+        };
+
+        flushWebhooksBtn.onclick = async () => {
+          await flushPendingWebhooks();
+          alert('Attempted to flush pending webhooks.');
+        };
+
+        viewPendingBtn.onclick = () => {
+          pendingPanel.style.display = pendingPanel.style.display === 'none' ? 'block' : 'none';
+          renderPendingWebhooks();
+        };
+
+        function renderPendingWebhooks(){
+          const pending = getPendingWebhooks();
+          pendingContainer.innerHTML = '';
+          if(pending.length === 0){ pendingContainer.textContent = 'No pending webhooks.'; return; }
+          pending.forEach(p => {
+            const el = document.createElement('div');
+            el.style.padding = '6px 0';
+            el.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+            el.innerHTML = `<div style="font-size:12px;color:var(--muted)">${new Date(p.ts).toLocaleString()}</div><pre style="white-space:pre-wrap;margin-top:6px;font-size:12px">${escapeHtml(JSON.stringify(p.payload, null, 2))}</pre>`;
+            pendingContainer.appendChild(el);
+          });
+        }
+
+        renderUsersTable('');
+        renderLogs();
+      } // end isAdmin
+    }
+
+    /* Close modal on backdrop click */
+    modalBackdrop.addEventListener('click', (e) => {
+      if(e.target === modalBackdrop) closeModal();
+    });
+
+    /* ---------- Utilities ---------- */
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+    }
+
+    /* ---------- Session flag for "already opened" detection ---------- */
+    // Set a flag when the page is opened in this tab/browser so later login can detect it.
+    (function markSessionOpened(){
+      try { localStorage.setItem('hw_session_opened', 'true'); } catch(e) {}
+    })();
+
+    /* ---------- Initialize ---------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      profileAvatar.src = DEFAULT_AVATAR;
+      const active = document.querySelector('.nav-item.active');
+      const initial = active ? active.dataset.category : 'games';
+      showSection(initial);
+      renderProfile();
+      renderNotifUI();
+
+      // Flush pending webhooks in background (best-effort)
+      flushPendingWebhooks().catch(()=>{});
+
+      // Keep UI in sync across tabs
+      window.addEventListener('storage', (e) => {
+        if(e.key && e.key.startsWith('hw_')) {
+          renderProfile();
+          renderNotifUI();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
