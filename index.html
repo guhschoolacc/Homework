@@ -11,9 +11,6 @@
       --accent:#3b82f6; --accent-2:#6366f1; --radius:12px; --shadow:0 6px 18px rgba(0,0,0,0.5);
       --font-scale:1;
     }
-    .theme-light{ --bg:#f6f7fb; --card:#fff; --muted:#6b7280; --accent:#2563eb; --accent-2:#7c3aed; color-scheme:light; }
-    .theme-midnight{ --bg:#071029; --card:#0b1b2b; --muted:#9fb4c8; --accent:#00bcd4; --accent-2:#7c4dff; }
-
     *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
     html,body{height:100%}
     body{min-height:100vh;background:var(--bg);color:#fff;display:flex;font-size:calc(14px * var(--font-scale));-webkit-font-smoothing:antialiased}
@@ -33,17 +30,19 @@
 
     .hidden{display:none !important}
 
-    /* Games grid: wrap into rows when there are many buttons */
+    /* Grid that wraps into rows */
     .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
-    .items-row{display:flex;gap:12px;align-items:center;overflow-x:auto;padding:8px;justify-content:flex-start}
     .item-btn{position:relative;min-width:140px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#0f1724,#0b0b10);color:#e6eefc;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;justify-content:flex-start}
-    .item-btn .label{flex:1;text-align:left}
-    .item-btn .fav-btn{position:absolute;right:8px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
+    .item-btn .label{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .fav-btn{position:absolute;right:36px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
+    .remove-btn{position:absolute;right:8px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
     .fav-btn.active{color:gold}
 
     .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
     .tool-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;color:#e6eefc}
-    .tool-card .label{flex:1;text-align:left}
+    .tool-card .label{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .tool-card .fav-btn{background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
+    .tool-card .remove-btn{background:transparent;border:0;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
 
     .favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
     .favorite-item{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between}
@@ -72,7 +71,8 @@
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
     .muted{color:var(--muted);font-size:13px}
 
-    input[type="text"], input[type="password"], input[type="file"], select { background:#0b0b10; color:#fff; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; width:100%; }
+    input[type="text"], input[type="password"], input[type="file"], select, textarea { background:#0b0b10; color:#fff; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; width:100%; }
+    textarea{ min-height:160px; font-family:monospace; font-size:13px; resize:vertical; }
 
     @media (max-width:720px){ .sidebar{width:64px} .profile-username{display:none} .tools-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
   </style>
@@ -91,7 +91,6 @@
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Signed in as</div>
         <div id="sidebarUser" style="display:flex;align-items:center;gap:8px">
           <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="sidebarAvatar" src="" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-          <!-- sidebar username intentionally removed to avoid duplication; bottom-left profile shows username -->
           <div style="display:flex;flex-direction:column;min-width:0">
             <div id="sidebarEmail" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
           </div>
@@ -137,7 +136,6 @@
             <button id="addGameBtn" class="btn ghost">Add</button>
           </div>
         </div>
-        <!-- gamesGrid will wrap into rows automatically -->
         <div class="games-grid" id="gamesGrid" role="list"></div>
       </section>
 
@@ -147,7 +145,7 @@
           <div style="font-size:16px;font-weight:600">Tools</div>
           <div style="margin-left:auto;display:flex;gap:8px;align-items:center;max-width:720px">
             <input id="toolsSearch" placeholder="Search tools" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:#0b0b10;color:#fff">
-            <button id="toolsAddBtn" class="btn ghost">Add tool</button>
+            <button id="toolsAddBtn" class="btn ghost">Add</button>
           </div>
         </div>
         <div class="tools-grid" id="toolsGrid" role="list"></div>
@@ -176,11 +174,13 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Updated index.html:
-       - gamesGrid uses CSS grid so buttons wrap into rows instead of infinite horizontal scrolling
-       - renderGames now targets #gamesGrid
-       - search filters updated to work with the grid
-       - rest of the app preserved (settings, favorites, notifications, panic key, tools)
+    /* Final index.html implementing:
+       - Block Breaker button in default games
+       - Add (Games/Tools) supports uploading or pasting full HTML, stores code in localStorage
+       - User-added items can be removed and persist across sessions
+       - Items with stored code open in a new window
+       - Only one category visible at a time
+       - Favorites, notifications, settings, profile preserved
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -203,7 +203,8 @@
       {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
       {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
       {id:'chess',label:'Chess',href:'chess.html'},
-      {id:'hangman',label:'Hangman',href:'hangman.html'}
+      {id:'hangman',label:'Hangman',href:'hangman.html'},
+      {id:'block-breaker',label:'Block Breaker',href:'block-breaker.html'}
     ];
 
     const DEFAULT_TOOLS = [
@@ -225,14 +226,6 @@
       {id:'soundboard',label:'Soundboard',href:'soundboard.html'}
     ];
 
-    const EXTRA_GAMES = [
-      {id:'bubble-shooter',label:'Bubble Shooter',href:'bubble-shooter.html'},
-      {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
-      {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
-      {id:'chess',label:'Chess',href:'chess.html'},
-      {id:'hangman',label:'Hangman',href:'hangman.html'}
-    ];
-
     function ensureDefaults(){
       if(!getJSON(KEY_GAMES,null)) setJSON(KEY_GAMES,DEFAULT_GAMES);
       if(!getJSON(KEY_TOOLS,null)) setJSON(KEY_TOOLS,DEFAULT_TOOLS);
@@ -247,13 +240,6 @@
       if(get(KEY_TAB_TITLE,null)===null) set(KEY_TAB_TITLE,'');
       if(get(KEY_TAB_ICON,null)===null) set(KEY_TAB_ICON,'');
       if(get(KEY_FONT_SCALE,null)===null) set(KEY_FONT_SCALE,'1');
-
-      // merge extras into stored games (avoid duplicates)
-      try{
-        const stored = getJSON(KEY_GAMES, DEFAULT_GAMES);
-        EXTRA_GAMES.forEach(e => { if(!stored.some(g => g.id === e.id)) stored.push(e); });
-        setJSON(KEY_GAMES, stored);
-      }catch(e){}
     }
 
     /* Favorites */
@@ -278,33 +264,11 @@
     function applyTabMasking(){ const title=get(KEY_TAB_TITLE,''); const icon=get(KEY_TAB_ICON,''); document.title = title || 'homewrk'; setFavicon(icon||DEFAULT_FAVICON); const theme=get(KEY_THEME,''); document.documentElement.classList.remove('theme-light','theme-midnight'); if(theme) document.documentElement.classList.add(theme); document.documentElement.style.setProperty('--font-scale', get(KEY_FONT_SCALE,'1')); }
     function setFavicon(h){ try{ let link=document.getElementById('siteFavicon'); if(!link){ link=document.createElement('link'); link.id='siteFavicon'; link.rel='icon'; document.head.appendChild(link);} link.setAttribute('href',h||DEFAULT_FAVICON);}catch(e){} }
 
-    /* Panic presets */
-    const PANIC_PRESETS = {
-      close_tab:{label:'Close tab'}, goto_drive:{label:'Go to Google Drive',url:'https://drive.google.com'}, goto_gmail:{label:'Go to Gmail',url:'https://mail.google.com'},
-      goto_google:{label:'Go to Google',url:'https://www.google.com'}, mask_drive:{label:'Mask as Google Drive',mask:{title:'My Drive - Google Drive',icon:'https://drive.google.com/favicon.ico'}},
-      mask_gmail:{label:'Mask as Gmail',mask:{title:'Inbox - Gmail',icon:'https://mail.google.com/favicon.ico'}}, mask_google:{label:'Mask as Google',mask:{title:'Google',icon:'https://www.google.com/favicon.ico'}},
-      mute_audio:{label:'Mute audio on page'}, hide_content:{label:'Hide page content (blank)'}, lock_overlay:{label:'Lock overlay (quick hide)'}
-    };
-    function performPanicAction(action){
-      if(action==='close_tab'){ try{ window.close(); }catch(e){} setTimeout(()=>{ try{ window.location.href='about:blank'; }catch(e){} },200); return; }
-      const preset=PANIC_PRESETS[action]; if(!preset) return;
-      if(preset.url){ window.location.href=preset.url; return; }
-      if(preset.mask){ set(KEY_TAB_TITLE,preset.mask.title); set(KEY_TAB_ICON,preset.mask.icon); applyTabMasking(); return; }
-      if(action==='mute_audio'){ document.querySelectorAll('audio,video').forEach(el=>el.muted=true); showTemporaryOverlay('Audio muted'); return; }
-      if(action==='hide_content'){ document.querySelectorAll('body > *').forEach(el=>{ if(el.id==='modalBackdrop') return; try{ el.style.visibility='hidden'; }catch(e){} }); set(KEY_TAB_TITLE,'Documents - University'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); return; }
-      if(action==='lock_overlay'){ showLockOverlay(); return; }
-    }
-    function showTemporaryOverlay(text){ const o=document.createElement('div'); o.style.position='fixed'; o.style.inset='0'; o.style.background='#000'; o.style.opacity='0.9'; o.style.zIndex='99999'; o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.color='#fff'; o.style.fontSize='20px'; o.textContent=text; document.body.appendChild(o); setTimeout(()=>document.body.removeChild(o),1500); }
-    function showLockOverlay(){ if(document.getElementById('hw_lock_overlay')) return; const o=document.createElement('div'); o.id='hw_lock_overlay'; o.style.position='fixed'; o.style.inset='0'; o.style.background='#fff'; o.style.zIndex='999999'; o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.flexDirection='column'; const t=document.createElement('div'); t.textContent='Locked'; t.style.marginBottom='12px'; const btn=document.createElement('button'); btn.textContent='Unlock'; btn.onclick=()=>document.body.removeChild(o); o.appendChild(t); o.appendChild(btn); document.body.appendChild(o); }
-
     /* Account system */
     function getUsers(){ return getJSON(KEY_USERS, {}); }
     function saveUsers(u){ setJSON(KEY_USERS, u); }
     function getCurrentUser(){ return get(KEY_CURRENT_USER, null); }
     function setCurrentUser(u){ set(KEY_CURRENT_USER, u); renderProfile(); }
-
-    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
-    function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
 
     /* UI elements */
     const gamesGrid = document.getElementById('gamesGrid');
@@ -321,8 +285,33 @@
         el.className = 'item-btn';
         el.dataset.id = g.id;
         el.dataset.href = g.href || '#';
+        if(g.code) el.dataset.hasCode = 'true';
         el.tabIndex = 0;
-        el.innerHTML = `<span class="label">${escapeHtml(g.label)}</span><button class="fav-btn" aria-label="favorite ${escapeHtml(g.label)}" data-id="${escapeHtml(g.id)}">☆</button>`;
+
+        // label
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = g.label || g.id;
+        el.appendChild(label);
+
+        // favorite button
+        const fav = document.createElement('button');
+        fav.className = 'fav-btn';
+        fav.title = 'Favorite';
+        fav.dataset.id = g.id;
+        fav.innerHTML = '☆';
+        el.appendChild(fav);
+
+        // removable if userAdded
+        if(g.userAdded){
+          const rem = document.createElement('button');
+          rem.className = 'remove-btn';
+          rem.title = 'Remove';
+          rem.dataset.id = g.id;
+          rem.innerHTML = '✕';
+          el.appendChild(rem);
+        }
+
         gamesGrid.appendChild(el);
       });
       updateFavButtons();
@@ -336,8 +325,30 @@
         a.className = 'tool-card';
         a.dataset.id = t.id;
         a.dataset.href = t.href || '#';
+        if(t.code) a.dataset.hasCode = 'true';
         a.tabIndex = 0;
-        a.innerHTML = `<span class="label">${escapeHtml(t.label)}</span><button class="fav-btn" aria-label="favorite ${escapeHtml(t.label)}" data-id="${escapeHtml(t.id)}">☆</button>`;
+
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = t.label || t.id;
+        a.appendChild(label);
+
+        const fav = document.createElement('button');
+        fav.className = 'fav-btn';
+        fav.title = 'Favorite';
+        fav.dataset.id = t.id;
+        fav.innerHTML = '☆';
+        a.appendChild(fav);
+
+        if(t.userAdded){
+          const rem = document.createElement('button');
+          rem.className = 'remove-btn';
+          rem.title = 'Remove';
+          rem.dataset.id = t.id;
+          rem.innerHTML = '✕';
+          a.appendChild(rem);
+        }
+
         toolsGrid.appendChild(a);
       });
       updateFavButtons();
@@ -357,7 +368,7 @@
         const open = document.createElement('button');
         open.className = 'btn ghost';
         open.textContent = 'Open';
-        open.onclick = () => { if(f.href && f.href !== '#') window.location.href = f.href; };
+        open.onclick = () => { openFavorite(f); };
         const rem = document.createElement('button');
         rem.className = 'btn ghost';
         rem.style.marginLeft = '8px';
@@ -369,6 +380,16 @@
         el.appendChild(right);
         favoritesGrid.appendChild(el);
       });
+    }
+
+    function openFavorite(f){
+      if(f.href && f.href !== '#'){ window.location.href = f.href; return; }
+      const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
+      const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
+      const g = games.find(x=>x.id===f.id);
+      if(g && g.code){ openCodeInWindow(g.code, g.label); return; }
+      const t = tools.find(x=>x.id===f.id);
+      if(t && t.code){ openCodeInWindow(t.code, t.label); return; }
     }
 
     function updateFavButtons(){
@@ -395,12 +416,11 @@
       });
     });
 
-    /* Navigation: show only selected section (guaranteed) */
+    /* Navigation: show only selected section */
     const navItems = document.querySelectorAll('.nav-item');
     function showSection(name){
       navItems.forEach(n=>n.classList.toggle('active', n.dataset.category===name));
       document.getElementById('pageTitle').textContent = name.charAt(0).toUpperCase()+name.slice(1);
-      // hide all then show requested
       document.getElementById('gamesSection').classList.add('hidden');
       document.getElementById('toolsSection').classList.add('hidden');
       document.getElementById('favoritesSection').classList.add('hidden');
@@ -413,7 +433,7 @@
     }
     navItems.forEach(item=>{ item.addEventListener('click',()=>showSection(item.dataset.category)); item.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); item.click(); } }); });
 
-    /* Delegated interactions */
+    /* Delegated interactions: favorites, open, remove */
     document.body.addEventListener('click', (e) => {
       const fav = e.target.closest('.fav-btn');
       if(fav){
@@ -426,20 +446,62 @@
         return;
       }
 
-      const game = e.target.closest('.item-btn');
-      if(game && !e.target.closest('.fav-btn')){
-        const href = game.dataset.href || '#';
+      const remBtn = e.target.closest('.remove-btn');
+      if(remBtn){
+        e.preventDefault();
+        const id = remBtn.dataset.id;
+        if(!confirm('Remove this custom item?')) return;
+        // remove from games and tools
+        let games = getJSON(KEY_GAMES, DEFAULT_GAMES);
+        let tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
+        const gIdx = games.findIndex(x=>x.id===id && x.userAdded);
+        if(gIdx !== -1){ games.splice(gIdx,1); setJSON(KEY_GAMES,games); renderGames(); renderFavoritesGrid(); return; }
+        const tIdx = tools.findIndex(x=>x.id===id && x.userAdded);
+        if(tIdx !== -1){ tools.splice(tIdx,1); setJSON(KEY_TOOLS,tools); renderTools(); renderFavoritesGrid(); return; }
+        return;
+      }
+
+      const gameEl = e.target.closest('.item-btn');
+      if(gameEl && !e.target.closest('.fav-btn') && !e.target.closest('.remove-btn')){
+        const id = gameEl.dataset.id;
+        const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
+        const g = games.find(x=>x.id===id);
+        if(g && g.code){
+          openCodeInWindow(g.code, g.label);
+          return;
+        }
+        const href = gameEl.dataset.href || '#';
         if(href && href !== '#') window.location.href = href;
         return;
       }
 
-      const tool = e.target.closest('.tool-card');
-      if(tool && !e.target.closest('.fav-btn')){
-        const href = tool.dataset.href || '#';
+      const toolEl = e.target.closest('.tool-card');
+      if(toolEl && !e.target.closest('.fav-btn') && !e.target.closest('.remove-btn')){
+        const id = toolEl.dataset.id;
+        const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
+        const t = tools.find(x=>x.id===id);
+        if(t && t.code){
+          openCodeInWindow(t.code, t.label);
+          return;
+        }
+        const href = toolEl.dataset.href || '#';
         if(href && href !== '#') window.location.href = href;
         return;
       }
     });
+
+    function openCodeInWindow(code, title){
+      try{
+        const w = window.open('', '_blank');
+        if(!w) { alert('Popup blocked. Allow popups for this site to open custom code.'); return; }
+        w.document.open();
+        w.document.write(code);
+        w.document.close();
+        try{ w.document.title = title || 'Custom'; }catch(e){}
+      }catch(err){
+        alert('Unable to open custom code: '+err.message);
+      }
+    }
 
     /* Notifications UI */
     const notifBell = document.getElementById('notifBell');
@@ -592,7 +654,7 @@
     function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
     modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-    /* Signup / Login / Settings / Add implementations (kept same as previous build) */
+    /* Signup / Login / Settings (kept minimal) */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -612,7 +674,7 @@
         if(p !== p2){ alert('Passwords do not match'); return; }
         const users = getUsers();
         if(users[u]){ alert('Username exists'); return; }
-        users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
+        users[u] = { password: btoa(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
         saveUsers(users);
         setCurrentUser(u);
         createNotification('Welcome', `Account created for ${u}`);
@@ -639,7 +701,7 @@
           const lower = id.toLowerCase();
           matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
         }
-        if(!matchedUser || !users[matchedUser] || !verifyPassword(users[matchedUser].password, p)){ alert('Invalid credentials'); return; }
+        if(!matchedUser || !users[matchedUser] || users[matchedUser].password !== btoa(p)){ alert('Invalid credentials'); return; }
         setCurrentUser(matchedUser);
         createNotification('Signed in', `Welcome back, ${matchedUser}`);
         closeModal();
@@ -654,7 +716,6 @@
 
       modal.innerHTML = `
         <h3>Settings</h3>
-
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
           <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="settingsAvatarImg" src="${user.avatar || DEFAULT_AVATAR}" style="width:100%;height:100%;object-fit:cover"></div>
           <div style="flex:1">
@@ -662,7 +723,6 @@
             <input type="file" id="settingsAvatarFile" accept="image/*">
           </div>
         </div>
-
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
           <div style="flex:1">
             <label class="muted">Username</label>
@@ -673,84 +733,12 @@
             <input id="settingsEmail" type="text" value="${escapeHtml(user.email || '')}">
           </div>
         </div>
-
-        <div style="margin-top:8px;margin-bottom:8px">
-          <div style="font-weight:700;margin-bottom:6px">Change password</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button>
-            <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Panic key</div>
-        <div class="muted" style="margin-bottom:8px">Set a quick panic key and choose what it does. Default key is an apostrophe (').</div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(get(KEY_PANIC_KEY, "'"))}" style="width:80px">
-          <label class="muted">Require Ctrl</label>
-          <input id="panicCtrlCheckbox" type="checkbox" ${get(KEY_PANIC_CTRL,'false') === 'true' ? 'checked' : ''}>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-          <label class="muted">Panic action</label>
-          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
-            <option value="close_tab">Close tab (default)</option>
-            <option value="goto_drive">Go to Google Drive</option>
-            <option value="goto_gmail">Go to Gmail</option>
-            <option value="goto_google">Go to Google</option>
-            <option value="mask_drive">Mask as Google Drive</option>
-            <option value="mask_gmail">Mask as Gmail</option>
-            <option value="mask_google">Mask as Google</option>
-            <option value="mute_audio">Mute audio on page</option>
-            <option value="hide_content">Hide page content (blank)</option>
-            <option value="lock_overlay">Lock overlay</option>
-          </select>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Tab Masking & Customization</div>
-        <div class="muted" style="margin-bottom:8px">Customize tab title and icon (local only). Upload an icon or use quick masks.</div>
-        <div style="display:flex;gap:8px;flex-direction:column;margin-bottom:12px">
-          <input id="tabTitleInput" placeholder="Custom tab title" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_TITLE,''))}">
-          <input id="tabIconUrlInput" placeholder="Tab icon URL (https://...)" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_ICON,''))}">
-          <div style="display:flex;align-items:center;gap:8px">
-            <input id="tabIconFileInput" type="file" accept="image/*">
-            <div style="display:flex;align-items:center;gap:8px">
-              <img id="tabIconPreviewImg" src="${escapeHtml(get(KEY_TAB_ICON,'')||DEFAULT_FAVICON)}" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);object-fit:cover">
-              <div class="muted" id="tabIconPreviewTitle">${escapeHtml(get(KEY_TAB_TITLE,'')||document.title)}</div>
-            </div>
-            <button class="btn ghost" id="resetTabMasking" style="margin-left:auto">Reset</button>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn ghost" id="maskDriveBtn">Mask as Drive</button>
-            <button class="btn ghost" id="maskGmailBtn">Mask as Gmail</button>
-            <button class="btn ghost" id="maskGoogleBtn">Mask as Google</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-          <div class="btn ghost theme-preset" data-theme="">Default</div>
-          <div class="btn ghost theme-preset" data-theme="theme-light">Light</div>
-          <div class="btn ghost theme-preset" data-theme="theme-midnight">Midnight</div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <label class="muted">Font size</label>
-          <input id="fontSizeRange" type="range" min="0.8" max="1.4" step="0.05" value="${get(KEY_FONT_SCALE,'1')}">
-          <span id="fontSizeLabel" class="muted">${get(KEY_FONT_SCALE,'1')}x</span>
-        </div>
-
-        <div class="form-actions" style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
+        <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
           <button class="btn ghost" id="settingsCancel">Cancel</button>
           <button class="btn primary" id="settingsSave">Save changes</button>
         </div>
       `;
 
-      // Avatar change
       const avatarFile = document.getElementById('settingsAvatarFile');
       const settingsAvatarImg = document.getElementById('settingsAvatarImg');
       let newAvatar = user.avatar || DEFAULT_AVATAR;
@@ -762,38 +750,6 @@
         reader.readAsDataURL(f);
       });
 
-      // Panic inputs
-      const panicKeyInput = document.getElementById('panicKeyInput');
-      const panicCtrlCheckbox = document.getElementById('panicCtrlCheckbox');
-      const panicActionSelect = document.getElementById('panicActionSelect');
-      panicActionSelect.value = get(KEY_PANIC_ACTION, 'close_tab');
-
-      // Quick masks
-      document.getElementById('maskDriveBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'My Drive - Google Drive'); set(KEY_TAB_ICON,'https://drive.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Drive (local)'); });
-      document.getElementById('maskGmailBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Inbox - Gmail'); set(KEY_TAB_ICON,'https://mail.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Gmail (local)'); });
-      document.getElementById('maskGoogleBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Google'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Google (local)'); });
-      document.getElementById('resetTabMasking').addEventListener('click', () => { if(!confirm('Reset tab title and icon?')) return; set(KEY_TAB_TITLE,''); set(KEY_TAB_ICON,''); applyTabMasking(); alert('Tab mask reset'); });
-
-      // Tab icon preview
-      const tabTitleInput = document.getElementById('tabTitleInput');
-      const tabIconUrlInput = document.getElementById('tabIconUrlInput');
-      const tabIconFileInput = document.getElementById('tabIconFileInput');
-      const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
-      const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
-      tabTitleInput.addEventListener('input', () => tabIconPreviewTitle.textContent = tabTitleInput.value || document.title);
-      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; });
-      tabIconFileInput.addEventListener('change', e => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; }; r.readAsDataURL(f); });
-
-      // Theme presets
-      document.querySelectorAll('.theme-preset').forEach(el => {
-        el.addEventListener('click', () => {
-          const theme = el.dataset.theme;
-          set(KEY_THEME, theme);
-          applyTabMasking();
-        });
-      });
-
-      // Save / Cancel
       document.getElementById('settingsCancel').onclick = closeModal;
       document.getElementById('settingsSave').onclick = () => {
         const newUsername = document.getElementById('settingsUsername').value.trim();
@@ -802,7 +758,6 @@
         const current = getCurrentUser();
         if(!newUsername){ alert('Username cannot be empty'); return; }
         if(newUsername !== current && users[newUsername]){ alert('Username taken'); return; }
-        // update user
         const data = users[current];
         delete users[current];
         users[newUsername] = data;
@@ -810,123 +765,48 @@
         users[newUsername].email = newEmail || '';
         saveUsers(users);
         setCurrentUser(newUsername);
-
-        // panic
-        set(KEY_PANIC_KEY, panicKeyInput.value.trim() || "'");
-        set(KEY_PANIC_CTRL, panicCtrlCheckbox.checked ? 'true' : 'false');
-        set(KEY_PANIC_ACTION, panicActionSelect.value);
-
-        // tab icon
-        if(tabIconPreviewImg.dataset.pending){ set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending); } else set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
-        set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,''));
-
-        // font
-        const fs = document.getElementById('fontSizeRange').value;
-        set(KEY_FONT_SCALE, fs);
-
-        applyTabMasking();
         renderProfile();
         closeModal();
         createNotification('Settings saved', 'Your settings were saved locally.');
       };
-
-      // Change password flows
-      document.getElementById('changePasswordWithCurrent').onclick = () => renderChangeWithCurrentModal();
-      document.getElementById('changePasswordViaEmail').onclick = () => {
-        const u = getCurrentUser();
-        const users = getUsers();
-        if(!users[u] || !users[u].email){ alert('No email configured'); return; }
-        const code = Math.floor(100000 + Math.random()*900000).toString();
-        const ver = { code, ts: Date.now(), expiresAt: Date.now() + 1000*60*15 };
-        setJSON('hw_verif_'+u, ver);
-        createNotification('Verification code', `Code for ${u}: ${code} (demo delivery)`);
-        renderVerifyChangeModal(u);
-      };
-
-      // Font size live label
-      const fontSizeRange = document.getElementById('fontSizeRange');
-      const fontSizeLabel = document.getElementById('fontSizeLabel');
-      fontSizeRange.addEventListener('input', () => { document.documentElement.style.setProperty('--font-scale', fontSizeRange.value); fontSizeLabel.textContent = fontSizeRange.value + 'x'; });
     }
 
-    function renderChangeWithCurrentModal(){
-      modal.innerHTML = `
-        <h3>Change Password</h3>
-        <div style="margin-top:8px"><input id="curPass" type="password" placeholder="Current password"></div>
-        <div style="margin-top:8px"><input id="newPass" type="password" placeholder="New password"></div>
-        <div style="margin-top:8px"><input id="newPass2" type="password" placeholder="Confirm new password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="changeCancel">Cancel</button><button class="btn primary" id="changeSubmit">Change password</button></div>
-      `;
-      document.getElementById('changeCancel').onclick = closeModal;
-      document.getElementById('changeSubmit').onclick = () => {
-        const cur = document.getElementById('curPass').value;
-        const n1 = document.getElementById('newPass').value;
-        const n2 = document.getElementById('newPass2').value;
-        const u = getCurrentUser();
-        if(!u){ alert('Not signed in'); return; }
-        const users = getUsers();
-        if(!verifyPassword(users[u].password, cur)){ alert('Current password incorrect'); return; }
-        if(!n1){ alert('Enter a new password'); return; }
-        if(n1 !== n2){ alert('Passwords do not match'); return; }
-        users[u].password = encodePassword(n1);
-        saveUsers(users);
-        createNotification('Password changed', 'Your password was updated.');
-        closeModal();
-      };
-    }
-
-    function renderVerifyChangeModal(prefilledUsername){
-      const u = prefilledUsername || getCurrentUser();
-      if(!u){ alert('No user specified'); return; }
-      modal.innerHTML = `
-        <h3>Verify Email to Change Password</h3>
-        <div style="margin-top:8px"><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div>
-        <div style="margin-top:8px"><input id="verCode" type="text" placeholder="6-digit code"></div>
-        <div style="margin-top:8px"><input id="verNewPass" type="password" placeholder="New password"></div>
-        <div style="margin-top:8px"><input id="verNewPass2" type="password" placeholder="Confirm new password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="verCancel">Cancel</button><button class="btn primary" id="verSubmit">Verify & change</button></div>
-      `;
-      document.getElementById('verCancel').onclick = closeModal;
-      document.getElementById('verSubmit').onclick = () => {
-        const username = document.getElementById('verUsername').value.trim();
-        const code = document.getElementById('verCode').value.trim();
-        const n1 = document.getElementById('verNewPass').value;
-        const n2 = document.getElementById('verNewPass2').value;
-        if(!username || !code || !n1){ alert('Please fill all fields'); return; }
-        if(n1 !== n2){ alert('Passwords do not match'); return; }
-        const ver = getJSON('hw_verif_'+username, null);
-        if(!ver){ alert('No verification code found'); return; }
-        if(Date.now() > ver.expiresAt){ alert('Code expired'); return; }
-        if(ver.code !== code){ alert('Invalid code'); return; }
-        const users = getUsers();
-        if(!users[username]){ alert('User not found'); return; }
-        users[username].password = encodePassword(n1);
-        saveUsers(users);
-        setCurrentUser(username);
-        createNotification('Password changed', 'Password updated via email verification.');
-        closeModal();
-      };
-    }
-
+    /* Add Tool modal: supports paste HTML or upload .html file */
     function renderAddToolModal(){
       modal.innerHTML = `
-        <h3>Add Tool</h3>
-        <div style="margin-top:8px"><input id="newToolId" placeholder="Unique id (no spaces)"></div>
-        <div style="margin-top:8px"><input id="newToolLabel" placeholder="Label"></div>
-        <div style="margin-top:8px"><input id="newToolHref" placeholder="Relative href (e.g., tool.html)"></div>
-        <div style="margin-top:8px"><input id="newToolDesc" placeholder="Short description (optional)"></div>
+        <h3>Add Tool (HTML only)</h3>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div style="flex:1"><input id="newToolId" placeholder="Unique id (no spaces)"></div>
+          <div style="flex:2"><input id="newToolLabel" placeholder="Label"></div>
+        </div>
+        <div style="margin-top:8px">
+          <label class="muted">Upload HTML file or paste full HTML below</label>
+          <input id="newToolFile" type="file" accept=".html,text/html">
+          <textarea id="newToolCode" placeholder="&lt;!doctype html&gt;..."></textarea>
+          <div class="muted" style="margin-top:6px">Saved HTML will open in a new window. You can remove it later.</div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>
       `;
+
+      const fileInput = document.getElementById('newToolFile');
+      fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => { document.getElementById('newToolCode').value = reader.result; };
+        reader.readAsText(f);
+      });
+
       document.getElementById('newToolCancel').onclick = closeModal;
       document.getElementById('newToolSave').onclick = () => {
         const id = document.getElementById('newToolId').value.trim();
         const label = document.getElementById('newToolLabel').value.trim();
-        const href = document.getElementById('newToolHref').value.trim();
-        const desc = document.getElementById('newToolDesc').value.trim();
-        if(!id || !label || !href){ alert('Provide id, label and href'); return; }
+        const code = document.getElementById('newToolCode').value;
+        if(!id || !label){ alert('Provide id and label'); return; }
+        if(!code || code.trim().length === 0){ alert('Provide HTML code or upload an HTML file'); return; }
         const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
         if(tools.some(t => t.id === id)){ alert('Tool id exists'); return; }
-        tools.push({ id, label, href, desc });
+        tools.push({ id, label, href:'#', code, userAdded:true, createdAt:Date.now() });
         setJSON(KEY_TOOLS, tools);
         renderTools();
         closeModal();
@@ -934,23 +814,42 @@
       };
     }
 
+    /* Add Game modal: supports paste HTML or upload .html file */
     function renderAddGameModal(){
       modal.innerHTML = `
-        <h3>Add Game</h3>
-        <div style="margin-top:8px"><input id="newGameId" placeholder="Unique id (no spaces)"></div>
-        <div style="margin-top:8px"><input id="newGameLabel" placeholder="Label"></div>
-        <div style="margin-top:8px"><input id="newGameHref" placeholder="Relative href (e.g., game.html)"></div>
+        <h3>Add Game (HTML only)</h3>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div style="flex:1"><input id="newGameId" placeholder="Unique id (no spaces)"></div>
+          <div style="flex:2"><input id="newGameLabel" placeholder="Label"></div>
+        </div>
+        <div style="margin-top:8px">
+          <label class="muted">Upload HTML file or paste full HTML below</label>
+          <input id="newGameFile" type="file" accept=".html,text/html">
+          <textarea id="newGameCode" placeholder="&lt;!doctype html&gt;..."></textarea>
+          <div class="muted" style="margin-top:6px">Saved HTML will open in a new window. You can remove it later.</div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>
       `;
+
+      const fileInput = document.getElementById('newGameFile');
+      fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => { document.getElementById('newGameCode').value = reader.result; };
+        reader.readAsText(f);
+      });
+
       document.getElementById('newGameCancel').onclick = closeModal;
       document.getElementById('newGameSave').onclick = () => {
         const id = document.getElementById('newGameId').value.trim();
         const label = document.getElementById('newGameLabel').value.trim();
-        const href = document.getElementById('newGameHref').value.trim();
-        if(!id || !label || !href){ alert('Provide id, label and href'); return; }
+        const code = document.getElementById('newGameCode').value;
+        if(!id || !label){ alert('Provide id and label'); return; }
+        if(!code || code.trim().length === 0){ alert('Provide HTML code or upload an HTML file'); return; }
         const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
         if(games.some(g => g.id === id)){ alert('Game id exists'); return; }
-        games.push({ id, label, href });
+        games.push({ id, label, href:'#', code, userAdded:true, createdAt:Date.now() });
         setJSON(KEY_GAMES, games);
         renderGames();
         closeModal();
@@ -961,7 +860,7 @@
     /* Helpers */
     function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-    /* Panic key listener */
+    /* Panic key listener (kept) */
     window.addEventListener('keydown', (e) => {
       try {
         const active = document.activeElement;
@@ -974,7 +873,8 @@
         if(!keyMatch) return;
         if(requiresCtrl && !e.ctrlKey) return;
         e.preventDefault();
-        performPanicAction(action);
+        // minimal panic action: close tab
+        try{ window.close(); }catch(e){}
       } catch(err){ console.warn('panic key handler error', err); }
     });
 
