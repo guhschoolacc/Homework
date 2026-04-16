@@ -11,6 +11,9 @@
       --accent:#3b82f6; --accent-2:#6366f1; --radius:12px; --shadow:0 6px 18px rgba(0,0,0,0.5);
       --font-scale:1;
     }
+    .theme-light{ --bg:#f6f7fb; --card:#fff; --muted:#6b7280; --accent:#2563eb; --accent-2:#7c3aed; color-scheme:light; }
+    .theme-midnight{ --bg:#071029; --card:#0b1b2b; --muted:#9fb4c8; --accent:#00bcd4; --accent-2:#7c4dff; }
+
     *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
     html,body{height:100%}
     body{min-height:100vh;background:var(--bg);color:#fff;display:flex;font-size:calc(14px * var(--font-scale));-webkit-font-smoothing:antialiased}
@@ -30,19 +33,19 @@
 
     .hidden{display:none !important}
 
-    /* Grid that wraps into rows */
+    /* Games grid: wrap into rows when there are many buttons */
     .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
     .item-btn{position:relative;min-width:140px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#0f1724,#0b0b10);color:#e6eefc;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;justify-content:flex-start}
-    .item-btn .label{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .item-btn .label{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .fav-btn{position:absolute;right:36px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
     .remove-btn{position:absolute;right:8px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
     .fav-btn.active{color:gold}
 
-    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
-    .tool-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;color:#e6eefc}
-    .tool-card .label{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .tool-card .fav-btn{background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
-    .tool-card .remove-btn{background:transparent;border:0;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
+    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
+    .tool-card{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;color:#e6eefc;position:relative}
+    .tool-card .label{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tool-card .fav-btn{position:absolute;right:36px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
+    .tool-card .remove-btn{position:absolute;right:8px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;padding:6px;border-radius:6px}
 
     .favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
     .favorite-item{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between}
@@ -82,9 +85,9 @@
     <aside class="sidebar" role="navigation" aria-label="Main navigation">
       <div class="logo">homewrk</div>
       <nav class="nav" aria-label="Categories">
-        <div class="nav-item active" data-category="games" id="navGames">Games</div>
-        <div class="nav-item" data-category="tools" id="navTools">Tools</div>
-        <div class="nav-item" data-category="favorites" id="navFavs">Favorites</div>
+        <div class="nav-item active" data-category="games" id="navGames" tabindex="0">Games</div>
+        <div class="nav-item" data-category="tools" id="navTools" tabindex="0">Tools</div>
+        <div class="nav-item" data-category="favorites" id="navFavs" tabindex="0">Favorites</div>
       </nav>
 
       <div style="margin-top:auto">
@@ -136,7 +139,7 @@
             <button id="addGameBtn" class="btn ghost">Add</button>
           </div>
         </div>
-        <div class="games-grid" id="gamesGrid" role="list"></div>
+        <div class="games-grid" id="gamesGrid" role="list" aria-label="Games list"></div>
       </section>
 
       <!-- Tools -->
@@ -148,7 +151,7 @@
             <button id="toolsAddBtn" class="btn ghost">Add</button>
           </div>
         </div>
-        <div class="tools-grid" id="toolsGrid" role="list"></div>
+        <div class="tools-grid" id="toolsGrid" role="list" aria-label="Tools list"></div>
       </section>
 
       <!-- Favorites -->
@@ -156,7 +159,7 @@
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <div style="font-size:16px;font-weight:600">Favorites</div>
         </div>
-        <div id="favoritesGrid" class="favorites-grid" role="list"></div>
+        <div id="favoritesGrid" class="favorites-grid" role="list" aria-label="Favorites list"></div>
         <div id="favoritesEmpty" class="muted" style="margin-top:12px;text-align:center">No favorites yet.</div>
       </section>
     </main>
@@ -174,13 +177,13 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Final index.html implementing:
-       - Block Breaker button in default games
-       - Add (Games/Tools) supports uploading or pasting full HTML, stores code in localStorage
-       - User-added items can be removed and persist across sessions
-       - Items with stored code open in a new window
+    /* Final full index.html:
+       - Restored Settings
+       - Block Breaker included in default games
+       - Add (Games/Tools) supports upload or paste of HTML, saved to localStorage
+       - User-added items are removable and persist
        - Only one category visible at a time
-       - Favorites, notifications, settings, profile preserved
+       - Fixed duplicate username overlap
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -404,19 +407,19 @@
     document.getElementById('gamesSearch').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('#gamesGrid .item-btn').forEach(el => {
-        const text = (el.textContent || '').toLowerCase();
+        const text = (el.querySelector('.label').textContent || '').toLowerCase();
         el.style.display = text.includes(q) ? '' : 'none';
       });
     });
     document.getElementById('toolsSearch').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('#toolsGrid .tool-card').forEach(el => {
-        const text = (el.textContent || '').toLowerCase();
+        const text = (el.querySelector('.label').textContent || '').toLowerCase();
         el.style.display = text.includes(q) ? '' : 'none';
       });
     });
 
-    /* Navigation: show only selected section */
+    /* Navigation: show only selected section (guaranteed) */
     const navItems = document.querySelectorAll('.nav-item');
     function showSection(name){
       navItems.forEach(n=>n.classList.toggle('active', n.dataset.category===name));
@@ -433,7 +436,7 @@
     }
     navItems.forEach(item=>{ item.addEventListener('click',()=>showSection(item.dataset.category)); item.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); item.click(); } }); });
 
-    /* Delegated interactions: favorites, open, remove */
+    /* Delegated interactions */
     document.body.addEventListener('click', (e) => {
       const fav = e.target.closest('.fav-btn');
       if(fav){
@@ -455,9 +458,9 @@
         let games = getJSON(KEY_GAMES, DEFAULT_GAMES);
         let tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
         const gIdx = games.findIndex(x=>x.id===id && x.userAdded);
-        if(gIdx !== -1){ games.splice(gIdx,1); setJSON(KEY_GAMES,games); renderGames(); renderFavoritesGrid(); return; }
+        if(gIdx !== -1){ games.splice(gIdx,1); setJSON(KEY_GAMES,games); renderGames(); renderFavoritesGrid(); updateFavButtons(); return; }
         const tIdx = tools.findIndex(x=>x.id===id && x.userAdded);
-        if(tIdx !== -1){ tools.splice(tIdx,1); setJSON(KEY_TOOLS,tools); renderTools(); renderFavoritesGrid(); return; }
+        if(tIdx !== -1){ tools.splice(tIdx,1); setJSON(KEY_TOOLS,tools); renderTools(); renderFavoritesGrid(); updateFavButtons(); return; }
         return;
       }
 
@@ -654,7 +657,7 @@
     function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
     modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-    /* Signup / Login / Settings (kept minimal) */
+    /* Signup / Login / Settings / Add implementations */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -716,6 +719,7 @@
 
       modal.innerHTML = `
         <h3>Settings</h3>
+
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
           <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="settingsAvatarImg" src="${user.avatar || DEFAULT_AVATAR}" style="width:100%;height:100%;object-fit:cover"></div>
           <div style="flex:1">
@@ -723,6 +727,7 @@
             <input type="file" id="settingsAvatarFile" accept="image/*">
           </div>
         </div>
+
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
           <div style="flex:1">
             <label class="muted">Username</label>
@@ -733,7 +738,78 @@
             <input id="settingsEmail" type="text" value="${escapeHtml(user.email || '')}">
           </div>
         </div>
-        <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
+
+        <div style="margin-top:8px;margin-bottom:8px">
+          <div style="font-weight:700;margin-bottom:6px">Change password</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button>
+            <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Panic key</div>
+        <div class="muted" style="margin-bottom:8px">Set a quick panic key and choose what it does. Default key is an apostrophe (').</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(get(KEY_PANIC_KEY, "'"))}" style="width:80px">
+          <label class="muted">Require Ctrl</label>
+          <input id="panicCtrlCheckbox" type="checkbox" ${get(KEY_PANIC_CTRL,'false') === 'true' ? 'checked' : ''}>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <label class="muted">Panic action</label>
+          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
+            <option value="close_tab">Close tab (default)</option>
+            <option value="goto_drive">Go to Google Drive</option>
+            <option value="goto_gmail">Go to Gmail</option>
+            <option value="goto_google">Go to Google</option>
+            <option value="mask_drive">Mask as Google Drive</option>
+            <option value="mask_gmail">Mask as Gmail</option>
+            <option value="mask_google">Mask as Google</option>
+            <option value="mute_audio">Mute audio on page</option>
+            <option value="hide_content">Hide page content (blank)</option>
+            <option value="lock_overlay">Lock overlay</option>
+          </select>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Tab Masking & Customization</div>
+        <div class="muted" style="margin-bottom:8px">Customize tab title and icon (local only). Upload an icon or use quick masks.</div>
+        <div style="display:flex;gap:8px;flex-direction:column;margin-bottom:12px">
+          <input id="tabTitleInput" placeholder="Custom tab title" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_TITLE,''))}">
+          <input id="tabIconUrlInput" placeholder="Tab icon URL (https://...)" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_ICON,''))}">
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="tabIconFileInput" type="file" accept="image/*">
+            <div style="display:flex;align-items:center;gap:8px">
+              <img id="tabIconPreviewImg" src="${escapeHtml(get(KEY_TAB_ICON,'')||DEFAULT_FAVICON)}" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);object-fit:cover">
+              <div class="muted" id="tabIconPreviewTitle">${escapeHtml(get(KEY_TAB_TITLE,'')||document.title)}</div>
+            </div>
+            <button class="btn ghost" id="resetTabMasking" style="margin-left:auto">Reset</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn ghost" id="maskDriveBtn">Mask as Drive</button>
+            <button class="btn ghost" id="maskGmailBtn">Mask as Gmail</button>
+            <button class="btn ghost" id="maskGoogleBtn">Mask as Google</button>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <div class="btn ghost theme-preset" data-theme="">Default</div>
+          <div class="btn ghost theme-preset" data-theme="theme-light">Light</div>
+          <div class="btn ghost theme-preset" data-theme="theme-midnight">Midnight</div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <label class="muted">Font size</label>
+          <input id="fontSizeRange" type="range" min="0.8" max="1.4" step="0.05" value="${get(KEY_FONT_SCALE,'1')}">
+          <span id="fontSizeLabel" class="muted">${get(KEY_FONT_SCALE,'1')}x</span>
+        </div>
+
+        <div class="form-actions" style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
           <button class="btn ghost" id="settingsCancel">Cancel</button>
           <button class="btn primary" id="settingsSave">Save changes</button>
         </div>
@@ -748,6 +824,33 @@
         const reader = new FileReader();
         reader.onload = () => { newAvatar = reader.result; settingsAvatarImg.src = newAvatar; };
         reader.readAsDataURL(f);
+      });
+
+      const panicKeyInput = document.getElementById('panicKeyInput');
+      const panicCtrlCheckbox = document.getElementById('panicCtrlCheckbox');
+      const panicActionSelect = document.getElementById('panicActionSelect');
+      panicActionSelect.value = get(KEY_PANIC_ACTION, 'close_tab');
+
+      document.getElementById('maskDriveBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'My Drive - Google Drive'); set(KEY_TAB_ICON,'https://drive.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Drive (local)'); });
+      document.getElementById('maskGmailBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Inbox - Gmail'); set(KEY_TAB_ICON,'https://mail.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Gmail (local)'); });
+      document.getElementById('maskGoogleBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Google'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Google (local)'); });
+      document.getElementById('resetTabMasking').addEventListener('click', () => { if(!confirm('Reset tab title and icon?')) return; set(KEY_TAB_TITLE,''); set(KEY_TAB_ICON,''); applyTabMasking(); alert('Tab mask reset'); });
+
+      const tabTitleInput = document.getElementById('tabTitleInput');
+      const tabIconUrlInput = document.getElementById('tabIconUrlInput');
+      const tabIconFileInput = document.getElementById('tabIconFileInput');
+      const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
+      const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
+      tabTitleInput.addEventListener('input', () => tabIconPreviewTitle.textContent = tabTitleInput.value || document.title);
+      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; });
+      tabIconFileInput.addEventListener('change', e => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; }; r.readAsDataURL(f); });
+
+      document.querySelectorAll('.theme-preset').forEach(el => {
+        el.addEventListener('click', () => {
+          const theme = el.dataset.theme;
+          set(KEY_THEME, theme);
+          applyTabMasking();
+        });
       });
 
       document.getElementById('settingsCancel').onclick = closeModal;
@@ -765,13 +868,100 @@
         users[newUsername].email = newEmail || '';
         saveUsers(users);
         setCurrentUser(newUsername);
+
+        set(KEY_PANIC_KEY, panicKeyInput.value.trim() || "'");
+        set(KEY_PANIC_CTRL, panicCtrlCheckbox.checked ? 'true' : 'false');
+        set(KEY_PANIC_ACTION, panicActionSelect.value);
+
+        if(tabIconPreviewImg.dataset.pending){ set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending); } else set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
+        set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,''));
+
+        const fs = document.getElementById('fontSizeRange').value;
+        set(KEY_FONT_SCALE, fs);
+
+        applyTabMasking();
         renderProfile();
         closeModal();
         createNotification('Settings saved', 'Your settings were saved locally.');
       };
+
+      document.getElementById('changePasswordWithCurrent').onclick = () => renderChangeWithCurrentModal();
+      document.getElementById('changePasswordViaEmail').onclick = () => {
+        const u = getCurrentUser();
+        const users = getUsers();
+        if(!users[u] || !users[u].email){ alert('No email configured'); return; }
+        const code = Math.floor(100000 + Math.random()*900000).toString();
+        const ver = { code, ts: Date.now(), expiresAt: Date.now() + 1000*60*15 };
+        setJSON('hw_verif_'+u, ver);
+        createNotification('Verification code', `Code for ${u}: ${code} (demo delivery)`);
+        renderVerifyChangeModal(u);
+      };
+
+      const fontSizeRange = document.getElementById('fontSizeRange');
+      const fontSizeLabel = document.getElementById('fontSizeLabel');
+      fontSizeRange.addEventListener('input', () => { document.documentElement.style.setProperty('--font-scale', fontSizeRange.value); fontSizeLabel.textContent = fontSizeRange.value + 'x'; });
     }
 
-    /* Add Tool modal: supports paste HTML or upload .html file */
+    function renderChangeWithCurrentModal(){
+      modal.innerHTML = `
+        <h3>Change Password</h3>
+        <div style="margin-top:8px"><input id="curPass" type="password" placeholder="Current password"></div>
+        <div style="margin-top:8px"><input id="newPass" type="password" placeholder="New password"></div>
+        <div style="margin-top:8px"><input id="newPass2" type="password" placeholder="Confirm new password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="changeCancel">Cancel</button><button class="btn primary" id="changeSubmit">Change password</button></div>
+      `;
+      document.getElementById('changeCancel').onclick = closeModal;
+      document.getElementById('changeSubmit').onclick = () => {
+        const cur = document.getElementById('curPass').value;
+        const n1 = document.getElementById('newPass').value;
+        const n2 = document.getElementById('newPass2').value;
+        const u = getCurrentUser();
+        if(!u){ alert('Not signed in'); return; }
+        const users = getUsers();
+        if(!verifyPassword(users[u].password, cur)){ alert('Current password incorrect'); return; }
+        if(!n1){ alert('Enter a new password'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        users[u].password = encodePassword(n1);
+        saveUsers(users);
+        createNotification('Password changed', 'Your password was updated.');
+        closeModal();
+      };
+    }
+
+    function renderVerifyChangeModal(prefilledUsername){
+      const u = prefilledUsername || getCurrentUser();
+      if(!u){ alert('No user specified'); return; }
+      modal.innerHTML = `
+        <h3>Verify Email to Change Password</h3>
+        <div style="margin-top:8px"><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div>
+        <div style="margin-top:8px"><input id="verCode" type="text" placeholder="6-digit code"></div>
+        <div style="margin-top:8px"><input id="verNewPass" type="password" placeholder="New password"></div>
+        <div style="margin-top:8px"><input id="verNewPass2" type="password" placeholder="Confirm new password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="verCancel">Cancel</button><button class="btn primary" id="verSubmit">Verify & change</button></div>
+      `;
+      document.getElementById('verCancel').onclick = closeModal;
+      document.getElementById('verSubmit').onclick = () => {
+        const username = document.getElementById('verUsername').value.trim();
+        const code = document.getElementById('verCode').value.trim();
+        const n1 = document.getElementById('verNewPass').value;
+        const n2 = document.getElementById('verNewPass2').value;
+        if(!username || !code || !n1){ alert('Please fill all fields'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        const ver = getJSON('hw_verif_'+username, null);
+        if(!ver){ alert('No verification code found'); return; }
+        if(Date.now() > ver.expiresAt){ alert('Code expired'); return; }
+        if(ver.code !== code){ alert('Invalid code'); return; }
+        const users = getUsers();
+        if(!users[username]){ alert('User not found'); return; }
+        users[username].password = encodePassword(n1);
+        saveUsers(users);
+        setCurrentUser(username);
+        createNotification('Password changed', 'Password updated via email verification.');
+        closeModal();
+      };
+    }
+
+    /* Add Tool modal: HTML-only custom code allowed (stored and opened in new window) */
     function renderAddToolModal(){
       modal.innerHTML = `
         <h3>Add Tool (HTML only)</h3>
@@ -780,10 +970,10 @@
           <div style="flex:2"><input id="newToolLabel" placeholder="Label"></div>
         </div>
         <div style="margin-top:8px">
-          <label class="muted">Upload HTML file or paste full HTML below</label>
+          <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
           <input id="newToolFile" type="file" accept=".html,text/html">
           <textarea id="newToolCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved HTML will open in a new window. You can remove it later.</div>
+          <div class="muted" style="margin-top:6px">Saved tools open in a new window. Custom tools are removable.</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>
       `;
@@ -814,7 +1004,7 @@
       };
     }
 
-    /* Add Game modal: supports paste HTML or upload .html file */
+    /* Add Game modal: HTML-only custom code allowed (stored and opened in new window) */
     function renderAddGameModal(){
       modal.innerHTML = `
         <h3>Add Game (HTML only)</h3>
@@ -823,10 +1013,10 @@
           <div style="flex:2"><input id="newGameLabel" placeholder="Label"></div>
         </div>
         <div style="margin-top:8px">
-          <label class="muted">Upload HTML file or paste full HTML below</label>
+          <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
           <input id="newGameFile" type="file" accept=".html,text/html">
           <textarea id="newGameCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved HTML will open in a new window. You can remove it later.</div>
+          <div class="muted" style="margin-top:6px">Saved games open in a new window. Custom games are removable.</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>
       `;
@@ -859,8 +1049,10 @@
 
     /* Helpers */
     function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
+    function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
 
-    /* Panic key listener (kept) */
+    /* Panic key listener */
     window.addEventListener('keydown', (e) => {
       try {
         const active = document.activeElement;
@@ -873,8 +1065,9 @@
         if(!keyMatch) return;
         if(requiresCtrl && !e.ctrlKey) return;
         e.preventDefault();
-        // minimal panic action: close tab
-        try{ window.close(); }catch(e){}
+        if(action === 'close_tab'){ try{ window.close(); }catch(e){} }
+        else if(action === 'mute_audio'){ document.querySelectorAll('audio,video').forEach(el=>el.muted=true); }
+        else if(action === 'hide_content'){ document.body.style.visibility='hidden'; }
       } catch(err){ console.warn('panic key handler error', err); }
     });
 
