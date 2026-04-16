@@ -46,7 +46,6 @@
     .favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
     .favorite-item{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between}
 
-    /* bottom-left profile (single username) */
     .profile-wrap{position:fixed;left:18px;bottom:18px;display:flex;align-items:center;gap:10px;z-index:60;cursor:pointer}
     .profile-btn{width:48px;height:48px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:#111217;display:flex;align-items:center;justify-content:center}
     .profile-btn img{width:100%;height:100%;object-fit:cover}
@@ -90,7 +89,7 @@
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Signed in as</div>
         <div id="sidebarUser" style="display:flex;align-items:center;gap:8px">
           <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="sidebarAvatar" src="" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-          <!-- removed duplicate username text here; username now only shown in bottom-left profile -->
+          <!-- sidebar username removed to avoid duplication; bottom-left profile shows username -->
           <div style="display:flex;flex-direction:column;min-width:0">
             <div id="sidebarEmail" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
           </div>
@@ -174,8 +173,14 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Updated: removed duplicate sidebar username and removed specified tools from DEFAULT_TOOLS.
-       Everything else (settings, favorites, notifications, panic key, tab masking) remains intact.
+    /* Full single-file app with:
+       - only-one-open-section navigation
+       - bottom-left profile (clickable)
+       - uniform tool buttons (no descriptions)
+       - removed duplicate sidebar username
+       - removed specified tools
+       - added requested games
+       - full settings, favorites, notifications, panic key, tab masking
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -188,12 +193,18 @@
 
     const KEY_GAMES='hw_games', KEY_TOOLS='hw_tools', KEY_FAVS='hw_favs', KEY_USERS='hw_users', KEY_CURRENT_USER='hw_currentUser', KEY_NOTIFS='hw_notifications', KEY_THEME='hw_theme_name', KEY_TAB_TITLE='hw_tab_title', KEY_TAB_ICON='hw_tab_icon', KEY_PANIC_KEY='hw_panic_key', KEY_PANIC_CTRL='hw_panic_ctrl', KEY_PANIC_ACTION='hw_panic_action', KEY_FONT_SCALE='hw_font_scale';
 
+    /* DEFAULT_GAMES updated with requested entries */
     const DEFAULT_GAMES = [
       {id:'sandbox',label:'Sandbox',href:'sandbox.html'},
       {id:'snake',label:'Snake Game Ripoff',href:'snake.html'},
       {id:'tictactoe',label:'Tic Tac Toe',href:'tictactoe.html'},
       {id:'mines',label:'Minesweeper',href:'mines.html'},
-      {id:'2048',label:'2048',href:'2048.html'}
+      {id:'2048',label:'2048',href:'2048.html'},
+      {id:'bubble-shooter',label:'Bubble Shooter',href:'bubble-shooter.html'},
+      {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
+      {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
+      {id:'chess',label:'Chess',href:'chess.html'},
+      {id:'hangman',label:'Hangman',href:'hangman.html'}
     ];
 
     /* DEFAULT_TOOLS updated: removed contrast checker, unit converter, password generator, markdown preview, color picker */
@@ -232,19 +243,7 @@
       if(get(KEY_FONT_SCALE,null)===null) set(KEY_FONT_SCALE,'1');
     }
 
-    /* Favorites, notifications, settings, rendering, navigation, and all other logic remain the same as before.
-       Key changes:
-       - sidebarUsername element removed from DOM (so only bottom-left profile shows username)
-       - DEFAULT_TOOLS no longer includes the five tools you asked to remove
-    */
-
-    /* For brevity, the rest of the script is identical to the previous full build (renderers, modals, handlers).
-       It is included below unchanged to keep the file self-contained.
-    */
-
-    /* ---------- (script continues with the same functions as before) ---------- */
-
-    /* Favorites functions */
+    /* Favorites */
     function getFavorites(){ return getJSON(KEY_FAVS,[]); }
     function saveFavorites(list){ setJSON(KEY_FAVS,list); }
     function isFavorited(id){ return getFavorites().some(f=>f.id===id); }
@@ -285,142 +284,404 @@
     function showTemporaryOverlay(text){ const o=document.createElement('div'); o.style.position='fixed'; o.style.inset='0'; o.style.background='#000'; o.style.opacity='0.9'; o.style.zIndex='99999'; o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.color='#fff'; o.style.fontSize='20px'; o.textContent=text; document.body.appendChild(o); setTimeout(()=>document.body.removeChild(o),1500); }
     function showLockOverlay(){ if(document.getElementById('hw_lock_overlay')) return; const o=document.createElement('div'); o.id='hw_lock_overlay'; o.style.position='fixed'; o.style.inset='0'; o.style.background='#fff'; o.style.zIndex='999999'; o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.flexDirection='column'; const t=document.createElement('div'); t.textContent='Locked'; t.style.marginBottom='12px'; const btn=document.createElement('button'); btn.textContent='Unlock'; btn.onclick=()=>document.body.removeChild(o); o.appendChild(t); o.appendChild(btn); document.body.appendChild(o); }
 
-    /* Account helpers */
-    function getUsers(){ return getJSON(KEY_USERS,{}); }
-    function saveUsers(u){ setJSON(KEY_USERS,u); }
-    function getCurrentUser(){ return get(KEY_CURRENT_USER,null); }
-    function setCurrentUser(u){ set(KEY_CURRENT_USER,u); renderProfile(); }
+    /* Account system */
+    function getUsers(){ return getJSON(KEY_USERS, {}); }
+    function saveUsers(u){ setJSON(KEY_USERS, u); }
+    function getCurrentUser(){ return get(KEY_CURRENT_USER, null); }
+    function setCurrentUser(u){ set(KEY_CURRENT_USER, u); renderProfile(); }
 
-    function encodePassword(p){ try{return btoa(p);}catch(e){return p;} }
-    function verifyPassword(stored,candidate){ return stored===encodePassword(candidate); }
+    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
+    function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
+
+    /* UI elements */
+    const gamesRow = document.getElementById('gamesRow');
+    const toolsGrid = document.getElementById('toolsGrid');
+    const favoritesGrid = document.getElementById('favoritesGrid');
+    const favoritesEmpty = document.getElementById('favoritesEmpty');
 
     /* Renderers */
-    const gamesRow = document.getElementById('gamesRow'), toolsGrid = document.getElementById('toolsGrid'), favoritesGrid = document.getElementById('favoritesGrid'), favoritesEmpty = document.getElementById('favoritesEmpty');
-
     function renderGames(){
-      const games = getJSON(KEY_GAMES,DEFAULT_GAMES);
-      gamesRow.innerHTML='';
-      games.forEach(g=>{
-        const el=document.createElement('div'); el.className='item-btn'; el.dataset.id=g.id; el.dataset.href=g.href||'#'; el.tabIndex=0;
-        el.innerHTML=`<span class="label">${escapeHtml(g.label)}</span><button class="fav-btn" data-id="${escapeHtml(g.id)}">☆</button>`;
+      const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
+      gamesRow.innerHTML = '';
+      games.forEach(g => {
+        const el = document.createElement('div');
+        el.className = 'item-btn';
+        el.dataset.id = g.id;
+        el.dataset.href = g.href || '#';
+        el.tabIndex = 0;
+        el.innerHTML = `<span class="label">${escapeHtml(g.label)}</span><button class="fav-btn" aria-label="favorite ${escapeHtml(g.label)}" data-id="${escapeHtml(g.id)}">☆</button>`;
         gamesRow.appendChild(el);
       });
       updateFavButtons();
     }
 
     function renderTools(){
-      const tools = getJSON(KEY_TOOLS,DEFAULT_TOOLS);
-      toolsGrid.innerHTML='';
-      tools.forEach(t=>{
-        const a=document.createElement('div'); a.className='tool-card'; a.dataset.id=t.id; a.dataset.href=t.href||'#'; a.tabIndex=0;
-        a.innerHTML=`<span class="label">${escapeHtml(t.label)}</span><button class="fav-btn" data-id="${escapeHtml(t.id)}">☆</button>`;
+      const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
+      toolsGrid.innerHTML = '';
+      tools.forEach(t => {
+        const a = document.createElement('div');
+        a.className = 'tool-card';
+        a.dataset.id = t.id;
+        a.dataset.href = t.href || '#';
+        a.tabIndex = 0;
+        a.innerHTML = `<span class="label">${escapeHtml(t.label)}</span><button class="fav-btn" aria-label="favorite ${escapeHtml(t.label)}" data-id="${escapeHtml(t.id)}">☆</button>`;
         toolsGrid.appendChild(a);
       });
       updateFavButtons();
     }
 
     function renderFavoritesGrid(){
-      const favs=getFavorites(); favoritesGrid.innerHTML='';
-      if(!favs||favs.length===0){ favoritesEmpty.style.display='block'; return; }
-      favoritesEmpty.style.display='none';
-      favs.forEach(f=>{
-        const el=document.createElement('div'); el.className='favorite-item';
-        const left=document.createElement('div'); left.textContent=f.label||f.id;
-        const right=document.createElement('div');
-        const open=document.createElement('button'); open.className='btn ghost'; open.textContent='Open'; open.onclick=()=>{ if(f.href&&f.href!=='#') window.location.href=f.href; };
-        const rem=document.createElement('button'); rem.className='btn ghost'; rem.style.marginLeft='8px'; rem.textContent='Remove'; rem.onclick=()=>toggleFavorite(f.id);
-        right.appendChild(open); right.appendChild(rem); el.appendChild(left); el.appendChild(right); favoritesGrid.appendChild(el);
+      const favs = getFavorites();
+      favoritesGrid.innerHTML = '';
+      if(!favs || favs.length === 0){ favoritesEmpty.style.display = 'block'; return; }
+      favoritesEmpty.style.display = 'none';
+      favs.forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'favorite-item';
+        const left = document.createElement('div');
+        left.textContent = f.label || f.id;
+        const right = document.createElement('div');
+        const open = document.createElement('button');
+        open.className = 'btn ghost';
+        open.textContent = 'Open';
+        open.onclick = () => { if(f.href && f.href !== '#') window.location.href = f.href; };
+        const rem = document.createElement('button');
+        rem.className = 'btn ghost';
+        rem.style.marginLeft = '8px';
+        rem.textContent = 'Remove';
+        rem.onclick = () => { toggleFavorite(f.id); };
+        right.appendChild(open);
+        right.appendChild(rem);
+        el.appendChild(left);
+        el.appendChild(right);
+        favoritesGrid.appendChild(el);
       });
     }
 
-    function updateFavButtons(){ document.querySelectorAll('.fav-btn').forEach(btn=>{ const id=btn.dataset.id; if(!id) return; if(isFavorited(id)){ btn.classList.add('active'); btn.innerHTML='★'; } else { btn.classList.remove('active'); btn.innerHTML='☆'; } }); }
+    function updateFavButtons(){
+      document.querySelectorAll('.fav-btn').forEach(btn=>{
+        const id = btn.dataset.id;
+        if(!id) return;
+        if(isFavorited(id)){ btn.classList.add('active'); btn.innerHTML='★'; } else { btn.classList.remove('active'); btn.innerHTML='☆'; }
+      });
+    }
 
     /* Search */
-    document.getElementById('gamesSearch').addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); document.querySelectorAll('#gamesRow .item-btn').forEach(el=>{ el.style.display=(el.textContent||'').toLowerCase().includes(q)?'':''; }); });
-    document.getElementById('toolsSearch').addEventListener('input',e=>{ const q=e.target.value.toLowerCase(); document.querySelectorAll('#toolsGrid .tool-card').forEach(el=>{ el.style.display=(el.textContent||'').toLowerCase().includes(q)?'':''; }); });
+    document.getElementById('gamesSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#gamesRow .item-btn').forEach(el => {
+        const text = (el.textContent || '').toLowerCase();
+        el.style.display = text.includes(q) ? '' : 'none';
+      });
+    });
+    document.getElementById('toolsSearch').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#toolsGrid .tool-card').forEach(el => {
+        const text = (el.textContent || '').toLowerCase();
+        el.style.display = text.includes(q) ? '' : 'none';
+      });
+    });
 
-    /* Navigation */
+    /* Navigation: show only selected section (guaranteed) */
     const navItems = document.querySelectorAll('.nav-item');
     function showSection(name){
       navItems.forEach(n=>n.classList.toggle('active', n.dataset.category===name));
       document.getElementById('pageTitle').textContent = name.charAt(0).toUpperCase()+name.slice(1);
+      // hide all then show requested
       document.getElementById('gamesSection').classList.add('hidden');
       document.getElementById('toolsSection').classList.add('hidden');
       document.getElementById('favoritesSection').classList.add('hidden');
-      if(name === 'games') { document.getElementById('gamesSection').classList.remove('hidden'); document.getElementById('gamesSection').removeAttribute('aria-hidden'); }
-      if(name === 'tools') { document.getElementById('toolsSection').classList.remove('hidden'); document.getElementById('toolsSection').removeAttribute('aria-hidden'); }
-      if(name === 'favorites') { document.getElementById('favoritesSection').classList.remove('hidden'); document.getElementById('favoritesSection').removeAttribute('aria-hidden'); }
+      if(name === 'games'){ document.getElementById('gamesSection').classList.remove('hidden'); document.getElementById('gamesSection').removeAttribute('aria-hidden'); }
+      if(name === 'tools'){ document.getElementById('toolsSection').classList.remove('hidden'); document.getElementById('toolsSection').removeAttribute('aria-hidden'); }
+      if(name === 'favorites'){ document.getElementById('favoritesSection').classList.remove('hidden'); document.getElementById('favoritesSection').removeAttribute('aria-hidden'); }
       if(name !== 'games') document.getElementById('gamesSection').setAttribute('aria-hidden','true');
       if(name !== 'tools') document.getElementById('toolsSection').setAttribute('aria-hidden','true');
       if(name !== 'favorites') document.getElementById('favoritesSection').setAttribute('aria-hidden','true');
     }
     navItems.forEach(item=>{ item.addEventListener('click',()=>showSection(item.dataset.category)); item.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); item.click(); } }); });
 
-    /* Delegated clicks */
-    document.body.addEventListener('click', e=>{
+    /* Delegated interactions */
+    document.body.addEventListener('click', (e) => {
       const fav = e.target.closest('.fav-btn');
-      if(fav){ e.preventDefault(); const id=fav.dataset.id; const parent=fav.closest('.tool-card')||fav.closest('.item-btn'); const label=parent?(parent.querySelector('.label')?parent.querySelector('.label').textContent:parent.textContent):id; const href=parent&&(parent.getAttribute('href')||parent.dataset.href)?(parent.getAttribute('href')||parent.dataset.href):'#'; toggleFavorite(id,label.trim(),href); return; }
+      if(fav){
+        e.preventDefault();
+        const id = fav.dataset.id;
+        const parent = fav.closest('.tool-card') || fav.closest('.item-btn');
+        const label = parent ? (parent.querySelector('.label') ? parent.querySelector('.label').textContent : parent.textContent) : id;
+        const href = parent && (parent.getAttribute('href') || parent.dataset.href) ? (parent.getAttribute('href') || parent.dataset.href) : '#';
+        toggleFavorite(id, label.trim(), href);
+        return;
+      }
 
       const game = e.target.closest('.item-btn');
-      if(game && !e.target.closest('.fav-btn')){ const href=game.dataset.href||'#'; if(href&&href!=='#') window.location.href=href; return; }
+      if(game && !e.target.closest('.fav-btn')){
+        const href = game.dataset.href || '#';
+        if(href && href !== '#') window.location.href = href;
+        return;
+      }
 
       const tool = e.target.closest('.tool-card');
-      if(tool && !e.target.closest('.fav-btn')){ const href=tool.dataset.href||'#'; if(href&&href!=='#') window.location.href=href; return; }
+      if(tool && !e.target.closest('.fav-btn')){
+        const href = tool.dataset.href || '#';
+        if(href && href !== '#') window.location.href = href;
+        return;
+      }
     });
 
     /* Notifications UI */
-    const notifBell=document.getElementById('notifBell'), notifPanel=document.getElementById('notifPanel'), notifList=document.getElementById('notifList'), notifDot=document.getElementById('notifDot');
-    function renderNotifUI(){ const list=getNotifications(); const unread=list.filter(n=>!n.read).length; notifDot.style.display=unread>0?'block':'none'; notifList.innerHTML=''; if(list.length===0){ notifList.innerHTML='<div class="muted" style="text-align:center;padding:12px">No notifications</div>'; return; } list.forEach(n=>{ const el=document.createElement('div'); el.className='notif-item'+(n.read?'':' unread'); el.innerHTML=`<div style="display:flex;justify-content:space-between"><div style="flex:1"><div style="font-weight:700">${escapeHtml(n.title)}</div><div style="margin-top:6px;color:var(--muted);font-size:13px">${escapeHtml(n.message)}</div><div class="time">${new Date(n.ts).toLocaleString()}</div></div><div style="display:flex;flex-direction:column;gap:6px;margin-left:8px"><button class="btn ghost" data-action="open" data-id="${n.id}">Open</button><button class="btn ghost" data-action="mark" data-id="${n.id}">${n.read?'Read':'Mark read'}</button></div></div>`; notifList.appendChild(el); }); }
-    notifList.addEventListener('click', e=>{ const btn=e.target.closest('button'); if(!btn) return; const action=btn.dataset.action; const id=btn.dataset.id; if(action==='mark') markNotificationRead(id); if(action==='open'){ const list=getNotifications(); const n=list.find(x=>x.id===id); if(n){ if(n.meta&&n.meta.href) window.location.href=n.meta.href; else alert(n.title+'\n\n'+n.message); markNotificationRead(id); } } });
-    notifBell.addEventListener('click', e=>{ e.stopPropagation(); const shown=notifPanel.classList.toggle('show'); notifPanel.setAttribute('aria-hidden', shown? 'false':'true'); });
-    document.addEventListener('click', e=>{ if(!notifPanel.contains(e.target) && !notifBell.contains(e.target)){ notifPanel.classList.remove('show'); notifPanel.setAttribute('aria-hidden','true'); } });
-    document.getElementById('markAllRead').addEventListener('click', ()=>markAllNotificationsRead());
-    document.getElementById('clearAll').addEventListener('click', ()=>{ if(confirm('Clear all notifications?')) clearAllNotifications(); });
-    document.getElementById('notifSettings').addEventListener('click', ()=>openModal('settings'));
+    const notifBell = document.getElementById('notifBell');
+    const notifPanel = document.getElementById('notifPanel');
+    const notifList = document.getElementById('notifList');
+    const notifDot = document.getElementById('notifDot');
 
-    /* Profile popover bottom-left */
-    const bottomProfile = document.getElementById('bottomProfile'), profilePopover=document.getElementById('profilePopover'), popoverContent=document.getElementById('popoverContent'), profileAvatar=document.getElementById('profileAvatar'), profileNameDisplay=document.getElementById('profileNameDisplay'), sidebarAvatar=document.getElementById('sidebarAvatar'), sidebarEmail=document.getElementById('sidebarEmail');
+    function renderNotifUI(){
+      const list = getNotifications();
+      const unread = list.filter(n => !n.read).length;
+      notifDot.style.display = unread > 0 ? 'block' : 'none';
+      notifList.innerHTML = '';
+      if(list.length === 0){ notifList.innerHTML = `<div class="muted" style="text-align:center;padding:12px">No notifications</div>`; return; }
+      list.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'notif-item' + (n.read ? '' : ' unread');
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="flex:1">
+              <div style="font-weight:700">${escapeHtml(n.title)}</div>
+              <div style="margin-top:6px;color:var(--muted);font-size:13px">${escapeHtml(n.message)}</div>
+              <div class="time">${new Date(n.ts).toLocaleString()}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px">
+              <button class="btn small" data-action="open" data-id="${n.id}">Open</button>
+              <button class="btn small" data-action="mark" data-id="${n.id}">${n.read ? 'Read' : 'Mark read'}</button>
+            </div>
+          </div>
+        `;
+        notifList.appendChild(el);
+      });
+    }
 
-    function renderProfile(){ const username=getCurrentUser(); const users=getUsers(); if(username && users[username]){ profileAvatar.src=users[username].avatar||DEFAULT_AVATAR; sidebarAvatar.src=users[username].avatar||DEFAULT_AVATAR; profileNameDisplay.textContent=username; sidebarEmail.textContent=users[username].email||''; } else { profileAvatar.src=DEFAULT_AVATAR; sidebarAvatar.src=DEFAULT_AVATAR; profileNameDisplay.textContent='Guest'; sidebarEmail.textContent=''; } renderPopover(); }
+    notifList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if(action === 'mark') markNotificationRead(id);
+      if(action === 'open'){
+        const list = getNotifications();
+        const n = list.find(x => x.id === id);
+        if(n){
+          if(n.meta && n.meta.href) window.location.href = n.meta.href;
+          else alert(n.title + '\n\n' + n.message);
+          markNotificationRead(id);
+        }
+      }
+    });
 
-    function renderPopover(){ const username=getCurrentUser(); popoverContent.innerHTML=''; if(!username){ const signUp=document.createElement('button'); signUp.className='btn primary'; signUp.textContent='Sign Up'; signUp.onclick=()=>openModal('signup'); const login=document.createElement('button'); login.className='btn ghost'; login.style.marginTop='8px'; login.textContent='Log In'; login.onclick=()=>openModal('login'); popoverContent.appendChild(signUp); popoverContent.appendChild(login); const hint=document.createElement('div'); hint.className='muted'; hint.style.marginTop='8px'; hint.textContent='Create an account to save preferences locally'; popoverContent.appendChild(hint); } else { const settings=document.createElement('button'); settings.className='btn'; settings.textContent='Settings'; settings.onclick=()=>openModal('settings'); const logout=document.createElement('button'); logout.className='btn ghost'; logout.style.marginTop='8px'; logout.textContent='Log out'; logout.onclick=()=>{ setCurrentUser(null); renderProfile(); }; popoverContent.appendChild(settings); popoverContent.appendChild(logout); } }
-    function togglePopover(show){ if(show){ profilePopover.classList.add('show'); profilePopover.setAttribute('aria-hidden','false'); } else { profilePopover.classList.remove('show'); profilePopover.setAttribute('aria-hidden','true'); } }
-    bottomProfile.addEventListener('click', (e)=>{ e.stopPropagation(); togglePopover(!profilePopover.classList.contains('show')); });
-    document.addEventListener('click', (e)=>{ if(!profilePopover.contains(e.target) && !bottomProfile.contains(e.target)) togglePopover(false); });
+    notifBell.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const shown = notifPanel.classList.toggle('show');
+      notifPanel.setAttribute('aria-hidden', shown ? 'false' : 'true');
+    });
+    document.addEventListener('click', (e) => {
+      if(!notifPanel.contains(e.target) && !notifBell.contains(e.target)) {
+        notifPanel.classList.remove('show');
+        notifPanel.setAttribute('aria-hidden','true');
+      }
+    });
+    document.getElementById('markAllRead').addEventListener('click', () => markAllNotificationsRead());
+    document.getElementById('clearAll').addEventListener('click', () => { if(confirm('Clear all notifications?')) clearAllNotifications(); });
+    document.getElementById('notifSettings').addEventListener('click', () => openModal('settings'));
+
+    /* Profile popover & modals */
+    const bottomProfile = document.getElementById('bottomProfile');
+    const profilePopover = document.getElementById('profilePopover');
+    const popoverContent = document.getElementById('popoverContent');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileNameDisplay = document.getElementById('profileNameDisplay');
+    const sidebarAvatarImg = document.querySelector('#sidebarAvatar');
+    const sidebarEmail = document.getElementById('sidebarEmail');
+
+    function renderProfile(){
+      const username = getCurrentUser();
+      const users = getUsers();
+      if(username && users[username]){
+        profileAvatar.src = users[username].avatar || DEFAULT_AVATAR;
+        sidebarAvatarImg.src = users[username].avatar || DEFAULT_AVATAR;
+        profileNameDisplay.textContent = username;
+        sidebarEmail.textContent = users[username].email || '';
+      } else {
+        profileAvatar.src = DEFAULT_AVATAR;
+        sidebarAvatarImg.src = DEFAULT_AVATAR;
+        profileNameDisplay.textContent = 'Guest';
+        sidebarEmail.textContent = '';
+      }
+      renderPopover();
+    }
+
+    function renderPopover(){
+      const username = getCurrentUser();
+      popoverContent.innerHTML = '';
+      if(!username){
+        const signUpBtn = document.createElement('button');
+        signUpBtn.textContent = 'Sign Up';
+        signUpBtn.className = 'btn primary';
+        signUpBtn.onclick = () => openModal('signup');
+
+        const loginBtn = document.createElement('button');
+        loginBtn.textContent = 'Log In';
+        loginBtn.className = 'btn ghost';
+        loginBtn.style.marginTop = '8px';
+        loginBtn.onclick = () => openModal('login');
+
+        popoverContent.appendChild(signUpBtn);
+        popoverContent.appendChild(loginBtn);
+        const hint = document.createElement('div');
+        hint.className = 'small muted';
+        hint.style.marginTop = '8px';
+        hint.textContent = 'Create an account to save preferences locally';
+        popoverContent.appendChild(hint);
+      } else {
+        const settingsBtn = document.createElement('button');
+        settingsBtn.textContent = 'Settings';
+        settingsBtn.className = 'btn';
+        settingsBtn.onclick = () => openModal('settings');
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.textContent = 'Log out';
+        logoutBtn.className = 'btn ghost';
+        logoutBtn.style.marginTop = '8px';
+        logoutBtn.onclick = () => { setCurrentUser(null); renderProfile(); };
+
+        popoverContent.appendChild(settingsBtn);
+        popoverContent.appendChild(logoutBtn);
+      }
+    }
+
+    function togglePopover(show){
+      if(show){ profilePopover.classList.add('show'); profilePopover.setAttribute('aria-hidden','false'); }
+      else { profilePopover.classList.remove('show'); profilePopover.setAttribute('aria-hidden','true'); }
+    }
+    bottomProfile.addEventListener('click', (e) => { e.stopPropagation(); const isShown = profilePopover.classList.contains('show'); togglePopover(!isShown); });
+    document.addEventListener('click', (e) => { if(!profilePopover.contains(e.target) && !bottomProfile.contains(e.target)) togglePopover(false); });
 
     /* Modal system */
-    const modalBackdrop=document.getElementById('modalBackdrop'), modal=document.getElementById('modal');
-    function openModal(mode){ modalBackdrop.classList.add('show'); modalBackdrop.style.display='flex'; modal.innerHTML=''; if(mode==='signup') renderSignupModal(); else if(mode==='login') renderLoginModal(); else if(mode==='settings') renderSettingsModal(); else if(mode==='addTool') renderAddToolModal(); else if(mode==='addGame') renderAddGameModal(); }
-    function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.style.display='none'; modal.innerHTML=''; }
-    modalBackdrop.addEventListener('click', e=>{ if(e.target===modalBackdrop) closeModal(); });
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modal = document.getElementById('modal');
 
-    /* Signup/Login/Settings/Add implementations (same as previous full build) */
-    function renderSignupModal(){ modal.innerHTML=`<h3>Sign Up</h3><div style="margin-top:8px"><input id="signupUsername" placeholder="Username"></div><div style="margin-top:8px"><input id="signupEmail" placeholder="Email (optional)"></div><div style="margin-top:8px"><input id="signupPassword" type="password" placeholder="Password"></div><div style="margin-top:8px"><input id="signupPassword2" type="password" placeholder="Confirm password"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="signupCancel">Cancel</button><button class="btn primary" id="signupSubmit">Create account</button></div>`; document.getElementById('signupCancel').onclick=closeModal; document.getElementById('signupSubmit').onclick=()=>{ const u=document.getElementById('signupUsername').value.trim(), email=document.getElementById('signupEmail').value.trim(), p=document.getElementById('signupPassword').value, p2=document.getElementById('signupPassword2').value; if(!u||!p){ alert('Provide username and password'); return; } if(p!==p2){ alert('Passwords do not match'); return; } const users=getUsers(); if(users[u]){ alert('Username exists'); return; } users[u]={password:encodePassword(p),avatar:DEFAULT_AVATAR,email:email||'',createdAt:Date.now()}; saveUsers(users); setCurrentUser(u); createNotification('Welcome',`Account created for ${u}`); closeModal(); }; }
-    function renderLoginModal(){ modal.innerHTML=`<h3>Log In</h3><div style="margin-top:8px"><input id="loginIdentifier" placeholder="Username or email"></div><div style="margin-top:8px"><input id="loginPassword" type="password" placeholder="Password"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="loginCancel">Cancel</button><button class="btn primary" id="loginSubmit">Log in</button></div>`; document.getElementById('loginCancel').onclick=closeModal; document.getElementById('loginSubmit').onclick=()=>{ const id=document.getElementById('loginIdentifier').value.trim(), p=document.getElementById('loginPassword').value; if(!id||!p){ alert('Provide username/email and password'); return; } const users=getUsers(); let matched=null; if(users[id]) matched=id; else { const lower=id.toLowerCase(); matched=Object.keys(users).find(u=>users[u].email&&users[u].email.toLowerCase()===lower)||null; } if(!matched||!users[matched]||!verifyPassword(users[matched].password,p)){ alert('Invalid credentials'); return; } setCurrentUser(matched); createNotification('Signed in',`Welcome back, ${matched}`); closeModal(); }; }
+    function openModal(mode, data){
+      modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); modal.innerHTML = '';
+      if(mode === 'signup') renderSignupModal();
+      else if(mode === 'login') renderLoginModal();
+      else if(mode === 'settings') renderSettingsModal();
+      else if(mode === 'addTool') renderAddToolModal();
+      else if(mode === 'addGame') renderAddGameModal();
+    }
+    function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
+    modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
+    /* Signup / Login */
+    function renderSignupModal(){
+      modal.innerHTML = `
+        <h3>Sign Up</h3>
+        <div style="margin-top:8px"><input id="signupUsername" placeholder="Username"></div>
+        <div style="margin-top:8px"><input id="signupEmail" placeholder="Email (optional)"></div>
+        <div style="margin-top:8px"><input id="signupPassword" type="password" placeholder="Password"></div>
+        <div style="margin-top:8px"><input id="signupPassword2" type="password" placeholder="Confirm password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="signupCancel">Cancel</button><button class="btn primary" id="signupSubmit">Create account</button></div>
+      `;
+      document.getElementById('signupCancel').onclick = closeModal;
+      document.getElementById('signupSubmit').onclick = () => {
+        const u = document.getElementById('signupUsername').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const p = document.getElementById('signupPassword').value;
+        const p2 = document.getElementById('signupPassword2').value;
+        if(!u || !p){ alert('Provide username and password'); return; }
+        if(p !== p2){ alert('Passwords do not match'); return; }
+        const users = getUsers();
+        if(users[u]){ alert('Username exists'); return; }
+        users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
+        saveUsers(users);
+        setCurrentUser(u);
+        createNotification('Welcome', `Account created for ${u}`);
+        closeModal();
+      };
+    }
+
+    function renderLoginModal(){
+      modal.innerHTML = `
+        <h3>Log In</h3>
+        <div style="margin-top:8px"><input id="loginIdentifier" placeholder="Username or email"></div>
+        <div style="margin-top:8px"><input id="loginPassword" type="password" placeholder="Password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="loginCancel">Cancel</button><button class="btn primary" id="loginSubmit">Log in</button></div>
+      `;
+      document.getElementById('loginCancel').onclick = closeModal;
+      document.getElementById('loginSubmit').onclick = () => {
+        const id = document.getElementById('loginIdentifier').value.trim();
+        const p = document.getElementById('loginPassword').value;
+        if(!id || !p){ alert('Provide username/email and password'); return; }
+        const users = getUsers();
+        let matchedUser = null;
+        if(users[id]) matchedUser = id;
+        else {
+          const lower = id.toLowerCase();
+          matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
+        }
+        if(!matchedUser || !users[matchedUser] || !verifyPassword(users[matchedUser].password, p)){ alert('Invalid credentials'); return; }
+        setCurrentUser(matchedUser);
+        createNotification('Signed in', `Welcome back, ${matchedUser}`);
+        closeModal();
+      };
+    }
+
+    /* Settings modal (restored fully) */
     function renderSettingsModal(){
-      const username=getCurrentUser(); if(!username){ alert('Not signed in'); closeModal(); return; } const users=getUsers(); const user=users[username];
+      const username = getCurrentUser();
+      if(!username){ alert('Not signed in'); closeModal(); return; }
+      const users = getUsers();
+      const user = users[username];
+
       modal.innerHTML = `
         <h3>Settings</h3>
+
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="settingsAvatarImg" src="${user.avatar||DEFAULT_AVATAR}" style="width:100%;height:100%;object-fit:cover"></div>
-          <div style="flex:1"><label class="muted">Change profile picture</label><input type="file" id="settingsAvatarFile" accept="image/*"></div>
+          <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="settingsAvatarImg" src="${user.avatar || DEFAULT_AVATAR}" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="flex:1">
+            <label class="muted">Change profile picture</label>
+            <input type="file" id="settingsAvatarFile" accept="image/*">
+          </div>
         </div>
+
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-          <div style="flex:1"><label class="muted">Username</label><input id="settingsUsername" type="text" value="${escapeHtml(username)}"></div>
-          <div style="flex:1"><label class="muted">Email</label><input id="settingsEmail" type="text" value="${escapeHtml(user.email||'')}"></div>
+          <div style="flex:1">
+            <label class="muted">Username</label>
+            <input id="settingsUsername" type="text" value="${escapeHtml(username)}">
+          </div>
+          <div style="flex:1">
+            <label class="muted">Email</label>
+            <input id="settingsEmail" type="text" value="${escapeHtml(user.email || '')}">
+          </div>
         </div>
-        <div style="margin-top:8px;margin-bottom:8px"><div style="font-weight:700;margin-bottom:6px">Change password</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button><button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button></div></div>
+
+        <div style="margin-top:8px;margin-bottom:8px">
+          <div style="font-weight:700;margin-bottom:6px">Change password</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button>
+            <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
+          </div>
+        </div>
+
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
         <div style="font-weight:700;margin-bottom:8px">Panic key</div>
         <div class="muted" style="margin-bottom:8px">Set a quick panic key and choose what it does. Default key is an apostrophe (').</div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(get(KEY_PANIC_KEY,"'"))}" style="width:80px">
-          <label class="muted">Require Ctrl</label><input id="panicCtrlCheckbox" type="checkbox" ${get(KEY_PANIC_CTRL,'false')==='true'?'checked':''}>
+          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(get(KEY_PANIC_KEY, "'"))}" style="width:80px">
+          <label class="muted">Require Ctrl</label>
+          <input id="panicCtrlCheckbox" type="checkbox" ${get(KEY_PANIC_CTRL,'false') === 'true' ? 'checked' : ''}>
         </div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
           <label class="muted">Panic action</label>
-          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;color:#fff">
+          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
             <option value="close_tab">Close tab (default)</option>
             <option value="goto_drive">Go to Google Drive</option>
             <option value="goto_gmail">Go to Gmail</option>
@@ -433,7 +694,9 @@
             <option value="lock_overlay">Lock overlay</option>
           </select>
         </div>
+
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
         <div style="font-weight:700;margin-bottom:8px">Tab Masking & Customization</div>
         <div class="muted" style="margin-bottom:8px">Customize tab title and icon (local only). Upload an icon or use quick masks.</div>
         <div style="display:flex;gap:8px;flex-direction:column;margin-bottom:12px">
@@ -453,62 +716,286 @@
             <button class="btn ghost" id="maskGoogleBtn">Mask as Google</button>
           </div>
         </div>
+
         <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
         <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
           <div class="btn ghost theme-preset" data-theme="">Default</div>
           <div class="btn ghost theme-preset" data-theme="theme-light">Light</div>
           <div class="btn ghost theme-preset" data-theme="theme-midnight">Midnight</div>
         </div>
+
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
           <label class="muted">Font size</label>
           <input id="fontSizeRange" type="range" min="0.8" max="1.4" step="0.05" value="${get(KEY_FONT_SCALE,'1')}">
           <span id="fontSizeLabel" class="muted">${get(KEY_FONT_SCALE,'1')}x</span>
         </div>
-        <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
+
+        <div class="form-actions" style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
           <button class="btn ghost" id="settingsCancel">Cancel</button>
           <button class="btn primary" id="settingsSave">Save changes</button>
         </div>
       `;
-      // (settings handlers same as previous build)
-      const avatarFile=document.getElementById('settingsAvatarFile'), settingsAvatarImg=document.getElementById('settingsAvatarImg');
-      let newAvatar=user.avatar||DEFAULT_AVATAR;
-      avatarFile.addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ newAvatar=r.result; settingsAvatarImg.src=newAvatar; }; r.readAsDataURL(f); });
-      const tabTitleInput=document.getElementById('tabTitleInput'), tabIconUrlInput=document.getElementById('tabIconUrlInput'), tabIconFileInput=document.getElementById('tabIconFileInput'), tabIconPreviewImg=document.getElementById('tabIconPreviewImg'), tabIconPreviewTitle=document.getElementById('tabIconPreviewTitle');
-      tabTitleInput.addEventListener('input',()=>tabIconPreviewTitle.textContent=tabTitleInput.value||document.title);
-      tabIconUrlInput.addEventListener('input',()=>{ const v=tabIconUrlInput.value.trim(); tabIconPreviewImg.src=v||get(KEY_TAB_ICON,'')||DEFAULT_FAVICON; });
-      tabIconFileInput.addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ tabIconPreviewImg.src=r.result; tabIconUrlInput.value=''; tabIconPreviewImg.dataset.pending=r.result; }; r.readAsDataURL(f); });
-      document.getElementById('resetTabMasking').addEventListener('click',()=>{ if(!confirm('Reset tab title and icon?')) return; set(KEY_TAB_TITLE,''); set(KEY_TAB_ICON,''); applyTabMasking(); alert('Tab masking reset'); });
-      document.getElementById('maskDriveBtn').addEventListener('click',()=>{ set(KEY_TAB_TITLE,'My Drive - Google Drive'); set(KEY_TAB_ICON,'https://drive.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Drive (local)'); });
-      document.getElementById('maskGmailBtn').addEventListener('click',()=>{ set(KEY_TAB_TITLE,'Inbox - Gmail'); set(KEY_TAB_ICON,'https://mail.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Gmail (local)'); });
-      document.getElementById('maskGoogleBtn').addEventListener('click',()=>{ set(KEY_TAB_TITLE,'Google'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Google (local)'); });
-      document.querySelectorAll('.theme-preset').forEach(el=>el.addEventListener('click',()=>{ set(KEY_THEME,el.dataset.theme); applyTabMasking(); }));
-      document.getElementById('settingsCancel').onclick=closeModal;
-      document.getElementById('settingsSave').onclick=()=>{ const newUsername=document.getElementById('settingsUsername').value.trim(), newEmail=document.getElementById('settingsEmail').value.trim(); const users=getUsers(); const current=getCurrentUser(); if(!newUsername){ alert('Username cannot be empty'); return; } if(newUsername!==current && users[newUsername]){ alert('Username taken'); return; } const data=users[current]; delete users[current]; users[newUsername]=data; users[newUsername].avatar=newAvatar||users[newUsername].avatar||DEFAULT_AVATAR; users[newUsername].email=newEmail||''; saveUsers(users); setCurrentUser(newUsername); if(tabIconPreviewImg.dataset.pending){ set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending); } else set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,'')); set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,'')); set(KEY_PANIC_KEY, document.getElementById('panicKeyInput').value.trim()||"'"); set(KEY_PANIC_CTRL, document.getElementById('panicCtrlCheckbox').checked?'true':'false'); set(KEY_PANIC_ACTION, document.getElementById('panicActionSelect').value); const fs=document.getElementById('fontSizeRange').value; set(KEY_FONT_SCALE,fs); applyTabMasking(); renderProfile(); closeModal(); createNotification('Settings saved','Your settings were saved locally.'); };
-      document.getElementById('changePasswordWithCurrent').onclick=()=>renderChangeWithCurrentModal();
-      document.getElementById('changePasswordViaEmail').onclick=()=>{ const u=getCurrentUser(); const users=getUsers(); if(!users[u]||!users[u].email){ alert('No email configured'); return; } const code=Math.floor(100000+Math.random()*900000).toString(); const ver={code,ts:Date.now(),expiresAt:Date.now()+1000*60*15}; setJSON('hw_verif_'+u,ver); createNotification('Verification code',`Code for ${u}: ${code} (demo)`); renderVerifyChangeModal(u); };
-      const fontSizeRange=document.getElementById('fontSizeRange'), fontSizeLabel=document.getElementById('fontSizeLabel'); fontSizeRange.addEventListener('input',()=>{ document.documentElement.style.setProperty('--font-scale',fontSizeRange.value); fontSizeLabel.textContent=fontSizeRange.value+'x'; });
+
+      // Avatar change
+      const avatarFile = document.getElementById('settingsAvatarFile');
+      const settingsAvatarImg = document.getElementById('settingsAvatarImg');
+      let newAvatar = user.avatar || DEFAULT_AVATAR;
+      avatarFile.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = () => { newAvatar = reader.result; settingsAvatarImg.src = newAvatar; };
+        reader.readAsDataURL(f);
+      });
+
+      // Panic inputs
+      const panicKeyInput = document.getElementById('panicKeyInput');
+      const panicCtrlCheckbox = document.getElementById('panicCtrlCheckbox');
+      const panicActionSelect = document.getElementById('panicActionSelect');
+      panicActionSelect.value = get(KEY_PANIC_ACTION, 'close_tab');
+
+      // Quick masks
+      document.getElementById('maskDriveBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'My Drive - Google Drive'); set(KEY_TAB_ICON,'https://drive.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Drive (local)'); });
+      document.getElementById('maskGmailBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Inbox - Gmail'); set(KEY_TAB_ICON,'https://mail.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Gmail (local)'); });
+      document.getElementById('maskGoogleBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Google'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Google (local)'); });
+      document.getElementById('resetTabMasking').addEventListener('click', () => { if(!confirm('Reset tab title and icon?')) return; set(KEY_TAB_TITLE,''); set(KEY_TAB_ICON,''); applyTabMasking(); alert('Tab mask reset'); });
+
+      // Tab icon preview
+      const tabTitleInput = document.getElementById('tabTitleInput');
+      const tabIconUrlInput = document.getElementById('tabIconUrlInput');
+      const tabIconFileInput = document.getElementById('tabIconFileInput');
+      const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
+      const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
+      tabTitleInput.addEventListener('input', () => tabIconPreviewTitle.textContent = tabTitleInput.value || document.title);
+      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; });
+      tabIconFileInput.addEventListener('change', e => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; }; r.readAsDataURL(f); });
+
+      // Theme presets
+      document.querySelectorAll('.theme-preset').forEach(el => {
+        el.addEventListener('click', () => {
+          const theme = el.dataset.theme;
+          set(KEY_THEME, theme);
+          applyTabMasking();
+        });
+      });
+
+      // Save / Cancel
+      document.getElementById('settingsCancel').onclick = closeModal;
+      document.getElementById('settingsSave').onclick = () => {
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        const newEmail = document.getElementById('settingsEmail').value.trim();
+        const users = getUsers();
+        const current = getCurrentUser();
+        if(!newUsername){ alert('Username cannot be empty'); return; }
+        if(newUsername !== current && users[newUsername]){ alert('Username taken'); return; }
+        // update user
+        const data = users[current];
+        delete users[current];
+        users[newUsername] = data;
+        users[newUsername].avatar = newAvatar || users[newUsername].avatar || DEFAULT_AVATAR;
+        users[newUsername].email = newEmail || '';
+        saveUsers(users);
+        setCurrentUser(newUsername);
+
+        // panic
+        set(KEY_PANIC_KEY, panicKeyInput.value.trim() || "'");
+        set(KEY_PANIC_CTRL, panicCtrlCheckbox.checked ? 'true' : 'false');
+        set(KEY_PANIC_ACTION, panicActionSelect.value);
+
+        // tab icon
+        if(tabIconPreviewImg.dataset.pending){ set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending); } else set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
+        set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,''));
+
+        // font
+        const fs = document.getElementById('fontSizeRange').value;
+        set(KEY_FONT_SCALE, fs);
+
+        applyTabMasking();
+        renderProfile();
+        closeModal();
+        createNotification('Settings saved', 'Your settings were saved locally.');
+      };
+
+      // Change password flows
+      document.getElementById('changePasswordWithCurrent').onclick = () => renderChangeWithCurrentModal();
+      document.getElementById('changePasswordViaEmail').onclick = () => {
+        const u = getCurrentUser();
+        const users = getUsers();
+        if(!users[u] || !users[u].email){ alert('No email configured'); return; }
+        const code = Math.floor(100000 + Math.random()*900000).toString();
+        const ver = { code, ts: Date.now(), expiresAt: Date.now() + 1000*60*15 };
+        setJSON('hw_verif_'+u, ver);
+        createNotification('Verification code', `Code for ${u}: ${code} (demo delivery)`);
+        renderVerifyChangeModal(u);
+      };
+
+      // Font size live label
+      const fontSizeRange = document.getElementById('fontSizeRange');
+      const fontSizeLabel = document.getElementById('fontSizeLabel');
+      fontSizeRange.addEventListener('input', () => { document.documentElement.style.setProperty('--font-scale', fontSizeRange.value); fontSizeLabel.textContent = fontSizeRange.value + 'x'; });
     }
 
-    function renderChangeWithCurrentModal(){ modal.innerHTML=`<h3>Change Password</h3><div style="margin-top:8px"><input id="curPass" type="password" placeholder="Current password"></div><div style="margin-top:8px"><input id="newPass" type="password" placeholder="New password"></div><div style="margin-top:8px"><input id="newPass2" type="password" placeholder="Confirm new password"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="changeCancel">Cancel</button><button class="btn primary" id="changeSubmit">Change password</button></div>`; document.getElementById('changeCancel').onclick=closeModal; document.getElementById('changeSubmit').onclick=()=>{ const cur=document.getElementById('curPass').value, n1=document.getElementById('newPass').value, n2=document.getElementById('newPass2').value, u=getCurrentUser(); if(!u){ alert('Not signed in'); return; } const users=getUsers(); if(!verifyPassword(users[u].password,cur)){ alert('Current password incorrect'); return; } if(!n1){ alert('Enter a new password'); return; } if(n1!==n2){ alert('Passwords do not match'); return; } users[u].password=encodePassword(n1); saveUsers(users); createNotification('Password changed','Your password was updated.'); closeModal(); }; }
-    function renderVerifyChangeModal(prefilledUsername){ const u=prefilledUsername||getCurrentUser(); if(!u){ alert('No user specified'); return; } modal.innerHTML=`<h3>Verify Email to Change Password</h3><div style="margin-top:8px"><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div><div style="margin-top:8px"><input id="verCode" placeholder="6-digit code"></div><div style="margin-top:8px"><input id="verNewPass" type="password" placeholder="New password"></div><div style="margin-top:8px"><input id="verNewPass2" type="password" placeholder="Confirm new password"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="verCancel">Cancel</button><button class="btn primary" id="verSubmit">Verify & change</button></div>`; document.getElementById('verCancel').onclick=closeModal; document.getElementById('verSubmit').onclick=()=>{ const username=document.getElementById('verUsername').value.trim(), code=document.getElementById('verCode').value.trim(), n1=document.getElementById('verNewPass').value, n2=document.getElementById('verNewPass2').value; if(!username||!code||!n1){ alert('Please fill all fields'); return; } if(n1!==n2){ alert('Passwords do not match'); return; } const ver=getJSON('hw_verif_'+username,null); if(!ver){ alert('No verification code found'); return; } if(Date.now()>ver.expiresAt){ alert('Code expired'); return; } if(ver.code!==code){ alert('Invalid code'); return; } const users=getUsers(); if(!users[username]){ alert('User not found'); return; } users[username].password=encodePassword(n1); saveUsers(users); setCurrentUser(username); createNotification('Password changed','Password updated via email verification.'); closeModal(); }; }
+    function renderChangeWithCurrentModal(){
+      modal.innerHTML = `
+        <h3>Change Password</h3>
+        <div style="margin-top:8px"><input id="curPass" type="password" placeholder="Current password"></div>
+        <div style="margin-top:8px"><input id="newPass" type="password" placeholder="New password"></div>
+        <div style="margin-top:8px"><input id="newPass2" type="password" placeholder="Confirm new password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="changeCancel">Cancel</button><button class="btn primary" id="changeSubmit">Change password</button></div>
+      `;
+      document.getElementById('changeCancel').onclick = closeModal;
+      document.getElementById('changeSubmit').onclick = () => {
+        const cur = document.getElementById('curPass').value;
+        const n1 = document.getElementById('newPass').value;
+        const n2 = document.getElementById('newPass2').value;
+        const u = getCurrentUser();
+        if(!u){ alert('Not signed in'); return; }
+        const users = getUsers();
+        if(!verifyPassword(users[u].password, cur)){ alert('Current password incorrect'); return; }
+        if(!n1){ alert('Enter a new password'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        users[u].password = encodePassword(n1);
+        saveUsers(users);
+        createNotification('Password changed', 'Your password was updated.');
+        closeModal();
+      };
+    }
 
-    function renderAddToolModal(){ modal.innerHTML=`<h3>Add Tool</h3><div style="margin-top:8px"><input id="newToolId" placeholder="Unique id (no spaces)"></div><div style="margin-top:8px"><input id="newToolLabel" placeholder="Label"></div><div style="margin-top:8px"><input id="newToolHref" placeholder="Relative href (e.g., tool.html)"></div><div style="margin-top:8px"><input id="newToolDesc" placeholder="Short description (optional)"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>`; document.getElementById('newToolCancel').onclick=closeModal; document.getElementById('newToolSave').onclick=()=>{ const id=document.getElementById('newToolId').value.trim(), label=document.getElementById('newToolLabel').value.trim(), href=document.getElementById('newToolHref').value.trim(), desc=document.getElementById('newToolDesc').value.trim(); if(!id||!label||!href){ alert('Provide id, label and href'); return; } const tools=getJSON(KEY_TOOLS,DEFAULT_TOOLS); if(tools.some(t=>t.id===id)){ alert('Tool id exists'); return; } tools.push({id,label,href,desc}); setJSON(KEY_TOOLS,tools); renderTools(); closeModal(); createNotification('Tool added',`${label} added to Tools`); }; }
-    function renderAddGameModal(){ modal.innerHTML=`<h3>Add Game</h3><div style="margin-top:8px"><input id="newGameId" placeholder="Unique id (no spaces)"></div><div style="margin-top:8px"><input id="newGameLabel" placeholder="Label"></div><div style="margin-top:8px"><input id="newGameHref" placeholder="Relative href (e.g., game.html)"></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>`; document.getElementById('newGameCancel').onclick=closeModal; document.getElementById('newGameSave').onclick=()=>{ const id=document.getElementById('newGameId').value.trim(), label=document.getElementById('newGameLabel').value.trim(), href=document.getElementById('newGameHref').value.trim(); if(!id||!label||!href){ alert('Provide id, label and href'); return; } const games=getJSON(KEY_GAMES,DEFAULT_GAMES); if(games.some(g=>g.id===id)){ alert('Game id exists'); return; } games.push({id,label,href}); setJSON(KEY_GAMES,games); renderGames(); closeModal(); createNotification('Game added',`${label} added to Games`); }; }
+    function renderVerifyChangeModal(prefilledUsername){
+      const u = prefilledUsername || getCurrentUser();
+      if(!u){ alert('No user specified'); return; }
+      modal.innerHTML = `
+        <h3>Verify Email to Change Password</h3>
+        <div style="margin-top:8px"><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div>
+        <div style="margin-top:8px"><input id="verCode" type="text" placeholder="6-digit code"></div>
+        <div style="margin-top:8px"><input id="verNewPass" type="password" placeholder="New password"></div>
+        <div style="margin-top:8px"><input id="verNewPass2" type="password" placeholder="Confirm new password"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="verCancel">Cancel</button><button class="btn primary" id="verSubmit">Verify & change</button></div>
+      `;
+      document.getElementById('verCancel').onclick = closeModal;
+      document.getElementById('verSubmit').onclick = () => {
+        const username = document.getElementById('verUsername').value.trim();
+        const code = document.getElementById('verCode').value.trim();
+        const n1 = document.getElementById('verNewPass').value;
+        const n2 = document.getElementById('verNewPass2').value;
+        if(!username || !code || !n1){ alert('Please fill all fields'); return; }
+        if(n1 !== n2){ alert('Passwords do not match'); return; }
+        const ver = getJSON('hw_verif_'+username, null);
+        if(!ver){ alert('No verification code found'); return; }
+        if(Date.now() > ver.expiresAt){ alert('Code expired'); return; }
+        if(ver.code !== code){ alert('Invalid code'); return; }
+        const users = getUsers();
+        if(!users[username]){ alert('User not found'); return; }
+        users[username].password = encodePassword(n1);
+        saveUsers(users);
+        setCurrentUser(username);
+        createNotification('Password changed', 'Password updated via email verification.');
+        closeModal();
+      };
+    }
 
-    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    /* Add tool / game */
+    function renderAddToolModal(){
+      modal.innerHTML = `
+        <h3>Add Tool</h3>
+        <div style="margin-top:8px"><input id="newToolId" placeholder="Unique id (no spaces)"></div>
+        <div style="margin-top:8px"><input id="newToolLabel" placeholder="Label"></div>
+        <div style="margin-top:8px"><input id="newToolHref" placeholder="Relative href (e.g., tool.html)"></div>
+        <div style="margin-top:8px"><input id="newToolDesc" placeholder="Short description (optional)"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>
+      `;
+      document.getElementById('newToolCancel').onclick = closeModal;
+      document.getElementById('newToolSave').onclick = () => {
+        const id = document.getElementById('newToolId').value.trim();
+        const label = document.getElementById('newToolLabel').value.trim();
+        const href = document.getElementById('newToolHref').value.trim();
+        const desc = document.getElementById('newToolDesc').value.trim();
+        if(!id || !label || !href){ alert('Provide id, label and href'); return; }
+        const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
+        if(tools.some(t => t.id === id)){ alert('Tool id exists'); return; }
+        tools.push({ id, label, href, desc });
+        setJSON(KEY_TOOLS, tools);
+        renderTools();
+        closeModal();
+        createNotification('Tool added', `${label} added to Tools`);
+      };
+    }
 
-    window.addEventListener('keydown', e=>{ try{ const active=document.activeElement; if(active && (active.tagName==='INPUT'||active.tagName==='TEXTAREA'||active.isContentEditable)) return; const storedKey=get(KEY_PANIC_KEY,"'"); const requiresCtrl=get(KEY_PANIC_CTRL,'false')==='true'; const action=get(KEY_PANIC_ACTION,'close_tab'); if(!storedKey) return; const keyMatch=(storedKey.length===1)?(e.key===storedKey):(e.key.toLowerCase()===storedKey.toLowerCase()); if(!keyMatch) return; if(requiresCtrl && !e.ctrlKey) return; e.preventDefault(); performPanicAction(action); }catch(err){ console.warn('panic key handler error',err); } });
+    function renderAddGameModal(){
+      modal.innerHTML = `
+        <h3>Add Game</h3>
+        <div style="margin-top:8px"><input id="newGameId" placeholder="Unique id (no spaces)"></div>
+        <div style="margin-top:8px"><input id="newGameLabel" placeholder="Label"></div>
+        <div style="margin-top:8px"><input id="newGameHref" placeholder="Relative href (e.g., game.html)"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>
+      `;
+      document.getElementById('newGameCancel').onclick = closeModal;
+      document.getElementById('newGameSave').onclick = () => {
+        const id = document.getElementById('newGameId').value.trim();
+        const label = document.getElementById('newGameLabel').value.trim();
+        const href = document.getElementById('newGameHref').value.trim();
+        if(!id || !label || !href){ alert('Provide id, label and href'); return; }
+        const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
+        if(games.some(g => g.id === id)){ alert('Game id exists'); return; }
+        games.push({ id, label, href });
+        setJSON(KEY_GAMES, games);
+        renderGames();
+        closeModal();
+        createNotification('Game added', `${label} added to Games`);
+      };
+    }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      ensureDefaults(); applyTabMasking(); renderGames(); renderTools(); renderFavoritesGrid(); renderNotifUI(); renderProfile();
-      document.getElementById('toolsAddBtn').addEventListener('click',()=>openModal('addTool'));
-      document.getElementById('addGameBtn').addEventListener('click',()=>openModal('addGame'));
-      window.addEventListener('storage', e=>{ if(e.key && e.key.startsWith('hw_')){ renderGames(); renderTools(); renderFavoritesGrid(); renderNotifUI(); renderProfile(); applyTabMasking(); } });
+    /* Helpers */
+    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    /* Panic key listener */
+    window.addEventListener('keydown', (e) => {
+      try {
+        const active = document.activeElement;
+        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+        const storedKey = get(KEY_PANIC_KEY, "'");
+        const requiresCtrl = get(KEY_PANIC_CTRL, 'false') === 'true';
+        const action = get(KEY_PANIC_ACTION, 'close_tab');
+        if(!storedKey) return;
+        const keyMatch = (storedKey.length === 1) ? (e.key === storedKey) : (e.key.toLowerCase() === storedKey.toLowerCase());
+        if(!keyMatch) return;
+        if(requiresCtrl && !e.ctrlKey) return;
+        e.preventDefault();
+        performPanicAction(action);
+      } catch(err){ console.warn('panic key handler error', err); }
+    });
+
+    /* Initialization */
+    document.addEventListener('DOMContentLoaded', () => {
+      ensureDefaults();
+      applyTabMasking();
+      renderGames();
+      renderTools();
+      renderFavoritesGrid();
+      renderNotifUI();
+      renderProfile();
+
+      document.getElementById('toolsAddBtn').addEventListener('click', () => openModal('addTool'));
+      document.getElementById('addGameBtn').addEventListener('click', () => openModal('addGame'));
+
+      window.addEventListener('storage', (e) => {
+        if(e.key && e.key.startsWith('hw_')){
+          renderGames();
+          renderTools();
+          renderFavoritesGrid();
+          renderNotifUI();
+          renderProfile();
+          applyTabMasking();
+        }
+      });
+
       showSection('games');
     });
 
-    window.hw={ toggleFavorite, createNotification, getUsers, setCurrentUser, getCurrentUser };
+    /* Expose small API for debugging */
+    window.hw = { toggleFavorite, createNotification, getUsers, setCurrentUser, getCurrentUser, renderGames, renderTools };
   </script>
 </body>
 </html>
