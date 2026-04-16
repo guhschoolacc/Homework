@@ -33,8 +33,10 @@
 
     .hidden{display:none !important}
 
+    /* Games grid: wrap into rows when there are many buttons */
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
     .items-row{display:flex;gap:12px;align-items:center;overflow-x:auto;padding:8px;justify-content:flex-start}
-    .item-btn{position:relative;min-width:160px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#0f1724,#0b0b10);color:#e6eefc;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;justify-content:flex-start}
+    .item-btn{position:relative;min-width:140px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,#0f1724,#0b0b10);color:#e6eefc;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;justify-content:flex-start}
     .item-btn .label{flex:1;text-align:left}
     .item-btn .fav-btn{position:absolute;right:8px;top:8px;background:transparent;border:0;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
     .fav-btn.active{color:gold}
@@ -72,7 +74,7 @@
 
     input[type="text"], input[type="password"], input[type="file"], select { background:#0b0b10; color:#fff; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; width:100%; }
 
-    @media (max-width:720px){ .sidebar{width:64px} .profile-username{display:none} .tools-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
+    @media (max-width:720px){ .sidebar{width:64px} .profile-username{display:none} .tools-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} }
   </style>
 </head>
 <body>
@@ -135,7 +137,8 @@
             <button id="addGameBtn" class="btn ghost">Add</button>
           </div>
         </div>
-        <div class="items-row" id="gamesRow" role="list"></div>
+        <!-- gamesGrid will wrap into rows automatically -->
+        <div class="games-grid" id="gamesGrid" role="list"></div>
       </section>
 
       <!-- Tools -->
@@ -173,8 +176,11 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Final index.html: ensures requested games are merged into localStorage on load,
-       removes duplicate sidebar username, removes specified tools, and keeps full settings.
+    /* Updated index.html:
+       - gamesGrid uses CSS grid so buttons wrap into rows instead of infinite horizontal scrolling
+       - renderGames now targets #gamesGrid
+       - search filters updated to work with the grid
+       - rest of the app preserved (settings, favorites, notifications, panic key, tools)
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -187,7 +193,6 @@
 
     const KEY_GAMES='hw_games', KEY_TOOLS='hw_tools', KEY_FAVS='hw_favs', KEY_USERS='hw_users', KEY_CURRENT_USER='hw_currentUser', KEY_NOTIFS='hw_notifications', KEY_THEME='hw_theme_name', KEY_TAB_TITLE='hw_tab_title', KEY_TAB_ICON='hw_tab_icon', KEY_PANIC_KEY='hw_panic_key', KEY_PANIC_CTRL='hw_panic_ctrl', KEY_PANIC_ACTION='hw_panic_action', KEY_FONT_SCALE='hw_font_scale';
 
-    /* DEFAULT_GAMES includes requested entries */
     const DEFAULT_GAMES = [
       {id:'sandbox',label:'Sandbox',href:'sandbox.html'},
       {id:'snake',label:'Snake Game Ripoff',href:'snake.html'},
@@ -201,7 +206,6 @@
       {id:'hangman',label:'Hangman',href:'hangman.html'}
     ];
 
-    /* DEFAULT_TOOLS updated: removed contrast checker, unit converter, password generator, markdown preview, color picker */
     const DEFAULT_TOOLS = [
       {id:'calculator',label:'Calculator',href:'calculator.html'},
       {id:'clock',label:'Clock',href:'clock.html'},
@@ -221,7 +225,6 @@
       {id:'soundboard',label:'Soundboard',href:'soundboard.html'}
     ];
 
-    /* Extras to ensure present in stored games (merge on load) */
     const EXTRA_GAMES = [
       {id:'bubble-shooter',label:'Bubble Shooter',href:'bubble-shooter.html'},
       {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
@@ -231,7 +234,6 @@
     ];
 
     function ensureDefaults(){
-      // ensure base defaults exist
       if(!getJSON(KEY_GAMES,null)) setJSON(KEY_GAMES,DEFAULT_GAMES);
       if(!getJSON(KEY_TOOLS,null)) setJSON(KEY_TOOLS,DEFAULT_TOOLS);
       if(!getJSON(KEY_FAVS,null)) setJSON(KEY_FAVS,[]);
@@ -305,7 +307,7 @@
     function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
 
     /* UI elements */
-    const gamesRow = document.getElementById('gamesRow');
+    const gamesGrid = document.getElementById('gamesGrid');
     const toolsGrid = document.getElementById('toolsGrid');
     const favoritesGrid = document.getElementById('favoritesGrid');
     const favoritesEmpty = document.getElementById('favoritesEmpty');
@@ -313,7 +315,7 @@
     /* Renderers */
     function renderGames(){
       const games = getJSON(KEY_GAMES, DEFAULT_GAMES);
-      gamesRow.innerHTML = '';
+      gamesGrid.innerHTML = '';
       games.forEach(g => {
         const el = document.createElement('div');
         el.className = 'item-btn';
@@ -321,7 +323,7 @@
         el.dataset.href = g.href || '#';
         el.tabIndex = 0;
         el.innerHTML = `<span class="label">${escapeHtml(g.label)}</span><button class="fav-btn" aria-label="favorite ${escapeHtml(g.label)}" data-id="${escapeHtml(g.id)}">☆</button>`;
-        gamesRow.appendChild(el);
+        gamesGrid.appendChild(el);
       });
       updateFavButtons();
     }
@@ -380,7 +382,7 @@
     /* Search */
     document.getElementById('gamesSearch').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#gamesRow .item-btn').forEach(el => {
+      document.querySelectorAll('#gamesGrid .item-btn').forEach(el => {
         const text = (el.textContent || '').toLowerCase();
         el.style.display = text.includes(q) ? '' : 'none';
       });
@@ -590,7 +592,7 @@
     function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
     modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-    /* Signup / Login */
+    /* Signup / Login / Settings / Add implementations (kept same as previous build) */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -644,7 +646,6 @@
       };
     }
 
-    /* Settings modal (restored fully) */
     function renderSettingsModal(){
       const username = getCurrentUser();
       if(!username){ alert('Not signed in'); closeModal(); return; }
@@ -907,7 +908,6 @@
       };
     }
 
-    /* Add tool / game */
     function renderAddToolModal(){
       modal.innerHTML = `
         <h3>Add Tool</h3>
