@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>GUH Clicker</title>
-
   <style>
     :root{
       --bg:#0f1724;
@@ -12,7 +11,6 @@
       --accent:#7ee787;
       --muted:#9aa6b2;
       --glass: rgba(255,255,255,0.04);
-      --glass-2: rgba(255,255,255,0.02);
     }
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
     body{
@@ -21,184 +19,81 @@
                   var(--bg);
       color:#e6eef6;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
-      overflow:hidden;
+      overflow:auto;
+      padding:28px;
+      box-sizing:border-box;
     }
-
-    /* Top-left dashboard button */
-    .top-left {
-      position:fixed;
-      left:18px;
-      top:18px;
-      z-index:50;
-    }
+    .top-left { position:fixed; left:18px; top:18px; z-index:60; }
     .dash-btn{
       background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      color:var(--muted);
-      padding:8px 12px;
-      border-radius:8px;
-      text-decoration:none;
-      font-weight:600;
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 6px 18px rgba(2,6,23,0.6), inset 0 -1px 0 rgba(255,255,255,0.02);
+      color:var(--muted); padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600;
+      border:1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 18px rgba(2,6,23,0.6);
       transition:transform .18s ease, color .18s ease;
     }
     .dash-btn:hover{transform:translateY(-3px); color:var(--accent);}
 
-    /* Main container */
     .game-wrap{
-      width:100%;
-      max-width:1100px;
-      height:80vh;
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:28px;
-      align-items:center;
-      padding:28px;
-      box-sizing:border-box;
+      width:100%; max-width:1100px; min-height:72vh;
+      display:grid; grid-template-columns: 1fr 360px; gap:28px; align-items:start;
+      padding:28px; box-sizing:border-box; border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.03); box-shadow: 0 30px 80px rgba(2,6,23,0.6);
     }
 
     .stage{
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:18px;
-      padding:40px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,0.03);
-      box-shadow: 0 20px 60px rgba(2,6,23,0.6);
+      border-radius:18px; padding:40px; display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:visible; border:1px solid rgba(255,255,255,0.03); min-height:420px;
     }
 
-    /* The big "guh" - Comic Sans */
     .guh{
       font-family: "Comic Sans MS", "Comic Sans", cursive;
-      font-size:140px;
-      color:#ffffff;
-      cursor:pointer;
-      user-select:none;
-      -webkit-user-select:none;
-      transform-origin:center;
-      transition:transform .12s cubic-bezier(.2,.9,.3,1), filter .18s;
+      font-size:140px; color:#ffffff; cursor:pointer; user-select:none;
+      transform-origin:center; transition:transform .12s cubic-bezier(.2,.9,.3,1), filter .18s;
       text-shadow: 0 6px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02);
-      letter-spacing:2px;
-      position:relative;
-      z-index:2;
+      letter-spacing:2px; position:relative; z-index:2;
     }
     .guh:active{transform:scale(.96) rotate(-1deg);}
-
-    /* remove weird blur/shine around guh - keep a subtle highlight without blur */
     .guh::after{
-      content:'';
-      position:absolute;
-      width:220px;height:80px;
-      left:50%;top:50%;
+      content:''; position:absolute; width:220px;height:80px; left:50%;top:50%;
       transform:translate(-50%,-50%) rotate(12deg) translateX(-300px);
       background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.12), rgba(255,255,255,0.0));
-      opacity:0;
-      transition:opacity .25s, transform .9s;
-      pointer-events:none;
+      opacity:0; transition:opacity .25s, transform .9s; pointer-events:none;
     }
     .guh.shine::after{ transform:translate(-50%,-50%) rotate(12deg) translateX(300px); opacity:1; }
 
-    /* floating +score */
-    .float {
-      position:absolute;
-      font-weight:700;
-      color:var(--accent);
-      text-shadow:0 2px 8px rgba(0,0,0,0.6);
-      pointer-events:none;
-      transform:translateY(0) scale(1);
-      opacity:1;
-      transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
-      z-index:3;
+    .float { position:absolute; font-weight:700; color:var(--accent); text-shadow:0 2px 8px rgba(0,0,0,0.6);
+      pointer-events:none; transform:translateY(0) scale(1); opacity:1; transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms; z-index:3;
     }
 
-    /* right panel */
     .panel{
       background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:14px;
-      padding:18px;
-      height:100%;
-      box-sizing:border-box;
-      border:1px solid rgba(255,255,255,0.03);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      border-radius:14px; padding:18px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.03);
+      display:flex; flex-direction:column; gap:12px; max-height: calc(100vh - 120px); overflow:auto;
     }
-    .stat{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:10px 12px;
-      border-radius:10px;
-      background:var(--glass);
-      color:var(--muted);
-      font-weight:600;
-    }
-    .stat .value{color:var(--accent); font-weight:800;}
+    .stat{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:10px; background:var(--glass); color:var(--muted); font-weight:600; }
+    .stat .value{ color:var(--accent); font-weight:800; }
 
-    .upgrades{
-      margin-top:6px;
-      overflow:auto;
-      padding-right:6px;
-    }
-    .upgrade{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:12px;
-      border-radius:10px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      border:1px solid rgba(255,255,255,0.02);
-      transition:transform .12s, box-shadow .12s;
-    }
+    .upgrades{ margin-top:6px; overflow:visible; display:flex; flex-direction:column; gap:10px; padding-right:6px; }
+    .upgrade{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); border:1px solid rgba(255,255,255,0.02); transition:transform .12s, box-shadow .12s; }
     .upgrade:hover{transform:translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.6);}
-    .upgrade .meta{display:flex;flex-direction:column;}
-    .upgrade .meta .title{font-weight:700; color:#eaf7ea;}
-    .upgrade .meta .desc{font-size:12px; color:var(--muted); margin-top:4px;}
-    .upgrade button{
-      background:linear-gradient(180deg, rgba(126,231,135,0.14), rgba(126,231,135,0.06));
-      color:#04210a;
-      border:none;
-      padding:8px 12px;
-      border-radius:8px;
-      font-weight:800;
-      cursor:pointer;
-      transition:transform .12s;
-    }
+    .upgrade .meta{ display:flex; flex-direction:column; }
+    .upgrade .meta .title{ font-weight:700; color:#eaf7ea; }
+    .upgrade .meta .desc{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .upgrade button{ background:linear-gradient(180deg, rgba(126,231,135,0.14), rgba(126,231,135,0.06)); color:#04210a; border:none; padding:8px 12px; border-radius:8px; font-weight:800; cursor:pointer; transition:transform .12s; }
     .upgrade button:active{transform:translateY(1px);}
-    .upgrade .cost{font-weight:800; color:var(--accent); margin-left:8px;}
+    .upgrade .cost{ font-weight:800; color:var(--accent); margin-left:8px; }
 
-    /* small footer */
-    .footer{
-      margin-top:auto;
-      color:var(--muted);
-      font-size:13px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
+    .footer{ margin-top:auto; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center; }
 
-    /* particle (no blur) */
-    .particle{
-      position:absolute;
-      width:10px;height:10px;border-radius:50%;
-      background:linear-gradient(90deg,var(--accent),#b6ffb6);
-      pointer-events:none;
-      opacity:0.95;
-      transform:translate(-50%,-50%) scale(1);
-      transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
-      z-index:1;
-    }
+    .particle{ position:absolute; width:10px;height:10px;border-radius:50%; background:linear-gradient(90deg,var(--accent),#b6ffb6); pointer-events:none; opacity:0.95; transform:translate(-50%,-50%) scale(1); transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms; z-index:1; }
 
-    /* responsive */
     @media (max-width:980px){
-      .game-wrap{grid-template-columns:1fr; padding:18px; height:92vh;}
-      .panel{height:auto;}
+      .game-wrap{grid-template-columns:1fr; padding:18px; min-height:0;}
+      .panel{max-height:none; overflow:visible;}
+      .stage{min-height:320px; padding:28px;}
       .guh{font-size:96px;}
     }
   </style>
@@ -217,10 +112,9 @@
       <div class="stat"><div>GUH Count</div><div class="value" id="count">0</div></div>
       <div class="stat"><div>Per Click</div><div class="value" id="perClick">1</div></div>
       <div class="stat"><div>Auto Clickers</div><div class="value" id="autoCount">0</div></div>
-
+      <div class="stat"><div>Prestige Points</div><div class="value" id="prestigePoints">0</div></div>
       <div style="font-weight:800; color:var(--muted); margin-top:8px;">Upgrades</div>
       <div class="upgrades" id="upgrades"></div>
-
       <div class="footer">
         <div>Saved automatically</div>
         <div id="fps" style="color:var(--muted)">—</div>
@@ -229,14 +123,22 @@
   </div>
 
   <script>
-    /* ---------- Game state with clear base and multiplier ---------- */
+    /* ---------------- Stable save key and migration ---------------- */
+    const SAVE_KEY = 'guh_save'; // stable key used going forward
+    const LEGACY_KEYS = ['guh_state_v2','guh_state_v1']; // older keys to migrate from (if present)
+    const CURRENT_VERSION = 3;
+
     const defaultState = {
+      version: CURRENT_VERSION,
       count: 0,
-      baseClickPower: 1,      // base GUH per click before multipliers
-      multiplier: 1,          // multiplicative factor applied to baseClickPower
+      baseClickPower: 1,
+      multiplier: 1,
       autoCount: 0,
-      autoPower: 1,           // how many GUH each auto click gives (multiplies baseClickPower)
+      autoPower: 1,
       autoIntervalMs: 1000,
+      prestigePoints: 0,
+      prestigeMultiplier: 1, // permanent multiplier from prestige
+      totalPrestiges: 0,
       upgrades: {
         clickPowerLevel: 0,
         multiplierLevel: 0,
@@ -248,7 +150,78 @@
       }
     };
 
+    /* ---------- Load state with migration from legacy keys ---------- */
+    function loadState(){
+      // 1) try stable key
+      try{
+        const raw = localStorage.getItem(SAVE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          // if version older than current, migrate
+          if(!parsed.version || parsed.version < CURRENT_VERSION){
+            return migrateState(parsed);
+          }
+          return parsed;
+        }
+      }catch(e){ console.warn('loadState stable read failed', e); }
+
+      // 2) try legacy keys and merge them
+      for(const k of LEGACY_KEYS){
+        try{
+          const raw = localStorage.getItem(k);
+          if(raw){
+            const parsed = JSON.parse(raw);
+            const migrated = migrateState(parsed);
+            saveState(migrated);
+            // remove legacy key to avoid confusion
+            try{ localStorage.removeItem(k); }catch(e){}
+            return migrated;
+          }
+        }catch(e){}
+      }
+
+      // 3) fallback to default
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+
+    /* ---------- Migration logic: bring older states up to date ---------- */
+    function migrateState(old){
+      const s = JSON.parse(JSON.stringify(defaultState));
+      // copy known fields if present
+      if(typeof old.count === 'number') s.count = old.count;
+      if(typeof old.baseClickPower === 'number') s.baseClickPower = old.baseClickPower;
+      if(typeof old.multiplier === 'number') s.multiplier = old.multiplier;
+      if(typeof old.autoCount === 'number') s.autoCount = old.autoCount;
+      if(typeof old.autoPower === 'number') s.autoPower = old.autoPower;
+      if(typeof old.autoIntervalMs === 'number') s.autoIntervalMs = old.autoIntervalMs;
+      if(typeof old.prestigePoints === 'number') s.prestigePoints = old.prestigePoints;
+      if(typeof old.prestigeMultiplier === 'number') s.prestigeMultiplier = old.prestigeMultiplier;
+      if(typeof old.totalPrestiges === 'number') s.totalPrestiges = old.totalPrestiges;
+      if(old.upgrades && typeof old.upgrades === 'object'){
+        s.upgrades = Object.assign({}, s.upgrades, old.upgrades);
+      }
+      // If old had perClick instead of base/multiplier, try to infer baseClickPower
+      if(typeof old.perClick === 'number' && (!old.baseClickPower || !old.multiplier)){
+        // assume multiplier 1 and set baseClickPower to perClick
+        s.baseClickPower = old.perClick;
+        s.multiplier = 1;
+      }
+      s.version = CURRENT_VERSION;
+      return s;
+    }
+
+    /* ---------- Save state (writes stable key) ---------- */
+    function saveState(stateObj){
+      try{
+        const toSave = stateObj ? stateObj : state;
+        toSave.version = CURRENT_VERSION;
+        localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+      }catch(e){ console.warn('saveState failed', e); }
+    }
+
+    /* ---------- Game state ---------- */
     let state = loadState();
+
     const stage = document.getElementById('stage');
     const guhEl = document.getElementById('guh');
     const countEl = document.getElementById('count');
@@ -256,191 +229,142 @@
     const autoCountEl = document.getElementById('autoCount');
     const upgradesEl = document.getElementById('upgrades');
     const fpsEl = document.getElementById('fps');
+    const prestigePointsElId = 'prestigePoints';
 
-    /* ---------- Utilities ---------- */
-    function saveState(){
-      localStorage.setItem('guh_state_v2', JSON.stringify(state));
-    }
-    function loadState(){
-      try{
-        const raw = localStorage.getItem('guh_state_v2');
-        if(raw) return JSON.parse(raw);
-      }catch(e){}
-      return JSON.parse(JSON.stringify(defaultState));
-    }
+    /* ---------- Helpers ---------- */
     function format(n){
+      if(n>=1e12) return (n/1e12).toFixed(2)+'T';
       if(n>=1e9) return (n/1e9).toFixed(2)+'B';
       if(n>=1e6) return (n/1e6).toFixed(2)+'M';
       if(n>=1e3) return (n/1e3).toFixed(2)+'K';
       return Math.floor(n).toString();
     }
 
-    /* compute effective per-click */
     function effectivePerClick(){
-      return state.baseClickPower * state.multiplier;
+      // base * multiplier * prestigeMultiplier
+      return state.baseClickPower * state.multiplier * state.prestigeMultiplier;
     }
 
-    /* ---------- UI updates ---------- */
+    /* ---------- UI rendering ---------- */
     function render(){
       countEl.textContent = format(state.count);
       perClickEl.textContent = format(effectivePerClick());
       autoCountEl.textContent = state.autoCount;
+      // prestige points display
+      const existing = document.getElementById(prestigePointsElId);
+      if(existing) existing.textContent = format(state.prestigePoints);
       renderUpgrades();
     }
 
     function renderUpgrades(){
       upgradesEl.innerHTML = '';
 
-      // Click Power upgrade (increases baseClickPower)
-      const cpLevel = state.upgrades.clickPowerLevel;
-      const cpCost = Math.floor(10 * Math.pow(2, cpLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        'Click Power',
-        'Increase base GUH per click by +1.',
-        cpCost,
-        () => {
-          if(state.count >= cpCost){
-            state.count -= cpCost;
-            state.upgrades.clickPowerLevel++;
-            state.baseClickPower += 1;
-            saveState(); render();
-            pulseUpgradeButton();
-          }
-        },
-        `Level ${cpLevel}`
-      ));
-
-      // Click Multiplier upgrade (multiplicative)
-      const mLevel = state.upgrades.multiplierLevel;
-      const mCost = Math.floor(50 * Math.pow(2, mLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        'Click Multiplier',
-        'Multiply your base click power by 2.',
-        mCost,
-        () => {
-          if(state.count >= mCost){
-            state.count -= mCost;
-            state.upgrades.multiplierLevel++;
-            state.multiplier *= 2;
-            saveState(); render();
-            pulseUpgradeButton();
-          }
-        },
-        `x${Math.pow(2,mLevel)}`
-      ));
-
-      // Mega Click (adds a flat big bonus to base)
-      const megaLevel = state.upgrades.megaClickLevel;
-      const megaCost = Math.floor(200 * Math.pow(2, megaLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        'Mega Click',
-        'Add a big flat bonus to base click power (+5).',
-        megaCost,
-        () => {
-          if(state.count >= megaCost){
-            state.count -= megaCost;
-            state.upgrades.megaClickLevel++;
-            state.baseClickPower += 5;
-            saveState(); render();
-            pulseUpgradeButton();
-          }
-        },
-        `Level ${megaLevel}`
-      ));
-
-      // Auto Clicker purchase / speed / count
-      const autoBought = state.upgrades.autoBought;
-      const autoCost = Math.floor(200 * Math.pow(2, state.upgrades.autoSpeedLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        autoBought ? 'Upgrade Auto Speed' : 'Buy Auto Clicker',
-        autoBought ? 'Decrease auto click interval or add another auto clicker.' : 'Auto clicks for you every interval.',
-        autoCost,
-        () => {
-          if(state.count >= autoCost){
-            state.count -= autoCost;
-            if(!state.upgrades.autoBought){
-              state.upgrades.autoBought = true;
-              state.autoCount = 1;
-              state.autoPower = 1;
-            } else {
-              state.upgrades.autoSpeedLevel++;
-              state.autoIntervalMs = Math.max(100, Math.round(state.autoIntervalMs * 0.85));
-              state.autoCount += 1;
-            }
-            saveState(); render();
-            restartWorker();
-            pulseUpgradeButton();
-          }
-        },
-        autoBought ? `Speed Lv ${state.upgrades.autoSpeedLevel}` : 'Not owned'
-      ));
-
-      // Auto Power upgrade (increase how much each auto click gives)
-      const apLevel = state.upgrades.autoPowerLevel;
-      const apCost = Math.floor(300 * Math.pow(2, apLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        'Auto Power',
-        'Increase GUH per auto click (adds +1 to autoPower).',
-        apCost,
-        () => {
-          if(state.count >= apCost && state.upgrades.autoBought){
-            state.count -= apCost;
-            state.upgrades.autoPowerLevel++;
-            state.autoPower += 1;
-            saveState(); render();
-            pulseUpgradeButton();
-          } else if(!state.upgrades.autoBought){
-            alert('Buy an Auto Clicker first.');
-          }
-        },
-        `Lv ${apLevel}`
-      ));
-
-      // Efficiency (reduces future upgrade costs slightly)
-      const effLevel = state.upgrades.efficiencyLevel;
-      const effCost = Math.floor(500 * Math.pow(2, effLevel));
-      upgradesEl.appendChild(makeUpgrade(
-        'Efficiency',
-        'Reduce future upgrade costs by 5% (stacking).',
-        effCost,
-        () => {
-          if(state.count >= effCost){
-            state.count -= effCost;
-            state.upgrades.efficiencyLevel++;
-            saveState(); render();
-            pulseUpgradeButton();
-          }
-        },
-        `Lv ${effLevel}`
-      ));
-
-      // Prestige placeholder
-      upgradesEl.appendChild(makeUpgrade(
-        'Prestige (Reset)',
-        'Reset for a permanent multiplier (placeholder).',
-        999999999,
-        () => { alert('Prestige is a placeholder in this demo.'); },
-        ''
-      ));
-    }
-
-    function makeUpgrade(title, desc, costRaw, onBuy, rightLabel){
-      // apply efficiency discount to displayed cost
+      // helper to compute discounted cost
       const eff = state.upgrades.efficiencyLevel || 0;
       const discount = Math.pow(0.95, eff);
-      const cost = Math.max(1, Math.floor(costRaw * discount));
 
-      const wrap = document.createElement('div');
-      wrap.className = 'upgrade';
-      const meta = document.createElement('div');
-      meta.className = 'meta';
+      // Click Power
+      const cpLevel = state.upgrades.clickPowerLevel;
+      const cpCostRaw = Math.floor(10 * Math.pow(2, cpLevel));
+      const cpCost = Math.max(1, Math.floor(cpCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade('Click Power','Increase base GUH per click by +1.', cpCost, ()=>{
+        if(state.count >= cpCost){ state.count -= cpCost; state.upgrades.clickPowerLevel++; state.baseClickPower += 1; saveState(); render(); pulse(); } else flashInsufficient();
+      }, `Lv ${cpLevel}`));
+
+      // Click Multiplier
+      const mLevel = state.upgrades.multiplierLevel;
+      const mCostRaw = Math.floor(50 * Math.pow(2, mLevel));
+      const mCost = Math.max(1, Math.floor(mCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade('Click Multiplier','Multiply your base click power by 2.', mCost, ()=>{
+        if(state.count >= mCost){ state.count -= mCost; state.upgrades.multiplierLevel++; state.multiplier *= 2; saveState(); render(); pulse(); } else flashInsufficient();
+      }, `x${Math.pow(2,mLevel)}`));
+
+      // Mega Click
+      const megaLevel = state.upgrades.megaClickLevel;
+      const megaCostRaw = Math.floor(200 * Math.pow(2, megaLevel));
+      const megaCost = Math.max(1, Math.floor(megaCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade('Mega Click','Add a big flat bonus to base click power (+5).', megaCost, ()=>{
+        if(state.count >= megaCost){ state.count -= megaCost; state.upgrades.megaClickLevel++; state.baseClickPower += 5; saveState(); render(); pulse(); } else flashInsufficient();
+      }, `Lv ${megaLevel}`));
+
+      // Auto Clicker
+      const autoBought = state.upgrades.autoBought;
+      const autoCostRaw = Math.floor(200 * Math.pow(2, state.upgrades.autoSpeedLevel));
+      const autoCost = Math.max(1, Math.floor(autoCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade(autoBought ? 'Upgrade Auto Speed' : 'Buy Auto Clicker', autoBought ? 'Decrease auto click interval or add another auto clicker.' : 'Auto clicks for you every interval.', autoCost, ()=>{
+        if(state.count >= autoCost){
+          state.count -= autoCost;
+          if(!state.upgrades.autoBought){
+            state.upgrades.autoBought = true; state.autoCount = 1; state.autoPower = 1;
+          } else {
+            state.upgrades.autoSpeedLevel++; state.autoIntervalMs = Math.max(100, Math.round(state.autoIntervalMs * 0.85)); state.autoCount += 1;
+          }
+          saveState(); render(); restartWorker(); pulse();
+        } else flashInsufficient();
+      }, autoBought ? `Speed Lv ${state.upgrades.autoSpeedLevel}` : 'Not owned'));
+
+      // Auto Power
+      const apLevel = state.upgrades.autoPowerLevel;
+      const apCostRaw = Math.floor(300 * Math.pow(2, apLevel));
+      const apCost = Math.max(1, Math.floor(apCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade('Auto Power','Increase GUH per auto click (adds +1 to autoPower).', apCost, ()=>{
+        if(!state.upgrades.autoBought){ alert('Buy an Auto Clicker first.'); return; }
+        if(state.count >= apCost){ state.count -= apCost; state.upgrades.autoPowerLevel++; state.autoPower += 1; saveState(); render(); pulse(); } else flashInsufficient();
+      }, `Lv ${apLevel}`));
+
+      // Efficiency
+      const effLevel = state.upgrades.efficiencyLevel;
+      const effCostRaw = Math.floor(500 * Math.pow(2, effLevel));
+      const effCost = Math.max(1, Math.floor(effCostRaw * discount));
+      upgradesEl.appendChild(makeUpgrade('Efficiency','Reduce future upgrade costs by 5% (stacking).', effCost, ()=>{
+        if(state.count >= effCost){ state.count -= effCost; state.upgrades.efficiencyLevel++; saveState(); render(); pulse(); } else flashInsufficient();
+      }, `Lv ${effLevel}`));
+
+      // Prestige UI: show preview and button
+      const prestigeWrap = document.createElement('div');
+      prestigeWrap.className = 'upgrade';
+      const meta = document.createElement('div'); meta.className = 'meta';
+      const title = document.createElement('div'); title.className = 'title'; title.textContent = 'Prestige';
+      const desc = document.createElement('div'); desc.className = 'desc';
+      desc.textContent = 'Reset most progress for Prestige Points that permanently boost gains.';
+      meta.appendChild(title); meta.appendChild(desc);
+
+      const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+      const preview = document.createElement('div'); preview.style.fontSize='13px'; preview.style.color='var(--muted)'; preview.style.marginRight='10px';
+      const gain = computePrestigeGain();
+      preview.textContent = `Gain ${gain} pts`;
+      const btn = document.createElement('button'); btn.textContent = 'Prestige';
+      btn.onclick = () => {
+        if(gain <= 0){ alert('You need more GUH to gain prestige points.'); return; }
+        if(confirm(`Prestige will reset most progress and grant ${gain} Prestige Points. Proceed?`)){
+          doPrestige(gain);
+        }
+      };
+      right.appendChild(preview); right.appendChild(btn);
+      prestigeWrap.appendChild(meta); prestigeWrap.appendChild(right);
+      upgradesEl.appendChild(prestigeWrap);
+
+      // show current prestige points as a small stat row (ensures it's visible)
+      const prestigeStat = document.createElement('div');
+      prestigeStat.className = 'upgrade';
+      const pm = document.createElement('div'); pm.className='meta';
+      const pt = document.createElement('div'); pt.className='title'; pt.textContent = 'Prestige Status';
+      const pd = document.createElement('div'); pd.className='desc'; pd.textContent = `Points: ${format(state.prestigePoints)} · Total Prestiges: ${state.totalPrestiges} · Mult x${state.prestigeMultiplier.toFixed(2)}`;
+      pm.appendChild(pt); pm.appendChild(pd);
+      prestigeStat.appendChild(pm);
+      upgradesEl.appendChild(prestigeStat);
+    }
+
+    function makeUpgrade(title, desc, cost, onBuy, rightLabel){
+      const wrap = document.createElement('div'); wrap.className='upgrade';
+      const meta = document.createElement('div'); meta.className='meta';
       const t = document.createElement('div'); t.className='title'; t.textContent = title;
       const d = document.createElement('div'); d.className='desc'; d.textContent = desc;
       meta.appendChild(t); meta.appendChild(d);
       const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
       const label = document.createElement('div'); label.className='cost'; label.textContent = format(cost);
       const btn = document.createElement('button'); btn.textContent = 'Buy';
-      btn.onclick = () => { if(state.count >= cost){ onBuy(); } else { flashInsufficient(); } };
+      btn.onclick = onBuy;
       right.appendChild(label); right.appendChild(btn);
       if(rightLabel){
         const small = document.createElement('div'); small.style.fontSize='12px'; small.style.color='var(--muted)'; small.style.marginLeft='8px'; small.textContent = rightLabel;
@@ -450,12 +374,8 @@
       return wrap;
     }
 
-    function pulseUpgradeButton(){
-      document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.03)'}], {duration:220,iterations:1});
-    }
-    function flashInsufficient(){
-      const a = document.body.animate([{filter:'hue-rotate(0deg)'},{filter:'hue-rotate(-20deg)'},{filter:'hue-rotate(0deg)'}], {duration:420,iterations:1});
-    }
+    function pulse(){ document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.03)'}], {duration:220,iterations:1}); }
+    function flashInsufficient(){ document.body.animate([{filter:'hue-rotate(0deg)'},{filter:'hue-rotate(-20deg)'},{filter:'hue-rotate(0deg)'}], {duration:420,iterations:1}); }
 
     /* ---------- Click handling & visuals ---------- */
     function doClick(n){
@@ -472,40 +392,24 @@
     guhEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); doClick(effectivePerClick()); }});
 
     function spawnFloat(text){
-      const el = document.createElement('div');
-      el.className = 'float';
-      el.textContent = text;
-      const rect = guhEl.getBoundingClientRect();
-      const stageRect = stage.getBoundingClientRect();
-      const x = rect.left + rect.width/2 - stageRect.left;
-      const y = rect.top + rect.height/2 - stageRect.top;
-      el.style.left = x + (Math.random()*40-20) + 'px';
-      el.style.top = y + (Math.random()*20-10) + 'px';
+      const el = document.createElement('div'); el.className = 'float'; el.textContent = text;
+      const rect = guhEl.getBoundingClientRect(); const stageRect = stage.getBoundingClientRect();
+      const x = rect.left + rect.width/2 - stageRect.left; const y = rect.top + rect.height/2 - stageRect.top;
+      el.style.left = x + (Math.random()*40-20) + 'px'; el.style.top = y + (Math.random()*20-10) + 'px';
       stage.appendChild(el);
-      requestAnimationFrame(()=> {
-        el.style.transform = 'translateY(-120px) scale(1.1)';
-        el.style.opacity = '0';
-      });
+      requestAnimationFrame(()=> { el.style.transform = 'translateY(-120px) scale(1.1)'; el.style.opacity = '0'; });
       setTimeout(()=> el.remove(), 900);
     }
 
     function spawnParticles(){
       for(let i=0;i<10;i++){
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const rect = guhEl.getBoundingClientRect();
-        const stageRect = stage.getBoundingClientRect();
+        const p = document.createElement('div'); p.className = 'particle';
+        const rect = guhEl.getBoundingClientRect(); const stageRect = stage.getBoundingClientRect();
         const x = rect.left + rect.width/2 - stageRect.left + (Math.random()*80-40);
         const y = rect.top + rect.height/2 - stageRect.top + (Math.random()*40-20);
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
-        stage.appendChild(p);
-        const dx = (Math.random()*300-150);
-        const dy = (Math.random()*-200-40);
-        requestAnimationFrame(()=> {
-          p.style.transform = `translate(${dx}px, ${dy}px) scale(${0.6+Math.random()*0.8})`;
-          p.style.opacity = '0';
-        });
+        p.style.left = x + 'px'; p.style.top = y + 'px'; stage.appendChild(p);
+        const dx = (Math.random()*300-150); const dy = (Math.random()*-200-40);
+        requestAnimationFrame(()=> { p.style.transform = `translate(${dx}px, ${dy}px) scale(${0.6+Math.random()*0.8})`; p.style.opacity = '0'; });
         setTimeout(()=> p.remove(), 900);
       }
     }
@@ -519,16 +423,9 @@
         let timer = setInterval(tick, interval);
         onmessage = function(e){
           const d = e.data;
-          if(d.type === 'setInterval'){
-            interval = d.value;
-            clearInterval(timer);
-            timer = setInterval(tick, interval);
-          } else if(d.type === 'stop'){
-            clearInterval(timer);
-          } else if(d.type === 'start'){
-            clearInterval(timer);
-            timer = setInterval(tick, interval);
-          }
+          if(d.type === 'setInterval'){ interval = d.value; clearInterval(timer); timer = setInterval(tick, interval); }
+          else if(d.type === 'stop'){ clearInterval(timer); }
+          else if(d.type === 'start'){ clearInterval(timer); timer = setInterval(tick, interval); }
         };
       `;
       const blob = new Blob([code], {type:'application/javascript'});
@@ -541,8 +438,7 @@
       worker = createWorker();
       worker.onmessage = (e) => {
         if(e.data && e.data.type === 'tick'){
-          // apply auto clicks: autoCount * (baseClickPower * autoPower)
-          const clicks = (state.autoCount || 0) * (state.baseClickPower * (state.autoPower || 1));
+          const clicks = (state.autoCount || 0) * (state.baseClickPower * (state.autoPower || 1) * state.prestigeMultiplier);
           if(clicks > 0) {
             state.count += clicks;
             spawnFloat('+'+format(clicks));
@@ -555,44 +451,69 @@
     }
 
     function restartWorker(){
-      if(state.upgrades.autoBought){
-        startWorker();
-      } else {
-        if(worker){ worker.postMessage({type:'stop'}); worker.terminate(); worker = null; }
-      }
+      if(state.upgrades.autoBought) startWorker();
+      else { if(worker){ worker.postMessage({type:'stop'}); worker.terminate(); worker = null; } }
     }
 
     document.addEventListener('visibilitychange', ()=>{
-      if(document.visibilityState === 'visible'){
-        if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
-      } else {
-        if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
-      }
+      if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
     });
 
-    /* ---------- Simple FPS indicator ---------- */
+    /* ---------- Prestige logic ---------- */
+    function computePrestigeGain(){
+      // Example formula: 1 prestige point per 100k GUH, scaled with sqrt for larger numbers
+      // This formula is intentionally simple and predictable.
+      const base = Math.floor(state.count / 100000);
+      // give a small bonus for existing totalPrestiges (encourages repeated prestiges)
+      const bonus = Math.floor(Math.sqrt(state.totalPrestiges));
+      return Math.max(0, base + bonus);
+    }
+
+    function doPrestige(gain){
+      // apply prestige points and multiplier
+      state.prestigePoints += gain;
+      state.totalPrestiges += 1;
+      // each prestige point gives a small permanent multiplier; example: 1% per point
+      state.prestigeMultiplier = 1 + state.prestigePoints * 0.01;
+
+      // reset most progress but keep prestige-related fields and efficiency upgrades optionally
+      const keep = {
+        prestigePoints: state.prestigePoints,
+        prestigeMultiplier: state.prestigeMultiplier,
+        totalPrestiges: state.totalPrestiges
+      };
+
+      // reset to defaults but preserve prestige fields
+      state = JSON.parse(JSON.stringify(defaultState));
+      state.prestigePoints = keep.prestigePoints;
+      state.prestigeMultiplier = keep.prestigeMultiplier;
+      state.totalPrestiges = keep.totalPrestiges;
+
+      // save and restart worker
+      saveState();
+      render();
+      restartWorker();
+      alert(`You gained ${gain} Prestige Points. Permanent multiplier is now x${state.prestigeMultiplier.toFixed(2)}.`);
+    }
+
+    /* ---------- FPS indicator ---------- */
     let last = performance.now(), frames = 0;
     function fpsTick(now){
       frames++;
       if(now - last >= 1000){
         fpsEl.textContent = frames + ' fps';
-        frames = 0;
-        last = now;
+        frames = 0; last = now;
       }
       requestAnimationFrame(fpsTick);
     }
     requestAnimationFrame(fpsTick);
 
-    /* ---------- Load and start ---------- */
-    render();
-    if(state.upgrades.autoBought) startWorker();
-    setInterval(saveState, 2000);
-
     /* ---------- Cross-tab sync ---------- */
     window.addEventListener('storage', (e)=>{
-      if(e.key === 'guh_state_v2' && e.newValue){
+      if(e.key === SAVE_KEY && e.newValue){
         try{
           const other = JSON.parse(e.newValue);
+          // merge minimal fields to avoid overwriting local transient UI
           state.count = other.count;
           state.baseClickPower = other.baseClickPower;
           state.multiplier = other.multiplier;
@@ -600,12 +521,29 @@
           state.autoIntervalMs = other.autoIntervalMs;
           state.autoPower = other.autoPower;
           state.upgrades = other.upgrades;
+          state.prestigePoints = other.prestigePoints;
+          state.prestigeMultiplier = other.prestigeMultiplier;
+          state.totalPrestiges = other.totalPrestiges;
           render();
         }catch(err){}
       }
     });
 
-    /* ---------- Reset helper ---------- */
+    /* ---------- Init ---------- */
+    // ensure DOM shows prestige points element
+    const statNodes = document.querySelectorAll('.stat');
+    // create a small element to show prestige points in the panel header area
+    const prestigeStatEl = document.getElementById('prestigePoints');
+    if(!prestigeStatEl){
+      // already created as stat row earlier; ensure it displays
+      // nothing to do
+    }
+
+    render();
+    if(state.upgrades.autoBought) startWorker();
+    setInterval(()=> saveState(), 2000);
+
+    /* ---------- Debug / reset helper ---------- */
     window.resetGuh = function(){
       if(confirm('Reset game to defaults?')){
         state = JSON.parse(JSON.stringify(defaultState));
