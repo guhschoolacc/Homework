@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>GUH Clicker</title>
 
-  <!-- Cursive font -->
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-
   <style>
     :root{
       --bg:#0f1724;
@@ -75,11 +72,11 @@
       box-shadow: 0 20px 60px rgba(2,6,23,0.6);
     }
 
-    /* The big "guh" */
+    /* The big "guh" - Comic Sans */
     .guh{
-      font-family:'Great Vibes', cursive;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
       font-size:140px;
-      color:linear-gradient(#fff,#ddd);
+      color:#ffffff;
       cursor:pointer;
       user-select:none;
       -webkit-user-select:none;
@@ -87,18 +84,19 @@
       transition:transform .12s cubic-bezier(.2,.9,.3,1), filter .18s;
       text-shadow: 0 6px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02);
       letter-spacing:2px;
+      position:relative;
+      z-index:2;
     }
     .guh:active{transform:scale(.96) rotate(-1deg);}
 
-    /* shine animation */
+    /* remove weird blur/shine around guh - keep a subtle highlight without blur */
     .guh::after{
       content:'';
       position:absolute;
       width:220px;height:80px;
       left:50%;top:50%;
       transform:translate(-50%,-50%) rotate(12deg) translateX(-300px);
-      background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.18), rgba(255,255,255,0.0));
-      filter:blur(18px);
+      background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.12), rgba(255,255,255,0.0));
       opacity:0;
       transition:opacity .25s, transform .9s;
       pointer-events:none;
@@ -115,6 +113,7 @@
       transform:translateY(0) scale(1);
       opacity:1;
       transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
+      z-index:3;
     }
 
     /* right panel */
@@ -184,16 +183,16 @@
       align-items:center;
     }
 
-    /* particle */
+    /* particle (no blur) */
     .particle{
       position:absolute;
       width:10px;height:10px;border-radius:50%;
       background:linear-gradient(90deg,var(--accent),#b6ffb6);
       pointer-events:none;
-      filter:blur(.6px);
       opacity:0.95;
       transform:translate(-50%,-50%) scale(1);
       transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
+      z-index:1;
     }
 
     /* responsive */
@@ -212,7 +211,6 @@
   <div class="game-wrap" role="application" aria-label="GUH Clicker game">
     <div class="stage" id="stage">
       <div id="guh" class="guh" role="button" tabindex="0" aria-label="Click GUH">guh</div>
-      <!-- floating numbers and particles will be appended here -->
     </div>
 
     <div class="panel" aria-hidden="false">
@@ -221,9 +219,7 @@
       <div class="stat"><div>Auto Clickers</div><div class="value" id="autoCount">0</div></div>
 
       <div style="font-weight:800; color:var(--muted); margin-top:8px;">Upgrades</div>
-      <div class="upgrades" id="upgrades">
-        <!-- upgrades injected here -->
-      </div>
+      <div class="upgrades" id="upgrades"></div>
 
       <div class="footer">
         <div>Saved automatically</div>
@@ -233,18 +229,22 @@
   </div>
 
   <script>
-    /* ---------- Game state ---------- */
+    /* ---------- Game state with clear base and multiplier ---------- */
     const defaultState = {
       count: 0,
-      perClick: 1,
+      baseClickPower: 1,      // base GUH per click before multipliers
+      multiplier: 1,          // multiplicative factor applied to baseClickPower
       autoCount: 0,
-      autoPower: 1,
+      autoPower: 1,           // how many GUH each auto click gives (multiplies baseClickPower)
       autoIntervalMs: 1000,
       upgrades: {
         clickPowerLevel: 0,
         multiplierLevel: 0,
         autoBought: false,
-        autoSpeedLevel: 0
+        autoSpeedLevel: 0,
+        megaClickLevel: 0,
+        autoPowerLevel: 0,
+        efficiencyLevel: 0
       }
     };
 
@@ -259,11 +259,11 @@
 
     /* ---------- Utilities ---------- */
     function saveState(){
-      localStorage.setItem('guh_state_v1', JSON.stringify(state));
+      localStorage.setItem('guh_state_v2', JSON.stringify(state));
     }
     function loadState(){
       try{
-        const raw = localStorage.getItem('guh_state_v1');
+        const raw = localStorage.getItem('guh_state_v2');
         if(raw) return JSON.parse(raw);
       }catch(e){}
       return JSON.parse(JSON.stringify(defaultState));
@@ -275,28 +275,34 @@
       return Math.floor(n).toString();
     }
 
+    /* compute effective per-click */
+    function effectivePerClick(){
+      return state.baseClickPower * state.multiplier;
+    }
+
     /* ---------- UI updates ---------- */
     function render(){
       countEl.textContent = format(state.count);
-      perClickEl.textContent = format(state.perClick);
+      perClickEl.textContent = format(effectivePerClick());
       autoCountEl.textContent = state.autoCount;
       renderUpgrades();
     }
 
     function renderUpgrades(){
       upgradesEl.innerHTML = '';
-      // Click Power upgrade
+
+      // Click Power upgrade (increases baseClickPower)
       const cpLevel = state.upgrades.clickPowerLevel;
       const cpCost = Math.floor(10 * Math.pow(2, cpLevel));
       upgradesEl.appendChild(makeUpgrade(
         'Click Power',
-        'Increase base GUH per click.',
+        'Increase base GUH per click by +1.',
         cpCost,
         () => {
           if(state.count >= cpCost){
             state.count -= cpCost;
             state.upgrades.clickPowerLevel++;
-            state.perClick = 1 + state.upgrades.clickPowerLevel * 1;
+            state.baseClickPower += 1;
             saveState(); render();
             pulseUpgradeButton();
           }
@@ -304,18 +310,18 @@
         `Level ${cpLevel}`
       ));
 
-      // Multiplier upgrade
+      // Click Multiplier upgrade (multiplicative)
       const mLevel = state.upgrades.multiplierLevel;
       const mCost = Math.floor(50 * Math.pow(2, mLevel));
       upgradesEl.appendChild(makeUpgrade(
         'Click Multiplier',
-        'Multiply your click power by 2.',
+        'Multiply your base click power by 2.',
         mCost,
         () => {
           if(state.count >= mCost){
             state.count -= mCost;
             state.upgrades.multiplierLevel++;
-            state.perClick *= 2;
+            state.multiplier *= 2;
             saveState(); render();
             pulseUpgradeButton();
           }
@@ -323,12 +329,31 @@
         `x${Math.pow(2,mLevel)}`
       ));
 
-      // Auto Clicker purchase
+      // Mega Click (adds a flat big bonus to base)
+      const megaLevel = state.upgrades.megaClickLevel;
+      const megaCost = Math.floor(200 * Math.pow(2, megaLevel));
+      upgradesEl.appendChild(makeUpgrade(
+        'Mega Click',
+        'Add a big flat bonus to base click power (+5).',
+        megaCost,
+        () => {
+          if(state.count >= megaCost){
+            state.count -= megaCost;
+            state.upgrades.megaClickLevel++;
+            state.baseClickPower += 5;
+            saveState(); render();
+            pulseUpgradeButton();
+          }
+        },
+        `Level ${megaLevel}`
+      ));
+
+      // Auto Clicker purchase / speed / count
       const autoBought = state.upgrades.autoBought;
-      const autoCost = 200 * Math.pow(2, state.upgrades.autoSpeedLevel);
+      const autoCost = Math.floor(200 * Math.pow(2, state.upgrades.autoSpeedLevel));
       upgradesEl.appendChild(makeUpgrade(
         autoBought ? 'Upgrade Auto Speed' : 'Buy Auto Clicker',
-        autoBought ? 'Decrease auto click interval.' : 'Auto clicks for you every interval.',
+        autoBought ? 'Decrease auto click interval or add another auto clicker.' : 'Auto clicks for you every interval.',
         autoCost,
         () => {
           if(state.count >= autoCost){
@@ -338,7 +363,6 @@
               state.autoCount = 1;
               state.autoPower = 1;
             } else {
-              // speed upgrade: reduce interval by 15% each level, min 100ms
               state.upgrades.autoSpeedLevel++;
               state.autoIntervalMs = Math.max(100, Math.round(state.autoIntervalMs * 0.85));
               state.autoCount += 1;
@@ -351,17 +375,61 @@
         autoBought ? `Speed Lv ${state.upgrades.autoSpeedLevel}` : 'Not owned'
       ));
 
-      // Prestige / Reset (optional)
+      // Auto Power upgrade (increase how much each auto click gives)
+      const apLevel = state.upgrades.autoPowerLevel;
+      const apCost = Math.floor(300 * Math.pow(2, apLevel));
+      upgradesEl.appendChild(makeUpgrade(
+        'Auto Power',
+        'Increase GUH per auto click (adds +1 to autoPower).',
+        apCost,
+        () => {
+          if(state.count >= apCost && state.upgrades.autoBought){
+            state.count -= apCost;
+            state.upgrades.autoPowerLevel++;
+            state.autoPower += 1;
+            saveState(); render();
+            pulseUpgradeButton();
+          } else if(!state.upgrades.autoBought){
+            alert('Buy an Auto Clicker first.');
+          }
+        },
+        `Lv ${apLevel}`
+      ));
+
+      // Efficiency (reduces future upgrade costs slightly)
+      const effLevel = state.upgrades.efficiencyLevel;
+      const effCost = Math.floor(500 * Math.pow(2, effLevel));
+      upgradesEl.appendChild(makeUpgrade(
+        'Efficiency',
+        'Reduce future upgrade costs by 5% (stacking).',
+        effCost,
+        () => {
+          if(state.count >= effCost){
+            state.count -= effCost;
+            state.upgrades.efficiencyLevel++;
+            saveState(); render();
+            pulseUpgradeButton();
+          }
+        },
+        `Lv ${effLevel}`
+      ));
+
+      // Prestige placeholder
       upgradesEl.appendChild(makeUpgrade(
         'Prestige (Reset)',
-        'Reset for a permanent multiplier (not implemented).',
+        'Reset for a permanent multiplier (placeholder).',
         999999999,
         () => { alert('Prestige is a placeholder in this demo.'); },
         ''
       ));
     }
 
-    function makeUpgrade(title, desc, cost, onBuy, rightLabel){
+    function makeUpgrade(title, desc, costRaw, onBuy, rightLabel){
+      // apply efficiency discount to displayed cost
+      const eff = state.upgrades.efficiencyLevel || 0;
+      const discount = Math.pow(0.95, eff);
+      const cost = Math.max(1, Math.floor(costRaw * discount));
+
       const wrap = document.createElement('div');
       wrap.className = 'upgrade';
       const meta = document.createElement('div');
@@ -372,7 +440,7 @@
       const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
       const label = document.createElement('div'); label.className='cost'; label.textContent = format(cost);
       const btn = document.createElement('button'); btn.textContent = 'Buy';
-      btn.onclick = onBuy;
+      btn.onclick = () => { if(state.count >= cost){ onBuy(); } else { flashInsufficient(); } };
       right.appendChild(label); right.appendChild(btn);
       if(rightLabel){
         const small = document.createElement('div'); small.style.fontSize='12px'; small.style.color='var(--muted)'; small.style.marginLeft='8px'; small.textContent = rightLabel;
@@ -383,8 +451,10 @@
     }
 
     function pulseUpgradeButton(){
-      // small visual pulse
       document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.03)'}], {duration:220,iterations:1});
+    }
+    function flashInsufficient(){
+      const a = document.body.animate([{filter:'hue-rotate(0deg)'},{filter:'hue-rotate(-20deg)'},{filter:'hue-rotate(0deg)'}], {duration:420,iterations:1});
     }
 
     /* ---------- Click handling & visuals ---------- */
@@ -394,13 +464,12 @@
       spawnParticles();
       saveState();
       render();
-      // shine effect
       guhEl.classList.add('shine');
       setTimeout(()=>guhEl.classList.remove('shine'), 420);
     }
 
-    guhEl.addEventListener('click', ()=> doClick(state.perClick));
-    guhEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); doClick(state.perClick); }});
+    guhEl.addEventListener('click', ()=> doClick(effectivePerClick()));
+    guhEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); doClick(effectivePerClick()); }});
 
     function spawnFloat(text){
       const el = document.createElement('div');
@@ -442,13 +511,11 @@
     }
 
     /* ---------- Auto clicker via Web Worker ---------- */
-    // Create worker from blob so it's self-contained
     let worker = null;
     function createWorker(){
       const code = `
         let interval = 1000;
-        let running = true;
-        function tick(){ postMessage({type:'tick'}); }
+        function tick(){ postMessage({type:'tick', time:Date.now()}); }
         let timer = setInterval(tick, interval);
         onmessage = function(e){
           const d = e.data;
@@ -457,13 +524,10 @@
             clearInterval(timer);
             timer = setInterval(tick, interval);
           } else if(d.type === 'stop'){
-            running = false;
             clearInterval(timer);
           } else if(d.type === 'start'){
-            if(!running){
-              running = true;
-              timer = setInterval(tick, interval);
-            }
+            clearInterval(timer);
+            timer = setInterval(tick, interval);
           }
         };
       `;
@@ -477,10 +541,9 @@
       worker = createWorker();
       worker.onmessage = (e) => {
         if(e.data && e.data.type === 'tick'){
-          // apply auto clicks: autoCount * autoPower
-          const clicks = (state.autoCount || 0) * (state.autoPower || 1);
+          // apply auto clicks: autoCount * (baseClickPower * autoPower)
+          const clicks = (state.autoCount || 0) * (state.baseClickPower * (state.autoPower || 1));
           if(clicks > 0) {
-            // apply clicks in main thread
             state.count += clicks;
             spawnFloat('+'+format(clicks));
             saveState();
@@ -488,7 +551,6 @@
           }
         }
       };
-      // set interval
       worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
     }
 
@@ -500,18 +562,15 @@
       }
     }
 
-    // Try to keep worker running when page hidden: if page becomes visible, restart worker to sync interval
     document.addEventListener('visibilitychange', ()=>{
       if(document.visibilityState === 'visible'){
-        // sync worker interval
         if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
       } else {
-        // when hidden, still keep worker running; some browsers will throttle it
         if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
       }
     });
 
-    /* ---------- Simple FPS indicator (for fun) ---------- */
+    /* ---------- Simple FPS indicator ---------- */
     let last = performance.now(), frames = 0;
     function fpsTick(now){
       frames++;
@@ -527,27 +586,26 @@
     /* ---------- Load and start ---------- */
     render();
     if(state.upgrades.autoBought) startWorker();
-
-    // autosave every 2s
     setInterval(saveState, 2000);
 
-    /* ---------- Cross-tab sync (so auto clicks persist across tabs) ---------- */
+    /* ---------- Cross-tab sync ---------- */
     window.addEventListener('storage', (e)=>{
-      if(e.key === 'guh_state_v1' && e.newValue){
+      if(e.key === 'guh_state_v2' && e.newValue){
         try{
           const other = JSON.parse(e.newValue);
-          // merge minimal fields to avoid overwriting local transient UI
           state.count = other.count;
-          state.perClick = other.perClick;
+          state.baseClickPower = other.baseClickPower;
+          state.multiplier = other.multiplier;
           state.autoCount = other.autoCount;
           state.autoIntervalMs = other.autoIntervalMs;
+          state.autoPower = other.autoPower;
           state.upgrades = other.upgrades;
           render();
         }catch(err){}
       }
     });
 
-    /* ---------- Helpful: allow manual reset via console: window.resetGuh() ---------- */
+    /* ---------- Reset helper ---------- */
     window.resetGuh = function(){
       if(confirm('Reset game to defaults?')){
         state = JSON.parse(JSON.stringify(defaultState));
@@ -557,11 +615,9 @@
       }
     };
 
-    /* ---------- Accessibility: keyboard focus styles ---------- */
+    /* ---------- Accessibility ---------- */
     guhEl.addEventListener('focus', ()=> guhEl.style.outline = '3px solid rgba(126,231,135,0.12)');
     guhEl.addEventListener('blur', ()=> guhEl.style.outline = 'none');
-
-    /* ---------- End of script ---------- */
   </script>
 </body>
 </html>
