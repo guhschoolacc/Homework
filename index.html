@@ -89,7 +89,7 @@
         <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Signed in as</div>
         <div id="sidebarUser" style="display:flex;align-items:center;gap:8px">
           <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="sidebarAvatar" src="" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-          <!-- sidebar username removed to avoid duplication; bottom-left profile shows username -->
+          <!-- sidebar username intentionally removed to avoid duplication; bottom-left profile shows username -->
           <div style="display:flex;flex-direction:column;min-width:0">
             <div id="sidebarEmail" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
           </div>
@@ -173,14 +173,8 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Full single-file app with:
-       - only-one-open-section navigation
-       - bottom-left profile (clickable)
-       - uniform tool buttons (no descriptions)
-       - removed duplicate sidebar username
-       - removed specified tools
-       - added requested games
-       - full settings, favorites, notifications, panic key, tab masking
+    /* Final index.html: ensures requested games are merged into localStorage on load,
+       removes duplicate sidebar username, removes specified tools, and keeps full settings.
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -193,7 +187,7 @@
 
     const KEY_GAMES='hw_games', KEY_TOOLS='hw_tools', KEY_FAVS='hw_favs', KEY_USERS='hw_users', KEY_CURRENT_USER='hw_currentUser', KEY_NOTIFS='hw_notifications', KEY_THEME='hw_theme_name', KEY_TAB_TITLE='hw_tab_title', KEY_TAB_ICON='hw_tab_icon', KEY_PANIC_KEY='hw_panic_key', KEY_PANIC_CTRL='hw_panic_ctrl', KEY_PANIC_ACTION='hw_panic_action', KEY_FONT_SCALE='hw_font_scale';
 
-    /* DEFAULT_GAMES updated with requested entries */
+    /* DEFAULT_GAMES includes requested entries */
     const DEFAULT_GAMES = [
       {id:'sandbox',label:'Sandbox',href:'sandbox.html'},
       {id:'snake',label:'Snake Game Ripoff',href:'snake.html'},
@@ -227,7 +221,17 @@
       {id:'soundboard',label:'Soundboard',href:'soundboard.html'}
     ];
 
+    /* Extras to ensure present in stored games (merge on load) */
+    const EXTRA_GAMES = [
+      {id:'bubble-shooter',label:'Bubble Shooter',href:'bubble-shooter.html'},
+      {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
+      {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
+      {id:'chess',label:'Chess',href:'chess.html'},
+      {id:'hangman',label:'Hangman',href:'hangman.html'}
+    ];
+
     function ensureDefaults(){
+      // ensure base defaults exist
       if(!getJSON(KEY_GAMES,null)) setJSON(KEY_GAMES,DEFAULT_GAMES);
       if(!getJSON(KEY_TOOLS,null)) setJSON(KEY_TOOLS,DEFAULT_TOOLS);
       if(!getJSON(KEY_FAVS,null)) setJSON(KEY_FAVS,[]);
@@ -241,6 +245,13 @@
       if(get(KEY_TAB_TITLE,null)===null) set(KEY_TAB_TITLE,'');
       if(get(KEY_TAB_ICON,null)===null) set(KEY_TAB_ICON,'');
       if(get(KEY_FONT_SCALE,null)===null) set(KEY_FONT_SCALE,'1');
+
+      // merge extras into stored games (avoid duplicates)
+      try{
+        const stored = getJSON(KEY_GAMES, DEFAULT_GAMES);
+        EXTRA_GAMES.forEach(e => { if(!stored.some(g => g.id === e.id)) stored.push(e); });
+        setJSON(KEY_GAMES, stored);
+      }catch(e){}
     }
 
     /* Favorites */
