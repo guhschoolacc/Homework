@@ -177,13 +177,12 @@
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
 
   <script>
-    /* Final full index.html:
-       - Restored Settings
-       - Block Breaker included in default games
-       - Add (Games/Tools) supports upload or paste of HTML, saved to localStorage
-       - User-added items are removable and persist
-       - Only one category visible at a time
-       - Fixed duplicate username overlap
+    /* Full index.html with:
+       - Block Breaker included in default games and rendered
+       - Add (Games/Tools) supports upload/paste of HTML, saved to localStorage and removable
+       - Panic key fixed and fully functional with all preset actions
+       - Settings restored with previous features: avatar upload, username/email, password change (current/email), panic key + ctrl, panic action presets, tab masking (title/icon), theme presets, font size, mask quick buttons, reset
+       - Sidebar shows avatar + email only (avoids duplicate username overlap); bottom profile shows username
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -267,11 +266,58 @@
     function applyTabMasking(){ const title=get(KEY_TAB_TITLE,''); const icon=get(KEY_TAB_ICON,''); document.title = title || 'homewrk'; setFavicon(icon||DEFAULT_FAVICON); const theme=get(KEY_THEME,''); document.documentElement.classList.remove('theme-light','theme-midnight'); if(theme) document.documentElement.classList.add(theme); document.documentElement.style.setProperty('--font-scale', get(KEY_FONT_SCALE,'1')); }
     function setFavicon(h){ try{ let link=document.getElementById('siteFavicon'); if(!link){ link=document.createElement('link'); link.id='siteFavicon'; link.rel='icon'; document.head.appendChild(link);} link.setAttribute('href',h||DEFAULT_FAVICON);}catch(e){} }
 
+    /* Panic actions implementation */
+    const PANIC_PRESETS = {
+      close_tab:{label:'Close tab'},
+      goto_drive:{label:'Go to Google Drive',url:'https://drive.google.com'},
+      goto_gmail:{label:'Go to Gmail',url:'https://mail.google.com'},
+      goto_google:{label:'Go to Google',url:'https://www.google.com'},
+      mask_drive:{label:'Mask as Google Drive',mask:{title:'My Drive - Google Drive',icon:'https://drive.google.com/favicon.ico'}},
+      mask_gmail:{label:'Mask as Gmail',mask:{title:'Inbox - Gmail',icon:'https://mail.google.com/favicon.ico'}},
+      mask_google:{label:'Mask as Google',mask:{title:'Google',icon:'https://www.google.com/favicon.ico'}},
+      mute_audio:{label:'Mute audio on page'},
+      hide_content:{label:'Hide page content (blank)'},
+      lock_overlay:{label:'Lock overlay (quick hide)'}
+    };
+
+    function performPanicAction(action){
+      try{
+        if(!action) return;
+        if(action === 'close_tab'){ try{ window.close(); }catch(e){}; setTimeout(()=>{ try{ window.location.href='about:blank'; }catch(e){} },200); return; }
+        const preset = PANIC_PRESETS[action];
+        if(!preset) return;
+        if(preset.url){ window.location.href = preset.url; return; }
+        if(preset.mask){ set(KEY_TAB_TITLE,preset.mask.title); set(KEY_TAB_ICON,preset.mask.icon); applyTabMasking(); return; }
+        if(action === 'mute_audio'){ document.querySelectorAll('audio,video').forEach(el=>el.muted=true); showTemporaryOverlay('Audio muted'); return; }
+        if(action === 'hide_content'){ document.querySelectorAll('body > *').forEach(el=>{ if(el.id==='modalBackdrop') return; try{ el.style.visibility='hidden'; }catch(e){} }); set(KEY_TAB_TITLE,'Documents - University'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); return; }
+        if(action === 'lock_overlay'){ showLockOverlay(); return; }
+      }catch(err){ console.warn('performPanicAction error', err); }
+    }
+
+    function showTemporaryOverlay(text){
+      const o=document.createElement('div');
+      o.style.position='fixed'; o.style.inset='0'; o.style.background='#000'; o.style.opacity='0.9'; o.style.zIndex='99999'; o.style.display='flex';
+      o.style.alignItems='center'; o.style.justifyContent='center'; o.style.color='#fff'; o.style.fontSize='20px'; o.textContent=text;
+      document.body.appendChild(o); setTimeout(()=>document.body.removeChild(o),1500);
+    }
+
+    function showLockOverlay(){
+      if(document.getElementById('hw_lock_overlay')) return;
+      const o=document.createElement('div'); o.id='hw_lock_overlay'; o.style.position='fixed'; o.style.inset='0'; o.style.background='#fff'; o.style.zIndex='999999';
+      o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.flexDirection='column';
+      const t=document.createElement('div'); t.textContent='Locked'; t.style.marginBottom='12px'; t.style.fontSize='20px';
+      const btn=document.createElement('button'); btn.textContent='Unlock'; btn.className='btn primary'; btn.onclick=()=>document.body.removeChild(o);
+      o.appendChild(t); o.appendChild(btn); document.body.appendChild(o);
+    }
+
     /* Account system */
     function getUsers(){ return getJSON(KEY_USERS, {}); }
     function saveUsers(u){ setJSON(KEY_USERS, u); }
     function getCurrentUser(){ return get(KEY_CURRENT_USER, null); }
     function setCurrentUser(u){ set(KEY_CURRENT_USER, u); renderProfile(); }
+
+    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
+    function verifyPassword(stored, candidate){ try{ return stored === encodePassword(candidate); }catch(e){ return false; } }
 
     /* UI elements */
     const gamesGrid = document.getElementById('gamesGrid');
@@ -291,13 +337,11 @@
         if(g.code) el.dataset.hasCode = 'true';
         el.tabIndex = 0;
 
-        // label
         const label = document.createElement('span');
         label.className = 'label';
         label.textContent = g.label || g.id;
         el.appendChild(label);
 
-        // favorite button
         const fav = document.createElement('button');
         fav.className = 'fav-btn';
         fav.title = 'Favorite';
@@ -305,7 +349,6 @@
         fav.innerHTML = '☆';
         el.appendChild(fav);
 
-        // removable if userAdded
         if(g.userAdded){
           const rem = document.createElement('button');
           rem.className = 'remove-btn';
@@ -419,7 +462,7 @@
       });
     });
 
-    /* Navigation: show only selected section (guaranteed) */
+    /* Navigation */
     const navItems = document.querySelectorAll('.nav-item');
     function showSection(name){
       navItems.forEach(n=>n.classList.toggle('active', n.dataset.category===name));
@@ -454,7 +497,6 @@
         e.preventDefault();
         const id = remBtn.dataset.id;
         if(!confirm('Remove this custom item?')) return;
-        // remove from games and tools
         let games = getJSON(KEY_GAMES, DEFAULT_GAMES);
         let tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS);
         const gIdx = games.findIndex(x=>x.id===id && x.userAdded);
@@ -677,7 +719,7 @@
         if(p !== p2){ alert('Passwords do not match'); return; }
         const users = getUsers();
         if(users[u]){ alert('Username exists'); return; }
-        users[u] = { password: btoa(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
+        users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
         saveUsers(users);
         setCurrentUser(u);
         createNotification('Welcome', `Account created for ${u}`);
@@ -704,7 +746,7 @@
           const lower = id.toLowerCase();
           matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
         }
-        if(!matchedUser || !users[matchedUser] || users[matchedUser].password !== btoa(p)){ alert('Invalid credentials'); return; }
+        if(!matchedUser || !users[matchedUser] || !verifyPassword(users[matchedUser].password, p)){ alert('Invalid credentials'); return; }
         setCurrentUser(matchedUser);
         createNotification('Signed in', `Welcome back, ${matchedUser}`);
         closeModal();
@@ -961,7 +1003,7 @@
       };
     }
 
-    /* Add Tool modal: HTML-only custom code allowed (stored and opened in new window) */
+    /* Add Tool modal */
     function renderAddToolModal(){
       modal.innerHTML = `
         <h3>Add Tool (HTML only)</h3>
@@ -973,7 +1015,7 @@
           <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
           <input id="newToolFile" type="file" accept=".html,text/html">
           <textarea id="newToolCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved tools open in a new window. Custom tools are removable.</div>
+          <div class="muted" style="margin-top:6px">Saved tools open in a new window. You can remove them later.</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>
       `;
@@ -1004,7 +1046,7 @@
       };
     }
 
-    /* Add Game modal: HTML-only custom code allowed (stored and opened in new window) */
+    /* Add Game modal */
     function renderAddGameModal(){
       modal.innerHTML = `
         <h3>Add Game (HTML only)</h3>
@@ -1016,7 +1058,7 @@
           <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
           <input id="newGameFile" type="file" accept=".html,text/html">
           <textarea id="newGameCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved games open in a new window. Custom games are removable.</div>
+          <div class="muted" style="margin-top:6px">Saved games open in a new window. You can remove them later.</div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>
       `;
@@ -1049,10 +1091,8 @@
 
     /* Helpers */
     function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
-    function verifyPassword(stored, candidate){ return stored === encodePassword(candidate); }
 
-    /* Panic key listener */
+    /* Panic key listener (fixed) */
     window.addEventListener('keydown', (e) => {
       try {
         const active = document.activeElement;
@@ -1061,13 +1101,12 @@
         const requiresCtrl = get(KEY_PANIC_CTRL, 'false') === 'true';
         const action = get(KEY_PANIC_ACTION, 'close_tab');
         if(!storedKey) return;
+        // support single char or named keys
         const keyMatch = (storedKey.length === 1) ? (e.key === storedKey) : (e.key.toLowerCase() === storedKey.toLowerCase());
         if(!keyMatch) return;
         if(requiresCtrl && !e.ctrlKey) return;
         e.preventDefault();
-        if(action === 'close_tab'){ try{ window.close(); }catch(e){} }
-        else if(action === 'mute_audio'){ document.querySelectorAll('audio,video').forEach(el=>el.muted=true); }
-        else if(action === 'hide_content'){ document.body.style.visibility='hidden'; }
+        performPanicAction(action);
       } catch(err){ console.warn('panic key handler error', err); }
     });
 
