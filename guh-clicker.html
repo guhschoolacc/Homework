@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GUH Clicker</title>
+
+  <!-- Cursive font -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f1724;
+      --panel:#0b1220;
+      --accent:#7ee787;
+      --muted:#9aa6b2;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.02);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(126,231,135,0.06), transparent),
+                  radial-gradient(900px 400px at 90% 90%, rgba(120,180,255,0.03), transparent),
+                  var(--bg);
+      color:#e6eef6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    /* Top-left dashboard button */
+    .top-left {
+      position:fixed;
+      left:18px;
+      top:18px;
+      z-index:50;
+    }
+    .dash-btn{
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      color:var(--muted);
+      padding:8px 12px;
+      border-radius:8px;
+      text-decoration:none;
+      font-weight:600;
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6), inset 0 -1px 0 rgba(255,255,255,0.02);
+      transition:transform .18s ease, color .18s ease;
+    }
+    .dash-btn:hover{transform:translateY(-3px); color:var(--accent);}
+
+    /* Main container */
+    .game-wrap{
+      width:100%;
+      max-width:1100px;
+      height:80vh;
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:28px;
+      align-items:center;
+      padding:28px;
+      box-sizing:border-box;
+    }
+
+    .stage{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      padding:40px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 20px 60px rgba(2,6,23,0.6);
+    }
+
+    /* The big "guh" */
+    .guh{
+      font-family:'Great Vibes', cursive;
+      font-size:140px;
+      color:linear-gradient(#fff,#ddd);
+      cursor:pointer;
+      user-select:none;
+      -webkit-user-select:none;
+      transform-origin:center;
+      transition:transform .12s cubic-bezier(.2,.9,.3,1), filter .18s;
+      text-shadow: 0 6px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02);
+      letter-spacing:2px;
+    }
+    .guh:active{transform:scale(.96) rotate(-1deg);}
+
+    /* shine animation */
+    .guh::after{
+      content:'';
+      position:absolute;
+      width:220px;height:80px;
+      left:50%;top:50%;
+      transform:translate(-50%,-50%) rotate(12deg) translateX(-300px);
+      background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.18), rgba(255,255,255,0.0));
+      filter:blur(18px);
+      opacity:0;
+      transition:opacity .25s, transform .9s;
+      pointer-events:none;
+    }
+    .guh.shine::after{ transform:translate(-50%,-50%) rotate(12deg) translateX(300px); opacity:1; }
+
+    /* floating +score */
+    .float {
+      position:absolute;
+      font-weight:700;
+      color:var(--accent);
+      text-shadow:0 2px 8px rgba(0,0,0,0.6);
+      pointer-events:none;
+      transform:translateY(0) scale(1);
+      opacity:1;
+      transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
+    }
+
+    /* right panel */
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:18px;
+      height:100%;
+      box-sizing:border-box;
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .stat{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:10px;
+      background:var(--glass);
+      color:var(--muted);
+      font-weight:600;
+    }
+    .stat .value{color:var(--accent); font-weight:800;}
+
+    .upgrades{
+      margin-top:6px;
+      overflow:auto;
+      padding-right:6px;
+    }
+    .upgrade{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border-radius:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.02);
+      transition:transform .12s, box-shadow .12s;
+    }
+    .upgrade:hover{transform:translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.6);}
+    .upgrade .meta{display:flex;flex-direction:column;}
+    .upgrade .meta .title{font-weight:700; color:#eaf7ea;}
+    .upgrade .meta .desc{font-size:12px; color:var(--muted); margin-top:4px;}
+    .upgrade button{
+      background:linear-gradient(180deg, rgba(126,231,135,0.14), rgba(126,231,135,0.06));
+      color:#04210a;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .12s;
+    }
+    .upgrade button:active{transform:translateY(1px);}
+    .upgrade .cost{font-weight:800; color:var(--accent); margin-left:8px;}
+
+    /* small footer */
+    .footer{
+      margin-top:auto;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    /* particle */
+    .particle{
+      position:absolute;
+      width:10px;height:10px;border-radius:50%;
+      background:linear-gradient(90deg,var(--accent),#b6ffb6);
+      pointer-events:none;
+      filter:blur(.6px);
+      opacity:0.95;
+      transform:translate(-50%,-50%) scale(1);
+      transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms;
+    }
+
+    /* responsive */
+    @media (max-width:980px){
+      .game-wrap{grid-template-columns:1fr; padding:18px; height:92vh;}
+      .panel{height:auto;}
+      .guh{font-size:96px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="top-left">
+    <a class="dash-btn" href="index.html">Back to dashboard</a>
+  </div>
+
+  <div class="game-wrap" role="application" aria-label="GUH Clicker game">
+    <div class="stage" id="stage">
+      <div id="guh" class="guh" role="button" tabindex="0" aria-label="Click GUH">guh</div>
+      <!-- floating numbers and particles will be appended here -->
+    </div>
+
+    <div class="panel" aria-hidden="false">
+      <div class="stat"><div>GUH Count</div><div class="value" id="count">0</div></div>
+      <div class="stat"><div>Per Click</div><div class="value" id="perClick">1</div></div>
+      <div class="stat"><div>Auto Clickers</div><div class="value" id="autoCount">0</div></div>
+
+      <div style="font-weight:800; color:var(--muted); margin-top:8px;">Upgrades</div>
+      <div class="upgrades" id="upgrades">
+        <!-- upgrades injected here -->
+      </div>
+
+      <div class="footer">
+        <div>Saved automatically</div>
+        <div id="fps" style="color:var(--muted)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- Game state ---------- */
+    const defaultState = {
+      count: 0,
+      perClick: 1,
+      autoCount: 0,
+      autoPower: 1,
+      autoIntervalMs: 1000,
+      upgrades: {
+        clickPowerLevel: 0,
+        multiplierLevel: 0,
+        autoBought: false,
+        autoSpeedLevel: 0
+      }
+    };
+
+    let state = loadState();
+    const stage = document.getElementById('stage');
+    const guhEl = document.getElementById('guh');
+    const countEl = document.getElementById('count');
+    const perClickEl = document.getElementById('perClick');
+    const autoCountEl = document.getElementById('autoCount');
+    const upgradesEl = document.getElementById('upgrades');
+    const fpsEl = document.getElementById('fps');
+
+    /* ---------- Utilities ---------- */
+    function saveState(){
+      localStorage.setItem('guh_state_v1', JSON.stringify(state));
+    }
+    function loadState(){
+      try{
+        const raw = localStorage.getItem('guh_state_v1');
+        if(raw) return JSON.parse(raw);
+      }catch(e){}
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+    function format(n){
+      if(n>=1e9) return (n/1e9).toFixed(2)+'B';
+      if(n>=1e6) return (n/1e6).toFixed(2)+'M';
+      if(n>=1e3) return (n/1e3).toFixed(2)+'K';
+      return Math.floor(n).toString();
+    }
+
+    /* ---------- UI updates ---------- */
+    function render(){
+      countEl.textContent = format(state.count);
+      perClickEl.textContent = format(state.perClick);
+      autoCountEl.textContent = state.autoCount;
+      renderUpgrades();
+    }
+
+    function renderUpgrades(){
+      upgradesEl.innerHTML = '';
+      // Click Power upgrade
+      const cpLevel = state.upgrades.clickPowerLevel;
+      const cpCost = Math.floor(10 * Math.pow(2, cpLevel));
+      upgradesEl.appendChild(makeUpgrade(
+        'Click Power',
+        'Increase base GUH per click.',
+        cpCost,
+        () => {
+          if(state.count >= cpCost){
+            state.count -= cpCost;
+            state.upgrades.clickPowerLevel++;
+            state.perClick = 1 + state.upgrades.clickPowerLevel * 1;
+            saveState(); render();
+            pulseUpgradeButton();
+          }
+        },
+        `Level ${cpLevel}`
+      ));
+
+      // Multiplier upgrade
+      const mLevel = state.upgrades.multiplierLevel;
+      const mCost = Math.floor(50 * Math.pow(2, mLevel));
+      upgradesEl.appendChild(makeUpgrade(
+        'Click Multiplier',
+        'Multiply your click power by 2.',
+        mCost,
+        () => {
+          if(state.count >= mCost){
+            state.count -= mCost;
+            state.upgrades.multiplierLevel++;
+            state.perClick *= 2;
+            saveState(); render();
+            pulseUpgradeButton();
+          }
+        },
+        `x${Math.pow(2,mLevel)}`
+      ));
+
+      // Auto Clicker purchase
+      const autoBought = state.upgrades.autoBought;
+      const autoCost = 200 * Math.pow(2, state.upgrades.autoSpeedLevel);
+      upgradesEl.appendChild(makeUpgrade(
+        autoBought ? 'Upgrade Auto Speed' : 'Buy Auto Clicker',
+        autoBought ? 'Decrease auto click interval.' : 'Auto clicks for you every interval.',
+        autoCost,
+        () => {
+          if(state.count >= autoCost){
+            state.count -= autoCost;
+            if(!state.upgrades.autoBought){
+              state.upgrades.autoBought = true;
+              state.autoCount = 1;
+              state.autoPower = 1;
+            } else {
+              // speed upgrade: reduce interval by 15% each level, min 100ms
+              state.upgrades.autoSpeedLevel++;
+              state.autoIntervalMs = Math.max(100, Math.round(state.autoIntervalMs * 0.85));
+              state.autoCount += 1;
+            }
+            saveState(); render();
+            restartWorker();
+            pulseUpgradeButton();
+          }
+        },
+        autoBought ? `Speed Lv ${state.upgrades.autoSpeedLevel}` : 'Not owned'
+      ));
+
+      // Prestige / Reset (optional)
+      upgradesEl.appendChild(makeUpgrade(
+        'Prestige (Reset)',
+        'Reset for a permanent multiplier (not implemented).',
+        999999999,
+        () => { alert('Prestige is a placeholder in this demo.'); },
+        ''
+      ));
+    }
+
+    function makeUpgrade(title, desc, cost, onBuy, rightLabel){
+      const wrap = document.createElement('div');
+      wrap.className = 'upgrade';
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const t = document.createElement('div'); t.className='title'; t.textContent = title;
+      const d = document.createElement('div'); d.className='desc'; d.textContent = desc;
+      meta.appendChild(t); meta.appendChild(d);
+      const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+      const label = document.createElement('div'); label.className='cost'; label.textContent = format(cost);
+      const btn = document.createElement('button'); btn.textContent = 'Buy';
+      btn.onclick = onBuy;
+      right.appendChild(label); right.appendChild(btn);
+      if(rightLabel){
+        const small = document.createElement('div'); small.style.fontSize='12px'; small.style.color='var(--muted)'; small.style.marginLeft='8px'; small.textContent = rightLabel;
+        right.appendChild(small);
+      }
+      wrap.appendChild(meta); wrap.appendChild(right);
+      return wrap;
+    }
+
+    function pulseUpgradeButton(){
+      // small visual pulse
+      document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.03)'}], {duration:220,iterations:1});
+    }
+
+    /* ---------- Click handling & visuals ---------- */
+    function doClick(n){
+      state.count += n;
+      spawnFloat('+'+format(n));
+      spawnParticles();
+      saveState();
+      render();
+      // shine effect
+      guhEl.classList.add('shine');
+      setTimeout(()=>guhEl.classList.remove('shine'), 420);
+    }
+
+    guhEl.addEventListener('click', ()=> doClick(state.perClick));
+    guhEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); doClick(state.perClick); }});
+
+    function spawnFloat(text){
+      const el = document.createElement('div');
+      el.className = 'float';
+      el.textContent = text;
+      const rect = guhEl.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const x = rect.left + rect.width/2 - stageRect.left;
+      const y = rect.top + rect.height/2 - stageRect.top;
+      el.style.left = x + (Math.random()*40-20) + 'px';
+      el.style.top = y + (Math.random()*20-10) + 'px';
+      stage.appendChild(el);
+      requestAnimationFrame(()=> {
+        el.style.transform = 'translateY(-120px) scale(1.1)';
+        el.style.opacity = '0';
+      });
+      setTimeout(()=> el.remove(), 900);
+    }
+
+    function spawnParticles(){
+      for(let i=0;i<10;i++){
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const rect = guhEl.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+        const x = rect.left + rect.width/2 - stageRect.left + (Math.random()*80-40);
+        const y = rect.top + rect.height/2 - stageRect.top + (Math.random()*40-20);
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        stage.appendChild(p);
+        const dx = (Math.random()*300-150);
+        const dy = (Math.random()*-200-40);
+        requestAnimationFrame(()=> {
+          p.style.transform = `translate(${dx}px, ${dy}px) scale(${0.6+Math.random()*0.8})`;
+          p.style.opacity = '0';
+        });
+        setTimeout(()=> p.remove(), 900);
+      }
+    }
+
+    /* ---------- Auto clicker via Web Worker ---------- */
+    // Create worker from blob so it's self-contained
+    let worker = null;
+    function createWorker(){
+      const code = `
+        let interval = 1000;
+        let running = true;
+        function tick(){ postMessage({type:'tick'}); }
+        let timer = setInterval(tick, interval);
+        onmessage = function(e){
+          const d = e.data;
+          if(d.type === 'setInterval'){
+            interval = d.value;
+            clearInterval(timer);
+            timer = setInterval(tick, interval);
+          } else if(d.type === 'stop'){
+            running = false;
+            clearInterval(timer);
+          } else if(d.type === 'start'){
+            if(!running){
+              running = true;
+              timer = setInterval(tick, interval);
+            }
+          }
+        };
+      `;
+      const blob = new Blob([code], {type:'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      return new Worker(url);
+    }
+
+    function startWorker(){
+      if(worker) worker.terminate();
+      worker = createWorker();
+      worker.onmessage = (e) => {
+        if(e.data && e.data.type === 'tick'){
+          // apply auto clicks: autoCount * autoPower
+          const clicks = (state.autoCount || 0) * (state.autoPower || 1);
+          if(clicks > 0) {
+            // apply clicks in main thread
+            state.count += clicks;
+            spawnFloat('+'+format(clicks));
+            saveState();
+            render();
+          }
+        }
+      };
+      // set interval
+      worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
+    }
+
+    function restartWorker(){
+      if(state.upgrades.autoBought){
+        startWorker();
+      } else {
+        if(worker){ worker.postMessage({type:'stop'}); worker.terminate(); worker = null; }
+      }
+    }
+
+    // Try to keep worker running when page hidden: if page becomes visible, restart worker to sync interval
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState === 'visible'){
+        // sync worker interval
+        if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
+      } else {
+        // when hidden, still keep worker running; some browsers will throttle it
+        if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
+      }
+    });
+
+    /* ---------- Simple FPS indicator (for fun) ---------- */
+    let last = performance.now(), frames = 0;
+    function fpsTick(now){
+      frames++;
+      if(now - last >= 1000){
+        fpsEl.textContent = frames + ' fps';
+        frames = 0;
+        last = now;
+      }
+      requestAnimationFrame(fpsTick);
+    }
+    requestAnimationFrame(fpsTick);
+
+    /* ---------- Load and start ---------- */
+    render();
+    if(state.upgrades.autoBought) startWorker();
+
+    // autosave every 2s
+    setInterval(saveState, 2000);
+
+    /* ---------- Cross-tab sync (so auto clicks persist across tabs) ---------- */
+    window.addEventListener('storage', (e)=>{
+      if(e.key === 'guh_state_v1' && e.newValue){
+        try{
+          const other = JSON.parse(e.newValue);
+          // merge minimal fields to avoid overwriting local transient UI
+          state.count = other.count;
+          state.perClick = other.perClick;
+          state.autoCount = other.autoCount;
+          state.autoIntervalMs = other.autoIntervalMs;
+          state.upgrades = other.upgrades;
+          render();
+        }catch(err){}
+      }
+    });
+
+    /* ---------- Helpful: allow manual reset via console: window.resetGuh() ---------- */
+    window.resetGuh = function(){
+      if(confirm('Reset game to defaults?')){
+        state = JSON.parse(JSON.stringify(defaultState));
+        saveState();
+        render();
+        restartWorker();
+      }
+    };
+
+    /* ---------- Accessibility: keyboard focus styles ---------- */
+    guhEl.addEventListener('focus', ()=> guhEl.style.outline = '3px solid rgba(126,231,135,0.12)');
+    guhEl.addEventListener('blur', ()=> guhEl.style.outline = 'none');
+
+    /* ---------- End of script ---------- */
+  </script>
+</body>
+</html>
