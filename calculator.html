@@ -37,7 +37,6 @@
   .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
   .btn-primary{background:linear-gradient(90deg,var(--accent),#00f0ff);color:#021124;border:none;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
   @media (max-width:1000px){.container{flex-direction:column;padding:12px}.side{width:100%}.kbd{grid-template-columns:repeat(4,1fr)}}
-  /* Hidden input to capture keyboard typing */
   #hiddenInput{position:fixed;left:-9999px;top:auto;opacity:0}
 </style>
 </head>
@@ -61,8 +60,8 @@
             <input id="precision" type="number" min="0" max="12" value="8" style="width:64px;background:transparent;border:none;color:var(--muted)" />
           </div>
           <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn-ghost" id="copyBtn" title="Copy result">Copy</button>
-            <button class="btn-ghost" id="clearAll" title="Clear everything">Clear</button>
+            <button class="btn-ghost" id="copyBtn" title="Copy result" type="button">Copy</button>
+            <button class="btn-ghost" id="clearAll" title="Clear everything" type="button">Clear</button>
           </div>
         </div>
 
@@ -70,75 +69,83 @@
         <div class="result" id="result"> </div>
 
         <div class="kbd" id="buttons">
-          <!-- Numeric and function keys only. Letter keys removed from on-screen keypad. -->
-          <button class="key" data-val="(">(</button>
-          <button class="key" data-val=")">)</button>
-          <button class="key" data-val="pi">π</button>
-          <button class="key" data-val="e">e</button>
-          <button class="key" data-action="back">⌫</button>
-          <button class="key" data-action="enter" style="background:linear-gradient(90deg,var(--accent),#00f0ff);color:#021124">=</button>
+          <!-- Row 1 -->
+          <button class="key" type="button" data-val="(">(</button>
+          <button class="key" type="button" data-val=")">)</button>
+          <button class="key" type="button" data-val="pi">π</button>
+          <button class="key" type="button" data-val="e">e</button>
+          <button class="key" type="button" data-action="back">⌫</button>
+          <button class="key" type="button" data-action="enter" style="background:linear-gradient(90deg,var(--accent),#00f0ff);color:#021124">=</button>
 
-          <button class="key" data-val="sin(">sin</button>
-          <button class="key" data-val="cos(">cos</button>
-          <button class="key" data-val="tan(">tan</button>
-          <button class="key" data-val="asin(">asin</button>
-          <button class="key" data-val="acos(">acos</button>
-          <button class="key" data-val="atan(">atan</button>
+          <!-- Row 2 -->
+          <button class="key" type="button" data-val="sin(">sin</button>
+          <button class="key" type="button" data-val="cos(">cos</button>
+          <button class="key" type="button" data-val="tan(">tan</button>
+          <button class="key" type="button" data-val="asin(">asin</button>
+          <button class="key" type="button" data-val="acos(">acos</button>
+          <button class="key" type="button" data-val="atan(">atan</button>
 
-          <button class="key" data-val="sinh(">sinh</button>
-          <button class="key" data-val="cosh(">cosh</button>
-          <button class="key" data-val="tanh(">tanh</button>
-          <button class="key" data-val="log10(">log</button>
-          <button class="key" data-val="ln(">ln</button>
-          <button class="key" data-val="sqrt(">√</button>
+          <!-- Row 3 -->
+          <button class="key" type="button" data-val="sinh(">sinh</button>
+          <button class="key" type="button" data-val="cosh(">cosh</button>
+          <button class="key" type="button" data-val="tanh(">tanh</button>
+          <button class="key" type="button" data-val="log10(">log</button>
+          <button class="key" type="button" data-val="ln(">ln</button>
+          <button class="key" type="button" data-val="sqrt(">√</button>
 
-          <button class="key" data-val="^">^</button>
-          <button class="key" data-val="**">pow</button>
-          <button class="key" data-val="abs(">abs</button>
-          <button class="key" data-val="!">!</button>
-          <button class="key" data-val="nPr(">nPr</button>
-          <button class="key" data-val="nCr(">nCr</button>
+          <!-- Row 4 -->
+          <button class="key" type="button" data-val="^">^</button>
+          <button class="key" type="button" data-val="**">pow</button>
+          <button class="key" type="button" data-val="abs(">abs</button>
+          <button class="key" type="button" data-val="!">!</button>
+          <button class="key" type="button" data-val="nPr(">nPr</button>
+          <button class="key" type="button" data-val="nCr(">nCr</button>
 
-          <button class="key" data-val="7">7</button>
-          <button class="key" data-val="8">8</button>
-          <button class="key" data-val="9">9</button>
-          <button class="key" data-val="/">÷</button>
-          <button class="key" data-val="%">mod</button>
-          <button class="key" data-val="floor(">floor</button>
+          <!-- Row 5 -->
+          <button class="key" type="button" data-val="7">7</button>
+          <button class="key" type="button" data-val="8">8</button>
+          <button class="key" type="button" data-val="9">9</button>
+          <button class="key" type="button" data-val="/">÷</button>
+          <button class="key" type="button" data-val="%">mod</button>
+          <button class="key" type="button" data-val="floor(">floor</button>
 
-          <button class="key" data-val="4">4</button>
-          <button class="key" data-val="5">5</button>
-          <button class="key" data-val="6">6</button>
-          <button class="key" data-val="*">×</button>
-          <button class="key" data-val="exp(">exp</button>
-          <button class="key" data-val="ceil(">ceil</button>
+          <!-- Row 6 -->
+          <button class="key" type="button" data-val="4">4</button>
+          <button class="key" type="button" data-val="5">5</button>
+          <button class="key" type="button" data-val="6">6</button>
+          <button class="key" type="button" data-val="*">×</button>
+          <button class="key" type="button" data-val="exp(">exp</button>
+          <button class="key" type="button" data-val="ceil(">ceil</button>
 
-          <button class="key" data-val="1">1</button>
-          <button class="key" data-val="2">2</button>
-          <button class="key" data-val="3">3</button>
-          <button class="key" data-val="-">−</button>
-          <button class="key" data-val="round(">round</button>
-          <button class="key" data-val="trunc(">trunc</button>
+          <!-- Row 7 -->
+          <button class="key" type="button" data-val="1">1</button>
+          <button class="key" type="button" data-val="2">2</button>
+          <button class="key" type="button" data-val="3">3</button>
+          <button class="key" type="button" data-val="-">−</button>
+          <button class="key" type="button" data-val="round(">round</button>
+          <button class="key" type="button" data-val="trunc(">trunc</button>
 
-          <button class="key wide" data-val="0">0</button>
-          <button class="key" data-val=".">.</button>
-          <button class="key" data-val="+">+</button>
-          <button class="key" data-val="ans">ans</button>
-          <button class="key" data-action="enter">Enter</button>
+          <!-- Row 8 -->
+          <button class="key wide" type="button" data-val="0">0</button>
+          <button class="key" type="button" data-val=".">.</button>
+          <button class="key" type="button" data-val="+">+</button>
+          <button class="key" type="button" data-val="ans">ans</button>
+          <button class="key" type="button" data-action="enter">Enter</button>
 
-          <button class="key" data-val="=" data-action="assign">assign</button>
-          <button class="key" data-val=";" >;</button>
-          <button class="key" data-action="clear">AC</button>
-          <button class="key" data-action="mem+">M+</button>
-          <button class="key" data-action="mem-">M-</button>
+          <!-- Row 9 -->
+          <button class="key" type="button" data-action="assign">assign</button>
+          <button class="key" type="button" data-val=";" >;</button>
+          <button class="key" type="button" data-action="clear">AC</button>
+          <button class="key" type="button" data-action="mem+">M+</button>
+          <button class="key" type="button" data-action="mem-">M-</button>
         </div>
       </div>
 
       <div class="footer">
         <div class="kbd-help small">Type expressions including letters for variables. Assign with a = 3 then use a in expressions. Press Enter to evaluate.</div>
         <div style="display:flex;gap:8px">
-          <button class="btn-ghost" id="toggleHistory">Toggle History</button>
-          <button class="btn-ghost" id="clearHistory">Clear History</button>
+          <button class="btn-ghost" id="toggleHistory" type="button">Toggle History</button>
+          <button class="btn-ghost" id="clearHistory" type="button">Clear History</button>
         </div>
       </div>
     </div>
@@ -161,7 +168,6 @@
     </aside>
   </div>
 
-  <!-- Hidden textarea captures keyboard input so typing letters works reliably -->
   <textarea id="hiddenInput" aria-hidden="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 
 <script>
@@ -269,7 +275,6 @@
     input = String(input).trim();
     if(!input) return 0;
 
-    // Assignment: single-letter = expr
     const assignMatch = input.match(/^([a-zA-Z])\s*=\s*(.+)$/);
     if(assignMatch){
       const name = assignMatch[1];
@@ -284,27 +289,19 @@
       }
     }
 
-    // Replace constants
     let exprToEval = input.replace(/\bpi\b/g, '('+Math.PI+')').replace(/\be\b/g, '('+Math.E+')');
-
-    // Replace ans with lastAns
     exprToEval = exprToEval.replace(/\bans\b/g, '('+lastAns+')');
 
-    // Replace variable names with their numeric values
     exprToEval = exprToEval.replace(/\b([a-zA-Z])\b/g, (m, p1) => {
       if(vars.hasOwnProperty(p1)) return '('+vars[p1]+')';
       if(functions.includes(p1)) return p1;
       return p1;
     });
 
-    // Factorial postfix
-    exprToEval = exprToEval.replace(/([0-9\.e\)\]]+)\s*!/g, (m, p1) => `__fact(${p1})`;
-
-    // nPr nCr
+    exprToEval = exprToEval.replace(/([0-9\.e\)\]]+)\s*!/g, (m, p1) => `__fact(${p1})`);
     exprToEval = exprToEval.replace(/\bnPr\s*\(/g, '__nPr(');
     exprToEval = exprToEval.replace(/\bnCr\s*\(/g, '__nCr(');
 
-    // Map functions
     const mapFns = {
       'sin':'__sin','cos':'__cos','tan':'__tan',
       'asin':'__asin','acos':'__acos','atan':'__atan',
@@ -319,10 +316,7 @@
       exprToEval = exprToEval.replace(re, mapFns[fn] + '(');
     });
 
-    // Replace ^ with **
     exprToEval = exprToEval.replace(/\^/g, '**');
-
-    // Replace mod word with %
     exprToEval = exprToEval.replace(/\bmod\b/g, '%');
 
     const helpers = {
@@ -350,29 +344,28 @@
     }
   }
 
-  // Button handling
+  // Button handling (robust)
   buttons.addEventListener('click', (ev) => {
     const btn = ev.target.closest('button');
     if(!btn) return;
-    const val = btn.dataset.val;
-    const action = btn.dataset.action;
+    const val = btn.getAttribute('data-val');
+    const action = btn.getAttribute('data-action');
 
-    if(action === 'back'){ backspace(); return; }
-    if(action === 'enter'){ doEvaluate(); return; }
-    if(action === 'clear'){ expr = ''; hiddenInput.value = ''; updateDisplay(); return; }
-    if(action === 'assign'){ expr += '='; hiddenInput.value = expr; updateDisplay(); return; }
-    if(action === 'mem+'){ memory += lastAns; renderMemory(); return; }
-    if(action === 'mem-'){ memory -= lastAns; renderMemory(); return; }
+    if(action === 'back'){ backspace(); hiddenInput.focus(); return; }
+    if(action === 'enter'){ doEvaluate(); hiddenInput.focus(); return; }
+    if(action === 'clear'){ expr = ''; hiddenInput.value = ''; updateDisplay(); hiddenInput.focus(); return; }
+    if(action === 'assign'){ expr += '='; hiddenInput.value = expr; updateDisplay(); hiddenInput.focus(); return; }
+    if(action === 'mem+'){ memory += lastAns; renderMemory(); hiddenInput.focus(); return; }
+    if(action === 'mem-'){ memory -= lastAns; renderMemory(); hiddenInput.focus(); return; }
 
-    if(val !== undefined){
-      if(val === 'ans'){ insert('ans'); return; }
+    if(val !== null){
+      if(val === 'ans'){ insert('ans'); hiddenInput.focus(); return; }
       insert(val);
+      hiddenInput.focus();
     }
-    // keep focus on hidden input so keyboard continues to work
-    hiddenInput.focus();
   });
 
-  document.getElementById('clearAll').addEventListener('click', () => { clearAll(); history = []; renderHistory(); vars = {}; renderVars(); memory = 0; renderMemory(); });
+  document.getElementById('clearAll').addEventListener('click', () => { clearAll(); history = []; renderHistory(); vars = {}; renderVars(); memory = 0; renderMemory(); hiddenInput.focus(); });
   document.getElementById('copyBtn').addEventListener('click', () => {
     const text = resultEl.textContent || exprEl.textContent;
     navigator.clipboard?.writeText(text).catch(()=>{/*ignore*/});
@@ -384,56 +377,44 @@
   });
   document.getElementById('clearHistory').addEventListener('click', () => { history = []; renderHistory(); });
 
-  // Focus handling: clicking the display focuses the hidden input
   exprEl.addEventListener('click', () => {
     hiddenInput.focus();
-    // place caret at end
     hiddenInput.selectionStart = hiddenInput.selectionEnd = hiddenInput.value.length;
   });
 
-  // Keep hidden input focused when user clicks anywhere on calculator
   document.querySelector('.calc').addEventListener('click', (e) => {
     if(e.target === hiddenInput) return;
     hiddenInput.focus();
   });
 
-  // Hidden input captures typing including letters
   hiddenInput.addEventListener('input', (e) => {
     expr = hiddenInput.value;
     updateDisplay();
   });
 
-  // Keydown for special keys (Enter, Backspace, Escape) when hiddenInput is focused
   hiddenInput.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){ e.preventDefault(); doEvaluate(); return; }
     if(e.key === 'Escape'){ e.preventDefault(); expr=''; hiddenInput.value=''; updateDisplay(); return; }
     if(e.key === 'Tab'){ e.preventDefault(); return; }
-    // Allow all printable characters; other keys are handled by default
   });
 
-  // Also support global keyboard shortcuts if user hasn't focused hidden input
   window.addEventListener('keydown', (e) => {
-    // If user is typing in another input (like precision), don't hijack
     const active = document.activeElement;
     if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
-    // If printable key, forward to hidden input
     if(e.key.length === 1){
       hiddenInput.focus();
-      // append char to hidden input
       const start = hiddenInput.selectionStart || 0;
       const end = hiddenInput.selectionEnd || 0;
       const before = hiddenInput.value.slice(0,start);
       const after = hiddenInput.value.slice(end);
       hiddenInput.value = before + e.key + after;
       hiddenInput.selectionStart = hiddenInput.selectionEnd = before.length + 1;
-      // trigger input event
-      const ev = new Event('input', {bubbles:true});
-      hiddenInput.dispatchEvent(ev);
+      hiddenInput.dispatchEvent(new Event('input', {bubbles:true}));
       e.preventDefault();
       return;
     }
     if(e.key === 'Enter'){ e.preventDefault(); doEvaluate(); return; }
-    if(e.key === 'Backspace'){ e.preventDefault(); // remove last char
+    if(e.key === 'Backspace'){ e.preventDefault();
       const start = hiddenInput.selectionStart || hiddenInput.value.length;
       const end = hiddenInput.selectionEnd || hiddenInput.value.length;
       if(start === end && start > 0){
@@ -461,15 +442,13 @@
     }
   }
 
-  // Initialize
+  // Init
   updateDisplay();
   renderHistory();
   renderVars();
   renderMemory();
-  // focus hidden input so typing works immediately
   setTimeout(()=>hiddenInput.focus(), 200);
 
-  // Expose for debugging
   window.calc = {
     evaluateExpression,
     getVars: () => ({...vars}),
