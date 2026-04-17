@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scratch Cards</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card-w:260px;
+    --card-h:160px;
+    --accent:#ffb86b;
+    --glass: rgba(255,255,255,0.06);
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(255,184,107,0.06), transparent 8%),
+      radial-gradient(900px 400px at 90% 90%, rgba(99,102,241,0.04), transparent 8%),
+      var(--bg);
+    color:#e6eef8;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    box-sizing:border-box;
+  }
+
+  /* Top-left hub button */
+  .top-left {
+    position:fixed;
+    top:12px;
+    left:12px;
+    z-index:9999;
+  }
+  .hub-btn{
+    display:inline-block;
+    background:linear-gradient(180deg,#111827,#0b1220);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    box-shadow:0 6px 18px rgba(2,6,23,0.6), inset 0 -1px 0 rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .hub-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 30px rgba(2,6,23,0.7); }
+
+  /* Layout */
+  .wrap{
+    width:100%;
+    max-width:1100px;
+    display:grid;
+    grid-template-columns: 1fr 420px;
+    gap:28px;
+    align-items:start;
+  }
+
+  /* Left: cards grid */
+  .cards-area{
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(var(--card-w),1fr));
+    gap:18px;
+    align-content:start;
+  }
+
+  .card{
+    width:var(--card-w);
+    height:var(--card-h);
+    border-radius:12px;
+    position:relative;
+    perspective:1000px;
+    margin:auto;
+  }
+
+  .card-inner{
+    width:100%;
+    height:100%;
+    border-radius:12px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .8s cubic-bezier(.2,.9,.3,1);
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    overflow:hidden;
+  }
+
+  .card.revealed .card-inner{
+    transform: rotateY(180deg);
+  }
+
+  .card-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  /* front face (prize) */
+  .face-front{
+    transform:rotateY(180deg);
+    background:linear-gradient(135deg,#0ea5a4,#7c3aed);
+    color:white;
+    padding:12px;
+    flex-direction:column;
+    gap:6px;
+  }
+  .prize-emoji{
+    font-size:40px;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+  }
+  .prize-text{
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:0.2px;
+  }
+  .prize-sub{
+    font-size:12px;
+    opacity:0.9;
+  }
+
+  /* back face (scratch overlay) */
+  .face-back{
+    background:linear-gradient(180deg,#111827,#0b1220);
+    border:1px solid rgba(255,255,255,0.03);
+    position:relative;
+  }
+
+  /* overlay label */
+  .scratch-label{
+    position:absolute;
+    top:10px;
+    left:12px;
+    font-size:12px;
+    background:rgba(255,255,255,0.03);
+    padding:6px 8px;
+    border-radius:8px;
+    font-weight:600;
+    z-index:5;
+    color:#e6eef8;
+  }
+
+  /* reveal badge */
+  .badge{
+    position:absolute;
+    bottom:10px;
+    right:10px;
+    background:linear-gradient(90deg,#ffb86b,#ff7ab6);
+    color:#08101a;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:12px;
+    z-index:5;
+    transform:translateY(6px);
+    opacity:0;
+    transition:opacity .28s ease, transform .28s ease;
+  }
+  .card.revealed .badge{ opacity:1; transform:translateY(0); }
+
+  /* controls panel */
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px;
+    padding:18px;
+    min-height:200px;
+    box-shadow:0 8px 30px rgba(2,6,23,0.5);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .panel h2{ margin:0 0 8px 0; font-size:18px; }
+  .panel p{ margin:0 0 12px 0; color:#cfe6ff; opacity:0.9; font-size:13px; }
+  .controls{ display:flex; gap:8px; flex-wrap:wrap; }
+  .btn{
+    background:linear-gradient(180deg,#1f2937,#0b1220);
+    color:#fff;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.03);
+    cursor:pointer;
+    font-weight:700;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{ transform:translateY(-3px); box-shadow:0 10px 30px rgba(2,6,23,0.6); }
+  .btn.secondary{ background:transparent; border:1px dashed rgba(255,255,255,0.04); color:#dbeafe; font-weight:600; }
+
+  /* confetti canvas overlay */
+  #confetti{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:9998;
+  }
+
+  /* small helper */
+  .muted{ color:#9fb3d6; font-size:13px; }
+
+  /* responsive */
+  @media (max-width:980px){
+    .wrap{ grid-template-columns: 1fr; }
+    .panel{ order:2; }
+  }
+</style>
+</head>
+<body>
+  <a class="top-left" href="casino.html" aria-label="Back to hub">
+    <span class="hub-btn">Back to Hub</span>
+  </a>
+
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap" role="main">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <h1 style="margin:0;font-size:20px;">Scratch Cards</h1>
+        <div class="muted">Scratch to reveal prizes — try your luck</div>
+      </div>
+
+      <div class="cards-area" id="cardsArea" aria-live="polite">
+        <!-- Cards will be injected here -->
+      </div>
+    </div>
+
+    <aside class="panel" aria-label="Controls">
+      <h2>Game Controls</h2>
+      <p>Click or drag on a card to scratch. When enough area is scratched the prize is revealed automatically.</p>
+
+      <div class="controls" style="margin-bottom:12px;">
+        <button class="btn" id="newSetBtn">New Set</button>
+        <button class="btn secondary" id="resetBtn">Reset All</button>
+        <button class="btn secondary" id="autoRevealBtn">Auto Reveal All</button>
+      </div>
+
+      <div style="margin-top:8px;">
+        <div class="muted">Statistics</div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <div><strong id="playedCount">0</strong><div class="muted">Played</div></div>
+          <div><strong id="winsCount">0</strong><div class="muted">Wins</div></div>
+          <div><strong id="lastPrize">—</strong><div class="muted">Last Prize</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="muted">Tips</div>
+        <ul style="margin:8px 0 0 18px;color:#cfe6ff;">
+          <li>Scratch with mouse or touch.</li>
+          <li>Try different cards — prizes vary.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+<script>
+/*
+  Scratch Cards Game
+  - Creates a grid of scratch cards (canvas overlay).
+  - Erases overlay on pointer move using destination-out.
+  - Tracks scratched percentage and reveals prize when threshold reached.
+  - Confetti animation on wins.
+  - Top-left button links to casino.html (provided by user).
+*/
+
+const PRIZES = [
+  {emoji:'💎', label:'Big Win', sub:'Jackpot x50', weight:1},
+  {emoji:'🎉', label:'Party Bonus', sub:'Free Spins x10', weight:3},
+  {emoji:'🍀', label:'Lucky', sub:'Bonus Coins x20', weight:6},
+  {emoji:'💰', label:'Cash', sub:'Coins x5', weight:10},
+  {emoji:'❌', label:'No Prize', sub:'Better luck next time', weight:20}
+];
+
+// Utility: weighted random prize
+function pickPrize(){
+  const total = PRIZES.reduce((s,p)=>s+p.weight,0);
+  let r = Math.random()*total;
+  for(const p of PRIZES){
+    if(r < p.weight) return p;
+    r -= p.weight;
+  }
+  return PRIZES[PRIZES.length-1];
+}
+
+const cardsArea = document.getElementById('cardsArea');
+const confettiCanvas = document.getElementById('confetti');
+const ctxConf = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiRunning = false;
+
+function resizeConfetti(){
+  confettiCanvas.width = innerWidth;
+  confettiCanvas.height = innerHeight;
+}
+addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+// Create a set of cards
+let stats = {played:0,wins:0,lastPrize:'—'};
+const playedCountEl = document.getElementById('playedCount');
+const winsCountEl = document.getElementById('winsCount');
+const lastPrizeEl = document.getElementById('lastPrize');
+
+function updateStats(){
+  playedCountEl.textContent = stats.played;
+  winsCountEl.textContent = stats.wins;
+  lastPrizeEl.textContent = stats.lastPrize;
+}
+
+function createCards(count=8){
+  cardsArea.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const prize = pickPrize();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label','Scratch card');
+    card.dataset.prize = JSON.stringify(prize);
+
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face face-back">
+          <div class="scratch-label">Scratch Me</div>
+          <canvas class="scratch-canvas" width="260" height="160" style="width:100%;height:100%;display:block;"></canvas>
+          <div class="badge">Reveal</div>
+        </div>
+        <div class="card-face face-front">
+          <div style="text-align:center;">
+            <div class="prize-emoji">${prize.emoji}</div>
+            <div class="prize-text">${prize.label}</div>
+            <div class="prize-sub">${prize.sub}</div>
+          </div>
+        </div>
+      </div>
+    `;
+    cardsArea.appendChild(card);
+    setupScratch(card);
+  }
+}
+
+// Scratch logic per card
+function setupScratch(card){
+  const canvas = card.querySelector('.scratch-canvas');
+  const badge = card.querySelector('.badge');
+  const inner = card.querySelector('.card-inner');
+  const prize = JSON.parse(card.dataset.prize);
+  const ctx = canvas.getContext('2d');
+
+  // Ensure canvas pixel ratio
+  function setCanvasSize(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(dpr, dpr);
+    drawOverlay();
+  }
+
+  function drawOverlay(){
+    // Draw metallic scratch overlay
+    const w = canvas.width / (window.devicePixelRatio||1);
+    const h = canvas.height / (window.devicePixelRatio||1);
+    // base
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#9ca3af';
+    ctx.fillRect(0,0,w,h);
+
+    // noise stripes
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,'rgba(255,255,255,0.06)');
+    g.addColorStop(0.5,'rgba(0,0,0,0.06)');
+    g.addColorStop(1,'rgba(255,255,255,0.03)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+    // subtle pattern
+    ctx.globalAlpha = 0.12;
+    for(let i=0;i<20;i++){
+      ctx.fillStyle = i%2? 'rgba(0,0,0,0.06)':'rgba(255,255,255,0.06)';
+      ctx.fillRect((i*37)%w, (i*23)%h, 12, h);
+    }
+    ctx.globalAlpha = 1;
+    // label
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.fillRect(0,h-36,w,36);
+  }
+
+  setCanvasSize();
+  addEventListener('resize', setCanvasSize);
+
+  let isDown = false;
+  let last = null;
+  const radius = 18;
+
+  function pointerDown(e){
+    if(card.classList.contains('revealed')) return;
+    isDown = true;
+    last = getPos(e);
+    scratchAt(last.x,last.y);
+    e.preventDefault();
+  }
+  function pointerMove(e){
+    if(!isDown) return;
+    const p = getPos(e);
+    scratchLine(last.x,last.y,p.x,p.y);
+    last = p;
+    e.preventDefault();
+  }
+  function pointerUp(e){
+    if(!isDown) return;
+    isDown = false;
+    checkReveal();
+    e.preventDefault();
+  }
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+    const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function scratchAt(x,y){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x,y,radius,0,Math.PI*2);
+    ctx.fill();
+    ctx.closePath();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function scratchLine(x1,y1,x2,y2){
+    const dx = x2-x1, dy = y2-y1;
+    const dist = Math.hypot(dx,dy);
+    const steps = Math.ceil(dist / (radius/2));
+    for(let i=0;i<steps;i++){
+      const t = i/steps;
+      const x = x1 + dx*t;
+      const y = y1 + dy*t;
+      scratchAt(x,y);
+    }
+  }
+
+  function getTransparentRatio(){
+    const w = canvas.width;
+    const h = canvas.height;
+    const img = ctx.getImageData(0,0,w,h).data;
+    let transparent = 0;
+    // sample every 4th pixel for speed
+    for(let i=3;i<img.length;i+=16){
+      if(img[i] === 0) transparent++;
+    }
+    const total = img.length/4/4;
+    return transparent/total;
+  }
+
+  function checkReveal(){
+    const ratio = getTransparentRatio();
+    // reveal threshold
+    if(ratio > 0.45){
+      revealCard();
+    }
+  }
+
+  function revealCard(){
+    if(card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    stats.played++;
+    stats.lastPrize = prize.label;
+    if(prize.label !== 'No Prize') stats.wins++;
+    updateStats();
+    // small celebration for wins
+    if(prize.label !== 'No Prize'){
+      startConfetti();
+    }
+    // animate badge
+    badge.textContent = prize.label;
+    // accessibility announcement
+    card.setAttribute('aria-label', `Revealed: ${prize.label} - ${prize.sub}`);
+  }
+
+  // pointer events
+  canvas.addEventListener('pointerdown', pointerDown);
+  window.addEventListener('pointermove', pointerMove);
+  window.addEventListener('pointerup', pointerUp);
+  // touch fallback
+  canvas.addEventListener('touchstart', pointerDown, {passive:false});
+  canvas.addEventListener('touchmove', pointerMove, {passive:false});
+  canvas.addEventListener('touchend', pointerUp);
+
+  // double-click to auto reveal (for accessibility)
+  canvas.addEventListener('dblclick', (e)=>{
+    revealCard();
+  });
+
+  // reset function
+  card.reset = () => {
+    card.classList.remove('revealed');
+    setCanvasSize();
+    badge.textContent = 'Reveal';
+    card.setAttribute('aria-label','Scratch card');
+  };
+}
+
+// Confetti system (simple particle emitter)
+function startConfetti(){
+  if(confettiRunning) return;
+  confettiRunning = true;
+  const count = 80;
+  for(let i=0;i<count;i++){
+    confettiParticles.push({
+      x: Math.random()*confettiCanvas.width,
+      y: -20 - Math.random()*200,
+      vx: (Math.random()-0.5)*6,
+      vy: 2 + Math.random()*6,
+      size: 6 + Math.random()*10,
+      rot: Math.random()*360,
+      color: randomColor(),
+      life: 0,
+      ttl: 120 + Math.random()*80
+    });
+  }
+  requestAnimationFrame(confettiLoop);
+}
+
+function randomColor(){
+  const palette = ['#ff7ab6','#ffb86b','#7ee787','#7c3aed','#60a5fa','#f472b6'];
+  return palette[Math.floor(Math.random()*palette.length)];
+}
+
+function confettiLoop(){
+  ctxConf.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  for(let i=confettiParticles.length-1;i>=0;i--){
+    const p = confettiParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.06;
+    p.rot += p.vx*2;
+    p.life++;
+    ctxConf.save();
+    ctxConf.translate(p.x,p.y);
+    ctxConf.rotate(p.rot * Math.PI/180);
+    ctxConf.fillStyle = p.color;
+    ctxConf.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+    ctxConf.restore();
+    if(p.life > p.ttl || p.y > confettiCanvas.height + 50){
+      confettiParticles.splice(i,1);
+    }
+  }
+  if(confettiParticles.length>0){
+    requestAnimationFrame(confettiLoop);
+  } else {
+    confettiRunning = false;
+  }
+}
+
+// Controls
+document.getElementById('newSetBtn').addEventListener('click', ()=>{
+  // create a fresh set with random count between 6 and 12
+  const count = 6 + Math.floor(Math.random()*7);
+  createCards(count);
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  // reset all cards in place
+  const cards = cardsArea.querySelectorAll('.card');
+  cards.forEach(c => c.reset && c.reset());
+});
+
+document.getElementById('autoRevealBtn').addEventListener('click', ()=>{
+  const cards = cardsArea.querySelectorAll('.card');
+  cards.forEach((c,idx) => {
+    setTimeout(()=> {
+      c.classList.add('revealed');
+      const prize = JSON.parse(c.dataset.prize);
+      stats.played++;
+      if(prize.label !== 'No Prize') stats.wins++;
+      stats.lastPrize = prize.label;
+      c.querySelector('.badge').textContent = prize.label;
+      if(prize.label !== 'No Prize') startConfetti();
+    }, idx*120);
+  });
+  updateStats();
+});
+
+// Initialize
+createCards(8);
+updateStats();
+
+// Accessibility: keyboard reveal (space/enter)
+document.addEventListener('keydown', (e)=>{
+  if(e.key === ' ' || e.key === 'Enter'){
+    const focused = document.activeElement;
+    if(focused && focused.classList && focused.classList.contains('card')){
+      focused.classList.add('revealed');
+      const prize = JSON.parse(focused.dataset.prize);
+      stats.played++;
+      if(prize.label !== 'No Prize') stats.wins++;
+      stats.lastPrize = prize.label;
+      focused.querySelector('.badge').textContent = prize.label;
+      updateStats();
+      if(prize.label !== 'No Prize') startConfetti();
+    }
+  }
+});
+
+// Make cards focusable for keyboard users
+function makeCardsFocusable(){
+  const cards = cardsArea.querySelectorAll('.card');
+  cards.forEach(c => c.setAttribute('tabindex','0'));
+}
+makeCardsFocusable();
+
+// Recreate focusable when new cards are added
+const observer = new MutationObserver(makeCardsFocusable);
+observer.observe(cardsArea, {childList:true});
+
+</script>
+</body>
+</html>
