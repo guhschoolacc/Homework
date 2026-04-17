@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Casino — Slots</title>
+  <style>
+    :root{
+      --bg:#06060a;
+      --panel:#0f1115;
+      --card:#121318;
+      --accent:#ffb86b;
+      --accent-2:#7c5cff;
+      --muted:#9aa0a6;
+      --glass: rgba(255,255,255,0.03);
+      --glow: rgba(124,92,255,0.14);
+      --win:#2ee6a7;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#e6eef6;background:
+      radial-gradient(800px 400px at 10% 10%, rgba(124,92,255,0.04), transparent 8%),
+      linear-gradient(180deg,var(--bg) 0%, #0b0b0d 100%);-webkit-font-smoothing:antialiased;}
+
+    /* Back button */
+    .back-btn{
+      position:fixed;
+      top:14px;
+      left:14px;
+      z-index:1000;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      color:var(--accent);
+      text-decoration:none;
+      border-radius:10px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      font-weight:700;
+    }
+
+    main{max-width:980px;margin:84px auto;padding:28px;display:flex;flex-direction:column;gap:20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    h1{margin:0;color:var(--accent);font-size:28px}
+    .sub{color:var(--muted);font-size:13px;margin:0}
+
+    /* Panel */
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+      border-radius:14px;
+      padding:20px;
+      box-shadow:0 18px 40px rgba(2,6,8,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    /* Slot machine area */
+    .machine{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .reel{
+      width:110px;
+      height:110px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:44px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      position:relative;
+      overflow:hidden;
+    }
+    .reel.win{box-shadow:0 12px 36px rgba(46,230,167,0.12), 0 0 18px rgba(46,230,167,0.06) inset;}
+    .reel .symbol{display:block;transform:translateY(0);transition:transform .12s linear}
+
+    /* Controls */
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:800;
+      color:#071018;
+      background:linear-gradient(90deg,var(--accent-2),var(--accent));
+      box-shadow:0 10px 30px rgba(124,92,255,0.06);
+    }
+    .btn.secondary{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.04);
+      font-weight:700;
+    }
+    .stat{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:120px;
+    }
+    .stat .label{font-size:12px;color:var(--muted)}
+    .stat .value{font-weight:800;color:#fff}
+
+    /* Message area */
+    .message{
+      min-height:28px;
+      font-weight:700;
+      color:var(--muted);
+    }
+    .message.win{color:var(--win)}
+    .message.lose{color:#ff6b6b}
+
+    /* Footer small note */
+    .note{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
+
+    @media (max-width:720px){
+      .reel{width:86px;height:86px;font-size:36px}
+      .panel{padding:16px}
+      main{padding:16px;margin-top:72px}
+    }
+  </style>
+</head>
+<body>
+  <a class="back-btn" href="hub.html" aria-label="Back to Hub">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back to Hub
+  </a>
+
+  <main>
+    <header>
+      <div>
+        <h1>Slots</h1>
+        <p class="sub">Three-reel demo — simple, responsive, and accessible.</p>
+      </div>
+
+      <div class="stat" aria-hidden="true">
+        <div class="label">House Edge</div>
+        <div class="value">~5%</div>
+      </div>
+    </header>
+
+    <section class="panel" aria-labelledby="slots-heading">
+      <div class="machine" role="application" aria-label="Slot machine">
+        <div class="reel" id="reel0" aria-live="polite"><span class="symbol">🍒</span></div>
+        <div class="reel" id="reel1" aria-live="polite"><span class="symbol">🍋</span></div>
+        <div class="reel" id="reel2" aria-live="polite"><span class="symbol">⭐</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:260px">
+        <div class="controls" role="group" aria-label="Controls">
+          <button class="btn" id="spinBtn" aria-live="polite">SPIN</button>
+          <button class="btn secondary" id="maxBtn">MAX</button>
+          <button class="btn secondary" id="autoBtn">AUTO</button>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div class="stat" aria-hidden="true">
+            <div class="label">Credits</div>
+            <div class="value" id="credits">1000</div>
+          </div>
+          <div class="stat">
+            <div class="label">Bet</div>
+            <div class="value" id="bet">10</div>
+          </div>
+          <div class="stat">
+            <div class="label">Last Win</div>
+            <div class="value" id="lastWin">0</div>
+          </div>
+        </div>
+
+        <div class="message" id="message" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <div class="note">This is a demo slot machine. Play responsibly — this page is for UI/UX and testing only.</div>
+  </main>
+
+  <script>
+    // Symbols and payouts
+    const symbols = ["🍒","🍋","🔔","⭐","💎","7️⃣"];
+    const payouts = {
+      "7️⃣": 50,
+      "💎": 20,
+      "⭐": 10,
+      "🔔": 8,
+      "🍋": 5,
+      "🍒": 3
+    };
+
+    // State
+    let credits = 1000;
+    let bet = 10;
+    let spinning = false;
+    let auto = false;
+    let autoInterval = null;
+
+    // Elements
+    const reels = [document.getElementById('reel0'), document.getElementById('reel1'), document.getElementById('reel2')];
+    const spinBtn = document.getElementById('spinBtn');
+    const maxBtn = document.getElementById('maxBtn');
+    const autoBtn = document.getElementById('autoBtn');
+    const creditsEl = document.getElementById('credits');
+    const betEl = document.getElementById('bet');
+    const lastWinEl = document.getElementById('lastWin');
+    const messageEl = document.getElementById('message');
+
+    // Helpers
+    function randSymbol(){ return symbols[Math.floor(Math.random()*symbols.length)]; }
+    function updateDisplays(){ creditsEl.textContent = credits; betEl.textContent = bet; lastWinEl.textContent = lastWin; }
+    let lastWin = 0;
+
+    // Spin logic: animate by rapidly changing symbols, stop reels sequentially
+    async function spin(){
+      if (spinning) return;
+      if (credits < bet){
+        showMessage("Not enough credits", "lose");
+        return;
+      }
+      spinning = true;
+      messageEl.className = 'message';
+      messageEl.textContent = '';
+      credits -= bet;
+      updateDisplays();
+
+      // Start rapid change intervals for each reel
+      const intervals = [];
+      const finalSymbols = [null,null,null];
+
+      for (let i=0;i<3;i++){
+        intervals[i] = setInterval(()=> {
+          const s = randSymbol();
+          const span = reels[i].querySelector('.symbol');
+          span.textContent = s;
+        }, 80 + i*10);
+      }
+
+      // Stop reels one by one with a small delay
+      for (let i=0;i<3;i++){
+        await new Promise(res => setTimeout(res, 600 + i*350));
+        clearInterval(intervals[i]);
+        const chosen = randSymbol();
+        finalSymbols[i] = chosen;
+        reels[i].querySelector('.symbol').textContent = chosen;
+        // small highlight
+        reels[i].classList.add('win');
+        setTimeout(()=> reels[i].classList.remove('win'), 700);
+      }
+
+      // Evaluate result
+      const winAmount = evaluate(finalSymbols);
+      lastWin = winAmount;
+      credits += winAmount;
+      updateDisplays();
+
+      if (winAmount > 0){
+        showMessage(`You won ${winAmount} credits!`, "win");
+      } else {
+        showMessage("No win — try again.", "lose");
+      }
+
+      spinning = false;
+
+      // If auto mode is on and enough credits, continue
+      if (auto && credits >= bet){
+        setTimeout(()=> spin(), 600);
+      } else if (auto){
+        auto = false;
+        autoBtn.textContent = 'AUTO';
+      }
+    }
+
+    function evaluate(arr){
+      // Simple payout: three of a kind pays symbol multiplier * bet
+      if (arr[0] === arr[1] && arr[1] === arr[2]){
+        const sym = arr[0];
+        const multiplier = payouts[sym] || 1;
+        return bet * multiplier;
+      }
+      // Two cherries small payout
+      if ((arr.filter(s => s === "🍒").length) === 2){
+        return Math.floor(bet * 1.5);
+      }
+      return 0;
+    }
+
+    function showMessage(text, type){
+      messageEl.textContent = text;
+      messageEl.className = 'message ' + (type || '');
+    }
+
+    // Controls
+    spinBtn.addEventListener('click', spin);
+
+    maxBtn.addEventListener('click', () => {
+      // set bet to 10% of credits (rounded), min 1
+      bet = Math.max(1, Math.floor(credits * 0.1));
+      betEl.textContent = bet;
+    });
+
+    autoBtn.addEventListener('click', () => {
+      auto = !auto;
+      autoBtn.textContent = auto ? 'STOP' : 'AUTO';
+      if (auto && !spinning){
+        spin();
+      }
+    });
+
+    // Keyboard shortcuts: Space to spin, ArrowUp/Down to change bet
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); spin(); }
+      if (e.code === 'ArrowUp') { bet = Math.min(credits, bet + 5); betEl.textContent = bet; }
+      if (e.code === 'ArrowDown') { bet = Math.max(1, bet - 5); betEl.textContent = bet; }
+      if (e.key.toLowerCase() === 'm') { maxBtn.click(); }
+    });
+
+    // Initialize display
+    updateDisplays();
+
+    // Accessibility: focus spin button on load
+    window.addEventListener('load', ()=> spinBtn.focus());
+  </script>
+</body>
+</html>
