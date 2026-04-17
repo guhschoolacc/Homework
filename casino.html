@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Casino Game Hub</title>
+  <style>
+    :root{
+      --bg:#0b0f1a;
+      --card:#0f1724;
+      --accent:#f6b93b;
+      --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.03);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#071028 0%, #071a2a 100%);}
+    /* Top-left back button */
+    .back-btn{
+      position:fixed;
+      top:16px;
+      left:16px;
+      z-index:1000;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      background:var(--card);
+      color:var(--accent);
+      text-decoration:none;
+      border-radius:8px;
+      box-shadow:0 6px 18px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      font-weight:600;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .back-btn:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(2,6,23,0.7);}
+    .container{
+      max-width:1200px;
+      margin:84px auto 48px;
+      padding:24px;
+    }
+    h1{margin:0 0 18px;font-size:28px;color:#fff;letter-spacing:-0.2px}
+    p.lead{margin:0 0 28px;color:var(--muted)}
+    /* Grid of game buttons */
+    .games-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+      gap:18px;
+    }
+    .game-card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:flex-start;
+      box-shadow:0 6px 18px rgba(2,6,23,0.5);
+      border:1px solid rgba(255,255,255,0.03);
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .game-card:hover{transform:translateY(-6px); box-shadow:0 18px 36px rgba(2,6,23,0.6);}
+    .game-title{font-weight:700;color:#fff;font-size:16px}
+    .game-desc{font-size:13px;color:var(--muted);margin-top:0}
+    .play-btn{
+      margin-top:auto;
+      align-self:stretch;
+      display:inline-flex;
+      justify-content:center;
+      padding:10px 12px;
+      background:linear-gradient(90deg,var(--accent),#ff9f1a);
+      color:#071028;
+      font-weight:700;
+      border-radius:8px;
+      text-decoration:none;
+      border:none;
+      cursor:pointer;
+    }
+    .play-btn:active{transform:translateY(1px)}
+    /* small screens */
+    @media (max-width:420px){
+      .container{margin-top:72px;padding:16px}
+      .back-btn{padding:8px 10px;font-size:14px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed top-left back button -->
+  <a class="back-btn" href="index.html" aria-label="Back to Dashboard">
+    <!-- simple arrow icon -->
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back to Dashboard
+  </a>
+
+  <main class="container" id="hub">
+    <h1>Game Hub</h1>
+    <p class="lead">Choose a game to play. Click any tile to open the game page or launch the game modal.</p>
+
+    <section class="games-grid" id="gamesGrid" aria-live="polite">
+      <!-- Game buttons will be injected here by JavaScript -->
+    </section>
+  </main>
+
+  <script>
+    // List every game here. Each item should have a title, slug (link), and short description.
+    // Add or remove entries to change the buttons shown.
+    const games = [
+      { title: "Slots", slug: "slots.html", desc: "Classic 3-reel and 5-reel slot machines." },
+      { title: "Blackjack", slug: "blackjack.html", desc: "Beat the dealer in this card classic." },
+      { title: "Roulette", slug: "roulette.html", desc: "Place your bets on red, black, or a number." },
+      { title: "Poker", slug: "poker.html", desc: "Texas Hold'em and other poker variants." },
+      { title: "Baccarat", slug: "baccarat.html", desc: "High-roller card game with simple rules." },
+      { title: "Craps", slug: "craps.html", desc: "Fast-paced dice action." },
+      { title: "Video Poker", slug: "video-poker.html", desc: "Poker hands on a slot-style machine." },
+      { title: "Keno", slug: "keno.html", desc: "Pick numbers and hope for a big hit." },
+      { title: "Bingo", slug: "bingo.html", desc: "Classic bingo halls and online rooms." },
+      { title: "Scratch Cards", slug: "scratch.html", desc: "Instant-win scratch-off tickets." }
+    ];
+
+    const grid = document.getElementById('gamesGrid');
+
+    // Create a card for each game
+    games.forEach(game => {
+      const card = document.createElement('article');
+      card.className = 'game-card';
+      card.setAttribute('role','group');
+      card.setAttribute('aria-label', game.title);
+
+      const title = document.createElement('div');
+      title.className = 'game-title';
+      title.textContent = game.title;
+
+      const desc = document.createElement('div');
+      desc.className = 'game-desc';
+      desc.textContent = game.desc;
+
+      // Anchor styled as button so it works without JS
+      const play = document.createElement('a');
+      play.className = 'play-btn';
+      play.href = game.slug;
+      play.textContent = 'Play';
+      play.setAttribute('aria-label', `Play ${game.title}`);
+
+      // Optional: data attribute for analytics or JS hooks
+      play.dataset.game = game.title.toLowerCase().replace(/\s+/g,'-');
+
+      card.appendChild(title);
+      card.appendChild(desc);
+      card.appendChild(play);
+
+      grid.appendChild(card);
+    });
+
+    // Optional: keyboard accessibility - Enter on card opens the link
+    grid.addEventListener('keydown', (e) => {
+      const card = e.target.closest('.game-card');
+      if (!card) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        const link = card.querySelector('.play-btn');
+        if (link) link.click();
+      }
+    });
+
+    // Make cards focusable for keyboard users
+    document.querySelectorAll('.game-card').forEach(c => c.tabIndex = 0);
+  </script>
+</body>
+</html>
