@@ -52,16 +52,19 @@
     display:inline-flex;
     gap:8px;
     align-items:center;
-    z-index:50;
+    z-index:80;
+    white-space:nowrap;
   }
   .back-btn:hover{transform:translateY(-2px);transition:transform .15s ease;}
 
   /* Header */
+  /* Add left margin so header content doesn't collide with the absolute back button */
   .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:8px;
+    margin-left:120px; /* <-- prevents overlap with back button on wide screens */
   }
   .title{
     font-size:20px;
@@ -287,6 +290,21 @@
     .main{grid-template-columns:1fr;grid-auto-rows:1fr;}
     .hand{width:100%;}
     .bet-area{height:320px;}
+
+    /* On small screens, make the back button part of the normal flow and remove header left margin */
+    .back-btn{
+      position:relative;
+      left:auto;
+      top:auto;
+      margin-bottom:8px;
+      display:inline-flex;
+    }
+    .header{
+      margin-left:0;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
   }
 </style>
 </head>
