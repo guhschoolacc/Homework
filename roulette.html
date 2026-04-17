@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Roulette — Play</title>
+<style>
+  :root{
+    --bg:#0b0f12;
+    --panel:#0f1720;
+    --accent:#f5c542;
+    --muted:#9aa6b2;
+    --green:#2ecc71;
+    --red:#e74c3c;
+    --black:#111827;
+    --glass: rgba(255,255,255,0.04);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#071018 0%, #07121a 60%);color:#e6eef6}
+  .app{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    box-sizing:border-box;
+  }
+
+  /* Top-left back button */
+  .back-btn{
+    position:fixed;
+    top:14px;
+    left:14px;
+    z-index:1000;
+    background:var(--panel);
+    color:var(--accent);
+    border:1px solid rgba(255,255,255,0.04);
+    padding:8px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    box-shadow:0 6px 18px rgba(2,6,23,0.6);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .back-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(2,6,23,0.7)}
+
+  .game-wrap{
+    width:1100px;
+    max-width:calc(100% - 48px);
+    display:grid;
+    grid-template-columns: 520px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+
+  /* Left column: wheel + controls */
+  .left{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;
+    padding:18px;
+    box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .wheel-stage{
+    position:relative;
+    width:480px;
+    height:480px;
+    margin:0 auto 12px;
+  }
+
+  canvas#wheel{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    display:block;
+    background:conic-gradient(#0b1220, #071018);
+    box-shadow: inset 0 8px 40px rgba(0,0,0,0.6), 0 12px 40px rgba(0,0,0,0.6);
+  }
+
+  .pointer{
+    position:absolute;
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;height:0;
+    border-left:18px solid transparent;
+    border-right:18px solid transparent;
+    border-bottom:36px solid var(--accent);
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+    z-index:20;
+  }
+
+  .wheel-center{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:120px;height:120px;border-radius:50%;
+    background:linear-gradient(180deg,#0b1220,#071018);
+    display:flex;align-items:center;justify-content:center;
+    border:6px solid rgba(255,255,255,0.03);
+    z-index:15;
+    box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  }
+  .wheel-center .label{font-weight:700;color:var(--muted);font-size:14px}
+  .wheel-center .balance{font-weight:800;color:var(--accent);font-size:18px;margin-top:6px}
+
+  .controls{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:center;
+    margin-top:8px;
+  }
+
+  .btn{
+    background:linear-gradient(180deg,#0f1720,#0b1220);
+    color:var(--accent);
+    border:1px solid rgba(255,255,255,0.04);
+    padding:10px 16px;border-radius:10px;font-weight:700;
+    cursor:pointer;box-shadow:0 8px 20px rgba(2,6,23,0.6);
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.secondary{background:var(--glass);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+  .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.03);color:var(--muted)}
+
+  .spin-info{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:10px;color:var(--muted);font-size:13px}
+
+  /* Right column: betting table */
+  .right{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);
+    box-shadow:0 8px 30px rgba(2,6,23,0.6);
+    display:flex;flex-direction:column;gap:12px;
+  }
+
+  .panel-row{display:flex;gap:12px;align-items:center}
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);flex:1;
+  }
+
+  .bets{
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:10px;
+    margin-top:6px;
+  }
+
+  .bet-option{
+    background:linear-gradient(180deg,#071018,#061018);
+    border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.02);
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .bet-option:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .bet-option.active{outline:2px solid rgba(245,197,66,0.12);box-shadow:0 12px 30px rgba(245,197,66,0.06)}
+
+  .chip-row{display:flex;gap:8px;align-items:center}
+  .chip{
+    width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:#071018;cursor:pointer;border:3px solid rgba(255,255,255,0.04);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .chip:hover{transform:translateY(-6px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .chip[data-value="1"]{background:#f1c40f}
+  .chip[data-value="5"]{background:#e67e22}
+  .chip[data-value="10"]{background:#e74c3c;color:#fff}
+  .chip[data-value="25"]{background:#9b59b6;color:#fff}
+  .chip[data-value="100"]{background:#2ecc71;color:#fff}
+
+  .betting-table{
+    background:linear-gradient(180deg,#061018,#041018);
+    border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.02);
+    display:flex;flex-direction:column;gap:10px;
+  }
+
+  .bet-controls{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .input{
+    background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);
+  }
+
+  .last-result{
+    display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px;margin-top:6px;
+  }
+
+  .result-bubble{
+    width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;
+    color:#fff;background:var(--muted);font-size:16px;
+  }
+
+  /* small screens */
+  @media (max-width:980px){
+    .game-wrap{grid-template-columns:1fr;max-width:100%}
+    .left,.right{width:100%}
+    .wheel-stage{width:360px;height:360px}
+  }
+</style>
+</head>
+<body>
+<a class="back-btn" href="casino.html" title="Back to hub">Back to Hub</a>
+
+<div class="app">
+  <div class="game-wrap" role="application" aria-label="Roulette game">
+    <div class="left" aria-hidden="false">
+      <div class="wheel-stage" id="wheelStage">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="1000" height="1000" role="img" aria-label="Roulette wheel"></canvas>
+        <div class="wheel-center" aria-hidden="true">
+          <div style="text-align:center">
+            <div class="label">Balance</div>
+            <div class="balance" id="balanceDisplay">$1000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls" role="group" aria-label="Spin controls">
+        <button class="btn" id="spinBtn">Spin</button>
+        <button class="btn secondary" id="clearBetsBtn">Clear Bets</button>
+        <button class="btn ghost" id="autoSpinBtn">Auto Spin: Off</button>
+      </div>
+
+      <div class="spin-info" id="spinInfo">
+        <div><strong>Bet:</strong> <span id="currentBetText">$0</span></div>
+        <div>|</div>
+        <div><strong>Selected:</strong> <span id="selectedBetText">None</span></div>
+      </div>
+
+      <div class="last-result" id="lastResult" aria-live="polite" style="margin-top:12px">
+        <div><strong>Last:</strong></div>
+        <div class="result-bubble" id="lastBubble">—</div>
+        <div id="lastText" style="color:var(--muted)">No spins yet</div>
+      </div>
+    </div>
+
+    <div class="right" aria-hidden="false">
+      <div class="panel-row">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:800;color:var(--accent)">Place Bets</div>
+              <div style="font-size:13px;color:var(--muted)">Choose a chip then click a bet option</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">Min bet</div>
+              <div style="font-weight:800;color:var(--accent)">$1</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="chip-row" role="list" aria-label="Chips">
+            <div class="chip" data-value="1" title="$1" role="button" tabindex="0">$1</div>
+            <div class="chip" data-value="5" title="$5" role="button" tabindex="0">$5</div>
+            <div class="chip" data-value="10" title="$10" role="button" tabindex="0">$10</div>
+            <div class="chip" data-value="25" title="$25" role="button" tabindex="0">$25</div>
+            <div class="chip" data-value="100" title="$100" role="button" tabindex="0">$100</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="font-weight:800;color:var(--accent)">Bet Types</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px">Click to select a bet target</div>
+
+          <div class="bets" style="margin-top:10px" role="list" aria-label="Bet options">
+            <div class="bet-option" data-type="color" data-value="red" role="button" tabindex="0">
+              <div>Red</div><div style="color:var(--red);font-weight:800">1:1</div>
+            </div>
+            <div class="bet-option" data-type="color" data-value="black" role="button" tabindex="0">
+              <div>Black</div><div style="color:var(--black);font-weight:800">1:1</div>
+            </div>
+            <div class="bet-option" data-type="number" data-value="0" role="button" tabindex="0">
+              <div>Number 0</div><div style="color:#2ecc71;font-weight:800">35:1</div>
+            </div>
+
+            <!-- We'll generate 1-36 dynamically in JS for clarity -->
+            <div class="bet-option" data-type="number" data-value="1" role="button" tabindex="0"><div>1</div><div>35:1</div></div>
+            <div class="bet-option" data-type="number" data-value="2" role="button" tabindex="0"><div>2</div><div>35:1</div></div>
+            <div class="bet-option" data-type="number" data-value="3" role="button" tabindex="0"><div>3</div><div>35:1</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="betting-table" aria-label="Betting table">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800;color:var(--accent)">Current Bet</div>
+            <div style="font-size:13px;color:var(--muted)">Total wager and selection</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--muted)">Payouts</div>
+            <div style="font-weight:800;color:var(--accent)">Number 35:1 • Color 1:1</div>
+          </div>
+        </div>
+
+        <div class="bet-controls">
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Wager</div>
+            <input id="betAmount" class="input" type="number" min="1" value="1" />
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Auto cashout</div>
+            <select id="autoCashout" class="input">
+              <option value="none">None</option>
+              <option value="double">Double</option>
+              <option value="triple">Triple</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Quick actions</div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button class="btn secondary" id="betMaxBtn">Bet Max</button>
+              <button class="btn secondary" id="repeatBtn">Repeat</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+          <button class="btn" id="placeBetBtn">Place Bet</button>
+          <button class="btn secondary" id="cancelBetBtn">Cancel Bet</button>
+        </div>
+
+        <div style="margin-top:8px;color:var(--muted);font-size:13px">
+          <strong>Tip:</strong> Click a chip to set the wager quickly, then click a bet option to select target.
+        </div>
+      </div>
+
+      <div style="margin-top:8px;color:var(--muted);font-size:13px">
+        <strong>Game rules:</strong> Single number pays 35:1. Color pays 1:1. House edge applied by 0 on wheel.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== Roulette Game Script ======
+   - Canvas wheel with numbers and colors
+   - Betting system: number or color
+   - Spin physics with easing and deceleration
+   - Balance, payouts, animations
+*/
+
+(() => {
+  // Basic state
+  const state = {
+    balance: 1000,
+    currentBet: 0,
+    selectedBet: null, // {type:'number'|'color', value: 'red'|'black'|0..36}
+    lastBet: null,
+    autoSpin: false,
+    wheelRotation: 0, // radians
+    spinning: false,
+    numbers: [
+      0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26
+    ], // European wheel order (single zero)
+    colors: {} // filled below
+  };
+
+  // assign colors for numbers
+  const redSet = new Set([32,19,21,25,34,27,36,30,23,5,16,1,14,9,18,7,12,3]);
+  state.numbers.forEach(n => {
+    if (n === 0) state.colors[n] = 'green';
+    else state.colors[n] = redSet.has(n) ? 'red' : 'black';
+  });
+
+  // DOM refs
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const spinBtn = document.getElementById('spinBtn');
+  const balanceDisplay = document.getElementById('balanceDisplay');
+  const betAmountInput = document.getElementById('betAmount');
+  const currentBetText = document.getElementById('currentBetText');
+  const selectedBetText = document.getElementById('selectedBetText');
+  const lastBubble = document.getElementById('lastBubble');
+  const lastText = document.getElementById('lastText');
+  const autoSpinBtn = document.getElementById('autoSpinBtn');
+  const clearBetsBtn = document.getElementById('clearBetsBtn');
+  const placeBetBtn = document.getElementById('placeBetBtn');
+  const cancelBetBtn = document.getElementById('cancelBetBtn');
+  const chipEls = document.querySelectorAll('.chip');
+  const betOptions = document.querySelectorAll('.bet-option');
+  const betMaxBtn = document.getElementById('betMaxBtn');
+  const repeatBtn = document.getElementById('repeatBtn');
+
+  // canvas sizing for crispness
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    drawWheel(state.wheelRotation);
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  // draw wheel
+  function drawWheel(rotation = 0) {
+    const w = canvas.width / (window.devicePixelRatio || 1);
+    const h = canvas.height / (window.devicePixelRatio || 1);
+    const cx = w/2, cy = h/2, r = Math.min(cx,cy) - 6;
+    ctx.clearRect(0,0,w,h);
+
+    const segments = state.numbers.length;
+    const segAngle = (Math.PI * 2) / segments;
+
+    // draw segments
+    for (let i=0;i<segments;i++){
+      const angle = i * segAngle + rotation;
+      const next = angle + segAngle;
+      const num = state.numbers[i];
+      const color = state.colors[num] === 'red' ? '#c0392b' : (state.colors[num] === 'black' ? '#111' : '#2ecc71');
+
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r, angle, next);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // segment border
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // number label
+      const mid = angle + segAngle/2;
+      const tx = cx + Math.cos(mid) * (r - 36);
+      const ty = cy + Math.sin(mid) * (r - 36);
+      ctx.save();
+      ctx.translate(tx,ty);
+      ctx.rotate(mid + Math.PI/2);
+      ctx.fillStyle = state.colors[num] === 'black' ? '#fff' : '#fff';
+      ctx.font = 'bold 18px system-ui, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(num), 0, 0);
+      ctx.restore();
+    }
+
+    // outer rim
+    ctx.beginPath();
+    ctx.arc(cx,cy,r+8,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fill();
+
+    // inner rim
+    ctx.beginPath();
+    ctx.arc(cx,cy, r - 80, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fill();
+
+    // pointer highlight (visual only)
+    // draw a subtle shine on top
+    const grad = ctx.createLinearGradient(0,0,0,cy);
+    grad.addColorStop(0,'rgba(255,255,255,0.02)');
+    grad.addColorStop(1,'rgba(0,0,0,0.2)');
+    ctx.beginPath();
+    ctx.arc(cx,cy,r+10, -0.2, 0.2);
+    ctx.lineTo(cx,cy);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // initial draw
+  resizeCanvas();
+
+  // UI helpers
+  function updateBalance() {
+    balanceDisplay.textContent = `$${state.balance.toFixed(2)}`;
+  }
+  function updateBetUI() {
+    currentBetText.textContent = `$${state.currentBet}`;
+    selectedBetText.textContent = state.selectedBet ? `${state.selectedBet.type} ${state.selectedBet.value}` : 'None';
+  }
+  updateBalance();
+  updateBetUI();
+
+  // chip selection
+  let activeChipValue = 1;
+  chipEls.forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeChipValue = Number(chip.dataset.value);
+      betAmountInput.value = activeChipValue;
+      // highlight
+      chipEls.forEach(c => c.style.outline = 'none');
+      chip.style.outline = '3px solid rgba(255,255,255,0.06)';
+    });
+    chip.addEventListener('keydown', (e) => { if (e.key === 'Enter') chip.click(); });
+  });
+
+  // bet option selection
+  betOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      // toggle active
+      betOptions.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      const type = opt.dataset.type;
+      const value = type === 'number' ? Number(opt.dataset.value) : opt.dataset.value;
+      state.selectedBet = {type, value};
+      updateBetUI();
+    });
+    opt.addEventListener('keydown', (e) => { if (e.key === 'Enter') opt.click(); });
+  });
+
+  // place bet
+  placeBetBtn.addEventListener('click', () => {
+    const wager = Math.max(1, Math.floor(Number(betAmountInput.value) || 1));
+    if (!state.selectedBet) {
+      alert('Select a bet target first (number or color).');
+      return;
+    }
+    if (wager > state.balance) {
+      alert('Insufficient balance.');
+      return;
+    }
+    state.currentBet = wager;
+    state.balance -= wager;
+    state.lastBet = { ...state.selectedBet, wager };
+    updateBalance();
+    updateBetUI();
+    // small visual: flash selected option
+    const active = document.querySelector('.bet-option.active');
+    if (active) {
+      active.animate([{transform:'scale(1)'},{transform:'scale(1.06)'}],{duration:220,fill:'forwards'});
+    }
+  });
+
+  cancelBetBtn.addEventListener('click', () => {
+    // refund current bet if placed
+    if (state.currentBet > 0) {
+      state.balance += state.currentBet;
+      state.currentBet = 0;
+      state.lastBet = null;
+      updateBalance();
+      updateBetUI();
+    }
+  });
+
+  betMaxBtn.addEventListener('click', () => {
+    betAmountInput.value = Math.max(1, Math.floor(state.balance));
+  });
+
+  repeatBtn.addEventListener('click', () => {
+    if (!state.lastBet) return;
+    if (state.lastBet.wager > state.balance) {
+      alert('Not enough balance to repeat last bet.');
+      return;
+    }
+    state.selectedBet = { type: state.lastBet.type, value: state.lastBet.value };
+    state.currentBet = state.lastBet.wager;
+    state.balance -= state.currentBet;
+    updateBalance();
+    updateBetUI();
+    // highlight the matching bet option
+    betOptions.forEach(o => {
+      const t = o.dataset.type;
+      const v = t === 'number' ? Number(o.dataset.value) : o.dataset.value;
+      if (t === state.selectedBet.type && v === state.selectedBet.value) {
+        o.classList.add('active');
+      } else o.classList.remove('active');
+    });
+  });
+
+  // clear bets
+  clearBetsBtn.addEventListener('click', () => {
+    state.currentBet = 0;
+    state.selectedBet = null;
+    state.lastBet = null;
+    betOptions.forEach(o => o.classList.remove('active'));
+    updateBetUI();
+  });
+
+  // auto spin toggle
+  autoSpinBtn.addEventListener('click', () => {
+    state.autoSpin = !state.autoSpin;
+    autoSpinBtn.textContent = `Auto Spin: ${state.autoSpin ? 'On' : 'Off'}`;
+  });
+
+  // spin logic
+  function spinWheel() {
+    if (state.spinning) return;
+    if (state.currentBet <= 0) {
+      alert('Place a bet first.');
+      return;
+    }
+    state.spinning = true;
+    spinBtn.disabled = true;
+    spinBtn.textContent = 'Spinning...';
+
+    // physics: initial angular velocity and deceleration
+    const segments = state.numbers.length;
+    const segAngle = (Math.PI * 2) / segments;
+
+    // choose a random winning index with slight house bias? We'll be fair random
+    const winningIndex = Math.floor(Math.random() * segments);
+    const targetNumber = state.numbers[winningIndex];
+
+    // compute target rotation so that the winning segment aligns with pointer at top (angle -PI/2)
+    // current rotation is state.wheelRotation
+    const currentRotation = state.wheelRotation;
+    // angle of winning segment center (in wheel coordinates)
+    const winAngle = winningIndex * segAngle + segAngle/2;
+    // we want wheel rotation such that winAngle + rotation = -PI/2 (pointer)
+    // so rotation = -PI/2 - winAngle + 2πk
+    // choose k so wheel spins several full turns
+    const extraTurns = 4 + Math.floor(Math.random()*3); // 4-6 turns
+    const targetRotation = -Math.PI/2 - winAngle + extraTurns * Math.PI * 2;
+
+    // animate rotation from currentRotation to targetRotation over duration with easing
+    const duration = 4200 + Math.floor(Math.random()*1200); // 4.2-5.4s
+    const start = performance.now();
+
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+    function frame(now){
+      const t = Math.min(1, (now - start) / duration);
+      const eased = easeOutCubic(t);
+      const rot = currentRotation + (targetRotation - currentRotation) * eased;
+      state.wheelRotation = rot;
+      drawWheel(rot);
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        // normalize rotation to within 0..2π for stability
+        state.wheelRotation = ((state.wheelRotation % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+        drawWheel(state.wheelRotation);
+        // determine final index by mapping rotation to segment
+        // compute angle at pointer: pointer angle is -PI/2, so wheel angle at pointer = (-rotation) + (-PI/2)
+        const pointerAngle = -state.wheelRotation - Math.PI/2;
+        // normalize
+        let normalized = ((pointerAngle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+        const landedIndex = Math.floor(normalized / segAngle) % segments;
+        const landedNumber = state.numbers[landedIndex];
+
+        // show result
+        showResult(landedNumber);
+        state.spinning = false;
+        spinBtn.disabled = false;
+        spinBtn.textContent = 'Spin';
+
+        // auto spin behavior
+        if (state.autoSpin && state.balance >= 1) {
+          // if last bet exists, repeat it automatically
+          if (state.lastBet && state.lastBet.wager <= state.balance) {
+            // repeat last bet
+            state.selectedBet = { type: state.lastBet.type, value: state.lastBet.value };
+            state.currentBet = state.lastBet.wager;
+            state.balance -= state.currentBet;
+            updateBalance();
+            updateBetUI();
+            setTimeout(() => spinWheel(), 800);
+          } else {
+            state.autoSpin = false;
+            autoSpinBtn.textContent = 'Auto Spin: Off';
+          }
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // show result and payout
+  function showResult(number) {
+    const color = state.colors[number];
+    lastBubble.textContent = number;
+    lastBubble.style.background = color === 'red' ? '#c0392b' : (color === 'black' ? '#111' : '#2ecc71');
+    lastText.textContent = `Landed ${number} (${color})`;
+
+    // determine payout
+    let payout = 0;
+    let won = false;
+    if (state.lastBet) {
+      const bet = state.lastBet;
+      if (bet.type === 'number') {
+        if (bet.value === number) {
+          payout = bet.wager * 35;
+          won = true;
+        }
+      } else if (bet.type === 'color') {
+        if (bet.value === color) {
+          payout = bet.wager * 1;
+          won = true;
+        }
+      }
+    } else if (state.selectedBet && state.currentBet > 0) {
+      // fallback if lastBet not set but currentBet exists
+      const bet = { ...state.selectedBet, wager: state.currentBet };
+      if (bet.type === 'number') {
+        if (bet.value === number) {
+          payout = bet.wager * 35;
+          won = true;
+        }
+      } else if (bet.type === 'color') {
+        if (bet.value === color) {
+          payout = bet.wager * 1;
+          won = true;
+        }
+      }
+    }
+
+    // apply payout and update UI
+    if (won) {
+      // return original wager + payout
+      const totalReturn = (state.lastBet ? state.lastBet.wager : state.currentBet) + payout;
+      state.balance += totalReturn;
+      // animate balance flash
+      balanceDisplay.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:420,fill:'forwards'});
+      lastText.textContent += ` — You won $${payout}!`;
+    } else {
+      lastText.textContent += ` — You lost $${state.lastBet ? state.lastBet.wager : state.currentBet}.`;
+    }
+
+    // reset current bet but keep lastBet for repeat
+    state.currentBet = 0;
+    updateBalance();
+    updateBetUI();
+  }
+
+  // spin button
+  spinBtn.addEventListener('click', spinWheel);
+
+  // keyboard shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (e.key === ' ' && !state.spinning) { e.preventDefault(); spinWheel(); }
+    if (e.key === 'a') { autoSpinBtn.click(); }
+  });
+
+  // small accessibility: announce results
+  const live = document.getElementById('lastText');
+  const obs = new MutationObserver(() => {
+    live.setAttribute('aria-live','polite');
+  });
+  obs.observe(live, {childList:true, subtree:true});
+
+  // draw initial wheel once more
+  drawWheel(state.wheelRotation);
+
+  // populate additional number bet options (4..36)
+  (function populateNumbers(){
+    const container = document.querySelector('.bets');
+    // we already have 0..3 in markup; add 4..36
+    for (let n=4;n<=36;n++){
+      const div = document.createElement('div');
+      div.className = 'bet-option';
+      div.dataset.type = 'number';
+      div.dataset.value = String(n);
+      div.tabIndex = 0;
+      div.innerHTML = `<div>${n}</div><div>35:1</div>`;
+      container.appendChild(div);
+      div.addEventListener('click', () => {
+        betOptions.forEach(o => o.classList.remove('active'));
+        // mark this as active visually
+        div.classList.add('active');
+        state.selectedBet = { type:'number', value: n };
+        updateBetUI();
+      });
+      div.addEventListener('keydown', (e) => { if (e.key === 'Enter') div.click(); });
+    }
+  })();
+
+  // small animation: pointer wobble when idle
+  (function pointerWobble(){
+    const pointer = document.querySelector('.pointer');
+    let dir = 1;
+    setInterval(() => {
+      pointer.animate([{transform:'translateX(-50%) rotate(-2deg)'},{transform:'translateX(-50%) rotate(2deg)'},{transform:'translateX(-50%) rotate(-2deg)'}],{duration:2200,iterations:1});
+    }, 2600);
+  })();
+
+  // friendly initial hint
+  setTimeout(()=> {
+    lastText.textContent = 'Tip: Press Space to spin. Use chips to set wager.';
+  }, 1200);
+
+})();
+</script>
+</body>
+</html>
