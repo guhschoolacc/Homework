@@ -22,7 +22,6 @@
       radial-gradient(800px 400px at 10% 10%, rgba(124,92,255,0.03), transparent 8%),
       linear-gradient(180deg,var(--bg) 0%, #07070a 100%);-webkit-font-smoothing:antialiased;}
 
-    /* Back button */
     .back-btn{
       position:fixed;
       top:14px;
@@ -59,7 +58,6 @@
       flex-wrap:wrap;
     }
 
-    /* Realistic slot machine shell */
     .machine-shell{
       display:flex;
       gap:18px;
@@ -71,7 +69,6 @@
       border:1px solid rgba(255,255,255,0.03);
     }
 
-    /* Reels container */
     .reels{
       display:flex;
       gap:12px;
@@ -82,7 +79,6 @@
       box-shadow:0 8px 24px rgba(0,0,0,0.6);
     }
 
-    /* Single reel */
     .reel-viewport{
       width: var(--symbol-size);
       height: calc(var(--symbol-size) * 1.2);
@@ -113,7 +109,6 @@
       text-shadow:0 4px 10px rgba(0,0,0,0.6);
     }
 
-    /* Center payline */
     .payline{
       position:absolute;
       left:0;
@@ -127,7 +122,6 @@
       border-bottom:1px solid rgba(255,255,255,0.02);
     }
 
-    /* Controls column */
     .controls{
       display:flex;
       flex-direction:column;
@@ -163,7 +157,6 @@
     .stat .label{font-size:12px;color:var(--muted)}
     .stat .value{font-weight:800;color:#fff}
 
-    /* Bet controls */
     .bet-controls{
       display:flex;
       gap:8px;
@@ -197,10 +190,8 @@
     .message.win{color:var(--win-glow); text-shadow:0 6px 18px rgba(46,230,167,0.08)}
     .message.lose{color:#ff6b6b}
 
-    /* Reel highlight on win */
     .reel-viewport.win{box-shadow:0 12px 36px rgba(46,230,167,0.12), 0 0 18px rgba(46,230,167,0.06) inset;}
 
-    /* Responsive */
     @media (max-width:920px){
       main{padding:18px;margin-top:72px}
       .controls{min-width:220px}
@@ -215,11 +206,11 @@
   </style>
 </head>
 <body>
-  <a class="back-btn" href="hub.html" aria-label="Back to Hub">
+  <a class="back-btn" href="casino.html" aria-label="Back to Casino">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    Back to Hub
+    Back to Casino
   </a>
 
   <main>
@@ -236,9 +227,7 @@
 
     <section class="panel" aria-labelledby="slots-heading">
       <div class="machine-shell" role="application" aria-label="Slot machine">
-        <div class="reels" id="reels">
-          <!-- Reels will be injected here -->
-        </div>
+        <div class="reels" id="reels"></div>
       </div>
 
       <div class="controls" aria-hidden="false">
@@ -282,11 +271,6 @@
   </main>
 
   <script>
-    /***********************
-     * Slot machine engine
-     ***********************/
-
-    // Symbols and weights (more realistic distribution)
     const symbolPool = [
       {s:"🍒", weight:18, payout:3},
       {s:"🍋", weight:16, payout:4},
@@ -296,31 +280,26 @@
       {s:"7️⃣", weight:1, payout:100}
     ];
 
-    // Build a weighted array for each reel (can vary per reel for realism)
     function buildReelStrip(multiplier = 3){
       const base = [];
       symbolPool.forEach(sym => {
         for (let i=0;i<sym.weight;i++) base.push(sym.s);
       });
-      // Shuffle base for variety
       for (let i = base.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [base[i], base[j]] = [base[j], base[i]];
       }
-      // Repeat the strip to allow long spins and smooth stops
       const strip = [];
       for (let m=0;m<multiplier;m++) strip.push(...base);
       return strip;
     }
 
-    // State
     let credits = 1000;
     let bet = 10;
     let lastWin = 0;
     let auto = false;
     let spinning = false;
 
-    // Reels config
     const REEL_COUNT = 3;
     const strips = [];
     const reelElements = [];
@@ -338,11 +317,12 @@
     const decBet = document.getElementById('decBet');
     const setCustom = document.getElementById('setCustom');
 
-    // Create reels DOM with realistic strip
     function createReels(){
       reelsContainer.innerHTML = '';
+      strips.length = 0;
+      reelElements.length = 0;
       for (let r=0;r<REEL_COUNT;r++){
-        const strip = buildReelStrip(4); // longer strip for smoother spin
+        const strip = buildReelStrip(4);
         strips.push(strip);
 
         const viewport = document.createElement('div');
@@ -355,14 +335,12 @@
 
         const stripEl = document.createElement('div');
         stripEl.className = 'reel-strip';
-        // populate symbols (add extra copies at top and bottom for seamless wrap)
         for (let i=0;i<strip.length;i++){
           const sym = document.createElement('div');
           sym.className = 'symbol';
           sym.textContent = strip[i];
           stripEl.appendChild(sym);
         }
-        // duplicate once more to allow large translate values without gaps
         for (let i=0;i<strip.length;i++){
           const sym = document.createElement('div');
           sym.className = 'symbol';
@@ -376,14 +354,12 @@
       }
     }
 
-    // Utility: get symbol at logical index (center line)
     function getCenterSymbol(reelIndex, finalOffsetIndex){
       const strip = strips[reelIndex];
       const idx = finalOffsetIndex % strip.length;
       return strip[idx];
     }
 
-    // Update displays
     function updateDisplays(){
       creditsEl.textContent = credits;
       betDisplay.textContent = bet;
@@ -391,7 +367,6 @@
       betInput.value = bet;
     }
 
-    // Spin physics: choose a random stop index for each reel, compute translateY
     function spin(){
       if (spinning) return;
       if (credits < bet){
@@ -404,50 +379,39 @@
       credits -= bet;
       updateDisplays();
 
-      // Visual: add small press animation
       spinBtn.disabled = true;
       spinBtn.style.opacity = 0.9;
 
-      // Choose final indices (simulate RNG)
       const finalIndices = [];
       for (let r=0;r<REEL_COUNT;r++){
         const len = reelElements[r].length;
-        // pick a random index within the base strip
         const chosen = Math.floor(Math.random() * len);
         finalIndices.push(chosen);
       }
 
-      // Staggered durations and easing to mimic real slot inertia
-      const baseDuration = 1400; // ms
+      const baseDuration = 1400;
       const durations = [baseDuration, baseDuration + 220, baseDuration + 480];
       const delays = [0, 120, 260];
 
-      // For each reel, compute translateY so that the chosen symbol lands centered
       reelElements.forEach((reel, r) => {
         const symbolHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--symbol-size')) || 96;
         const stripLen = reel.length;
-        // We duplicated the strip once, so we can offset by stripLen to ensure long travel
-        const cycles = 3 + Math.floor(Math.random() * 3); // full cycles before stopping
+        const cycles = 3 + Math.floor(Math.random() * 3);
         const targetIndex = finalIndices[r] + stripLen * cycles;
         const translateY = -targetIndex * symbolHeight + ( (reel.viewport.clientHeight - symbolHeight) / 2 );
 
-        // Apply transition
         reel.stripEl.style.transition = `transform ${durations[r]}ms cubic-bezier(.12,.72,.24,1) ${delays[r]}ms`;
-        // Force reflow then set transform
         requestAnimationFrame(() => {
           reel.stripEl.style.transform = `translateY(${translateY}px)`;
         });
 
-        // Listen for transition end to normalize position
         const onEnd = () => {
           reel.stripEl.style.transition = 'none';
-          // Normalize to the equivalent index within the first strip copy
           const normalizedIndex = finalIndices[r] % stripLen;
           const normalizedTranslate = -normalizedIndex * symbolHeight + ( (reel.viewport.clientHeight - symbolHeight) / 2 );
           reel.stripEl.style.transform = `translateY(${normalizedTranslate}px)`;
           reel.viewport.classList.remove('win');
           reel.stripEl.removeEventListener('transitionend', onEnd);
-          // When last reel finishes, evaluate
           if (r === REEL_COUNT - 1) {
             setTimeout(() => finalizeSpin(finalIndices), 40);
           }
@@ -456,14 +420,10 @@
       });
     }
 
-    // Evaluate result after spin completes
     function finalizeSpin(finalIndices){
-      // Get center symbols
       const centerSymbols = finalIndices.map((idx, r) => getCenterSymbol(r, idx));
-      // Simple evaluation: three of a kind pays according to symbol payout; two cherries small payout
       let win = 0;
       if (centerSymbols.every(s => s === centerSymbols[0])){
-        // find payout from symbolPool
         const sym = symbolPool.find(x => x.s === centerSymbols[0]);
         const multiplier = sym ? sym.payout : 2;
         win = bet * multiplier;
@@ -476,9 +436,7 @@
       credits += win;
       updateDisplays();
 
-      // Visual highlight for winning reels
       if (win > 0){
-        // highlight reels that match
         for (let r=0;r<REEL_COUNT;r++){
           if (centerSymbols[r] === centerSymbols[0] && centerSymbols.every(s => s === centerSymbols[0])) {
             reelElements[r].viewport.classList.add('win');
@@ -493,7 +451,6 @@
       spinBtn.disabled = false;
       spinBtn.style.opacity = 1;
 
-      // Auto-play handling
       if (auto && credits >= bet){
         setTimeout(() => spin(), 600);
       } else if (auto){
@@ -502,13 +459,11 @@
       }
     }
 
-    // UI helpers
     function showMessage(text, type){
       messageEl.textContent = text;
       messageEl.className = 'message ' + (type || '');
     }
 
-    // Controls wiring
     spinBtn.addEventListener('click', spin);
 
     autoBtn.addEventListener('click', () => {
@@ -520,7 +475,6 @@
     });
 
     maxBtn.addEventListener('click', () => {
-      // set bet to 10% of credits (rounded), min 1
       bet = Math.max(1, Math.floor(credits * 0.1));
       betInput.value = bet;
       updateDisplays();
@@ -550,7 +504,6 @@
       if (e.key === 'Enter') setCustom.click();
     });
 
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space') { e.preventDefault(); spin(); }
       if (e.code === 'ArrowUp') { incBet.click(); }
@@ -558,11 +511,9 @@
       if (e.key.toLowerCase() === 'm') { maxBtn.click(); }
     });
 
-    // Initialize
     createReels();
     updateDisplays();
 
-    // Center reels on load (pick a visible index)
     (function centerOnLoad(){
       reelElements.forEach((reel, r) => {
         const symbolHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--symbol-size')) || 96;
