@@ -13,65 +13,32 @@
     --glass: rgba(255,255,255,0.03);
     --btn:#111827;
     --btn-hover:#1f2937;
-    --danger:#ef4444;
-    --success:#10b981;
-    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
-  html,body{height:100%;margin:0;font-family:var(--font-sans);background:linear-gradient(180deg,#071024 0%, #071a2a 100%);color:#e6eef6}
-  .topbar{
-    display:flex;align-items:center;gap:16px;padding:14px 20px;background:transparent;
-  }
-  .back-btn{
-    background:var(--glass);color:var(--accent);border:1px solid rgba(0,180,216,0.12);padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;
-  }
-  .container{
-    max-width:1400px;margin:20px auto;padding:18px;display:flex;gap:18px;
-  }
-  .calc{
-    flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.6);
-    display:flex;flex-direction:column;
-  }
-  .display{
-    background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:10px;padding:18px;color:#e6eef6;border:1px solid rgba(255,255,255,0.03);
-    display:flex;flex-direction:column;gap:8px;
-  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#071024 0%, #071a2a 100%);color:#e6eef6}
+  .topbar{display:flex;align-items:center;gap:16px;padding:14px 20px;background:transparent}
+  .back-btn{background:var(--glass);color:var(--accent);border:1px solid rgba(0,180,216,0.12);padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+  .container{max-width:1400px;margin:20px auto;padding:18px;display:flex;gap:18px}
+  .calc{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column}
+  .display{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:10px;padding:18px;color:#e6eef6;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:8px}
   .top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .mode{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
-  .screen{
-    font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
-    font-size:22px;padding:10px;background:transparent;border-radius:6px;color:#dff6ff;min-height:56px;display:flex;align-items:center;justify-content:flex-end;
-    word-break:break-all;
-  }
+  .screen{font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;font-size:22px;padding:10px;background:transparent;border-radius:6px;color:#dff6ff;min-height:56px;display:flex;align-items:center;justify-content:flex-end;word-break:break-all;cursor:text}
   .result{font-size:18px;color:var(--muted);text-align:right;min-height:20px}
-  .kbd{
-    margin-top:14px;display:grid;grid-template-columns:repeat(6,1fr);gap:10px;
-  }
-  button.key{
-    background:var(--btn);border:1px solid rgba(255,255,255,0.03);color:#e6eef6;padding:14px;border-radius:10px;font-size:15px;cursor:pointer;
-    transition:transform .06s, background .12s;
-  }
+  .kbd{margin-top:14px;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  button.key{background:var(--btn);border:1px solid rgba(255,255,255,0.03);color:#e6eef6;padding:14px;border-radius:10px;font-size:15px;cursor:pointer;transition:transform .06s, background .12s}
   button.key:hover{transform:translateY(-2px);background:var(--btn-hover)}
   button.wide{grid-column:span 2}
-  .side{
-    width:360px;min-width:300px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.02);
-    display:flex;flex-direction:column;gap:12px;
-  }
+  .side{width:360px;min-width:300px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:12px}
   .panel-title{font-weight:700;color:#dff6ff}
   .history{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;max-height:360px;overflow:auto;font-family:monospace;font-size:13px;color:var(--muted)}
-  .history-item{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.02);display:flex;justify-content:space-between;gap:8px}
   .vars{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-family:monospace;font-size:13px;color:var(--muted);min-height:120px}
   .small{font-size:13px;color:var(--muted)}
   .footer{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:12px}
   .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
   .btn-primary{background:linear-gradient(90deg,var(--accent),#00f0ff);color:#021124;border:none;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-  .toggle{display:inline-flex;align-items:center;gap:8px}
-  .kbd-help{font-size:12px;color:var(--muted)}
-  @media (max-width:1000px){
-    .container{flex-direction:column;padding:12px}
-    .side{width:100%}
-    .kbd{grid-template-columns:repeat(4,1fr)}
-  }
+  @media (max-width:1000px){.container{flex-direction:column;padding:12px}.side{width:100%}.kbd{grid-template-columns:repeat(4,1fr)}}
+  /* Hidden input to capture keyboard typing */
+  #hiddenInput{position:fixed;left:-9999px;top:auto;opacity:0}
 </style>
 </head>
 <body>
@@ -99,11 +66,11 @@
           </div>
         </div>
 
-        <div class="screen" id="expr" aria-live="polite">0</div>
+        <div class="screen" id="expr" tabindex="0" aria-live="polite" title="Click to type or start typing">0</div>
         <div class="result" id="result"> </div>
 
         <div class="kbd" id="buttons">
-          <!-- Row 1 -->
+          <!-- Numeric and function keys only. Letter keys removed from on-screen keypad. -->
           <button class="key" data-val="(">(</button>
           <button class="key" data-val=")">)</button>
           <button class="key" data-val="pi">π</button>
@@ -111,7 +78,6 @@
           <button class="key" data-action="back">⌫</button>
           <button class="key" data-action="enter" style="background:linear-gradient(90deg,var(--accent),#00f0ff);color:#021124">=</button>
 
-          <!-- Row 2 -->
           <button class="key" data-val="sin(">sin</button>
           <button class="key" data-val="cos(">cos</button>
           <button class="key" data-val="tan(">tan</button>
@@ -119,7 +85,6 @@
           <button class="key" data-val="acos(">acos</button>
           <button class="key" data-val="atan(">atan</button>
 
-          <!-- Row 3 -->
           <button class="key" data-val="sinh(">sinh</button>
           <button class="key" data-val="cosh(">cosh</button>
           <button class="key" data-val="tanh(">tanh</button>
@@ -127,7 +92,6 @@
           <button class="key" data-val="ln(">ln</button>
           <button class="key" data-val="sqrt(">√</button>
 
-          <!-- Row 4 -->
           <button class="key" data-val="^">^</button>
           <button class="key" data-val="**">pow</button>
           <button class="key" data-val="abs(">abs</button>
@@ -135,7 +99,6 @@
           <button class="key" data-val="nPr(">nPr</button>
           <button class="key" data-val="nCr(">nCr</button>
 
-          <!-- Row 5 -->
           <button class="key" data-val="7">7</button>
           <button class="key" data-val="8">8</button>
           <button class="key" data-val="9">9</button>
@@ -143,7 +106,6 @@
           <button class="key" data-val="%">mod</button>
           <button class="key" data-val="floor(">floor</button>
 
-          <!-- Row 6 -->
           <button class="key" data-val="4">4</button>
           <button class="key" data-val="5">5</button>
           <button class="key" data-val="6">6</button>
@@ -151,7 +113,6 @@
           <button class="key" data-val="exp(">exp</button>
           <button class="key" data-val="ceil(">ceil</button>
 
-          <!-- Row 7 -->
           <button class="key" data-val="1">1</button>
           <button class="key" data-val="2">2</button>
           <button class="key" data-val="3">3</button>
@@ -159,49 +120,14 @@
           <button class="key" data-val="round(">round</button>
           <button class="key" data-val="trunc(">trunc</button>
 
-          <!-- Row 8 -->
           <button class="key wide" data-val="0">0</button>
           <button class="key" data-val=".">.</button>
           <button class="key" data-val="+">+</button>
           <button class="key" data-val="ans">ans</button>
-          <button class="key" data-val="=" data-action="enter">Enter</button>
+          <button class="key" data-action="enter">Enter</button>
 
-          <!-- Row 9 letters -->
-          <button class="key" data-val="a">a</button>
-          <button class="key" data-val="b">b</button>
-          <button class="key" data-val="c">c</button>
-          <button class="key" data-val="d">d</button>
-          <button class="key" data-val="f">f</button>
-          <button class="key" data-val="g">g</button>
-
-          <!-- Row 10 letters -->
-          <button class="key" data-val="h">h</button>
-          <button class="key" data-val="i">i</button>
-          <button class="key" data-val="j">j</button>
-          <button class="key" data-val="k">k</button>
-          <button class="key" data-val="l">l</button>
-          <button class="key" data-val="m">m</button>
-
-          <!-- Row 11 letters -->
-          <button class="key" data-val="n">n</button>
-          <button class="key" data-val="o">o</button>
-          <button class="key" data-val="p">p</button>
-          <button class="key" data-val="q">q</button>
-          <button class="key" data-val="r">r</button>
-          <button class="key" data-val="s">s</button>
-
-          <!-- Row 12 letters -->
-          <button class="key" data-val="t">t</button>
-          <button class="key" data-val="u">u</button>
-          <button class="key" data-val="v">v</button>
-          <button class="key" data-val="w">w</button>
-          <button class="key" data-val="x">x</button>
-          <button class="key" data-val="y">y</button>
-
-          <!-- Row 13 -->
-          <button class="key" data-val="z">z</button>
           <button class="key" data-val="=" data-action="assign">assign</button>
-          <button class="key" data-val=";">;</button>
+          <button class="key" data-val=";" >;</button>
           <button class="key" data-action="clear">AC</button>
           <button class="key" data-action="mem+">M+</button>
           <button class="key" data-action="mem-">M-</button>
@@ -209,7 +135,7 @@
       </div>
 
       <div class="footer">
-        <div class="kbd-help small">Type expressions, use letters for variables, assign with <strong>a = 3</strong>, use <strong>ans</strong> for last result.</div>
+        <div class="kbd-help small">Type expressions including letters for variables. Assign with a = 3 then use a in expressions. Press Enter to evaluate.</div>
         <div style="display:flex;gap:8px">
           <button class="btn-ghost" id="toggleHistory">Toggle History</button>
           <button class="btn-ghost" id="clearHistory">Clear History</button>
@@ -235,6 +161,9 @@
     </aside>
   </div>
 
+  <!-- Hidden textarea captures keyboard input so typing letters works reliably -->
+  <textarea id="hiddenInput" aria-hidden="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
 <script>
 (() => {
   const exprEl = document.getElementById('expr');
@@ -245,12 +174,13 @@
   const memoryList = document.getElementById('memoryList');
   const angleMode = document.getElementById('angleMode');
   const precisionInput = document.getElementById('precision');
+  const hiddenInput = document.getElementById('hiddenInput');
 
   let expr = '';
   let lastAns = 0;
   let memory = 0;
   let history = [];
-  let vars = {}; // letter variables
+  let vars = {};
 
   const functions = [
     'sin','cos','tan','asin','acos','atan',
@@ -294,6 +224,7 @@
 
   function insert(val){
     expr += val;
+    hiddenInput.value = expr;
     updateDisplay();
   }
 
@@ -306,6 +237,7 @@
 
   function backspace(){
     expr = expr.slice(0,-1);
+    hiddenInput.value = expr;
     updateDisplay();
   }
 
@@ -316,7 +248,6 @@
     renderHistory();
   }
 
-  // Math helpers
   function factorial(n){
     if(n < 0) return NaN;
     if(Math.abs(n - Math.round(n)) > 1e-12) return NaN;
@@ -334,17 +265,16 @@
     return factorial(n)/(factorial(r)*factorial(n-r));
   }
 
-  // Evaluate expression with support for variables and functions
   function evaluateExpression(input){
-    input = input.trim();
+    input = String(input).trim();
     if(!input) return 0;
 
-    // Assignment: letter = expr
+    // Assignment: single-letter = expr
     const assignMatch = input.match(/^([a-zA-Z])\s*=\s*(.+)$/);
     if(assignMatch){
       const name = assignMatch[1];
       const rhs = assignMatch[2];
-      const val = evaluateExpression(rhs); // recursive
+      const val = evaluateExpression(rhs);
       if(typeof val === 'number' && !isNaN(val)){
         vars[name] = val;
         renderVars();
@@ -363,21 +293,18 @@
     // Replace variable names with their numeric values
     exprToEval = exprToEval.replace(/\b([a-zA-Z])\b/g, (m, p1) => {
       if(vars.hasOwnProperty(p1)) return '('+vars[p1]+')';
-      // allow function names to pass through
       if(functions.includes(p1)) return p1;
       return p1;
     });
 
-    // Handle factorial postfix "!"
-    exprToEval = exprToEval.replace(/([0-9\.e\)\]]+)\s*!/g, (m, p1) => {
-      return `__fact(${p1})`;
-    });
+    // Factorial postfix
+    exprToEval = exprToEval.replace(/([0-9\.e\)\]]+)\s*!/g, (m, p1) => `__fact(${p1})`;
 
-    // Replace nPr and nCr calls like nPr(5,3)
+    // nPr nCr
     exprToEval = exprToEval.replace(/\bnPr\s*\(/g, '__nPr(');
     exprToEval = exprToEval.replace(/\bnCr\s*\(/g, '__nCr(');
 
-    // Map function names to Math equivalents or custom wrappers
+    // Map functions
     const mapFns = {
       'sin':'__sin','cos':'__cos','tan':'__tan',
       'asin':'__asin','acos':'__acos','atan':'__atan',
@@ -387,24 +314,17 @@
       'abs':'Math.abs','floor':'Math.floor','ceil':'Math.ceil',
       'round':'Math.round','trunc':'Math.trunc','exp':'Math.exp'
     };
-
-    // Replace function names with mapped names
     Object.keys(mapFns).forEach(fn => {
       const re = new RegExp('\\b' + fn + '\\s*\\(', 'g');
       exprToEval = exprToEval.replace(re, mapFns[fn] + '(');
     });
 
-    // Replace ^ with Math.pow
+    // Replace ^ with **
     exprToEval = exprToEval.replace(/\^/g, '**');
 
-    // Replace 'mod' or % with %
+    // Replace mod word with %
     exprToEval = exprToEval.replace(/\bmod\b/g, '%');
 
-    // Safety: disallow letters other than allowed tokens
-    // Allowed characters: digits, operators, parentheses, ., %, *, /, +, -, letters in our wrappers, commas, e
-    // We'll attempt to evaluate in a controlled Function with only allowed helpers.
-
-    // Build function
     const helpers = {
       __fact: factorial,
       __nPr: nPr,
@@ -418,7 +338,6 @@
       __atan: function(x){ const v = Math.atan(x); return angleMode.value === 'deg' ? v * 180/Math.PI : v; }
     };
 
-    // Final evaluation using Function constructor with helpers in scope
     try {
       const argNames = Object.keys(helpers);
       const argVals = Object.values(helpers);
@@ -440,12 +359,8 @@
 
     if(action === 'back'){ backspace(); return; }
     if(action === 'enter'){ doEvaluate(); return; }
-    if(action === 'clear'){ expr = ''; updateDisplay(); return; }
-    if(action === 'assign'){ // convenience: append '='
-      expr += '=';
-      updateDisplay();
-      return;
-    }
+    if(action === 'clear'){ expr = ''; hiddenInput.value = ''; updateDisplay(); return; }
+    if(action === 'assign'){ expr += '='; hiddenInput.value = expr; updateDisplay(); return; }
     if(action === 'mem+'){ memory += lastAns; renderMemory(); return; }
     if(action === 'mem-'){ memory -= lastAns; renderMemory(); return; }
 
@@ -453,12 +368,14 @@
       if(val === 'ans'){ insert('ans'); return; }
       insert(val);
     }
+    // keep focus on hidden input so keyboard continues to work
+    hiddenInput.focus();
   });
 
   document.getElementById('clearAll').addEventListener('click', () => { clearAll(); history = []; renderHistory(); vars = {}; renderVars(); memory = 0; renderMemory(); });
   document.getElementById('copyBtn').addEventListener('click', () => {
     const text = resultEl.textContent || exprEl.textContent;
-    navigator.clipboard?.writeText(text).then(()=>{/*copied*/}).catch(()=>{/*ignore*/});
+    navigator.clipboard?.writeText(text).catch(()=>{/*ignore*/});
   });
 
   document.getElementById('toggleHistory').addEventListener('click', () => {
@@ -467,16 +384,67 @@
   });
   document.getElementById('clearHistory').addEventListener('click', () => { history = []; renderHistory(); });
 
-  // Keyboard support
-  window.addEventListener('keydown', (e) => {
+  // Focus handling: clicking the display focuses the hidden input
+  exprEl.addEventListener('click', () => {
+    hiddenInput.focus();
+    // place caret at end
+    hiddenInput.selectionStart = hiddenInput.selectionEnd = hiddenInput.value.length;
+  });
+
+  // Keep hidden input focused when user clicks anywhere on calculator
+  document.querySelector('.calc').addEventListener('click', (e) => {
+    if(e.target === hiddenInput) return;
+    hiddenInput.focus();
+  });
+
+  // Hidden input captures typing including letters
+  hiddenInput.addEventListener('input', (e) => {
+    expr = hiddenInput.value;
+    updateDisplay();
+  });
+
+  // Keydown for special keys (Enter, Backspace, Escape) when hiddenInput is focused
+  hiddenInput.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){ e.preventDefault(); doEvaluate(); return; }
-    if(e.key === 'Backspace'){ e.preventDefault(); backspace(); return; }
-    if(e.key === 'Escape'){ e.preventDefault(); expr=''; updateDisplay(); return; }
-    // allow numbers, letters, operators, parentheses, ., ^, %
-    const allowed = /^[0-9a-zA-Z\+\-\*\/\^\%\.\(\)\,]$/;
-    if(allowed.test(e.key)){
-      insert(e.key);
+    if(e.key === 'Escape'){ e.preventDefault(); expr=''; hiddenInput.value=''; updateDisplay(); return; }
+    if(e.key === 'Tab'){ e.preventDefault(); return; }
+    // Allow all printable characters; other keys are handled by default
+  });
+
+  // Also support global keyboard shortcuts if user hasn't focused hidden input
+  window.addEventListener('keydown', (e) => {
+    // If user is typing in another input (like precision), don't hijack
+    const active = document.activeElement;
+    if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+    // If printable key, forward to hidden input
+    if(e.key.length === 1){
+      hiddenInput.focus();
+      // append char to hidden input
+      const start = hiddenInput.selectionStart || 0;
+      const end = hiddenInput.selectionEnd || 0;
+      const before = hiddenInput.value.slice(0,start);
+      const after = hiddenInput.value.slice(end);
+      hiddenInput.value = before + e.key + after;
+      hiddenInput.selectionStart = hiddenInput.selectionEnd = before.length + 1;
+      // trigger input event
+      const ev = new Event('input', {bubbles:true});
+      hiddenInput.dispatchEvent(ev);
       e.preventDefault();
+      return;
+    }
+    if(e.key === 'Enter'){ e.preventDefault(); doEvaluate(); return; }
+    if(e.key === 'Backspace'){ e.preventDefault(); // remove last char
+      const start = hiddenInput.selectionStart || hiddenInput.value.length;
+      const end = hiddenInput.selectionEnd || hiddenInput.value.length;
+      if(start === end && start > 0){
+        hiddenInput.value = hiddenInput.value.slice(0,start-1) + hiddenInput.value.slice(end);
+        hiddenInput.selectionStart = hiddenInput.selectionEnd = start-1;
+      } else {
+        hiddenInput.value = hiddenInput.value.slice(0,start) + hiddenInput.value.slice(end);
+        hiddenInput.selectionStart = hiddenInput.selectionEnd = start;
+      }
+      hiddenInput.dispatchEvent(new Event('input',{bubbles:true}));
+      return;
     }
   });
 
@@ -485,7 +453,9 @@
       const value = evaluateExpression(expr);
       setResult(value);
       lastAns = (typeof value === 'number') ? value : lastAns;
-      expr = ''; updateDisplay();
+      expr = '';
+      hiddenInput.value = '';
+      updateDisplay();
     } catch (err) {
       resultEl.textContent = err.message;
     }
@@ -496,8 +466,10 @@
   renderHistory();
   renderVars();
   renderMemory();
+  // focus hidden input so typing works immediately
+  setTimeout(()=>hiddenInput.focus(), 200);
 
-  // Expose for debugging (optional)
+  // Expose for debugging
   window.calc = {
     evaluateExpression,
     getVars: () => ({...vars}),
