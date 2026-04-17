@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Animated Poker - 5 Card Draw</title>
+<style>
+  :root{
+    --green:#0b6b3a;
+    --card-w:90px;
+    --card-h:130px;
+    --accent:#ffd54f;
+    --bg:#0b3b2f;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#063b2b 0%, #0b6b3a 60%);color:#fff}
+  .topbar{position:fixed;left:12px;top:12px;z-index:50}
+  .topbar a{display:inline-block;background:#222;color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;font-weight:600;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+  .container{max-width:1100px;margin:80px auto;padding:20px}
+  .table{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,0.04), transparent 20%), linear-gradient(180deg,#0b6b3a,#0b3b2f);border-radius:14px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .status{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .chips{font-weight:700}
+  .controls{display:flex;gap:8px;align-items:center}
+  .controls button, .controls input[type=number]{background:#222;border:0;color:#fff;padding:8px 12px;border-radius:8px;font-weight:700}
+  .controls input[type=number]{width:90px}
+  .board{display:flex;flex-direction:column;gap:18px;align-items:center}
+  .seat{display:flex;gap:18px;align-items:flex-end;justify-content:center}
+  .hand{display:flex;gap:12px;min-height:var(--card-h)}
+  .card{
+    width:var(--card-w);height:var(--card-h);border-radius:10px;background:#fff;color:#000;display:flex;flex-direction:column;justify-content:space-between;padding:8px;box-shadow:0 8px 18px rgba(0,0,0,.5);
+    transform-origin:center center;backface-visibility:hidden;position:relative;
+  }
+  .card.back{background:linear-gradient(135deg,#222,#111);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+  .card .rank{font-size:20px;font-weight:800}
+  .card .suit{font-size:28px;line-height:1}
+  .card.red{color:#c62828}
+  .deck-slot{width:var(--card-w);height:var(--card-h);position:relative}
+  .deck-stack{position:relative;width:var(--card-w);height:var(--card-h)}
+  .deck-stack .card{position:absolute;left:0;top:0;transform:translate(0,0) rotate(-6deg)}
+  .controls .small{padding:6px 10px;font-size:14px}
+  .message{margin-top:8px;font-weight:700}
+  .selectable{cursor:pointer;transition:transform .18s ease}
+  .selected{transform:translateY(-18px) rotate(-6deg);box-shadow:0 18px 30px rgba(0,0,0,.6)}
+  /* dealing animation */
+  .fly{
+    position:absolute;z-index:40;pointer-events:none;transition:transform .6s cubic-bezier(.2,.9,.2,1),opacity .4s;
+  }
+  .hidden{opacity:0}
+  .result{margin-top:12px;padding:10px;border-radius:8px;background:rgba(0,0,0,.25);font-weight:800}
+  .footer{margin-top:18px;display:flex;justify-content:space-between;align-items:center}
+  .small-muted{font-size:13px;color:rgba(255,255,255,.7)}
+  /* responsive */
+  @media (max-width:720px){
+    .hand{gap:8px}
+    :root{--card-w:64px;--card-h:96px}
+    .controls{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a id="backHub" href="casino.html">Back to Hub</a>
+  </div>
+
+  <div class="container">
+    <div class="table" role="application" aria-label="Poker table">
+      <div class="status">
+        <div>
+          <div class="chips">Player Chips: <span id="playerChips">1000</span></div>
+          <div class="small-muted">Dealer Chips: <span id="dealerChips">1000</span></div>
+        </div>
+        <div class="controls">
+          <input id="betAmount" type="number" min="1" value="50" />
+          <button id="btnBet">Bet</button>
+          <button id="btnCall" class="small">Call</button>
+          <button id="btnFold" class="small">Fold</button>
+          <button id="btnDraw" class="small">Draw</button>
+          <button id="btnShow" class="small">Showdown</button>
+          <button id="btnNew" class="small">New Round</button>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="seat" id="dealerSeat">
+          <div style="text-align:center">
+            <div class="small-muted">Dealer</div>
+            <div class="hand" id="dealerHand"></div>
+          </div>
+          <div class="deck-slot" id="deckSlot">
+            <div class="deck-stack" id="deckStack"></div>
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="seat" id="playerSeat">
+          <div style="text-align:center">
+            <div class="small-muted">You</div>
+            <div class="hand" id="playerHand"></div>
+          </div>
+        </div>
+
+        <div class="message" id="message">Place a bet to start the round.</div>
+        <div class="result" id="result" style="display:none"></div>
+      </div>
+
+      <div class="footer">
+        <div class="small-muted">Animated 5-card draw poker — click cards to select for redraw.</div>
+        <div class="small-muted">Pot: <span id="pot">0</span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Poker 5-card draw - animated, single file */
+const suits = ['♠','♥','♦','♣'];
+const ranks = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+let deck = [];
+let player = {hand:[],chips:1000};
+let dealer = {hand:[],chips:1000};
+let pot = 0;
+let currentBet = 0;
+let canDraw = false;
+let selectedForDraw = new Set();
+const playerHandEl = document.getElementById('playerHand');
+const dealerHandEl = document.getElementById('dealerHand');
+const deckStack = document.getElementById('deckStack');
+const deckSlot = document.getElementById('deckSlot');
+const messageEl = document.getElementById('message');
+const resultEl = document.getElementById('result');
+const playerChipsEl = document.getElementById('playerChips');
+const dealerChipsEl = document.getElementById('dealerChips');
+const potEl = document.getElementById('pot');
+const betInput = document.getElementById('betAmount');
+
+function makeDeck(){
+  deck = [];
+  for(let s of suits){
+    for(let r of ranks){
+      deck.push({suit:s,rank:r,code:r+s});
+    }
+  }
+}
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+}
+function drawCard(){
+  return deck.pop();
+}
+function resetTable(){
+  makeDeck();shuffle();
+  player.hand=[];dealer.hand=[];
+  pot=0;currentBet=0;canDraw=false;selectedForDraw.clear();
+  updateUI();
+  clearHands();
+  renderDeckStack();
+  message('Place a bet to start the round.');
+  resultEl.style.display='none';
+}
+function clearHands(){
+  playerHandEl.innerHTML='';dealerHandEl.innerHTML='';
+}
+function renderDeckStack(){
+  deckStack.innerHTML='';
+  // show a small stack of backs
+  for(let i=0;i<4;i++){
+    const c = document.createElement('div');
+    c.className='card back';
+    c.style.transform = `translate(${i*2}px,${-i*2}px) rotate(${i*2}deg)`;
+    c.textContent='POKER';
+    deckStack.appendChild(c);
+  }
+}
+function message(txt){ messageEl.textContent = txt; }
+function updateUI(){
+  playerChipsEl.textContent = player.chips;
+  dealerChipsEl.textContent = dealer.chips;
+  potEl.textContent = pot;
+}
+function createCardElement(card){
+  const el = document.createElement('div');
+  el.className='card';
+  if(card.suit==='♥' || card.suit==='♦') el.classList.add('red');
+  el.innerHTML = `<div class="rank">${card.rank}</div><div class="suit">${card.suit}</div>`;
+  return el;
+}
+function createBackCard(){
+  const el = document.createElement('div');
+  el.className='card back';
+  el.textContent='POKER';
+  return el;
+}
+function animateDealTo(targetEl, cardObj, delay=0, face=true, onDone=null){
+  // create a flying card from deckSlot to target position
+  const fly = face ? createCardElement(cardObj) : createBackCard();
+  fly.classList.add('fly');
+  document.body.appendChild(fly);
+  // start position: deckSlot center
+  const deckRect = deckSlot.getBoundingClientRect();
+  fly.style.left = (deckRect.left + deckRect.width/2 - fly.offsetWidth/2) + 'px';
+  fly.style.top = (deckRect.top + deckRect.height/2 - fly.offsetHeight/2) + 'px';
+  fly.style.opacity = '0';
+  setTimeout(()=>{
+    fly.style.opacity='1';
+    const targetRect = targetEl.getBoundingClientRect();
+    const tx = targetRect.left + targetRect.width/2 - fly.offsetWidth/2;
+    const ty = targetRect.top + targetRect.height/2 - fly.offsetHeight/2;
+    fly.style.transform = `translate(${tx - (deckRect.left + deckRect.width/2 - fly.offsetWidth/2)}px, ${ty - (deckRect.top + deckRect.height/2 - fly.offsetHeight/2)}px) scale(1)`;
+  }, delay+20);
+  setTimeout(()=>{
+    // attach to target
+    fly.remove();
+    const cardEl = createCardElement(cardObj);
+    targetEl.appendChild(cardEl);
+    if(onDone) onDone(cardEl);
+  }, delay + 650);
+}
+function dealInitial(){
+  clearHands();
+  // deal 5 to player and dealer alternately with animation
+  const dealOrder = [];
+  for(let i=0;i<5;i++){
+    dealOrder.push({to:'player',card:drawCard()});
+    dealOrder.push({to:'dealer',card:drawCard()});
+  }
+  let idx=0;
+  function next(){
+    if(idx>=dealOrder.length){
+      canDraw=true;
+      message('Select cards to replace, then click Draw.');
+      updateUI();
+      renderPlayerHandInteractive();
+      renderDealerBacks();
+      return;
+    }
+    const item = dealOrder[idx++];
+    const targetEl = item.to==='player' ? playerHandEl : dealerHandEl;
+    animateDealTo(targetEl, item.card, idx*80, item.to==='player', ()=>{
+      // push into hands after animation for logic
+      if(item.to==='player') player.hand.push(item.card);
+      else dealer.hand.push(item.card);
+      next();
+    });
+  }
+  next();
+}
+function renderPlayerHandInteractive(){
+  playerHandEl.innerHTML='';
+  player.hand.forEach((c,i)=>{
+    const el = createCardElement(c);
+    el.dataset.index = i;
+    el.classList.add('selectable');
+    el.addEventListener('click', ()=>{
+      if(!canDraw) return;
+      if(selectedForDraw.has(i)){ selectedForDraw.delete(i); el.classList.remove('selected'); }
+      else { selectedForDraw.add(i); el.classList.add('selected'); }
+    });
+    playerHandEl.appendChild(el);
+  });
+}
+function renderDealerBacks(){
+  dealerHandEl.innerHTML='';
+  dealer.hand.forEach((c,i)=>{
+    const el = createBackCard();
+    dealerHandEl.appendChild(el);
+  });
+}
+function replaceSelected(){
+  if(!canDraw) return;
+  if(selectedForDraw.size===0){ message('No cards selected — drawing none.'); }
+  const indices = Array.from(selectedForDraw).sort((a,b)=>b-a); // replace from high to low
+  indices.forEach(idx=>{
+    const newCard = drawCard();
+    player.hand[idx] = newCard;
+  });
+  // dealer simple draw: random replace 0-3 cards
+  const dealerReplaceCount = Math.floor(Math.random()*4);
+  const dealerIndices = [];
+  while(dealerIndices.length < dealerReplaceCount){
+    const r = Math.floor(Math.random()*5);
+    if(!dealerIndices.includes(r)) dealerIndices.push(r);
+  }
+  dealerIndices.forEach(i=>{
+    dealer.hand[i] = drawCard();
+  });
+  // animate replacement: remove selected elements and fly new ones in
+  const playerEls = Array.from(playerHandEl.children);
+  selectedForDraw.forEach(idx=>{
+    const el = playerEls[idx];
+    if(el){
+      el.classList.add('hidden');
+      setTimeout(()=>el.remove(),300);
+    }
+  });
+  // show new cards with small delay
+  setTimeout(()=>{
+    renderPlayerHandInteractive();
+    // reveal dealer new backs (still backs)
+    renderDealerBacks();
+    canDraw=false;
+    selectedForDraw.clear();
+    message('Draw complete. Click Showdown to reveal hands.');
+  }, 360);
+}
+function revealDealerAndShowdown(){
+  // animate dealer cards flipping from back to face
+  dealerHandEl.innerHTML='';
+  dealer.hand.forEach((c,i)=>{
+    const el = createCardElement(c);
+    el.style.opacity='0';
+    dealerHandEl.appendChild(el);
+    setTimeout(()=>el.style.opacity='1', i*120);
+  });
+  setTimeout(()=>{
+    const pScore = evaluateHand(player.hand);
+    const dScore = evaluateHand(dealer.hand);
+    const winner = compareScores(pScore,dScore);
+    let resText='';
+    if(winner>0){ resText='You win!'; player.chips += pot; }
+    else if(winner<0){ resText='Dealer wins.'; dealer.chips += pot; }
+    else { resText='Tie — split pot.'; player.chips += Math.floor(pot/2); dealer.chips += Math.ceil(pot/2); }
+    resultEl.style.display='block';
+    resultEl.innerHTML = `<div>Player: ${handName(pScore)} — Dealer: ${handName(dScore)}</div><div style="margin-top:8px">${resText}</div>`;
+    pot=0; updateUI();
+    message('Round complete. Start a new round when ready.');
+  }, 700 + dealer.hand.length*120);
+}
+function handName(score){
+  const names = ['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush'];
+  return names[score.rank] + ' (' + score.desc + ')';
+}
+
+/* Hand evaluation: returns {rank:0..8, tiebreak:array, desc} */
+function evaluateHand(cards){
+  // cards: array of {rank,suit}
+  const vals = cards.map(c=>rankValue(c.rank)).sort((a,b)=>a-b);
+  const suitsArr = cards.map(c=>c.suit);
+  const counts = {};
+  cards.forEach(c=>counts[c.rank]=(counts[c.rank]||0)+1);
+  const countVals = Object.values(counts).sort((a,b)=>b-a);
+  const isFlush = suitsArr.every(s=>s===suitsArr[0]);
+  const isStraight = isConsecutive(vals);
+  // map rank counts to ranks
+  const groups = {};
+  for(let r in counts){
+    const v = counts[r];
+    if(!groups[v]) groups[v]=[];
+    groups[v].push(rankValue(r));
+  }
+  for(let k in groups) groups[k].sort((a,b)=>b-a);
+  let rank=0; let tiebreak=[]; let desc='';
+  if(isStraight && isFlush){ rank=8; tiebreak=[Math.max(...vals)]; desc='Straight Flush'; }
+  else if(groups[4]){ rank=7; tiebreak=[groups[4][0], ...groups[1] ? groups[1].sort((a,b)=>b-a) : []]; desc='Four of a Kind'; }
+  else if(groups[3] && groups[2]){ rank=6; tiebreak=[groups[3][0], groups[2][0]]; desc='Full House'; }
+  else if(isFlush){ rank=5; tiebreak=vals.slice().sort((a,b)=>b-a); desc='Flush'; }
+  else if(isStraight){ rank=4; tiebreak=[Math.max(...vals)]; desc='Straight'; }
+  else if(groups[3]){ rank=3; tiebreak=[groups[3][0], ...vals.filter(v=>v!==groups[3][0]).sort((a,b)=>b-a)]; desc='Three of a Kind'; }
+  else if(groups[2] && groups[2].length>=2){ rank=2; tiebreak=[...groups[2].sort((a,b)=>b-a), ...vals.filter(v=>!groups[2].includes(v)).sort((a,b)=>b-a)]; desc='Two Pair'; }
+  else if(groups[2]){ rank=1; tiebreak=[groups[2][0], ...vals.filter(v=>v!==groups[2][0]).sort((a,b)=>b-a)]; desc='One Pair'; }
+  else { rank=0; tiebreak=vals.slice().sort((a,b)=>b-a); desc='High Card'; }
+  return {rank, tiebreak, desc};
+}
+function rankValue(r){
+  if(r==='J') return 11;
+  if(r==='Q') return 12;
+  if(r==='K') return 13;
+  if(r==='A') return 14;
+  return parseInt(r,10);
+}
+function isConsecutive(arr){
+  // handle wheel A-2-3-4-5
+  const s = Array.from(new Set(arr)).sort((a,b)=>a-b);
+  if(s.length!==5) return false;
+  // normal
+  let ok=true;
+  for(let i=1;i<s.length;i++) if(s[i] !== s[i-1]+1) ok=false;
+  if(ok) return true;
+  // wheel: A(14),2,3,4,5 -> treat A as 1
+  const wheel = s.slice().map(v=>v===14?1:v).sort((a,b)=>a-b);
+  for(let i=1;i<wheel.length;i++) if(wheel[i] !== wheel[i-1]+1) return false;
+  return true;
+}
+function compareScores(a,b){
+  if(a.rank !== b.rank) return a.rank > b.rank ? 1 : -1;
+  for(let i=0;i<Math.max(a.tiebreak.length,b.tiebreak.length);i++){
+    const av = a.tiebreak[i]||0, bv = b.tiebreak[i]||0;
+    if(av !== bv) return av > bv ? 1 : -1;
+  }
+  return 0;
+}
+
+/* Button handlers */
+document.getElementById('btnBet').addEventListener('click', ()=>{
+  const bet = Math.max(1, Math.floor(Number(betInput.value) || 0));
+  if(bet > player.chips){ message('Not enough chips to bet that amount.'); return; }
+  // start round
+  player.chips -= bet;
+  dealer.chips -= bet; // dealer matches
+  pot += bet*2;
+  currentBet = bet;
+  updateUI();
+  dealInitial();
+  message('Dealing cards...');
+});
+document.getElementById('btnCall').addEventListener('click', ()=>{
+  // simple call: match currentBet (no raise logic)
+  const need = currentBet;
+  if(need > player.chips){ message('Not enough chips to call.'); return; }
+  player.chips -= need; pot += need; updateUI();
+  message('You called.');
+});
+document.getElementById('btnFold').addEventListener('click', ()=>{
+  // fold: dealer wins pot
+  dealer.chips += pot;
+  pot = 0; updateUI();
+  message('You folded. Dealer wins the pot.');
+  resultEl.style.display='block';
+  resultEl.innerHTML = `<div>You folded. Dealer collects the pot.</div>`;
+});
+document.getElementById('btnDraw').addEventListener('click', ()=>{
+  if(!canDraw){ message('You cannot draw right now.'); return; }
+  replaceSelected();
+});
+document.getElementById('btnShow').addEventListener('click', ()=>{
+  if(canDraw){ message('You should draw (or skip) before showdown.'); return; }
+  revealDealerAndShowdown();
+});
+document.getElementById('btnNew').addEventListener('click', ()=>{
+  resetTable();
+});
+
+/* initialize */
+resetTable();
+
+/* small helper: start with a quick demo deal if user wants - not automatic */
+</script>
+</body>
+</html>
