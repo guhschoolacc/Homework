@@ -224,15 +224,11 @@
 
   <script>
     /*
-      This file implements the requested permanent removal of specific tools:
-      - contrast checker
-      - unit converter
-      - password generator
-      - markdown preview
-      - color picker
-
-      Those tool ids/names are blacklisted and will be filtered out from defaults,
-      prevented from being added via the UI, and never reintroduced by ensureDefaults.
+      Changes in this version:
+      - Added "Casino" to the Games tab (DEFAULT_GAMES).
+      - Fixed settings "Mask as ..." buttons so they update the settings inputs/preview and persist when you Save.
+      - Keeps existing features: Add (HTML upload/paste), remove user-added items, favorites, panic key, persistent localStorage.
+      - Tools blacklist behavior unchanged.
     */
 
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
@@ -245,7 +241,6 @@
 
     const KEY_GAMES='hw_games', KEY_TOOLS='hw_tools', KEY_FAVS='hw_favs', KEY_USERS='hw_users', KEY_CURRENT_USER='hw_currentUser', KEY_NOTIFS='hw_notifications', KEY_THEME='hw_theme_name', KEY_TAB_TITLE='hw_tab_title', KEY_TAB_ICON='hw_tab_icon', KEY_PANIC_KEY='hw_panic_key', KEY_PANIC_CTRL='hw_panic_ctrl', KEY_PANIC_ACTION='hw_panic_action', KEY_FONT_SCALE='hw_font_scale', KEY_TOOL_BLACKLIST='hw_tool_blacklist';
 
-    // Default games and tools (kept concise). Games include Bubble Shooter, GUH Clicker, Chess, Block Breaker.
     const DEFAULT_GAMES = [
       {id:'sandbox',label:'Sandbox',href:'sandbox.html'},
       {id:'snake',label:'Snake Game Ripoff',href:'snake.html'},
@@ -257,15 +252,14 @@
       {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
       {id:'chess',label:'Chess',href:'chess.html'},
       {id:'hangman',label:'Hangman',href:'hangman.html'},
-      {id:'block-breaker',label:'Block Breaker',href:'block-breaker.html'}
+      {id:'block-breaker',label:'Block Breaker',href:'block-breaker.html'},
+      {id:'casino',label:'Casino',href:'casino.html'}
     ];
 
-    // DEFAULT_TOOLS intentionally excludes the blacklisted tools. If your previous code had them,
-    // the blacklist below will ensure they are never re-added.
     const DEFAULT_TOOLS = [
       {id:'calculator',label:'Calculator',href:'calculator.html'},
       {id:'clock',label:'Clock',href:'clock.html'},
-      {id:'converter',label:'File Converter',href:'converter.html'}, /* note: generic converter kept; user asked to remove "unit converter" specifically */
+      {id:'converter',label:'File Converter',href:'converter.html'},
       {id:'notepad',label:'Notepad',href:'notepad.html'},
       {id:'jsonformatter',label:'JSON Formatter',href:'json-formatter.html'},
       {id:'regextester',label:'Regex Tester',href:'regex-tester.html'},
@@ -281,15 +275,6 @@
       {id:'soundboard',label:'Soundboard',href:'soundboard.html'}
     ];
 
-    // Blacklist: normalized ids or label keywords that must never be added back.
-    // The user requested permanent removal of:
-    // - contrast checker
-    // - unit converter
-    // - password generator
-    // - markdown prieview (assume "markdown preview")
-    // - color picker
-    //
-    // We normalize both ids and labels to lowercase and strip non-alphanumerics for matching.
     const PERMANENT_TOOL_BLACKLIST = [
       'contrastchecker','contrast-checker','contrast checker','contrast',
       'unitconverter','unit-converter','unit converter','unit',
@@ -304,26 +289,21 @@
     }
 
     function getToolBlacklist(){
-      // persisted blacklist (so removal persists across reloads and cannot be reintroduced by ensureDefaults)
       const persisted = getJSON(KEY_TOOL_BLACKLIST, null);
       if(persisted && Array.isArray(persisted)) return persisted;
-      // initialize persisted blacklist from PERMANENT_TOOL_BLACKLIST
       const normalized = Array.from(new Set(PERMANENT_TOOL_BLACKLIST.map(normalizeKey)));
       setJSON(KEY_TOOL_BLACKLIST, normalized);
       return normalized;
     }
 
-    // Utility: filter out any tools whose id or label matches blacklist
     function filterOutBlacklistedTools(list){
       const blacklist = getToolBlacklist();
       return (list || []).filter(item => {
         const idKey = normalizeKey(item.id || '');
         const labelKey = normalizeKey(item.label || '');
-        // if either id or label normalized matches any blacklist entry, exclude
         for(const b of blacklist){
           if(idKey === b) return false;
           if(labelKey === b) return false;
-          // also exclude if blacklist entry is contained in label/id (defensive)
           if(idKey.includes(b)) return false;
           if(labelKey.includes(b)) return false;
         }
@@ -332,13 +312,11 @@
     }
 
     function ensureDefaults(){
-      // ensure arrays exist and apply blacklist filtering before saving
       const filteredGames = filterOutBlacklistedTools(DEFAULT_GAMES.slice());
       const filteredTools = filterOutBlacklistedTools(DEFAULT_TOOLS.slice());
 
       if(!getJSON(KEY_GAMES,null)) setJSON(KEY_GAMES, filteredGames);
       else {
-        // if existing games are missing required ones (and not blacklisted), add them
         let existing = getJSON(KEY_GAMES, []);
         DEFAULT_GAMES.forEach(def => {
           const idKey = normalizeKey(def.id);
@@ -353,7 +331,6 @@
 
       if(!getJSON(KEY_TOOLS,null)) setJSON(KEY_TOOLS, filteredTools);
       else {
-        // remove any blacklisted tools from existing storage and ensure defaults (non-blacklisted) are present
         let existing = getJSON(KEY_TOOLS, []);
         existing = filterOutBlacklistedTools(existing);
         DEFAULT_TOOLS.forEach(def => {
@@ -464,8 +441,7 @@
     /* Renderers */
     function renderGames(){
       let games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-      // ensure required games present (defensive)
-      const required = ['bubble-shooter','guh-clicker','chess','block-breaker'];
+      const required = ['bubble-shooter','guh-clicker','chess','block-breaker','casino'];
       required.forEach(id => {
         if(!games.some(g => normalizeKey(g.id) === normalizeKey(id))){
           const def = DEFAULT_GAMES.find(x=>normalizeKey(x.id)===normalizeKey(id));
@@ -849,7 +825,7 @@
     function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
     modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-    /* Signup / Login / Settings / Add implementations (kept consistent) */
+    /* Signup / Login / Settings / Add implementations */
     function renderSignupModal(){
       modal.innerHTML = `
         <h3>Sign Up</h3>
@@ -1023,19 +999,80 @@
       const panicActionSelect = document.getElementById('panicActionSelect');
       panicActionSelect.value = get(KEY_PANIC_ACTION, 'close_tab');
 
-      document.getElementById('maskDriveBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'My Drive - Google Drive'); set(KEY_TAB_ICON,'https://drive.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Drive (local)'); });
-      document.getElementById('maskGmailBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Inbox - Gmail'); set(KEY_TAB_ICON,'https://mail.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Gmail (local)'); });
-      document.getElementById('maskGoogleBtn').addEventListener('click', () => { set(KEY_TAB_TITLE,'Google'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); alert('Masked as Google (local)'); });
-      document.getElementById('resetTabMasking').addEventListener('click', () => { if(!confirm('Reset tab title and icon?')) return; set(KEY_TAB_TITLE,''); set(KEY_TAB_ICON,''); applyTabMasking(); alert('Tab mask reset'); });
-
       const tabTitleInput = document.getElementById('tabTitleInput');
       const tabIconUrlInput = document.getElementById('tabIconUrlInput');
       const tabIconFileInput = document.getElementById('tabIconFileInput');
       const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
       const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
+
+      // When user types, update preview title/icon
       tabTitleInput.addEventListener('input', () => tabIconPreviewTitle.textContent = tabTitleInput.value || document.title);
-      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; });
-      tabIconFileInput.addEventListener('change', e => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; }; r.readAsDataURL(f); });
+      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; delete tabIconPreviewImg.dataset.pending; });
+
+      tabIconFileInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; };
+        r.readAsDataURL(f);
+      });
+
+      // Mask buttons: update inputs, preview, and persist immediately so the mask is saved even if user forgets to press Save.
+      document.getElementById('maskDriveBtn').addEventListener('click', () => {
+        const title = 'My Drive - Google Drive';
+        const icon = 'https://drive.google.com/favicon.ico';
+        tabTitleInput.value = title;
+        tabIconUrlInput.value = icon;
+        tabIconPreviewImg.src = icon;
+        tabIconPreviewImg.dataset.pending = icon;
+        tabIconPreviewTitle.textContent = title;
+        // persist immediately
+        set(KEY_TAB_TITLE, title);
+        set(KEY_TAB_ICON, icon);
+        applyTabMasking();
+        createNotification('Tab masked', 'Masked as Google Drive (saved).');
+      });
+
+      document.getElementById('maskGmailBtn').addEventListener('click', () => {
+        const title = 'Inbox - Gmail';
+        const icon = 'https://mail.google.com/favicon.ico';
+        tabTitleInput.value = title;
+        tabIconUrlInput.value = icon;
+        tabIconPreviewImg.src = icon;
+        tabIconPreviewImg.dataset.pending = icon;
+        tabIconPreviewTitle.textContent = title;
+        set(KEY_TAB_TITLE, title);
+        set(KEY_TAB_ICON, icon);
+        applyTabMasking();
+        createNotification('Tab masked', 'Masked as Gmail (saved).');
+      });
+
+      document.getElementById('maskGoogleBtn').addEventListener('click', () => {
+        const title = 'Google';
+        const icon = 'https://www.google.com/favicon.ico';
+        tabTitleInput.value = title;
+        tabIconUrlInput.value = icon;
+        tabIconPreviewImg.src = icon;
+        tabIconPreviewImg.dataset.pending = icon;
+        tabIconPreviewTitle.textContent = title;
+        set(KEY_TAB_TITLE, title);
+        set(KEY_TAB_ICON, icon);
+        applyTabMasking();
+        createNotification('Tab masked', 'Masked as Google (saved).');
+      });
+
+      document.getElementById('resetTabMasking').addEventListener('click', () => {
+        if(!confirm('Reset tab title and icon?')) return;
+        tabTitleInput.value = '';
+        tabIconUrlInput.value = '';
+        delete tabIconPreviewImg.dataset.pending;
+        tabIconPreviewImg.src = DEFAULT_FAVICON;
+        tabIconPreviewTitle.textContent = document.title;
+        set(KEY_TAB_TITLE,'');
+        set(KEY_TAB_ICON,'');
+        applyTabMasking();
+        createNotification('Tab mask reset', 'Tab title and icon reset.');
+      });
 
       document.querySelectorAll('.theme-preset').forEach(el => {
         el.addEventListener('click', () => {
@@ -1065,7 +1102,12 @@
         set(KEY_PANIC_CTRL, panicCtrlCheckbox.checked ? 'true' : 'false');
         set(KEY_PANIC_ACTION, panicActionSelect.value);
 
-        if(tabIconPreviewImg.dataset.pending){ set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending); } else set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
+        // If preview has pending (file or mask), prefer that; otherwise use URL input; otherwise keep existing
+        if(tabIconPreviewImg.dataset.pending){
+          set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending);
+        } else {
+          set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
+        }
         set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,''));
 
         const fs = document.getElementById('fontSizeRange').value;
@@ -1185,7 +1227,6 @@
         const label = document.getElementById('newToolLabel').value.trim();
         const code = document.getElementById('newToolCode').value;
         if(!id || !label){ alert('Provide id and label'); return; }
-        // Prevent adding blacklisted tools by id or label
         const idKey = normalizeKey(id);
         const labelKey = normalizeKey(label);
         const blacklist = getToolBlacklist();
@@ -1238,7 +1279,6 @@
         const label = document.getElementById('newGameLabel').value.trim();
         const code = document.getElementById('newGameCode').value;
         if(!id || !label){ alert('Provide id and label'); return; }
-        // Prevent adding blacklisted tools/games by id or label
         const idKey = normalizeKey(id);
         const labelKey = normalizeKey(label);
         const blacklist = getToolBlacklist();
@@ -1271,7 +1311,6 @@
         const requiresCtrl = get(KEY_PANIC_CTRL, 'false') === 'true';
         const action = get(KEY_PANIC_ACTION, 'close_tab');
         if(!storedKey) return;
-        // support single char or named keys
         const keyMatch = (storedKey.length === 1) ? (e.key === storedKey) : (e.key.toLowerCase() === storedKey.toLowerCase());
         if(!keyMatch) return;
         if(requiresCtrl && !e.ctrlKey) return;
