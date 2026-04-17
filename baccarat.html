@@ -52,24 +52,31 @@
     display:inline-flex;
     gap:8px;
     align-items:center;
-    z-index:80;
+    z-index:110;
     white-space:nowrap;
+    min-width:140px;           /* reserve a predictable width */
+    box-sizing:border-box;
   }
   .back-btn:hover{transform:translateY(-2px);transition:transform .15s ease;}
 
   /* Header */
-  /* Add left margin so header content doesn't collide with the absolute back button */
+  /* Increased left offset to avoid overlap with the absolute back button */
   .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
     margin-bottom:8px;
-    margin-left:120px; /* <-- prevents overlap with back button on wide screens */
+    margin-left:180px; /* <-- larger offset to prevent overlap */
+    transition:margin-left .18s ease;
   }
   .title{
     font-size:20px;
     font-weight:700;
     letter-spacing:0.6px;
+    max-width:calc(100% - 240px); /* keep title from growing into the button */
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .balance{
     background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -298,12 +305,16 @@
       top:auto;
       margin-bottom:8px;
       display:inline-flex;
+      min-width:0;
     }
     .header{
       margin-left:0;
       align-items:center;
       gap:8px;
       flex-wrap:wrap;
+    }
+    .title{
+      max-width:100%;
     }
   }
 </style>
