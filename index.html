@@ -3,1275 +3,317 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>homewrk</title>
-  <link id="siteFavicon" rel="icon" href="">
+  <title>homewrk — Chat</title>
   <style>
-    :root{
-      --bg:#050509; --sidebar:#0b0b12; --muted:#cfd3dc; --card:#0d0d12;
-      --accent:#3b82f6; --accent-2:#6366f1; --radius:12px; --shadow:0 6px 18px rgba(0,0,0,0.5);
-      --font-scale:1;
-    }
-    .theme-light{ --bg:#f6f7fb; --card:#fff; --muted:#6b7280; --accent:#2563eb; --accent-2:#7c3aed; color-scheme:light; }
-    .theme-midnight{ --bg:#071029; --card:#0b1b2b; --muted:#9fb4c8; --accent:#00bcd4; --accent-2:#7c4dff; }
-
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
-    html,body{height:100%}
-    body{min-height:100vh;background:var(--bg);color:#fff;display:flex;font-size:calc(15px * var(--font-scale));-webkit-font-smoothing:antialiased}
-
-    .app{display:flex;flex:1;height:100%}
-    .sidebar{width:220px;background:var(--sidebar);border-right:1px solid rgba(255,255,255,0.03);padding:22px 16px;display:flex;flex-direction:column;gap:14px}
-    .logo{font-size:22px;font-weight:700;color:#f3f4f6}
-    .nav{display:flex;flex-direction:column;gap:8px}
-    .nav-item{padding:10px 12px;border-radius:8px;font-size:15px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px}
-    .nav-item.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
-
-    .main{flex:1;padding:22px;display:flex;flex-direction:column;gap:18px;overflow:auto}
-    .header{display:flex;align-items:center;justify-content:space-between}
-    .page-title{font-size:20px;font-weight:600;color:#e6e9ef}
-
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:var(--shadow)}
-
-    .hidden{display:none !important}
-
-    .games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:12px}
-    .item-btn{
-      position:relative;
-      min-width:200px;
-      min-height:72px;
-      padding:14px 16px;
-      border-radius:12px;
-      background:linear-gradient(90deg,#0f1724,#0b0b10);
-      color:#e6eefc;
-      border:1px solid rgba(255,255,255,0.03);
-      display:flex;
-      align-items:center;
-      gap:12px;
-      cursor:pointer;
-      font-weight:700;
-      justify-content:flex-start;
-      font-size:15px;
-      line-height:1.15;
-    }
-    .item-btn .label{
-      flex:1;
-      text-align:left;
-      white-space:normal;
-      overflow:visible;
-      word-break:break-word;
-      margin-right:96px; /* reserve space for fav/remove */
-    }
-    .fav-btn{position:absolute;right:44px;top:12px;background:transparent;border:0;color:rgba(255,255,255,0.85);cursor:pointer;font-size:18px;padding:6px;border-radius:6px}
-    .remove-btn{position:absolute;right:8px;top:12px;background:transparent;border:0;color:rgba(255,255,255,0.65);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
-    .fav-btn.active{color:gold}
-
-    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:12px}
-    .tool-card{
-      padding:14px 16px;
-      border-radius:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border:1px solid rgba(255,255,255,0.03);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:700;
-      color:#e6eefc;
-      position:relative;
-      min-height:64px;
-      font-size:15px;
-      line-height:1.15;
-    }
-    .tool-card .label{flex:1;text-align:left;white-space:normal;overflow:visible;word-break:break-word;margin-right:84px}
-    .tool-card .fav-btn{position:absolute;right:36px;top:10px;background:transparent;border:0;color:rgba(255,255,255,0.85);cursor:pointer;font-size:18px;padding:6px;border-radius:6px}
-    .tool-card .remove-btn{position:absolute;right:8px;top:10px;background:transparent;border:0;color:rgba(255,255,255,0.65);cursor:pointer;font-size:16px;padding:6px;border-radius:6px}
-
-    .favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
-    .favorite-item{padding:12px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between}
-
-    .profile-wrap{position:fixed;left:18px;bottom:18px;display:flex;align-items:center;gap:10px;z-index:60;cursor:pointer}
-    .profile-btn{width:48px;height:48px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:#111217;display:flex;align-items:center;justify-content:center}
-    .profile-btn img{width:100%;height:100%;object-fit:cover}
-    .profile-username{margin-left:8px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-
-    .popover{position:fixed;left:18px;bottom:78px;width:360px;background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.04);display:none;z-index:70}
-    .popover.show{display:block}
-
-    .notif-bell{position:relative;width:36px;height:36px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
-    .notif-dot{position:absolute;right:6px;top:6px;width:10px;height:10px;border-radius:50%;background:#ef4444}
-    .notif-panel{position:absolute;right:18px;top:56px;width:360px;max-height:420px;overflow:auto;background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.04);display:none;z-index:80}
-    .notif-panel.show{display:block}
-    .notif-item{padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.02)}
-    .notif-item.unread{background:linear-gradient(90deg, rgba(59,130,246,0.06), rgba(99,102,241,0.03))}
-
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:90}
-    .modal-backdrop.show{display:flex}
-    .modal{width:920px;max-width:96%;background:var(--card);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);max-height:86vh;overflow:auto}
-
-    .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .muted{color:var(--muted);font-size:13px}
-
-    input[type="text"], input[type="password"], input[type="file"], select, textarea { background:#0b0b10; color:#fff; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; width:100%; }
-    textarea{ min-height:160px; font-family:monospace; font-size:13px; resize:vertical; }
-
-    @media (max-width:720px){
-      .sidebar{width:64px}
-      .profile-username{display:none}
-      .tools-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-      .games-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-      .item-btn{min-height:56px}
-      .tool-card{min-height:56px}
-    }
+    :root{--bg:#071021;--card:#0b1220;--muted:#9ca3af;--accent:#2563eb;--panel:#04101a}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#05060a,#071021);color:#e6eefc;margin:0;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    header h1{margin:0;font-size:20px}
+    .main{display:flex;gap:18px;max-width:1100px;margin:0 auto}
+    .left{width:320px}
+    .card{background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+    label{display:block;color:#9fb0d9;font-size:13px;margin-top:8px}
+    input[type="text"],input[type="email"],input[type="password"],textarea,select{width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:#05060a;color:#fff;font-size:13px}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfe6ff}
+    #chatMessages{height:520px;overflow:auto;padding:10px;background:linear-gradient(180deg,var(--panel),#021018);border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+    .msg{margin:8px 0}
+    .meta{color:#93c5fd;font-weight:700;margin-right:8px}
+    .time{color:var(--muted);font-size:11px;margin-left:8px}
+    .system{color:var(--muted);font-size:13px;margin:8px 0}
+    .sendRow{display:flex;gap:8px;margin-top:10px}
+    .sendRow input{flex:1}
+    .small{font-size:13px;color:var(--muted)}
+    .adminBox{margin-top:12px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+    footer{margin-top:18px;color:#9ca3af;font-size:13px;text-align:center}
+    .inline-note{font-size:12px;color:#9ca3af;margin-top:8px}
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <aside class="sidebar" role="navigation" aria-label="Main navigation">
-      <div class="logo">homewrk</div>
-      <nav class="nav" aria-label="Categories">
-        <div class="nav-item active" data-category="games" id="navGames" tabindex="0">Games</div>
-        <div class="nav-item" data-category="tools" id="navTools" tabindex="0">Tools</div>
-        <div class="nav-item" data-category="favorites" id="navFavs" tabindex="0">Favorites</div>
-      </nav>
+  <header>
+    <h1>homewrk</h1>
+    <div class="small">Realtime Chat powered by Firebase</div>
+  </header>
 
-      <div style="margin-top:auto">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Signed in as</div>
-        <div id="sidebarUser" style="display:flex;align-items:center;gap:8px">
-          <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="sidebarAvatar" src="" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-          <div style="display:flex;flex-direction:column;min-width:0">
-            <div id="sidebarEmail" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+  <div class="main">
+    <!-- Left column: Auth and Admin -->
+    <div class="left">
+      <div class="card">
+        <h2 style="margin:0 0 8px 0">Setup</h2>
+
+        <div class="inline-note" style="margin-bottom:8px">
+          **Important**: paste your Firebase config into the single placeholder shown later, then click Sign up / Log in.
+        </div>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0" />
+
+        <h2 style="margin:0 0 8px 0">Sign up / Log in</h2>
+        <label>Email</label>
+        <input id="email" type="email" placeholder="you@example.com" />
+        <label>Password</label>
+        <input id="password" type="password" placeholder="password" />
+        <label>Display name (optional)</label>
+        <input id="displayName" type="text" placeholder="Nickname" />
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="signupBtn">Sign up</button>
+          <button id="loginBtn" class="ghost">Log in</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="logoutBtn" class="ghost" style="flex:1">Log out</button>
+        </div>
+        <div id="userInfo" class="inline-note" style="margin-top:8px">Not signed in</div>
+
+        <div id="adminPanel" class="adminBox" style="display:none">
+          <strong>Admin Controls</strong>
+          <div class="inline-note">Set roles using the Cloud Function setUserRole (deploy separately).</div>
+          <label>Target user UID</label>
+          <input id="targetUid" placeholder="User UID from Firebase Console" />
+          <label>Role</label>
+          <select id="roleSelect">
+            <option value="admin">admin</option>
+            <option value="moderator">moderator</option>
+          </select>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="setRoleBtn">Set role</button>
+            <button id="revokeRoleBtn" class="ghost">Revoke role</button>
           </div>
+        </div>
+
+        <div class="inline-note" style="margin-top:12px">
+          Enable Email/Password in Firebase Console → Authentication → Sign‑in method. Create Firestore DB.
         </div>
       </div>
-    </aside>
+    </div>
 
-    <main class="main" role="main" aria-live="polite">
-      <div class="header">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div class="page-title" id="pageTitle">Games</div>
+    <!-- Right column: Chat -->
+    <div style="flex:1">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 style="margin:0">Global Chat</h2>
+          <div class="small" id="signedInAs">Not signed in</div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="opacity:0.7;font-size:13px" id="siteStatusLabel">homewrk</div>
+        <div id="chatMessages" style="margin-top:12px"></div>
 
-          <div style="position:relative">
-            <button id="notifBell" class="notif-bell" title="Notifications" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#cfd3dc" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 0 0-5-5.917V4a1 1 0 0 0-2 0v1.083A6 6 0 0 0 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            </button>
-            <div id="notifDot" class="notif-dot" style="display:none"></div>
-            <div id="notifPanel" class="notif-panel" aria-hidden="true">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                <div style="font-weight:700">Notifications</div>
-                <div style="display:flex;gap:8px">
-                  <button id="markAllRead" class="btn ghost">Mark all read</button>
-                  <button id="clearAll" class="btn ghost">Clear</button>
-                </div>
-              </div>
-              <div id="notifList"></div>
-              <div style="margin-top:8px;text-align:center"><button id="notifSettings" class="btn ghost">Notification settings</button></div>
-            </div>
-          </div>
+        <div class="sendRow" style="margin-top:12px">
+          <input id="chatInput" placeholder="Type a message..." />
+          <button id="chatSend">Send</button>
+        </div>
+
+        <div class="inline-note" style="margin-top:10px">
+          Open this page in another browser or incognito window and sign in with a different account to test realtime chat.
         </div>
       </div>
-
-      <!-- Games -->
-      <section class="card" id="gamesSection">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="font-size:16px;font-weight:600">Games</div>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;max-width:520px">
-            <input id="gamesSearch" placeholder="Search games" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#0b0b10;color:#fff">
-            <button id="addGameBtn" class="btn ghost">Add</button>
-          </div>
-        </div>
-        <div class="games-grid" id="gamesGrid" role="list" aria-label="Games list"></div>
-      </section>
-
-      <!-- Tools -->
-      <section class="card hidden" id="toolsSection" aria-hidden="true">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="font-size:16px;font-weight:600">Tools</div>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;max-width:720px">
-            <input id="toolsSearch" placeholder="Search tools" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#0b0b10;color:#fff">
-            <button id="toolsAddBtn" class="btn ghost">Add</button>
-          </div>
-        </div>
-        <div class="tools-grid" id="toolsGrid" role="list" aria-label="Tools list"></div>
-      </section>
-
-      <!-- Favorites -->
-      <section class="card hidden" id="favoritesSection" aria-hidden="true">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="font-size:16px;font-weight:600">Favorites</div>
-        </div>
-        <div id="favoritesGrid" class="favorites-grid" role="list" aria-label="Favorites list"></div>
-        <div id="favoritesEmpty" class="muted" style="margin-top:12px;text-align:center">No favorites yet.</div>
-      </section>
-    </main>
+    </div>
   </div>
 
-  <!-- bottom-left profile (clickable) -->
-  <div class="profile-wrap" id="bottomProfile" title="Profile (click)">
-    <div class="profile-btn" id="profileBtn"><img id="profileAvatar" src="" alt="avatar"></div>
-    <div class="profile-username" id="profileNameDisplay">Guest</div>
-  </div>
+  <footer>homewrk • Realtime chat demo</footer>
 
-  <div class="popover" id="profilePopover"><div id="popoverContent"></div></div>
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
 
-  <!-- Modal -->
-  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+  <!-- ======= PASTE YOUR FIREBASE CONFIG OBJECT HERE =======
+       Replace the entire line below (including the comment) with
+       the config object you copied from Firebase console.
+       Example object you will paste looks like:
+       {
+         "apiKey":"...","authDomain":"...","projectId":"...", ...
+       }
+       ====================================================== -->
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyAzwNlLaZnVa95Aik0o2EdXVlIH_6pn6rw",
+  authDomain: "guhg-f11d9.firebaseapp.com",
+  projectId: "guhg-f11d9",
+  storageBucket: "guhg-f11d9.firebasestorage.app",
+  messagingSenderId: "644415551313",
+  appId: "1:644415551313:web:b24d3aac37bb2919674570",
+  measurementId: "G-KECPVXC1PJ"
+};
+  </script>
+  <!-- ====================================================== -->
 
   <script>
-    /*
-      Fixed favorites handling: normalizeId() ensures IDs are consistent strings.
-      All other site features preserved.
-    */
+    // Application code (no edits needed)
+    // UI refs
+    const emailEl = document.getElementById('email');
+    const passEl = document.getElementById('password');
+    const nameEl = document.getElementById('displayName');
+    const signupBtn = document.getElementById('signupBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20.5c1.8-3.6 5.4-5.5 7.5-5.5s5.7 1.9 7.5 5.5"/></svg>');
-    const DEFAULT_FAVICON = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cfcfd6" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const signedInAs = document.getElementById('signedInAs');
 
-    function getJSON(k,f){ try{ return JSON.parse(localStorage.getItem(k)||JSON.stringify(f)); }catch(e){return f;} }
-    function setJSON(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-    function get(k,d){ try{ const v=localStorage.getItem(k); return v===null?d:v;}catch(e){return d;} }
-    function set(k,v){ try{ if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v);}catch(e){} }
+    const adminPanel = document.getElementById('adminPanel');
+    const targetUidEl = document.getElementById('targetUid');
+    const roleSelect = document.getElementById('roleSelect');
+    const setRoleBtn = document.getElementById('setRoleBtn');
+    const revokeRoleBtn = document.getElementById('revokeRoleBtn');
 
-    const KEY_GAMES='hw_games', KEY_TOOLS='hw_tools', KEY_FAVS='hw_favs', KEY_USERS='hw_users', KEY_CURRENT_USER='hw_currentUser', KEY_NOTIFS='hw_notifications', KEY_THEME='hw_theme_name', KEY_TAB_TITLE='hw_tab_title', KEY_TAB_ICON='hw_tab_icon', KEY_PANIC_KEY='hw_panic_key', KEY_PANIC_CTRL='hw_panic_ctrl', KEY_PANIC_ACTION='hw_panic_action', KEY_FONT_SCALE='hw_font_scale';
+    // Firebase variables
+    let app = null, auth = null, db = null, functions = null, unsubscribe = null;
 
-    const DEFAULT_GAMES = [
-      {id:'sandbox',label:'Sandbox',href:'sandbox.html'},
-      {id:'snake',label:'Snake Game Ripoff',href:'snake.html'},
-      {id:'tictactoe',label:'Tic Tac Toe',href:'tictactoe.html'},
-      {id:'mines',label:'Minesweeper',href:'mines.html'},
-      {id:'2048',label:'2048',href:'2048.html'},
-      {id:'bubble-shooter',label:'Bubble Shooter',href:'bubble-shooter.html'},
-      {id:'guh-clicker',label:'GUH Clicker',href:'guh-clicker.html'},
-      {id:'flappy-bird',label:'Flappy Bird',href:'flappy-bird.html'},
-      {id:'chess',label:'Chess',href:'chess.html'},
-      {id:'hangman',label:'Hangman',href:'hangman.html'},
-      {id:'block-breaker',label:'Block Breaker',href:'block-breaker.html'},
+    // Helpers
+    function esc(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function appendSystem(t){ const d=document.createElement('div'); d.className='system'; d.textContent=t; chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight; }
+    function appendMessage(from, text, time){ const d=document.createElement('div'); d.className='msg'; d.innerHTML = '<span class="meta">'+esc(from)+'</span> <span>'+esc(text)+'</span> <span class="time">'+esc(time)+'</span>'; chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-      // New games as separate files
-      {id:'wormscape',label:'Wormscape',href:'wormscape.html'},
-      {id:'arcade-racer',label:'Arcade Racer',href:'arcade-racer.html'},
-      {id:'tower-defense',label:'Tower Defense',href:'tower-defense.html'},
-      {id:'space-shooter',label:'Space Shooter',href:'space-shooter.html'}
-    ];
-
-    const DEFAULT_TOOLS = [
-      {id:'calculator',label:'Calculator',href:'calculator.html'},
-      {id:'clock',label:'Clock',href:'clock.html'},
-      {id:'notepad',label:'Notepad',href:'notepad.html'},
-      {id:'jsonformatter',label:'JSON Formatter',href:'json-formatter.html'},
-      {id:'regextester',label:'Regex Tester',href:'regex-tester.html'}
-    ];
-
-    // --- NEW: normalize IDs to consistent string form
-    function normalizeId(id){
-      if(id === undefined || id === null) return '';
-      return String(id).trim();
-    }
-
-    function ensureDefaults(){
-      if(!getJSON(KEY_GAMES,null)) setJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-      else {
-        let existing = getJSON(KEY_GAMES, []);
-        DEFAULT_GAMES.forEach(def => {
-          if(!existing.some(x=>normalizeId(x.id) === normalizeId(def.id))) existing.push(def);
-        });
-        setJSON(KEY_GAMES, existing);
-      }
-      if(!getJSON(KEY_TOOLS,null)) setJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-      if(!getJSON(KEY_FAVS,null)) setJSON(KEY_FAVS,[]);
-      if(!getJSON(KEY_USERS,null)){ const u={'guest':{password:btoa(''),avatar:DEFAULT_AVATAR,email:'',createdAt:Date.now()}}; setJSON(KEY_USERS,u); }
-      if(get(KEY_CURRENT_USER,null)===null) set(KEY_CURRENT_USER,null);
-      if(!getJSON(KEY_NOTIFS,null)) setJSON(KEY_NOTIFS,[]);
-      if(get(KEY_PANIC_KEY,null)===null) set(KEY_PANIC_KEY,"'");
-      if(get(KEY_PANIC_ACTION,null)===null) set(KEY_PANIC_ACTION,'close_tab');
-      if(get(KEY_PANIC_CTRL,null)===null) set(KEY_PANIC_CTRL,'false');
-      if(get(KEY_THEME,null)===null) set(KEY_THEME,'');
-      if(get(KEY_TAB_TITLE,null)===null) set(KEY_TAB_TITLE,'');
-      if(get(KEY_TAB_ICON,null)===null) set(KEY_TAB_ICON,'');
-      if(get(KEY_FONT_SCALE,null)===null) set(KEY_FONT_SCALE,'1');
-    }
-
-    /* Favorites (fixed) */
-    function getFavorites(){ return getJSON(KEY_FAVS,[]); }
-    function saveFavorites(list){ setJSON(KEY_FAVS,list); }
-    function isFavorited(id){ const nid = normalizeId(id); return getFavorites().some(f=>normalizeId(f.id) === nid); }
-    function toggleFavorite(id,label,href){
-      const nid = normalizeId(id);
-      if(!nid){ return; } // ignore invalid ids
-      const favs = getFavorites();
-      const idx = favs.findIndex(f => normalizeId(f.id) === nid);
-      if(idx === -1){
-        favs.push({ id: nid, label: label || nid, href: href || '#' });
+    // Initialize Firebase automatically if config is present
+    (function initIfConfig(){
+      if(typeof firebaseConfig === 'object' && firebaseConfig !== null){
+        try {
+          if(window.firebase && window.firebase.apps && window.firebase.apps.length){
+            window.firebase.app().delete().catch(()=>{});
+          }
+          app = firebase.initializeApp(firebaseConfig);
+          auth = firebase.auth();
+          db = firebase.firestore();
+          functions = firebase.functions();
+          attachAuthListener();
+          appendSystem('Firebase initialized.');
+        } catch(err){
+          console.error('Firebase init error', err);
+          appendSystem('Firebase init error: ' + (err.message || err));
+        }
       } else {
-        favs.splice(idx,1);
+        appendSystem('Firebase config missing. Replace the placeholder line with your config object.');
       }
-      saveFavorites(favs);
-      renderFavoritesGrid();
-      updateFavButtons();
-    }
-
-    /* Notifications */
-    function getNotifications(){ return getJSON(KEY_NOTIFS,[]); }
-    function saveNotifications(list){ setJSON(KEY_NOTIFS,list); }
-    function createNotification(title,message,meta){ const list=getNotifications(); list.unshift({id:'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),title,message,meta:meta||null,ts:Date.now(),read:false}); if(list.length>500) list.length=500; saveNotifications(list); renderNotifUI(); }
-    function markAllNotificationsRead(){ const list=getNotifications(); list.forEach(n=>n.read=true); saveNotifications(list); renderNotifUI(); }
-    function clearAllNotifications(){ saveNotifications([]); renderNotifUI(); }
-    function markNotificationRead(id){ const list=getNotifications(); const n=list.find(x=>x.id===id); if(n) n.read=true; saveNotifications(list); renderNotifUI(); }
-
-    /* Tab masking & theme */
-    function applyTabMasking(){ const title=get(KEY_TAB_TITLE,''); const icon=get(KEY_TAB_ICON,''); document.title = title || 'homewrk'; setFavicon(icon||DEFAULT_FAVICON); const theme=get(KEY_THEME,''); document.documentElement.classList.remove('theme-light','theme-midnight'); if(theme) document.documentElement.classList.add(theme); document.documentElement.style.setProperty('--font-scale', get(KEY_FONT_SCALE,'1')); }
-    function setFavicon(h){ try{ let link=document.getElementById('siteFavicon'); if(!link){ link=document.createElement('link'); link.id='siteFavicon'; link.rel='icon'; document.head.appendChild(link);} link.setAttribute('href',h||DEFAULT_FAVICON);}catch(e){} }
-
-    /* Panic actions implementation */
-    const PANIC_PRESETS = {
-      close_tab:{label:'Close tab'},
-      goto_drive:{label:'Go to Google Drive',url:'https://drive.google.com'},
-      goto_gmail:{label:'Go to Gmail',url:'https://mail.google.com'},
-      goto_google:{label:'Go to Google',url:'https://www.google.com'},
-      mask_drive:{label:'Mask as Google Drive',mask:{title:'My Drive - Google Drive',icon:'https://drive.google.com/favicon.ico'}},
-      mask_gmail:{label:'Mask as Gmail',mask:{title:'Inbox - Gmail',icon:'https://mail.google.com/favicon.ico'}},
-      mask_google:{label:'Mask as Google',mask:{title:'Google',icon:'https://www.google.com/favicon.ico'}},
-      mute_audio:{label:'Mute audio on page'},
-      hide_content:{label:'Hide page content (blank)'},
-      lock_overlay:{label:'Lock overlay (quick hide)'}
-    };
-
-    function performPanicAction(action){
-      try{
-        if(!action) return;
-        if(action === 'close_tab'){ try{ window.close(); }catch(e){}; setTimeout(()=>{ try{ window.location.href='about:blank'; }catch(e){} },200); return; }
-        const preset = PANIC_PRESETS[action];
-        if(!preset) return;
-        if(preset.url){ window.location.href = preset.url; return; }
-        if(preset.mask){ set(KEY_TAB_TITLE,preset.mask.title); set(KEY_TAB_ICON,preset.mask.icon); applyTabMasking(); return; }
-        if(action === 'mute_audio'){ document.querySelectorAll('audio,video').forEach(el=>el.muted=true); showTemporaryOverlay('Audio muted'); return; }
-        if(action === 'hide_content'){ document.querySelectorAll('body > *').forEach(el=>{ if(el.id==='modalBackdrop') return; try{ el.style.visibility='hidden'; }catch(e){} }); set(KEY_TAB_TITLE,'Documents - University'); set(KEY_TAB_ICON,'https://www.google.com/favicon.ico'); applyTabMasking(); return; }
-        if(action === 'lock_overlay'){ showLockOverlay(); return; }
-      }catch(err){ console.warn('performPanicAction error', err); }
-    }
-
-    function showTemporaryOverlay(text){
-      const o=document.createElement('div');
-      o.style.position='fixed'; o.style.inset='0'; o.style.background='#000'; o.style.opacity='0.9'; o.style.zIndex='99999'; o.style.display='flex';
-      o.style.alignItems='center'; o.style.justifyContent='center'; o.style.color='#fff'; o.style.fontSize='20px'; o.textContent=text;
-      document.body.appendChild(o); setTimeout(()=>document.body.removeChild(o),1500);
-    }
-
-    function showLockOverlay(){
-      if(document.getElementById('hw_lock_overlay')) return;
-      const o=document.createElement('div'); o.id='hw_lock_overlay'; o.style.position='fixed'; o.style.inset='0'; o.style.background='#fff'; o.style.zIndex='999999';
-      o.style.display='flex'; o.style.alignItems='center'; o.style.justifyContent='center'; o.style.flexDirection='column';
-      const t=document.createElement('div'); t.textContent='Locked'; t.style.marginBottom='12px'; t.style.fontSize='20px';
-      const btn=document.createElement('button'); btn.textContent='Unlock'; btn.className='btn primary'; btn.onclick=()=>document.body.removeChild(o);
-      o.appendChild(t); o.appendChild(btn); document.body.appendChild(o);
-    }
-
-    /* Account system */
-    function getUsers(){ return getJSON(KEY_USERS, {}); }
-    function saveUsers(u){ setJSON(KEY_USERS, u); }
-    function getCurrentUser(){ return get(KEY_CURRENT_USER, null); }
-    function setCurrentUser(u){ set(KEY_CURRENT_USER, u); renderProfile(); }
-
-    function encodePassword(p){ try { return btoa(p); } catch(e){ return p; } }
-    function verifyPassword(stored, candidate){ try{ return stored === encodePassword(candidate); }catch(e){ return false; } }
-
-    /* UI elements */
-    const gamesGrid = document.getElementById('gamesGrid');
-    const toolsGrid = document.getElementById('toolsGrid');
-    const favoritesGrid = document.getElementById('favoritesGrid');
-    const favoritesEmpty = document.getElementById('favoritesEmpty');
-
-    /* Renderers */
-    function renderGames(){
-      let games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-      const required = ['wormscape','arcade-racer','tower-defense','space-shooter','block-breaker'];
-      required.forEach(id => {
-        if(!games.some(g => normalizeId(g.id) === normalizeId(id))){
-          const def = DEFAULT_GAMES.find(x=>normalizeId(x.id)===normalizeId(id));
-          if(def) games.push(def);
-        }
-      });
-      setJSON(KEY_GAMES, games);
-
-      gamesGrid.innerHTML = '';
-      games.forEach(g => {
-        const el = document.createElement('div');
-        el.className = 'item-btn';
-        el.dataset.id = normalizeId(g.id);
-        el.dataset.href = g.href || '#';
-        if(g.code) el.dataset.hasCode = 'true';
-        el.tabIndex = 0;
-
-        const label = document.createElement('span');
-        label.className = 'label';
-        label.textContent = g.label || g.id;
-        el.appendChild(label);
-
-        const fav = document.createElement('button');
-        fav.className = 'fav-btn';
-        fav.title = 'Favorite';
-        fav.dataset.id = normalizeId(g.id);
-        fav.innerHTML = '☆';
-        el.appendChild(fav);
-
-        if(g.userAdded){
-          const rem = document.createElement('button');
-          rem.className = 'remove-btn';
-          rem.title = 'Remove';
-          rem.dataset.id = normalizeId(g.id);
-          rem.innerHTML = '✕';
-          el.appendChild(rem);
-        }
-
-        gamesGrid.appendChild(el);
-      });
-      updateFavButtons();
-    }
-
-    function renderTools(){
-      let tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-      toolsGrid.innerHTML = '';
-      tools.forEach(t => {
-        const a = document.createElement('div');
-        a.className = 'tool-card';
-        a.dataset.id = normalizeId(t.id);
-        a.dataset.href = t.href || '#';
-        if(t.code) a.dataset.hasCode = 'true';
-        a.tabIndex = 0;
-
-        const label = document.createElement('span');
-        label.className = 'label';
-        label.textContent = t.label || t.id;
-        a.appendChild(label);
-
-        const fav = document.createElement('button');
-        fav.className = 'fav-btn';
-        fav.title = 'Favorite';
-        fav.dataset.id = normalizeId(t.id);
-        fav.innerHTML = '☆';
-        a.appendChild(fav);
-
-        if(t.userAdded){
-          const rem = document.createElement('button');
-          rem.className = 'remove-btn';
-          rem.title = 'Remove';
-          rem.dataset.id = normalizeId(t.id);
-          rem.innerHTML = '✕';
-          a.appendChild(rem);
-        }
-
-        toolsGrid.appendChild(a);
-      });
-      updateFavButtons();
-    }
-
-    function renderFavoritesGrid(){
-      const favs = getFavorites();
-      favoritesGrid.innerHTML = '';
-      if(!favs || favs.length === 0){ favoritesEmpty.style.display = 'block'; return; }
-      favoritesEmpty.style.display = 'none';
-      favs.forEach(f => {
-        const el = document.createElement('div');
-        el.className = 'favorite-item';
-        const left = document.createElement('div');
-        left.textContent = f.label || f.id;
-        const right = document.createElement('div');
-        const open = document.createElement('button');
-        open.className = 'btn ghost';
-        open.textContent = 'Open';
-        open.onclick = () => { openFavorite(f); };
-        const rem = document.createElement('button');
-        rem.className = 'btn ghost';
-        rem.style.marginLeft = '8px';
-        rem.textContent = 'Remove';
-        rem.onclick = () => { toggleFavorite(f.id); };
-        right.appendChild(open);
-        right.appendChild(rem);
-        el.appendChild(left);
-        el.appendChild(right);
-        favoritesGrid.appendChild(el);
-      });
-    }
-
-    function openFavorite(f){
-      if(f.href && f.href !== '#'){ window.location.href = f.href; return; }
-      const games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-      const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-      const g = games.find(x=>normalizeId(x.id)===normalizeId(f.id));
-      if(g && g.code){ openCodeInWindow(g.code, g.label); return; }
-      const t = tools.find(x=>normalizeId(x.id)===normalizeId(f.id));
-      if(t && t.code){ openCodeInWindow(t.code, t.label); return; }
-    }
-
-    function updateFavButtons(){
-      document.querySelectorAll('.fav-btn').forEach(btn=>{
-        const id = normalizeId(btn.dataset.id);
-        if(!id) return;
-        if(isFavorited(id)){ btn.classList.add('active'); btn.innerHTML='★'; } else { btn.classList.remove('active'); btn.innerHTML='☆'; }
-      });
-    }
-
-    /* Search */
-    document.getElementById('gamesSearch').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#gamesGrid .item-btn').forEach(el => {
-        const text = (el.querySelector('.label').textContent || '').toLowerCase();
-        el.style.display = text.includes(q) ? '' : 'none';
-      });
-    });
-    document.getElementById('toolsSearch').addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#toolsGrid .tool-card').forEach(el => {
-        const text = (el.querySelector('.label').textContent || '').toLowerCase();
-        el.style.display = text.includes(q) ? '' : 'none';
-      });
-    });
-
-    /* Navigation */
-    const navItems = document.querySelectorAll('.nav-item');
-    function showSection(name){
-      navItems.forEach(n=>n.classList.toggle('active', n.dataset.category===name));
-      document.getElementById('pageTitle').textContent = name.charAt(0).toUpperCase()+name.slice(1);
-      document.getElementById('gamesSection').classList.add('hidden');
-      document.getElementById('toolsSection').classList.add('hidden');
-      document.getElementById('favoritesSection').classList.add('hidden');
-      if(name === 'games'){ document.getElementById('gamesSection').classList.remove('hidden'); document.getElementById('gamesSection').removeAttribute('aria-hidden'); }
-      if(name === 'tools'){ document.getElementById('toolsSection').classList.remove('hidden'); document.getElementById('toolsSection').removeAttribute('aria-hidden'); }
-      if(name === 'favorites'){ document.getElementById('favoritesSection').classList.remove('hidden'); document.getElementById('favoritesSection').removeAttribute('aria-hidden'); }
-      if(name !== 'games') document.getElementById('gamesSection').setAttribute('aria-hidden','true');
-      if(name !== 'tools') document.getElementById('toolsSection').setAttribute('aria-hidden','true');
-      if(name !== 'favorites') document.getElementById('favoritesSection').setAttribute('aria-hidden','true');
-    }
-    navItems.forEach(item=>{ item.addEventListener('click',()=>showSection(item.dataset.category)); item.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); item.click(); } }); });
-
-    /* Delegated interactions */
-    document.body.addEventListener('click', (e) => {
-      const fav = e.target.closest('.fav-btn');
-      if(fav){
-        e.preventDefault();
-        const id = normalizeId(fav.dataset.id);
-        const parent = fav.closest('.tool-card') || fav.closest('.item-btn');
-        const label = parent ? (parent.querySelector('.label') ? parent.querySelector('.label').textContent : parent.textContent) : id;
-        const href = parent && (parent.getAttribute('href') || parent.dataset.href) ? (parent.getAttribute('href') || parent.dataset.href) : '#';
-        toggleFavorite(id, label.trim(), href);
-        return;
-      }
-
-      const remBtn = e.target.closest('.remove-btn');
-      if(remBtn){
-        e.preventDefault();
-        const id = normalizeId(remBtn.dataset.id);
-        if(!confirm('Remove this custom item?')) return;
-        let games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-        let tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-        const gIdx = games.findIndex(x=>normalizeId(x.id)===id && x.userAdded);
-        if(gIdx !== -1){ games.splice(gIdx,1); setJSON(KEY_GAMES,games); renderGames(); renderFavoritesGrid(); updateFavButtons(); return; }
-        const tIdx = tools.findIndex(x=>normalizeId(x.id)===id && x.userAdded);
-        if(tIdx !== -1){ tools.splice(tIdx,1); setJSON(KEY_TOOLS,tools); renderTools(); renderFavoritesGrid(); updateFavButtons(); return; }
-        return;
-      }
-
-      const gameEl = e.target.closest('.item-btn');
-      if(gameEl && !e.target.closest('.fav-btn') && !e.target.closest('.remove-btn')){
-        const id = normalizeId(gameEl.dataset.id);
-        const games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-        const g = games.find(x=>normalizeId(x.id)===id);
-        if(g && g.code){
-          openCodeInWindow(g.code, g.label);
-          return;
-        }
-        const href = gameEl.dataset.href || '#';
-        if(href && href !== '#') window.location.href = href;
-        return;
-      }
-
-      const toolEl = e.target.closest('.tool-card');
-      if(toolEl && !e.target.closest('.fav-btn') && !e.target.closest('.remove-btn')){
-        const id = normalizeId(toolEl.dataset.id);
-        const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-        const t = tools.find(x=>normalizeId(x.id)===id);
-        if(t && t.code){
-          openCodeInWindow(t.code, t.label);
-          return;
-        }
-        const href = toolEl.dataset.href || '#';
-        if(href && href !== '#') window.location.href = href;
-        return;
-      }
-    });
-
-    function openCodeInWindow(code, title){
-      try{
-        const w = window.open('', '_blank');
-        if(!w) { alert('Popup blocked. Allow popups for this site to open custom code.'); return; }
-        w.document.open();
-        w.document.write(code);
-        w.document.close();
-        try{ w.document.title = title || 'Custom'; }catch(e){}
-      }catch(err){
-        alert('Unable to open custom code: '+err.message);
-      }
-    }
-
-    /* Notifications UI */
-    const notifBell = document.getElementById('notifBell');
-    const notifPanel = document.getElementById('notifPanel');
-    const notifList = document.getElementById('notifList');
-    const notifDot = document.getElementById('notifDot');
-
-    function renderNotifUI(){
-      const list = getNotifications();
-      const unread = list.filter(n => !n.read).length;
-      notifDot.style.display = unread > 0 ? 'block' : 'none';
-      notifList.innerHTML = '';
-      if(list.length === 0){ notifList.innerHTML = `<div class="muted" style="text-align:center;padding:12px">No notifications</div>`; return; }
-      list.forEach(n => {
-        const el = document.createElement('div');
-        el.className = 'notif-item' + (n.read ? '' : ' unread');
-        el.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-            <div style="flex:1">
-              <div style="font-weight:700">${escapeHtml(n.title)}</div>
-              <div style="margin-top:6px;color:var(--muted);font-size:13px">${escapeHtml(n.message)}</div>
-              <div class="time">${new Date(n.ts).toLocaleString()}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px">
-              <button class="btn small" data-action="open" data-id="${n.id}">Open</button>
-              <button class="btn small" data-action="mark" data-id="${n.id}">${n.read ? 'Read' : 'Mark read'}</button>
-            </div>
-          </div>
-        `;
-        notifList.appendChild(el);
-      });
-    }
-
-    notifList.addEventListener('click', (e) => {
-      const btn = e.target.closest('button');
-      if(!btn) return;
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-      if(action === 'mark') markNotificationRead(id);
-      if(action === 'open'){
-        const list = getNotifications();
-        const n = list.find(x => x.id === id);
-        if(n){
-          if(n.meta && n.meta.href) window.location.href = n.meta.href;
-          else alert(n.title + '\n\n' + n.message);
-          markNotificationRead(id);
-        }
-      }
-    });
-
-    notifBell.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const shown = notifPanel.classList.toggle('show');
-      notifPanel.setAttribute('aria-hidden', shown ? 'false' : 'true');
-    });
-    document.addEventListener('click', (e) => {
-      if(!notifPanel.contains(e.target) && !notifBell.contains(e.target)) {
-        notifPanel.classList.remove('show');
-        notifPanel.setAttribute('aria-hidden','true');
-      }
-    });
-    document.getElementById('markAllRead').addEventListener('click', () => markAllNotificationsRead());
-    document.getElementById('clearAll').addEventListener('click', () => { if(confirm('Clear all notifications?')) clearAllNotifications(); });
-    document.getElementById('notifSettings').addEventListener('click', () => openModal('settings'));
-
-    /* Profile popover & modals */
-    const bottomProfile = document.getElementById('bottomProfile');
-    const profilePopover = document.getElementById('profilePopover');
-    const popoverContent = document.getElementById('popoverContent');
-    const profileAvatar = document.getElementById('profileAvatar');
-    const profileNameDisplay = document.getElementById('profileNameDisplay');
-    const sidebarAvatarImg = document.querySelector('#sidebarAvatar');
-    const sidebarEmail = document.getElementById('sidebarEmail');
-
-    function renderProfile(){
-      const username = getCurrentUser();
-      const users = getUsers();
-      if(username && users[username]){
-        profileAvatar.src = users[username].avatar || DEFAULT_AVATAR;
-        sidebarAvatarImg.src = users[username].avatar || DEFAULT_AVATAR;
-        profileNameDisplay.textContent = username;
-        sidebarEmail.textContent = users[username].email || '';
-      } else {
-        profileAvatar.src = DEFAULT_AVATAR;
-        sidebarAvatarImg.src = DEFAULT_AVATAR;
-        profileNameDisplay.textContent = 'Guest';
-        sidebarEmail.textContent = '';
-      }
-      renderPopover();
-    }
-
-    function renderPopover(){
-      const username = getCurrentUser();
-      popoverContent.innerHTML = '';
-      if(!username){
-        const signUpBtn = document.createElement('button');
-        signUpBtn.textContent = 'Sign Up';
-        signUpBtn.className = 'btn primary';
-        signUpBtn.onclick = () => openModal('signup');
-
-        const loginBtn = document.createElement('button');
-        loginBtn.textContent = 'Log In';
-        loginBtn.className = 'btn ghost';
-        loginBtn.style.marginTop = '8px';
-        loginBtn.onclick = () => openModal('login');
-
-        popoverContent.appendChild(signUpBtn);
-        popoverContent.appendChild(loginBtn);
-        const hint = document.createElement('div');
-        hint.className = 'small muted';
-        hint.style.marginTop = '8px';
-        hint.textContent = 'Create an account to save preferences locally';
-        popoverContent.appendChild(hint);
-      } else {
-        const settingsBtn = document.createElement('button');
-        settingsBtn.textContent = 'Settings';
-        settingsBtn.className = 'btn';
-        settingsBtn.onclick = () => openModal('settings');
-
-        const logoutBtn = document.createElement('button');
-        logoutBtn.textContent = 'Log out';
-        logoutBtn.className = 'btn ghost';
-        logoutBtn.style.marginTop = '8px';
-        logoutBtn.onclick = () => { setCurrentUser(null); renderProfile(); };
-
-        popoverContent.appendChild(settingsBtn);
-        popoverContent.appendChild(logoutBtn);
-      }
-    }
-
-    function togglePopover(show){
-      if(show){ profilePopover.classList.add('show'); profilePopover.setAttribute('aria-hidden','false'); }
-      else { profilePopover.classList.remove('show'); profilePopover.setAttribute('aria-hidden','true'); }
-    }
-    bottomProfile.addEventListener('click', (e) => { e.stopPropagation(); const isShown = profilePopover.classList.contains('show'); togglePopover(!isShown); });
-    document.addEventListener('click', (e) => { if(!profilePopover.contains(e.target) && !bottomProfile.contains(e.target)) togglePopover(false); });
-
-    /* Modal system */
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    const modal = document.getElementById('modal');
-
-    function openModal(mode, data){
-      modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); modal.innerHTML = '';
-      if(mode === 'signup') renderSignupModal();
-      else if(mode === 'login') renderLoginModal();
-      else if(mode === 'settings') renderSettingsModal();
-      else if(mode === 'addTool') renderAddToolModal();
-      else if(mode === 'addGame') renderAddGameModal();
-    }
-    function closeModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.innerHTML = ''; }
-    modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
-
-    /* Signup / Login / Settings / Add implementations */
-    function renderSignupModal(){
-      modal.innerHTML = `
-        <h3>Sign Up</h3>
-        <div style="margin-top:8px"><input id="signupUsername" placeholder="Username"></div>
-        <div style="margin-top:8px"><input id="signupEmail" placeholder="Email (optional)"></div>
-        <div style="margin-top:8px"><input id="signupPassword" type="password" placeholder="Password"></div>
-        <div style="margin-top:8px"><input id="signupPassword2" type="password" placeholder="Confirm password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="signupCancel">Cancel</button><button class="btn primary" id="signupSubmit">Create account</button></div>
-      `;
-      document.getElementById('signupCancel').onclick = closeModal;
-      document.getElementById('signupSubmit').onclick = () => {
-        const u = document.getElementById('signupUsername').value.trim();
-        const email = document.getElementById('signupEmail').value.trim();
-        const p = document.getElementById('signupPassword').value;
-        const p2 = document.getElementById('signupPassword2').value;
-        if(!u || !p){ alert('Provide username and password'); return; }
-        if(p !== p2){ alert('Passwords do not match'); return; }
-        const users = getUsers();
-        if(users[u]){ alert('Username exists'); return; }
-        users[u] = { password: encodePassword(p), avatar: DEFAULT_AVATAR, email: email || '', createdAt: Date.now() };
-        saveUsers(users);
-        setCurrentUser(u);
-        createNotification('Welcome', `Account created for ${u}`);
-        closeModal();
-      };
-    }
-
-    function renderLoginModal(){
-      modal.innerHTML = `
-        <h3>Log In</h3>
-        <div style="margin-top:8px"><input id="loginIdentifier" placeholder="Username or email"></div>
-        <div style="margin-top:8px"><input id="loginPassword" type="password" placeholder="Password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="loginCancel">Cancel</button><button class="btn primary" id="loginSubmit">Log in</button></div>
-      `;
-      document.getElementById('loginCancel').onclick = closeModal;
-      document.getElementById('loginSubmit').onclick = () => {
-        const id = document.getElementById('loginIdentifier').value.trim();
-        const p = document.getElementById('loginPassword').value;
-        if(!id || !p){ alert('Provide username/email and password'); return; }
-        const users = getUsers();
-        let matchedUser = null;
-        if(users[id]) matchedUser = id;
-        else {
-          const lower = id.toLowerCase();
-          matchedUser = Object.keys(users).find(u => users[u].email && users[u].email.toLowerCase() === lower) || null;
-        }
-        if(!matchedUser || !users[matchedUser] || !verifyPassword(users[matchedUser].password, p)){ alert('Invalid credentials'); return; }
-        setCurrentUser(matchedUser);
-        createNotification('Signed in', `Welcome back, ${matchedUser}`);
-        closeModal();
-      };
-    }
-
-    function renderSettingsModal(){
-      const username = getCurrentUser();
-      if(!username){ alert('Not signed in'); closeModal(); return; }
-      const users = getUsers();
-      const user = users[username];
-
-      modal.innerHTML = `
-        <h3>Settings</h3>
-
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.04)"><img id="settingsAvatarImg" src="${user.avatar || DEFAULT_AVATAR}" style="width:100%;height:100%;object-fit:cover"></div>
-          <div style="flex:1">
-            <label class="muted">Change profile picture</label>
-            <input type="file" id="settingsAvatarFile" accept="image/*">
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-          <div style="flex:1">
-            <label class="muted">Username</label>
-            <input id="settingsUsername" type="text" value="${escapeHtml(username)}">
-          </div>
-          <div style="flex:1">
-            <label class="muted">Email</label>
-            <input id="settingsEmail" type="text" value="${escapeHtml(user.email || '')}">
-          </div>
-        </div>
-
-        <div style="margin-top:8px;margin-bottom:8px">
-          <div style="font-weight:700;margin-bottom:6px">Change password</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn ghost" id="changePasswordWithCurrent">Change (enter current password)</button>
-            <button class="btn ghost" id="changePasswordViaEmail">Change (email verification)</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Panic key</div>
-        <div class="muted" style="margin-bottom:8px">Set a quick panic key and choose what it does. Default key is an apostrophe (').</div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-          <input id="panicKeyInput" type="text" placeholder="'" value="${escapeHtml(get(KEY_PANIC_KEY, "'"))}" style="width:80px">
-          <label class="muted">Require Ctrl</label>
-          <input id="panicCtrlCheckbox" type="checkbox" ${get(KEY_PANIC_CTRL,'false') === 'true' ? 'checked' : ''}>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-          <label class="muted">Panic action</label>
-          <select id="panicActionSelect" style="flex:1;padding:8px;border-radius:8px;background:#0b0b10;border:1px solid rgba(255,255,255,0.04);color:#fff">
-            <option value="close_tab">Close tab (default)</option>
-            <option value="goto_drive">Go to Google Drive</option>
-            <option value="goto_gmail">Go to Gmail</option>
-            <option value="goto_google">Go to Google</option>
-            <option value="mask_drive">Mask as Google Drive</option>
-            <option value="mask_gmail">Mask as Gmail</option>
-            <option value="mask_google">Mask as Google</option>
-            <option value="mute_audio">Mute audio on page</option>
-            <option value="hide_content">Hide page content (blank)</option>
-            <option value="lock_overlay">Lock overlay</option>
-          </select>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Tab Masking & Customization</div>
-        <div class="muted" style="margin-bottom:8px">Customize tab title and icon (local only). Upload an icon or use quick masks.</div>
-        <div style="display:flex;gap:8px;flex-direction:column;margin-bottom:12px">
-          <input id="tabTitleInput" placeholder="Custom tab title" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_TITLE,''))}">
-          <input id="tabIconUrlInput" placeholder="Tab icon URL (https://...)" style="padding:8px;border-radius:8px" value="${escapeHtml(get(KEY_TAB_ICON,''))}">
-          <div style="display:flex;align-items:center;gap:8px">
-            <input id="tabIconFileInput" type="file" accept="image/*">
-            <div style="display:flex;align-items:center;gap:8px">
-              <img id="tabIconPreviewImg" src="${escapeHtml(get(KEY_TAB_ICON,'')||DEFAULT_FAVICON)}" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);object-fit:cover">
-              <div class="muted" id="tabIconPreviewTitle">${escapeHtml(get(KEY_TAB_TITLE,'')||document.title)}</div>
-            </div>
-            <button class="btn ghost" id="resetTabMasking" style="margin-left:auto">Reset</button>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn ghost" id="maskDriveBtn">Mask as Drive</button>
-            <button class="btn ghost" id="maskGmailBtn">Mask as Gmail</button>
-            <button class="btn ghost" id="maskGoogleBtn">Mask as Google</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <div style="font-weight:700;margin-bottom:8px">Appearance & Themes</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-          <div class="btn ghost theme-preset" data-theme="">Default</div>
-          <div class="btn ghost theme-preset" data-theme="theme-light">Light</div>
-          <div class="btn ghost theme-preset" data-theme="theme-midnight">Midnight</div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <label class="muted">Font size</label>
-          <input id="fontSizeRange" type="range" min="0.8" max="1.4" step="0.05" value="${get(KEY_FONT_SCALE,'1')}">
-          <span id="fontSizeLabel" class="muted">${get(KEY_FONT_SCALE,'1')}x</span>
-        </div>
-
-        <div class="form-actions" style="display:flex;gap:8px;justify-content:space-between;margin-top:12px">
-          <button class="btn ghost" id="settingsCancel">Cancel</button>
-          <button class="btn primary" id="settingsSave">Save changes</button>
-        </div>
-      `;
-
-      const avatarFile = document.getElementById('settingsAvatarFile');
-      const settingsAvatarImg = document.getElementById('settingsAvatarImg');
-      let newAvatar = user.avatar || DEFAULT_AVATAR;
-      avatarFile.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if(!f) return;
-        const reader = new FileReader();
-        reader.onload = () => { newAvatar = reader.result; settingsAvatarImg.src = newAvatar; };
-        reader.readAsDataURL(f);
-      });
-
-      const panicKeyInput = document.getElementById('panicKeyInput');
-      const panicCtrlCheckbox = document.getElementById('panicCtrlCheckbox');
-      const panicActionSelect = document.getElementById('panicActionSelect');
-      panicActionSelect.value = get(KEY_PANIC_ACTION, 'close_tab');
-
-      const tabTitleInput = document.getElementById('tabTitleInput');
-      const tabIconUrlInput = document.getElementById('tabIconUrlInput');
-      const tabIconFileInput = document.getElementById('tabIconFileInput');
-      const tabIconPreviewImg = document.getElementById('tabIconPreviewImg');
-      const tabIconPreviewTitle = document.getElementById('tabIconPreviewTitle');
-
-      // When user types, update preview title/icon
-      tabTitleInput.addEventListener('input', () => tabIconPreviewTitle.textContent = tabTitleInput.value || document.title);
-      tabIconUrlInput.addEventListener('input', () => { const v = tabIconUrlInput.value.trim(); tabIconPreviewImg.src = v || get(KEY_TAB_ICON,'') || DEFAULT_FAVICON; delete tabIconPreviewImg.dataset.pending; });
-
-      tabIconFileInput.addEventListener('change', e => {
-        const f = e.target.files[0];
-        if(!f) return;
-        const r = new FileReader();
-        r.onload = () => { tabIconPreviewImg.src = r.result; tabIconUrlInput.value = ''; tabIconPreviewImg.dataset.pending = r.result; };
-        r.readAsDataURL(f);
-      });
-
-      // Mask buttons: update inputs, preview, and persist immediately so the mask is saved even if user forgets to press Save.
-      document.getElementById('maskDriveBtn').addEventListener('click', () => {
-        const title = 'My Drive - Google Drive';
-        const icon = 'https://drive.google.com/favicon.ico';
-        tabTitleInput.value = title;
-        tabIconUrlInput.value = icon;
-        tabIconPreviewImg.src = icon;
-        tabIconPreviewImg.dataset.pending = icon;
-        tabIconPreviewTitle.textContent = title;
-        // persist immediately
-        set(KEY_TAB_TITLE, title);
-        set(KEY_TAB_ICON, icon);
-        applyTabMasking();
-        createNotification('Tab masked', 'Masked as Google Drive (saved).');
-      });
-
-      document.getElementById('maskGmailBtn').addEventListener('click', () => {
-        const title = 'Inbox - Gmail';
-        const icon = 'https://mail.google.com/favicon.ico';
-        tabTitleInput.value = title;
-        tabIconUrlInput.value = icon;
-        tabIconPreviewImg.src = icon;
-        tabIconPreviewImg.dataset.pending = icon;
-        tabIconPreviewTitle.textContent = title;
-        set(KEY_TAB_TITLE, title);
-        set(KEY_TAB_ICON, icon);
-        applyTabMasking();
-        createNotification('Tab masked', 'Masked as Gmail (saved).');
-      });
-
-      document.getElementById('maskGoogleBtn').addEventListener('click', () => {
-        const title = 'Google';
-        const icon = 'https://www.google.com/favicon.ico';
-        tabTitleInput.value = title;
-        tabIconUrlInput.value = icon;
-        tabIconPreviewImg.src = icon;
-        tabIconPreviewImg.dataset.pending = icon;
-        tabIconPreviewTitle.textContent = title;
-        set(KEY_TAB_TITLE, title);
-        set(KEY_TAB_ICON, icon);
-        applyTabMasking();
-        createNotification('Tab masked', 'Masked as Google (saved).');
-      });
-
-      document.getElementById('resetTabMasking').addEventListener('click', () => {
-        if(!confirm('Reset tab title and icon?')) return;
-        tabTitleInput.value = '';
-        tabIconUrlInput.value = '';
-        delete tabIconPreviewImg.dataset.pending;
-        tabIconPreviewImg.src = DEFAULT_FAVICON;
-        tabIconPreviewTitle.textContent = document.title;
-        set(KEY_TAB_TITLE,'');
-        set(KEY_TAB_ICON,'');
-        applyTabMasking();
-        createNotification('Tab mask reset', 'Tab title and icon reset.');
-      });
-
-      document.querySelectorAll('.theme-preset').forEach(el => {
-        el.addEventListener('click', () => {
-          const theme = el.dataset.theme;
-          set(KEY_THEME, theme);
-          applyTabMasking();
-        });
-      });
-
-      document.getElementById('settingsCancel').onclick = closeModal;
-      document.getElementById('settingsSave').onclick = () => {
-        const newUsername = document.getElementById('settingsUsername').value.trim();
-        const newEmail = document.getElementById('settingsEmail').value.trim();
-        const users = getUsers();
-        const current = getCurrentUser();
-        if(!newUsername){ alert('Username cannot be empty'); return; }
-        if(newUsername !== current && users[newUsername]){ alert('Username taken'); return; }
-        const data = users[current];
-        delete users[current];
-        users[newUsername] = data;
-        users[newUsername].avatar = newAvatar || users[newUsername].avatar || DEFAULT_AVATAR;
-        users[newUsername].email = newEmail || '';
-        saveUsers(users);
-        setCurrentUser(newUsername);
-
-        set(KEY_PANIC_KEY, panicKeyInput.value.trim() || "'");
-        set(KEY_PANIC_CTRL, panicCtrlCheckbox.checked ? 'true' : 'false');
-        set(KEY_PANIC_ACTION, panicActionSelect.value);
-
-        // If preview has pending (file or mask), prefer that; otherwise use URL input; otherwise keep existing
-        if(tabIconPreviewImg.dataset.pending){
-          set(KEY_TAB_ICON, tabIconPreviewImg.dataset.pending);
-        } else {
-          set(KEY_TAB_ICON, tabIconUrlInput.value.trim() || get(KEY_TAB_ICON,''));
-        }
-        set(KEY_TAB_TITLE, tabTitleInput.value.trim() || get(KEY_TAB_TITLE,''));
-
-        const fs = document.getElementById('fontSizeRange').value;
-        set(KEY_FONT_SCALE, fs);
-
-        applyTabMasking();
-        renderProfile();
-        closeModal();
-        createNotification('Settings saved', 'Your settings were saved locally.');
-      };
-
-      document.getElementById('changePasswordWithCurrent').onclick = () => renderChangeWithCurrentModal();
-      document.getElementById('changePasswordViaEmail').onclick = () => {
-        const u = getCurrentUser();
-        const users = getUsers();
-        if(!users[u] || !users[u].email){ alert('No email configured'); return; }
-        const code = Math.floor(100000 + Math.random()*900000).toString();
-        const ver = { code, ts: Date.now(), expiresAt: Date.now() + 1000*60*15 };
-        setJSON('hw_verif_'+u, ver);
-        createNotification('Verification code', `Code for ${u}: ${code} (demo delivery)`);
-        renderVerifyChangeModal(u);
-      };
-
-      const fontSizeRange = document.getElementById('fontSizeRange');
-      const fontSizeLabel = document.getElementById('fontSizeLabel');
-      fontSizeRange.addEventListener('input', () => { document.documentElement.style.setProperty('--font-scale', fontSizeRange.value); fontSizeLabel.textContent = fontSizeRange.value + 'x'; });
-    }
-
-    function renderChangeWithCurrentModal(){
-      modal.innerHTML = `
-        <h3>Change Password</h3>
-        <div style="margin-top:8px"><input id="curPass" type="password" placeholder="Current password"></div>
-        <div style="margin-top:8px"><input id="newPass" type="password" placeholder="New password"></div>
-        <div style="margin-top:8px"><input id="newPass2" type="password" placeholder="Confirm new password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="changeCancel">Cancel</button><button class="btn primary" id="changeSubmit">Change password</button></div>
-      `;
-      document.getElementById('changeCancel').onclick = closeModal;
-      document.getElementById('changeSubmit').onclick = () => {
-        const cur = document.getElementById('curPass').value;
-        const n1 = document.getElementById('newPass').value;
-        const n2 = document.getElementById('newPass2').value;
-        const u = getCurrentUser();
-        if(!u){ alert('Not signed in'); return; }
-        const users = getUsers();
-        if(!verifyPassword(users[u].password, cur)){ alert('Current password incorrect'); return; }
-        if(!n1){ alert('Enter a new password'); return; }
-        if(n1 !== n2){ alert('Passwords do not match'); return; }
-        users[u].password = encodePassword(n1);
-        saveUsers(users);
-        createNotification('Password changed', 'Your password was updated.');
-        closeModal();
-      };
-    }
-
-    function renderVerifyChangeModal(prefilledUsername){
-      const u = prefilledUsername || getCurrentUser();
-      if(!u){ alert('No user specified'); return; }
-      modal.innerHTML = `
-        <h3>Verify Email to Change Password</h3>
-        <div style="margin-top:8px"><input id="verUsername" type="text" value="${escapeHtml(u)}" readonly></div>
-        <div style="margin-top:8px"><input id="verCode" type="text" placeholder="6-digit code"></div>
-        <div style="margin-top:8px"><input id="verNewPass" type="password" placeholder="New password"></div>
-        <div style="margin-top:8px"><input id="verNewPass2" type="password" placeholder="Confirm new password"></div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="verCancel">Cancel</button><button class="btn primary" id="verSubmit">Verify & change</button></div>
-      `;
-      document.getElementById('verCancel').onclick = closeModal;
-      document.getElementById('verSubmit').onclick = () => {
-        const username = document.getElementById('verUsername').value.trim();
-        const code = document.getElementById('verCode').value.trim();
-        const n1 = document.getElementById('verNewPass').value;
-        const n2 = document.getElementById('verNewPass2').value;
-        if(!username || !code || !n1){ alert('Please fill all fields'); return; }
-        if(n1 !== n2){ alert('Passwords do not match'); return; }
-        const ver = getJSON('hw_verif_'+username, null);
-        if(!ver){ alert('No verification code found'); return; }
-        if(Date.now() > ver.expiresAt){ alert('Code expired'); return; }
-        if(ver.code !== code){ alert('Invalid code'); return; }
-        const users = getUsers();
-        if(!users[username]){ alert('User not found'); return; }
-        users[username].password = encodePassword(n1);
-        saveUsers(users);
-        setCurrentUser(username);
-        createNotification('Password changed', 'Password updated via email verification.');
-        closeModal();
-      };
-    }
-
-    /* Add Tool modal */
-    function renderAddToolModal(){
-      modal.innerHTML = `
-        <h3>Add Tool (HTML only)</h3>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <div style="flex:1"><input id="newToolId" placeholder="Unique id (no spaces)"></div>
-          <div style="flex:2"><input id="newToolLabel" placeholder="Label"></div>
-        </div>
-        <div style="margin-top:8px">
-          <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
-          <input id="newToolFile" type="file" accept=".html,text/html">
-          <textarea id="newToolCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved tools open in a new window. You can remove them later.</div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newToolCancel">Cancel</button><button class="btn primary" id="newToolSave">Add tool</button></div>
-      `;
-
-      const fileInput = document.getElementById('newToolFile');
-      fileInput.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if(!f) return;
-        const reader = new FileReader();
-        reader.onload = () => { document.getElementById('newToolCode').value = reader.result; };
-        reader.readAsText(f);
-      });
-
-      document.getElementById('newToolCancel').onclick = closeModal;
-      document.getElementById('newToolSave').onclick = () => {
-        const id = normalizeId(document.getElementById('newToolId').value.trim());
-        const label = document.getElementById('newToolLabel').value.trim();
-        const code = document.getElementById('newToolCode').value;
-        if(!id || !label){ alert('Provide id and label'); return; }
-        if(!code || code.trim().length === 0){ alert('Provide HTML code or upload an HTML file'); return; }
-        const tools = getJSON(KEY_TOOLS, DEFAULT_TOOLS.slice());
-        if(tools.some(t => normalizeId(t.id) === id)){ alert('Tool id exists'); return; }
-        tools.push({ id, label, href:'#', code, userAdded:true, createdAt:Date.now() });
-        setJSON(KEY_TOOLS, tools);
-        renderTools();
-        closeModal();
-        createNotification('Tool added', `${label} added to Tools`);
-      };
-    }
-
-    /* Add Game modal */
-    function renderAddGameModal(){
-      modal.innerHTML = `
-        <h3>Add Game (HTML only)</h3>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <div style="flex:1"><input id="newGameId" placeholder="Unique id (no spaces)"></div>
-          <div style="flex:2"><input id="newGameLabel" placeholder="Label"></div>
-        </div>
-        <div style="margin-top:8px">
-          <label class="muted">Upload HTML file (preferred) or paste full HTML below</label>
-          <input id="newGameFile" type="file" accept=".html,text/html">
-          <textarea id="newGameCode" placeholder="&lt;!doctype html&gt;..."></textarea>
-          <div class="muted" style="margin-top:6px">Saved games open in a new window. You can remove them later.</div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="newGameCancel">Cancel</button><button class="btn primary" id="newGameSave">Add game</button></div>
-      `;
-
-      const fileInput = document.getElementById('newGameFile');
-      fileInput.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if(!f) return;
-        const reader = new FileReader();
-        reader.onload = () => { document.getElementById('newGameCode').value = reader.result; };
-        reader.readAsText(f);
-      });
-
-      document.getElementById('newGameCancel').onclick = closeModal;
-      document.getElementById('newGameSave').onclick = () => {
-        const id = normalizeId(document.getElementById('newGameId').value.trim());
-        const label = document.getElementById('newGameLabel').value.trim();
-        const code = document.getElementById('newGameCode').value;
-        if(!id || !label){ alert('Provide id and label'); return; }
-        if(!code || code.trim().length === 0){ alert('Provide HTML code or upload an HTML file'); return; }
-        const games = getJSON(KEY_GAMES, DEFAULT_GAMES.slice());
-        if(games.some(g => normalizeId(g.id) === id)){ alert('Game id exists'); return; }
-        games.push({ id, label, href:'#', code, userAdded:true, createdAt:Date.now() });
-        setJSON(KEY_GAMES, games);
-        renderGames();
-        closeModal();
-        createNotification('Game added', `${label} added to Games`);
-      };
-    }
-
-    /* Helpers */
-    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-    /* Panic key listener (fixed) */
-    window.addEventListener('keydown', (e) => {
+    })();
+
+    // Auth actions
+    signupBtn.addEventListener('click', async () => {
+      if(!auth) return alert('Initialize Firebase first by pasting your config.');
+      const email = emailEl.value.trim(), pw = passEl.value;
+      if(!email || !pw) return alert('Enter email and password.');
       try {
-        const active = document.activeElement;
-        if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
-        const storedKey = get(KEY_PANIC_KEY, "'");
-        const requiresCtrl = get(KEY_PANIC_CTRL, 'false') === 'true';
-        const action = get(KEY_PANIC_ACTION, 'close_tab');
-        if(!storedKey) return;
-        const keyMatch = (storedKey.length === 1) ? (e.key === storedKey) : (e.key.toLowerCase() === storedKey.toLowerCase());
-        if(!keyMatch) return;
-        if(requiresCtrl && !e.ctrlKey) return;
-        e.preventDefault();
-        performPanicAction(action);
-      } catch(err){ console.warn('panic key handler error', err); }
+        const uc = await auth.createUserWithEmailAndPassword(email, pw);
+        const displayName = nameEl.value.trim();
+        if(displayName) await uc.user.updateProfile({ displayName });
+        alert('Signup successful. You are logged in.');
+      } catch(err){
+        alert('Signup error: ' + (err.message || err));
+      }
     });
 
-    /* Initialization */
-    document.addEventListener('DOMContentLoaded', () => {
-      ensureDefaults();
-      applyTabMasking();
-      renderGames();
-      renderTools();
-      renderFavoritesGrid();
-      renderNotifUI();
-      renderProfile();
+    loginBtn.addEventListener('click', async () => {
+      if(!auth) return alert('Initialize Firebase first by pasting your config.');
+      const email = emailEl.value.trim(), pw = passEl.value;
+      if(!email || !pw) return alert('Enter email and password.');
+      try {
+        await auth.signInWithEmailAndPassword(email, pw);
+        alert('Logged in.');
+      } catch(err){
+        alert('Login error: ' + (err.message || err));
+      }
+    });
 
-      document.getElementById('toolsAddBtn').addEventListener('click', () => openModal('addTool'));
-      document.getElementById('addGameBtn').addEventListener('click', () => openModal('addGame'));
+    logoutBtn.addEventListener('click', () => {
+      if(!auth) return;
+      auth.signOut();
+    });
 
-      window.addEventListener('storage', (e) => {
-        if(e.key && e.key.startsWith('hw_')){
-          renderGames();
-          renderTools();
-          renderFavoritesGrid();
-          renderNotifUI();
-          renderProfile();
-          applyTabMasking();
+    // Auth state listener
+    function attachAuthListener(){
+      if(!auth) return;
+      auth.onAuthStateChanged(async user => {
+        if(user){
+          signedInAs.textContent = 'Signed in as: ' + (user.displayName || user.email);
+          try { await user.getIdTokenResult(true); } catch(e){}
+          const idRes = await user.getIdTokenResult();
+          const claims = idRes.claims || {};
+          if(claims.admin) adminPanel.style.display = 'block'; else adminPanel.style.display = 'none';
+          startChatListener();
+        } else {
+          signedInAs.textContent = 'Not signed in';
+          adminPanel.style.display = 'none';
+          stopChatListener();
+          chatMessages.innerHTML = '';
         }
       });
+    }
 
-      showSection('games');
+    // Send message
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+    async function sendMessage(){
+      if(!auth || !db) return alert('Initialize Firebase and sign in first.');
+      const u = auth.currentUser;
+      if(!u) return alert('Sign in first.');
+      const text = chatInput.value.trim();
+      if(!text) return;
+      try {
+        await db.collection('global_chat').add({
+          from: u.displayName || u.email,
+          uid: u.uid,
+          text: text,
+          ts: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        chatInput.value = '';
+      } catch(err){
+        console.error(err);
+        alert('Send failed: ' + (err.message || err));
+      }
+    }
+
+    // Firestore listener
+    function startChatListener(){
+      if(!db) return;
+      if(unsubscribe) unsubscribe();
+      unsubscribe = db.collection('global_chat').orderBy('ts').limitToLast(200)
+        .onSnapshot(snapshot => {
+          chatMessages.innerHTML = '';
+          snapshot.forEach(doc => {
+            const m = doc.data();
+            const time = m.ts && m.ts.toDate ? m.ts.toDate().toLocaleTimeString() : '';
+            if(m.from && m.text) appendMessage(m.from, m.text, time);
+            else appendSystem(JSON.stringify(m));
+          });
+        }, err => {
+          console.error('Listener error', err);
+          appendSystem('Listener error: ' + (err.message || err));
+        });
+    }
+
+    function stopChatListener(){
+      if(unsubscribe){ unsubscribe(); unsubscribe = null; }
+    }
+
+    // Admin: call Cloud Function setUserRole (must be deployed)
+    setRoleBtn.addEventListener('click', async () => {
+      if(!functions) return alert('Initialize Firebase first.');
+      const uid = targetUidEl.value.trim(); const role = roleSelect.value;
+      if(!uid) return alert('Enter target user UID.');
+      try {
+        const fn = functions.httpsCallable('setUserRole');
+        await fn({ uid, role, action: 'set' });
+        alert('Role set. Target user must refresh token / re-login to see changes.');
+      } catch(err){
+        console.error(err);
+        alert('Error setting role: ' + (err.message || err));
+      }
     });
 
-    /* Expose small API for debugging */
-    window.hw = { toggleFavorite, createNotification, getUsers, setCurrentUser, getCurrentUser, renderGames, renderTools };
+    revokeRoleBtn.addEventListener('click', async () => {
+      if(!functions) return alert('Initialize Firebase first.');
+      const uid = targetUidEl.value.trim();
+      if(!uid) return alert('Enter target user UID.');
+      try {
+        const fn = functions.httpsCallable('setUserRole');
+        await fn({ uid, action: 'revoke' });
+        alert('Role revoked.');
+      } catch(err){
+        console.error(err);
+        alert('Error revoking role: ' + (err.message || err));
+      }
+    });
   </script>
 </body>
 </html>
