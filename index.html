@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>homewrk</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- favicon placeholder; script will update href when disguise applied -->
   <link id="pageFavicon" rel="icon" href="data:," />
   <style>
 :root{ --bg:#071021; --panel:#0e1620; --muted:#9aa4b2; --accent:#1db954; --accent-2:#17a44a; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.04); --radius:12px; --text:#e6eef6; }
@@ -93,6 +92,10 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .disguise-preview .fav img{width:100%;height:100%;object-fit:cover}
 .disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
+
+/* search clear button */
+.search-wrap{position:relative}
+.search-clear{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
   </style>
 </head>
 <body>
@@ -104,6 +107,11 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
           <div style="font-weight:800" id="brandTitle">homewrk</div>
           <div class="small-note">launcher & chat</div>
         </div>
+      </div>
+
+      <div style="margin-top:8px" class="search-wrap">
+        <input id="global-search" placeholder="Search..." style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+        <button id="searchClear" class="search-clear" title="Clear">✕</button>
       </div>
 
       <nav class="tabs" role="tablist" aria-label="Main categories" id="tabsContainer">
@@ -146,11 +154,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </aside>
 
     <main class="main">
-      <div style="display:flex;gap:12px;align-items:center">
-        <input id="global-search" placeholder="Search..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        <div style="width:12px"></div>
-      </div>
-
       <section id="content" class="content" aria-live="polite"></section>
     </main>
   </div>
@@ -385,14 +388,11 @@ function applyTabDisguise(){
   const faviconEl = document.getElementById('pageFavicon') || createFaviconLink();
   if(d && d.icon){
     setFavicon(d.icon);
-    // preview area update handled elsewhere
   } else {
-    // reset to default blank or app icon
     setFavicon('data:,');
   }
 }
 function setFavicon(url){
-  // update or create link#pageFavicon
   let link = document.getElementById('pageFavicon');
   if(!link){
     link = createFaviconLink();
@@ -413,7 +413,6 @@ function setTabDisguise(title, iconUrl){
   const obj = {};
   if(title !== undefined) obj.title = title || '';
   if(iconUrl !== undefined) obj.icon = iconUrl || '';
-  // if both empty, clear
   if((!obj.title || obj.title === '') && (!obj.icon || obj.icon === '')) {
     saveTabDisguise(null);
   } else {
@@ -570,6 +569,7 @@ function renderChat(){
   });
 }
 
+/* --------------------------- Message UI helpers --------------------------- */
 function makeAvatarElement(name, photoURL, size=48){
   const wrapper = document.createElement('div');
   wrapper.className = 'chat-avatar';
@@ -787,7 +787,6 @@ menuSettings.addEventListener('click', () => {
   const themeBtn = document.querySelector(`.theme-select[data-theme="${(s.theme||'dark')}"]`);
   if(themeBtn) themeBtn.classList.add('active');
 
-  // populate disguise preview with current disguise
   const d = loadTabDisguise();
   disguiseTitle.value = d && d.title ? d.title : '';
   disguiseFavicon.value = d && d.icon ? d.icon : '';
@@ -864,7 +863,6 @@ disguiseApplyTitle.addEventListener('click', () => {
 disguiseApplyIcon.addEventListener('click', async () => {
   const url = (disguiseFavicon.value||'').trim();
   if(!url){
-    // remove icon
     setTabDisguise(undefined, '');
     updateDisguisePreview();
     showToast('Favicon removed','success');
@@ -880,7 +878,6 @@ disguiseApplyIcon.addEventListener('click', async () => {
   }
 });
 disguiseResetBtn.addEventListener('click', () => {
-  // reset to default app title and favicon
   clearTabDisguise();
   disguiseTitle.value = '';
   disguiseFavicon.value = '';
@@ -888,7 +885,6 @@ disguiseResetBtn.addEventListener('click', () => {
   showToast('Tab disguise reset','success');
 });
 disguiseClearBtn.addEventListener('click', () => {
-  // clear stored disguise but keep preview inputs
   saveTabDisguise(null);
   updateDisguisePreview();
   showToast('Tab disguise cleared','success');
@@ -899,7 +895,6 @@ disguisePresets.forEach(btn => {
     const icon = btn.dataset.icon || '';
     disguiseTitle.value = title;
     disguiseFavicon.value = icon;
-    // apply immediately
     setTabDisguise(title, icon);
     updateDisguisePreview();
     showToast('Preset applied','success');
@@ -967,6 +962,92 @@ function updateMiniProfile(){
   }
 }
 
+/* --------------------------- Search (works per category) --------------------------- */
+const searchInput = document.getElementById('global-search');
+const searchClearBtn = document.getElementById('searchClear');
+
+function normalize(s){ return String(s||'').toLowerCase().trim(); }
+
+function filterGridByQuery(query){
+  const grid = document.getElementById('grid');
+  if(!grid) return;
+  const q = normalize(query);
+  if(!q){
+    Array.from(grid.children).forEach(child => child.style.display = '');
+    return;
+  }
+  Array.from(grid.children).forEach(tile => {
+    const title = normalize(tile.querySelector('.tile-title')?.textContent || tile.querySelector('.tile-title')?.innerText);
+    const file = normalize(tile.querySelector('.meta-file')?.textContent || '');
+    const matches = title.includes(q) || file.includes(q);
+    tile.style.display = matches ? '' : 'none';
+  });
+}
+
+function filterChatByQuery(query){
+  const chatMessagesEl = document.getElementById('chatMessages');
+  if(!chatMessagesEl) return;
+  const q = normalize(query);
+  const rows = Array.from(chatMessagesEl.querySelectorAll('.chat-row'));
+  if(!q){
+    rows.forEach(r => r.style.display = '');
+    return;
+  }
+  rows.forEach(row => {
+    const name = normalize(row.querySelector('.msg-name')?.textContent || '');
+    const text = normalize(row.querySelector('.msg-text')?.textContent || '');
+    const matches = name.includes(q) || text.includes(q);
+    row.style.display = matches ? '' : 'none';
+  });
+}
+
+/* Debounce helper */
+function debounce(fn, wait=250){
+  let t = null;
+  return function(...args){
+    clearTimeout(t);
+    t = setTimeout(()=> fn.apply(this, args), wait);
+  };
+}
+
+/* Called whenever search input changes or tab changes */
+const applySearchToActive = debounce(() => {
+  const q = searchInput.value || '';
+  const active = document.querySelector('.tab.active')?.dataset.target || 'games';
+  if(active === 'chat'){
+    const chatMessagesEl = document.getElementById('chatMessages');
+    if(!chatMessagesEl) renderChat();
+    setTimeout(()=> filterChatByQuery(q), 50);
+  } else {
+    const grid = document.getElementById('grid');
+    if(!grid) renderActive(active);
+    setTimeout(()=> filterGridByQuery(q), 50);
+  }
+}, 200);
+
+/* Wire search input */
+if(searchInput){
+  searchInput.addEventListener('input', () => {
+    applySearchToActive();
+  });
+}
+if(searchClearBtn){
+  searchClearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    applySearchToActive();
+    searchInput.focus();
+  });
+}
+
+/* Re-apply search when switching tabs */
+function wireTabClicksForSearch(){
+  Array.from(document.querySelectorAll('.tab')).forEach(t => {
+    t.addEventListener('click', () => {
+      setTimeout(() => applySearchToActive(), 60);
+    });
+  });
+}
+
 /* --------------------------- Event wiring & init --------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   applyThemeFromSettings();
@@ -977,6 +1058,8 @@ document.addEventListener('DOMContentLoaded', () => {
     t.classList.add('active');
     renderActive(t.dataset.target);
   }));
+
+  wireTabClicksForSearch();
 
   // content click handlers (open/fav)
   content.addEventListener('click', e=> {
@@ -1035,6 +1118,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // wire disguise preview updates when inputs change
   disguiseTitle.addEventListener('input', updateDisguisePreview);
   disguiseFavicon.addEventListener('input', updateDisguisePreview);
+
+  // apply any existing search query
+  if(searchInput && searchInput.value) setTimeout(()=> applySearchToActive(), 100);
 });
   </script>
 </body>
