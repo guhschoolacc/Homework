@@ -1,319 +1,106 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>homewrk — Chat</title>
+  <title>Tiny Firebase Chat</title>
   <style>
-    :root{--bg:#071021;--card:#0b1220;--muted:#9ca3af;--accent:#2563eb;--panel:#04101a}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#05060a,#071021);color:#e6eefc;margin:0;padding:18px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    header h1{margin:0;font-size:20px}
-    .main{display:flex;gap:18px;max-width:1100px;margin:0 auto}
-    .left{width:320px}
-    .card{background:var(--card);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 24px rgba(0,0,0,0.6)}
-    label{display:block;color:#9fb0d9;font-size:13px;margin-top:8px}
-    input[type="text"],input[type="email"],input[type="password"],textarea,select{width:100%;padding:8px;margin-top:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:#05060a;color:#fff;font-size:13px}
-    button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
-    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#cfe6ff}
-    #chatMessages{height:520px;overflow:auto;padding:10px;background:linear-gradient(180deg,var(--panel),#021018);border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
-    .msg{margin:8px 0}
-    .meta{color:#93c5fd;font-weight:700;margin-right:8px}
-    .time{color:var(--muted);font-size:11px;margin-left:8px}
-    .system{color:var(--muted);font-size:13px;margin:8px 0}
-    .sendRow{display:flex;gap:8px;margin-top:10px}
-    .sendRow input{flex:1}
-    .small{font-size:13px;color:var(--muted)}
-    .adminBox{margin-top:12px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
-    footer{margin-top:18px;color:#9ca3af;font-size:13px;text-align:center}
-    .inline-note{font-size:12px;color:#9ca3af;margin-top:8px}
+    body{font-family:Arial;max-width:700px;margin:20px}
+    #messages{border:1px solid #ddd;height:300px;overflow:auto;padding:8px}
+    .msg{margin-bottom:8px}
+    .me{font-weight:600}
   </style>
 </head>
 <body>
-  <header>
-    <h1>homewrk</h1>
-    <div class="small">Realtime Chat powered by Firebase</div>
-  </header>
-
-  <div class="main">
-    <!-- Left column: Auth and Admin -->
-    <div class="left">
-      <div class="card">
-        <h2 style="margin:0 0 8px 0">Setup</h2>
-
-        <div class="inline-note" style="margin-bottom:8px">
-          **Important**: paste your Firebase config into the single placeholder shown later, then click Sign up / Log in.
-        </div>
-
-        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0" />
-
-        <h2 style="margin:0 0 8px 0">Sign up / Log in</h2>
-        <label>Email</label>
-        <input id="email" type="email" placeholder="you@example.com" />
-        <label>Password</label>
-        <input id="password" type="password" placeholder="password" />
-        <label>Display name (optional)</label>
-        <input id="displayName" type="text" placeholder="Nickname" />
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button id="signupBtn">Sign up</button>
-          <button id="loginBtn" class="ghost">Log in</button>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="logoutBtn" class="ghost" style="flex:1">Log out</button>
-        </div>
-        <div id="userInfo" class="inline-note" style="margin-top:8px">Not signed in</div>
-
-        <div id="adminPanel" class="adminBox" style="display:none">
-          <strong>Admin Controls</strong>
-          <div class="inline-note">Set roles using the Cloud Function setUserRole (deploy separately).</div>
-          <label>Target user UID</label>
-          <input id="targetUid" placeholder="User UID from Firebase Console" />
-          <label>Role</label>
-          <select id="roleSelect">
-            <option value="admin">admin</option>
-            <option value="moderator">moderator</option>
-          </select>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="setRoleBtn">Set role</button>
-            <button id="revokeRoleBtn" class="ghost">Revoke role</button>
-          </div>
-        </div>
-
-        <div class="inline-note" style="margin-top:12px">
-          Enable Email/Password in Firebase Console → Authentication → Sign‑in method. Create Firestore DB.
-        </div>
-      </div>
-    </div>
-
-    <!-- Right column: Chat -->
-    <div style="flex:1">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h2 style="margin:0">Global Chat</h2>
-          <div class="small" id="signedInAs">Not signed in</div>
-        </div>
-
-        <div id="chatMessages" style="margin-top:12px"></div>
-
-        <div class="sendRow" style="margin-top:12px">
-          <input id="chatInput" placeholder="Type a message..." />
-          <button id="chatSend">Send</button>
-        </div>
-
-        <div class="inline-note" style="margin-top:10px">
-          Open this page in another browser or incognito window and sign in with a different account to test realtime chat.
-        </div>
-      </div>
-    </div>
+  <h3>Tiny Firebase Chat</h3>
+  <div id="auth">
+    <input id="email" placeholder="email" />
+    <input id="pass" placeholder="password" type="password" />
+    <button id="signin">Sign In</button>
+    <button id="signup">Sign Up</button>
+    <div id="user"></div>
   </div>
 
-  <footer>homewrk • Realtime chat demo</footer>
+  <div id="chat" style="display:none">
+    <div id="messages"></div>
+    <input id="text" placeholder="Type a message" style="width:80%" />
+    <button id="send">Send</button>
+  </div>
 
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
 
-  <!-- ======= PASTE YOUR FIREBASE CONFIG OBJECT HERE =======
-       Replace the entire line below (including the comment) with
-       the config object you copied from Firebase console.
-       Example object you will paste looks like:
-       {
-         "apiKey":"...","authDomain":"...","projectId":"...", ...
-       }
-       ====================================================== -->
-  <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyAzwNlLaZnVa95Aik0o2EdXVlIH_6pn6rw",
-  authDomain: "guhg-f11d9.firebaseapp.com",
-  projectId: "guhg-f11d9",
-  storageBucket: "guhg-f11d9.firebasestorage.app",
-  messagingSenderId: "644415551313",
-  appId: "1:644415551313:web:b24d3aac37bb2919674570",
-  measurementId: "G-KECPVXC1PJ"
-};
-  </script>
-  <!-- ====================================================== -->
+      apiKey: "REPLACE_ME",
+      authDomain: "REPLACE_ME",
+      projectId: "REPLACE_ME",
+      // other fields from your Firebase web config
+    };
 
-  <script>
-    // Application code (no edits needed)
-    // UI refs
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const emailEl = document.getElementById('email');
-    const passEl = document.getElementById('password');
-    const nameEl = document.getElementById('displayName');
-    const signupBtn = document.getElementById('signupBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
+    const passEl = document.getElementById('pass');
+    const signinBtn = document.getElementById('signin');
+    const signupBtn = document.getElementById('signup');
+    const userDiv = document.getElementById('user');
+    const chatDiv = document.getElementById('chat');
+    const messagesDiv = document.getElementById('messages');
+    const textEl = document.getElementById('text');
+    const sendBtn = document.getElementById('send');
 
-    const chatMessages = document.getElementById('chatMessages');
-    const chatInput = document.getElementById('chatInput');
-    const chatSend = document.getElementById('chatSend');
-    const signedInAs = document.getElementById('signedInAs');
+    signupBtn.onclick = async () => {
+      try { await createUserWithEmailAndPassword(auth, emailEl.value, passEl.value); }
+      catch(e){ alert(e.message); }
+    };
+    signinBtn.onclick = async () => {
+      try { await signInWithEmailAndPassword(auth, emailEl.value, passEl.value); }
+      catch(e){ alert(e.message); }
+    };
 
-    const adminPanel = document.getElementById('adminPanel');
-    const targetUidEl = document.getElementById('targetUid');
-    const roleSelect = document.getElementById('roleSelect');
-    const setRoleBtn = document.getElementById('setRoleBtn');
-    const revokeRoleBtn = document.getElementById('revokeRoleBtn');
-
-    // Firebase variables
-    let app = null, auth = null, db = null, functions = null, unsubscribe = null;
-
-    // Helpers
-    function esc(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function appendSystem(t){ const d=document.createElement('div'); d.className='system'; d.textContent=t; chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight; }
-    function appendMessage(from, text, time){ const d=document.createElement('div'); d.className='msg'; d.innerHTML = '<span class="meta">'+esc(from)+'</span> <span>'+esc(text)+'</span> <span class="time">'+esc(time)+'</span>'; chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight; }
-
-    // Initialize Firebase automatically if config is present
-    (function initIfConfig(){
-      if(typeof firebaseConfig === 'object' && firebaseConfig !== null){
-        try {
-          if(window.firebase && window.firebase.apps && window.firebase.apps.length){
-            window.firebase.app().delete().catch(()=>{});
-          }
-          app = firebase.initializeApp(firebaseConfig);
-          auth = firebase.auth();
-          db = firebase.firestore();
-          functions = firebase.functions();
-          attachAuthListener();
-          appendSystem('Firebase initialized.');
-        } catch(err){
-          console.error('Firebase init error', err);
-          appendSystem('Firebase init error: ' + (err.message || err));
-        }
+    let unsubscribe = null;
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        userDiv.textContent = 'Signed in as ' + user.email;
+        chatDiv.style.display = 'block';
+        startListening();
       } else {
-        appendSystem('Firebase config missing. Replace the placeholder line with your config object.');
-      }
-    })();
-
-    // Auth actions
-    signupBtn.addEventListener('click', async () => {
-      if(!auth) return alert('Initialize Firebase first by pasting your config.');
-      const email = emailEl.value.trim(), pw = passEl.value;
-      if(!email || !pw) return alert('Enter email and password.');
-      try {
-        const uc = await auth.createUserWithEmailAndPassword(email, pw);
-        const displayName = nameEl.value.trim();
-        if(displayName) await uc.user.updateProfile({ displayName });
-        alert('Signup successful. You are logged in.');
-      } catch(err){
-        alert('Signup error: ' + (err.message || err));
+        userDiv.textContent = 'Not signed in';
+        chatDiv.style.display = 'none';
+        if (unsubscribe) unsubscribe();
       }
     });
 
-    loginBtn.addEventListener('click', async () => {
-      if(!auth) return alert('Initialize Firebase first by pasting your config.');
-      const email = emailEl.value.trim(), pw = passEl.value;
-      if(!email || !pw) return alert('Enter email and password.');
-      try {
-        await auth.signInWithEmailAndPassword(email, pw);
-        alert('Logged in.');
-      } catch(err){
-        alert('Login error: ' + (err.message || err));
-      }
-    });
-
-    logoutBtn.addEventListener('click', () => {
-      if(!auth) return;
-      auth.signOut();
-    });
-
-    // Auth state listener
-    function attachAuthListener(){
-      if(!auth) return;
-      auth.onAuthStateChanged(async user => {
-        if(user){
-          signedInAs.textContent = 'Signed in as: ' + (user.displayName || user.email);
-          try { await user.getIdTokenResult(true); } catch(e){}
-          const idRes = await user.getIdTokenResult();
-          const claims = idRes.claims || {};
-          if(claims.admin) adminPanel.style.display = 'block'; else adminPanel.style.display = 'none';
-          startChatListener();
-        } else {
-          signedInAs.textContent = 'Not signed in';
-          adminPanel.style.display = 'none';
-          stopChatListener();
-          chatMessages.innerHTML = '';
-        }
+    function startListening() {
+      const q = query(collection(db, 'chats', 'main', 'messages'), orderBy('createdAt'), limit(100));
+      unsubscribe = onSnapshot(q, snap => {
+        messagesDiv.innerHTML = '';
+        snap.docs.forEach(d => {
+          const data = d.data();
+          const who = data.senderId === (auth.currentUser && auth.currentUser.uid) ? 'me' : 'them';
+          const el = document.createElement('div');
+          el.className = 'msg ' + (who === 'me' ? 'me' : '');
+          const time = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleTimeString() : '';
+          el.textContent = (who === 'me' ? 'You: ' : '') + (data.text || '') + ' ' + time;
+          messagesDiv.appendChild(el);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
     }
 
-    // Send message
-    chatSend.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
-
-    async function sendMessage(){
-      if(!auth || !db) return alert('Initialize Firebase and sign in first.');
-      const u = auth.currentUser;
-      if(!u) return alert('Sign in first.');
-      const text = chatInput.value.trim();
-      if(!text) return;
-      try {
-        await db.collection('global_chat').add({
-          from: u.displayName || u.email,
-          uid: u.uid,
-          text: text,
-          ts: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        chatInput.value = '';
-      } catch(err){
-        console.error(err);
-        alert('Send failed: ' + (err.message || err));
-      }
-    }
-
-    // Firestore listener
-    function startChatListener(){
-      if(!db) return;
-      if(unsubscribe) unsubscribe();
-      unsubscribe = db.collection('global_chat').orderBy('ts').limitToLast(200)
-        .onSnapshot(snapshot => {
-          chatMessages.innerHTML = '';
-          snapshot.forEach(doc => {
-            const m = doc.data();
-            const time = m.ts && m.ts.toDate ? m.ts.toDate().toLocaleTimeString() : '';
-            if(m.from && m.text) appendMessage(m.from, m.text, time);
-            else appendSystem(JSON.stringify(m));
-          });
-        }, err => {
-          console.error('Listener error', err);
-          appendSystem('Listener error: ' + (err.message || err));
-        });
-    }
-
-    function stopChatListener(){
-      if(unsubscribe){ unsubscribe(); unsubscribe = null; }
-    }
-
-    // Admin: call Cloud Function setUserRole (must be deployed)
-    setRoleBtn.addEventListener('click', async () => {
-      if(!functions) return alert('Initialize Firebase first.');
-      const uid = targetUidEl.value.trim(); const role = roleSelect.value;
-      if(!uid) return alert('Enter target user UID.');
-      try {
-        const fn = functions.httpsCallable('setUserRole');
-        await fn({ uid, role, action: 'set' });
-        alert('Role set. Target user must refresh token / re-login to see changes.');
-      } catch(err){
-        console.error(err);
-        alert('Error setting role: ' + (err.message || err));
-      }
-    });
-
-    revokeRoleBtn.addEventListener('click', async () => {
-      if(!functions) return alert('Initialize Firebase first.');
-      const uid = targetUidEl.value.trim();
-      if(!uid) return alert('Enter target user UID.');
-      try {
-        const fn = functions.httpsCallable('setUserRole');
-        await fn({ uid, action: 'revoke' });
-        alert('Role revoked.');
-      } catch(err){
-        console.error(err);
-        alert('Error revoking role: ' + (err.message || err));
-      }
-    });
+    sendBtn.onclick = async () => {
+      const text = textEl.value.trim();
+      if (!text || !auth.currentUser) return;
+      await addDoc(collection(db, 'chats', 'main', 'messages'), {
+        senderId: auth.currentUser.uid,
+        text: text,
+        createdAt: serverTimestamp()
+      });
+      textEl.value = '';
+    };
   </script>
 </body>
 </html>
