@@ -17,6 +17,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .app{height:100vh;display:grid;grid-template-columns:300px 1fr;gap:18px;padding:18px}
 .sidebar{background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
 .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#06202a,#0b2a3a);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:cover;border-radius:8px}
 .brand{display:flex;gap:12px;align-items:center}
 .tabs{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .tab{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid transparent;font-weight:700;display:flex;align-items:center;gap:8px}
@@ -38,9 +39,13 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .topbar-left{display:flex;gap:12px;align-items:center}
 .topbar-right{display:flex;gap:8px;align-items:center}
-.content{flex:1;background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+
+/* IMPORTANT: ensure content is a flex column and can shrink so chat pane can be constrained */
+.content{flex:1;background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
 .section-head{display:flex;justify-content:space-between;align-items:center}
-.chat-window{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
+
+/* Chat layout: chat-window fills available space; messages scroll inside it */
+.chat-window{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .chat-messages{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
 .chat-row{display:flex;gap:12px;align-items:flex-start}
 .chat-row.me{flex-direction:row-reverse}
@@ -51,18 +56,29 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .meta{font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;gap:8px;align-items:center}
 .timestamp{font-size:11px;color:var(--muted)}
 .upload-status{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* chat controls: keep them visible at bottom of chat area */
+.chat-controls { display:flex; gap:8px; align-items:center; margin-top:8px; flex-shrink:0; flex-wrap:wrap; position:relative; z-index:10; background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent); padding:8px 0 0 0; }
+.chat-controls-inner { display:flex; gap:8px; align-items:center; width:100%; }
+.chat-controls input[type="text"] { padding:10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:inherit; outline:none; min-width:0; }
+.chat-controls .wide { width:220px; max-width:40vw; }
+
 /* grid tiles */
 #grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:12px; }
 .tile{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:10px}
 .tile .meta-file{ color:var(--muted); font-size:13px; margin-top:6px; word-break:break-all; }
+
 /* chat images constrained so they don't blow out layout */
 .chat-image{max-width:100%;max-height:40vh;height:auto;border-radius:8px;display:block}
+
 /* scrollbar styling (modern browsers) */
 .chat-messages::-webkit-scrollbar{width:10px}
 .chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:8px}
 .chat-messages::-webkit-scrollbar-track{background:transparent}
+
 /* theme-select active */
 .theme-select.active{ background:var(--glass); color:var(--text); border-color:transparent; }
+
 /* toast */
 .toast-container{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:1400}
 .toast{background:var(--panel);border:1px solid var(--border);padding:10px 14px;border-radius:10px;color:var(--text);box-shadow:0 8px 30px rgba(0,0,0,0.6);min-width:200px}
@@ -71,30 +87,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 @media (max-width:900px){
   .app{grid-template-columns:1fr;grid-auto-rows:auto;padding:12px}
 }
-
-/* chat controls */
-.chat-controls { display:flex; gap:8px; align-items:center; margin-top:12px; flex-shrink:0; flex-wrap:wrap; }
-.chat-controls input[type="text"] { padding:10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:inherit; outline:none; min-width:0; }
-.chat-controls .wide { width:220px; max-width:40vw; }
-
-/* modal/backdrop */
-.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1200;background:rgba(0,0,0,0.45)}
-.modal{width:520px;max-width:96%;background:var(--panel);border-radius:12px;padding:18px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
-.modal h3{margin:0 0 12px 0}
-.form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.small-note{font-size:13px;color:var(--muted)}
-/* settings & account backdrops */
-#settingsBackdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1400;background:rgba(0,0,0,0.45)}
-#settingsBackdrop[aria-hidden="false"]{display:flex}
-#accountBackdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1400;background:rgba(0,0,0,0.45)}
-#accountBackdrop[aria-hidden="false"]{display:flex}
-
-/* disguise preview */
-.disguise-preview{display:flex;gap:12px;align-items:center}
-.disguise-preview .fav{width:36px;height:36px;border-radius:6px;background:#0b1220;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.disguise-preview .fav img{width:100%;height:100%;object-fit:cover}
-.disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 
 /* GIF results */
 #gifResults img { width:120px; height:80px; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.04); }
@@ -636,7 +628,7 @@ function ensureLoadOlderControl(){
     const chatMessagesEl = document.getElementById('chatMessages');
     if(chatMessagesEl) chatMessagesEl.parentNode.insertBefore(loadWrap, chatMessagesEl);
     const btn = document.getElementById('loadOlderBtn');
-    if(btn) btn.addEventListener('click', loadOlderMessages);
+    if(btn) { btn.addEventListener('click', loadOlderMessages); btn._wired = true; }
   } else {
     // ensure button wired
     const btn = document.getElementById('loadOlderBtn');
@@ -1318,15 +1310,6 @@ if(searchClearBtn){
   });
 }
 
-/* Re-apply search when switching tabs */
-function wireTabClicksForSearch(){
-  Array.from(document.querySelectorAll('.tab')).forEach(t => {
-    t.addEventListener('click', () => {
-      setTimeout(() => applySearchToActive(), 60);
-    });
-  });
-}
-
 /* --------------------------- GIF support (Tenor demo) --------------------------- */
 const TENOR_API_KEY = 'LIVDSRZULELA'; // demo key; replace for production
 
@@ -1522,16 +1505,18 @@ function renderChat(){
     <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
 
     <div class="chat-controls" style="margin-top:8px">
-      <input id="chatInput" placeholder="Say something..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-      <input id="chatImageUrl" placeholder="Paste image URL" class="wide" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-      <button class="btn ghost" id="sendImageUrlBtn">Send Image</button>
+      <div class="chat-controls-inner">
+        <input id="chatInput" placeholder="Say something..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+        <input id="chatImageUrl" placeholder="Paste image URL" class="wide" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+        <button class="btn ghost" id="sendImageUrlBtn">Send Image</button>
 
-      <div style="display:flex;gap:8px;align-items:center;margin-left:8px">
-        <input id="chatGifSearch" placeholder="Search GIFs (optional)" style="width:220px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        <button id="searchGifBtn" class="btn ghost">Search GIFs</button>
+        <div style="display:flex;gap:8px;align-items:center;margin-left:8px">
+          <input id="chatGifSearch" placeholder="Search GIFs (optional)" style="width:220px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+          <button id="searchGifBtn" class="btn ghost">Search GIFs</button>
+        </div>
+
+        <button class="btn" id="sendChat">Send</button>
       </div>
-
-      <button class="btn" id="sendChat">Send</button>
     </div>
 
     <div id="gifResults" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
@@ -1561,6 +1546,9 @@ function renderChat(){
   // start listener
   if(unsubscribeMessages) stopFirestoreListener();
   startFirestoreListener();
+
+  // ensure load older control exists and is wired
+  setTimeout(()=> ensureLoadOlderControl(), 80);
 }
 
 /* --------------------------- Event wiring & init --------------------------- */
