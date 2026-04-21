@@ -97,12 +97,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 
-/* GIF results */
-#gifResults img { width:120px; height:80px; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.04); }
-#gifResults img:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,0.45); }
-#gifResults .gif-item { position:relative; }
-#gifResults .gif-loading { width:120px; height:80px; display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03); }
-
 /* search clear button */
 .search-wrap{position:relative}
 .search-clear{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
@@ -211,7 +205,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
-  <!-- Settings modal (themes, accent, panic key, tab disguise, admin unlock) -->
+  <!-- Settings modal (themes, accent, panic key, tab disguise) -->
   <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <h3 id="settingsTitle">Settings</h3>
@@ -286,17 +280,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div class="small-note">Press the panic key to immediately close the tab or redirect. Default key is a single quote: '</div>
       </div>
 
-      <!-- Admin unlock area (client-side) -->
-      <div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:12px">
-        <div class="small-note" style="margin-bottom:8px">Admin Panel (code required)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="settingsAdminCode" placeholder="Enter admin code" type="password" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="settingsAdminUnlock" class="btn ghost">Unlock Admin</button>
-          <button id="settingsAdminClear" class="btn ghost" title="Clear saved admin access">Clear Access</button>
-        </div>
-        <div id="settingsAdminNote" class="small-note" style="margin-top:8px;color:var(--muted)">Enter the admin code to open the admin panel. Access is stored locally until cleared.</div>
-      </div>
-
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
         <button id="settingsCancel" class="btn ghost">Cancel</button>
         <button id="settingsSave" class="btn">Save</button>
@@ -326,23 +309,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       </div>
 
       <div id="accountStatus" class="small-note" style="margin-top:10px"></div>
-    </div>
-  </div>
-
-  <!-- Admin modal (client-side actions) -->
-  <div id="adminModalBackdrop" class="modal-backdrop" aria-hidden="true" style="z-index:1600">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
-      <h3 id="adminModalTitle">Admin Panel</h3>
-
-      <div class="form-row">
-        <div class="small-note">Quick admin actions</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="adminClearLocalMessages" class="btn ghost">Clear Local Chat DOM</button>
-          <button id="adminClearLocalData" class="btn ghost">Clear Local Storage</button>
-          <button id="adminCloseBtn" class="btn">Close</button>
-        </div>
-        <div id="adminActionStatus" class="small-note" style="margin-top:8px;color:var(--muted)"></div>
-      </div>
     </div>
   </div>
 
@@ -418,7 +384,6 @@ function showToast(msg, type='info', ttl=3500){
 const SETTINGS_KEY = 'homewrk.settings.v3';
 const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v1';
 const PANIC_KEY = 'homewrk.panic.v1';
-const ADMIN_LOCAL_KEY = 'homewrk.admin.access.v1';
 const defaultSettings = { theme:'dark', accent:'#1db954', notificationsEnabled:true, showEmailInProfile:true };
 
 function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
@@ -578,18 +543,8 @@ function renderFavorites(){
   favs.forEach(f => grid.appendChild(createTile(f)));
 }
 
-/* --------------------------- Chat (with length control & pagination) --------------------------- */
+/* --------------------------- Chat (fixed to fit) --------------------------- */
 function messagesCollectionRef(){ return db.collection('chat').doc('main').collection('messages'); }
-
-/* Message storage and DOM map */
-const messageElements = new Map();
-
-/* Chat length control & pagination settings */
-const MAX_CHAT_MESSAGES = 200;        // how many messages to keep in DOM
-const PAGE_SIZE = 100;               // how many older messages to fetch per "Load older"
-let oldestMessageTs = null;          // timestamp of the first message currently in the UI
-let loadingOlder = false;
-
 async function sendMessageFirestore(text, imageURL=null){
   if(!auth.currentUser){
     openAuthModal('Please sign in to send messages.');
@@ -601,221 +556,86 @@ async function sendMessageFirestore(text, imageURL=null){
   try{ await messagesCollectionRef().add(payload); showToast('Message sent','success'); }catch(e){ console.error(e); showToast('Failed to send message','warn'); }
 }
 
-/* Trim DOM to keep only the last MAX_CHAT_MESSAGES messages */
-function trimChatMessages(){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  while(chatMessagesEl.children.length > MAX_CHAT_MESSAGES){
-    const first = chatMessagesEl.firstElementChild;
-    if(!first) break;
-    const id = first.dataset.msgId;
-    if(id) messageElements.delete(id);
-    first.remove();
-  }
-  // update oldestMessageTs after trimming
-  const firstRow = chatMessagesEl.firstElementChild;
-  if(firstRow){
-    const tsText = firstRow.dataset.ts;
-    if(tsText) oldestMessageTs = new Date(tsText);
-  } else {
-    oldestMessageTs = null;
-  }
-}
-
-/* Helper to create the "Load older" control and wire it */
-function ensureLoadOlderControl(){
-  const chatWindow = document.querySelector('.chat-window');
-  if(!chatWindow) return;
-  let loadWrap = document.getElementById('loadOlderWrap');
-  if(!loadWrap){
-    loadWrap = document.createElement('div');
-    loadWrap.id = 'loadOlderWrap';
-    loadWrap.style.display = 'flex';
-    loadWrap.style.justifyContent = 'center';
-    loadWrap.style.marginBottom = '8px';
-    loadWrap.innerHTML = `<button id="loadOlderBtn" class="btn ghost">Load older messages</button>`;
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl) chatMessagesEl.parentNode.insertBefore(loadWrap, chatMessagesEl);
-    const btn = document.getElementById('loadOlderBtn');
-    btn.addEventListener('click', loadOlderMessages);
-  }
-}
-
-/* Load older messages (prepends them) */
-async function loadOlderMessages(){
-  if(loadingOlder) return;
-  loadingOlder = true;
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) { loadingOlder = false; return; }
-
-  // If we don't have an oldest timestamp, nothing to load
-  if(!oldestMessageTs){
-    const firstRow = chatMessagesEl.firstElementChild;
-    if(firstRow){
-      const ts = firstRow.dataset.ts;
-      if(ts) oldestMessageTs = new Date(ts);
-    }
-  }
-  if(!oldestMessageTs){
-    showToast('No older messages available','info');
-    loadingOlder = false;
-    return;
-  }
-
-  try{
-    // Query older messages: messages with ts < oldestMessageTs
-    const q = messagesCollectionRef()
-      .where('ts', '<', firebase.firestore.Timestamp.fromDate(oldestMessageTs))
-      .orderBy('ts', 'desc')
-      .limit(PAGE_SIZE);
-
-    const snap = await q.get();
-    if(snap.empty){
-      showToast('No older messages','info');
-      loadingOlder = false;
-      return;
-    }
-
-    // collect docs in reverse order so we prepend oldest-first
-    const docs = [];
-    snap.forEach(d => docs.push({ id: d.id, data: d.data() }));
-    docs.sort((a,b) => {
-      const ta = a.data.ts && a.data.ts.toDate ? a.data.ts.toDate() : new Date(0);
-      const tb = b.data.ts && b.data.ts.toDate ? b.data.ts.toDate() : new Date(0);
-      return ta - tb;
-    });
-
-    // prepend each message to UI
-    docs.forEach(doc => {
-      const data = doc.data;
-      const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null;
-      const msg = { id: doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null };
-      prependMessageToUI(msg);
-    });
-
-    // update oldestMessageTs to the first message's ts
-    const firstRow = chatMessagesEl.firstElementChild;
-    if(firstRow){
-      const tsAttr = firstRow.dataset.ts;
-      if(tsAttr) oldestMessageTs = new Date(tsAttr);
-    }
-
-    showToast('Loaded older messages','success');
-  }catch(err){
-    console.error('loadOlderMessages error', err);
-    showToast('Failed to load older messages','warn');
-  } finally {
-    loadingOlder = false;
-  }
-}
-
-/* Prepend message to UI (used by pagination) */
-function prependMessageToUI(msg){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  // avoid duplicates
-  if(messageElements.has(msg.id)) return;
-
-  const row = document.createElement('div');
-  row.className = 'chat-row ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  row.dataset.msgId = msg.id;
-  if(msg.ts) row.dataset.ts = msg.ts.toISOString();
-
-  const avatar = makeAvatarElement(msg.name, msg.photoURL, 48);
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  bubble.dataset.msgId = msg.id;
-
-  const meta = document.createElement('div');
-  meta.className = 'meta';
-  const timeText = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  meta.innerHTML = `<strong class="msg-name">${escapeHtml(msg.name||'Guest')}</strong><span class="timestamp" data-ts="${msg.ts?msg.ts.toISOString():''}">${timeText}</span>`;
-  bubble.appendChild(meta);
-
-  if(msg.text){
-    const body = document.createElement('div');
-    body.className='msg-text';
-    body.textContent = msg.text;
-    bubble.appendChild(body);
-  }
-  if(msg.imageURL){
-    const img = document.createElement('img');
-    img.src = msg.imageURL;
-    img.className='chat-image';
-    bubble.appendChild(img);
-  }
-
-  if(auth.currentUser && msg.uid === auth.currentUser.uid){
-    row.appendChild(bubble);
-    row.appendChild(avatar);
-  } else {
-    row.appendChild(avatar);
-    row.appendChild(bubble);
-  }
-
-  // prepend
-  chatMessagesEl.insertBefore(row, chatMessagesEl.firstChild);
-  messageElements.set(msg.id, {row,bubble,avatar});
-}
-
-/* Replace startFirestoreListener to limit streamed messages and ensure load control exists */
 let unsubscribeMessages = null;
+const messageElements = new Map();
+
 function startFirestoreListener(){
   if(unsubscribeMessages) return;
-  // use limitToLast so we only stream the most recent MAX_CHAT_MESSAGES
-  unsubscribeMessages = messagesCollectionRef().orderBy('ts','asc').limitToLast(MAX_CHAT_MESSAGES).onSnapshot(snap=>{
-    // if this is the first snapshot, ensure load control exists
-    ensureLoadOlderControl();
-
-    snap.docChanges().forEach(change=>{
-      const data = change.doc.data();
-      const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null;
-      const msg = { id: change.doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null };
-
-      if(change.type === 'added'){
-        // avoid re-adding duplicates
-        if(!messageElements.has(msg.id)){
-          appendMessageToUI(msg);
-        }
-      }
-      if(change.type === 'modified') modifyMessageInUI(msg);
-      if(change.type === 'removed') removeMessageFromUI(msg);
-    });
-
-    // after processing, trim DOM and set oldestMessageTs
-    trimChatMessages();
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl && chatMessagesEl.firstElementChild){
-      const tsAttr = chatMessagesEl.firstElementChild.dataset.ts;
-      if(tsAttr) oldestMessageTs = new Date(tsAttr);
-    }
-  }, err => console.error('listener', err));
+  unsubscribeMessages = messagesCollectionRef().orderBy('ts','asc').limitToLast(500).onSnapshot(snap=>{ snap.docChanges().forEach(change=>{ const data = change.doc.data(); const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null; const msg = { id: change.doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null }; if(change.type === 'added') appendMessageToUI(msg); if(change.type === 'modified') modifyMessageInUI(msg); if(change.type === 'removed') removeMessageFromUI(msg); }); }, err => console.error('listener', err));
 }
 
 function stopFirestoreListener(){ if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; } }
 
-/* Append message to UI (updated to store ISO ts and trim) */
+function renderChat(){
+  content.innerHTML = `
+  <div class="section-head"><h2 style="margin:0">Global Chat</h2></div>
+  <div class="chat-window" style="margin-top:12px">
+    <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+
+    <div class="chat-controls" style="margin-top:8px">
+      <input id="chatInput" placeholder="Say something..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+      <input id="chatImageUrl" placeholder="Paste image URL" class="wide" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+      <button class="btn ghost" id="sendImageUrlBtn">Send Image</button>
+      <button class="btn" id="sendChat">Send</button>
+    </div>
+
+    <div style="margin-top:6px;color:var(--muted);font-size:13px">ill make image uploading a thing when i have money to pay for storage</div>
+    <div id="chatUploadHint" class="upload-status"></div>
+  </div>
+  `;
+
+  const chatMessagesEl = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendChat');
+  const sendImageBtn = document.getElementById('sendImageUrlBtn');
+  const chatImageInput = document.getElementById('chatImageUrl');
+
+  if(unsubscribeMessages) stopFirestoreListener();
+  startFirestoreListener();
+
+  sendBtn.addEventListener('click', () => { sendMessageFirestore(chatInput.value); chatInput.value=''; });
+  chatInput.addEventListener('keydown', e => { if(e.key==='Enter') { sendMessageFirestore(chatInput.value); chatInput.value=''; } });
+  sendImageBtn.addEventListener('click', async () => {
+    const url = (chatImageInput.value||'').trim(); if(!url) return;
+    try{ await preloadImage(url); await sendMessageFirestore('', url); chatImageInput.value = ''; showToast('Image sent','success'); }catch(e){ showToast('Image failed to load','warn'); }
+  });
+}
+
+/* --------------------------- Message UI helpers --------------------------- */
+function makeAvatarElement(name, photoURL, size=48){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chat-avatar';
+  wrapper.style.width = size+'px';
+  wrapper.style.height = size+'px';
+  if(photoURL){
+    const img = document.createElement('img');
+    img.src = photoURL;
+    img.alt = name||'avatar';
+    img.style.width='100%';
+    img.style.height='100%';
+    img.style.objectFit='cover';
+    img.style.borderRadius='10px';
+    wrapper.appendChild(img);
+  } else {
+    wrapper.textContent = (name && name.charAt(0)) ? name.charAt(0).toUpperCase() : 'G';
+  }
+  return wrapper;
+}
+
 function appendMessageToUI(msg){
   const chatMessagesEl = document.getElementById('chatMessages');
   if(!chatMessagesEl) return;
-  // avoid duplicates
-  if(messageElements.has(msg.id)) return;
-
   const row = document.createElement('div');
   row.className = 'chat-row ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
   row.dataset.msgId = msg.id;
-  if(msg.ts) row.dataset.ts = msg.ts.toISOString();
-
   const avatar = makeAvatarElement(msg.name, msg.photoURL, 48);
   const bubble = document.createElement('div');
   bubble.className = 'chat-bubble ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
   bubble.dataset.msgId = msg.id;
-
   const meta = document.createElement('div');
   meta.className = 'meta';
-  meta.innerHTML = `<strong class="msg-name">${escapeHtml(msg.name||'Guest')}</strong><span class="timestamp" data-ts="${msg.ts?msg.ts.toISOString():''}">${msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''}</span>`;
+  meta.innerHTML = `<strong class="msg-name">${escapeHtml(msg.name||'Guest')}</strong><span class="timestamp">${msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''}</span>`;
   bubble.appendChild(meta);
-
   if(msg.text){
     const body = document.createElement('div');
     body.className='msg-text';
@@ -828,7 +648,6 @@ function appendMessageToUI(msg){
     img.className='chat-image';
     bubble.appendChild(img);
   }
-
   if(auth.currentUser && msg.uid === auth.currentUser.uid){
     row.appendChild(bubble);
     row.appendChild(avatar);
@@ -836,18 +655,11 @@ function appendMessageToUI(msg){
     row.appendChild(avatar);
     row.appendChild(bubble);
   }
-
   chatMessagesEl.appendChild(row);
-  messageElements.set(msg.id, {row,bubble,avatar});
-
-  // scroll to bottom
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-
-  // trim if too many messages
-  trimChatMessages();
+  messageElements.set(msg.id, {row,bubble,avatar});
 }
 
-/* Modify and remove helpers */
 function modifyMessageInUI(msg){
   const entry = messageElements.get(msg.id);
   if(!entry) return appendMessageToUI(msg);
@@ -1021,12 +833,6 @@ menuSettings.addEventListener('click', () => {
   panicKeyInput.value = panic.key || "'";
   panicAction.value = panic.action || 'close';
   panicRedirectUrl.value = panic.redirect || 'https://www.google.com';
-
-  // admin note update
-  const adminNote = document.getElementById('settingsAdminNote');
-  if(adminNote){
-    adminNote.textContent = localStorage.getItem(ADMIN_LOCAL_KEY) === '1' ? 'Admin access active (stored locally).' : 'Enter the admin code to open the admin panel. Access is stored locally until cleared.';
-  }
 
   settingsBackdrop.setAttribute('aria-hidden','false');
   settingsBackdrop.style.display = 'flex';
@@ -1284,10 +1090,14 @@ if(searchClearBtn){
   });
 }
 
-/* --------------------------- GIF support note
-   The chat already supports pasting a direct GIF URL into the "Paste image URL" field.
-   (You can add a Tenor/Giphy picker later if desired.)
---------------------------- */
+/* Re-apply search when switching tabs */
+function wireTabClicksForSearch(){
+  Array.from(document.querySelectorAll('.tab')).forEach(t => {
+    t.addEventListener('click', () => {
+      setTimeout(() => applySearchToActive(), 60);
+    });
+  });
+}
 
 /* --------------------------- Panic key handling --------------------------- */
 function loadPanicSettings(){
@@ -1319,119 +1129,11 @@ document.addEventListener('keydown', (e) => {
   const tag = (document.activeElement && document.activeElement.tagName) || '';
   if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable) return;
   if(!p || !p.key) return;
+  // compare by key (single character) or by code if user used special key
   if(e.key === p.key){
     handlePanic();
   }
 });
-
-/* --------------------------- Admin panel (client-side passcode) --------------------------- */
-/*
-  NOTE: This is client-side only. The passcode is reconstructed from char codes
-  at runtime to make casual discovery harder. This is obfuscation only — it
-  does not make the secret impossible to find. For real security, verify on a server.
-*/
-
-// Obfuscated passcode pieces (character codes for "sigmadownsyndrome")
-const _adminCharCodes = [115,105,103,109,97,100,111,119,110,115,121,110,100,114,111,109,101];
-
-function getExpectedAdminCode(){
-  return String.fromCharCode(..._adminCharCodes);
-}
-
-function setLocalAdminAccess(enabled){
-  if(enabled) localStorage.setItem(ADMIN_LOCAL_KEY, '1');
-  else localStorage.removeItem(ADMIN_LOCAL_KEY);
-}
-function hasLocalAdminAccess(){
-  return localStorage.getItem(ADMIN_LOCAL_KEY) === '1';
-}
-
-function openAdminModal(){
-  const b = document.getElementById('adminModalBackdrop');
-  if(!b) return;
-  b.style.display = 'flex';
-  b.setAttribute('aria-hidden','false');
-  document.getElementById('adminActionStatus').textContent = '';
-}
-function closeAdminModal(){
-  const b = document.getElementById('adminModalBackdrop');
-  if(!b) return;
-  b.style.display = 'none';
-  b.setAttribute('aria-hidden','true');
-}
-
-function wireAdminUI(){
-  const unlockBtn = document.getElementById('settingsAdminUnlock');
-  const codeInput = document.getElementById('settingsAdminCode');
-  const clearBtn = document.getElementById('settingsAdminClear');
-  const adminClose = document.getElementById('adminCloseBtn');
-  const adminClearLocalMessages = document.getElementById('adminClearLocalMessages');
-  const adminClearLocalData = document.getElementById('adminClearLocalData');
-
-  if(unlockBtn && codeInput){
-    unlockBtn.addEventListener('click', () => {
-      const entered = (codeInput.value || '').trim();
-      if(!entered){
-        showToast('Enter admin code','warn');
-        return;
-      }
-      const expected = getExpectedAdminCode();
-      if(entered === expected){
-        setLocalAdminAccess(true);
-        showToast('Admin unlocked','success');
-        openAdminModal();
-        codeInput.value = '';
-      } else {
-        showToast('Incorrect admin code','warn');
-      }
-    });
-    codeInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ unlockBtn.click(); } });
-  }
-
-  if(clearBtn){
-    clearBtn.addEventListener('click', () => {
-      setLocalAdminAccess(false);
-      const note = document.getElementById('settingsAdminNote');
-      if(note) note.textContent = 'Enter the admin code to open the admin panel. Access is stored locally until cleared.';
-      showToast('Admin access cleared locally','success');
-    });
-  }
-
-  if(adminClose){
-    adminClose.addEventListener('click', closeAdminModal);
-  }
-
-  if(adminClearLocalMessages){
-    adminClearLocalMessages.addEventListener('click', () => {
-      const chatMessagesEl = document.getElementById('chatMessages');
-      if(chatMessagesEl){
-        chatMessagesEl.innerHTML = '';
-        messageElements.clear();
-        showToast('Chat DOM cleared (local only)','success');
-      } else {
-        showToast('No chat DOM found','warn');
-      }
-    });
-  }
-
-  if(adminClearLocalData){
-    adminClearLocalData.addEventListener('click', () => {
-      localStorage.removeItem('homewrk.favs');
-      localStorage.removeItem(SETTINGS_KEY);
-      localStorage.removeItem(TAB_DISGUISE_KEY);
-      localStorage.removeItem(PANIC_KEY);
-      setLocalAdminAccess(false);
-      showToast('Local app data cleared','success');
-    });
-  }
-}
-
-function maybeShowAdminFromSettings(){
-  if(hasLocalAdminAccess()){
-    const note = document.getElementById('settingsAdminNote');
-    if(note) note.textContent = 'Admin access active (stored locally).';
-  }
-}
 
 /* --------------------------- Event wiring & init --------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1508,9 +1210,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if(!localStorage.getItem(PANIC_KEY)){
     localStorage.setItem(PANIC_KEY, JSON.stringify({ key: "'", action: 'close', redirect: 'https://www.google.com' }));
   }
-
-  // wire admin UI after a short delay so DOM elements exist
-  setTimeout(()=>{ try{ wireAdminUI(); maybeShowAdminFromSettings(); }catch(e){ console.error('admin wiring failed', e); } }, 120);
 
   // apply any existing search query
   if(searchInput && searchInput.value) setTimeout(()=> applySearchToActive(), 100);
