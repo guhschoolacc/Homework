@@ -4,137 +4,139 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>homewrk</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link id="pageFavicon" rel="icon" href="data:," />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-:root{ --bg:#071021; --panel:#0e1620; --muted:#9aa4b2; --accent:#1db954; --accent-2:#17a44a; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.04); --radius:12px; --text:#e6eef6; }
+:root{
+  --bg:#0f1724; --panel:#0b1220; --muted:#9aa4b2; --accent:#5865f2; --accent-2:#4752c4;
+  --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.04); --text:#e6eef6; --radius:10px;
+}
 [data-theme="light"]{ --bg:#f6f8fb; --panel:#ffffff; --muted:#6b7280; --accent:#0ea5e9; --accent-2:#3b82f6; --text:#0b1220; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
-[data-theme="solarized"]{ --bg:#002b36; --panel:#073642; --muted:#93a1a1; --accent:#b58900; --accent-2:#cb4b16; --text:#fdf6e3; --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.03); }
-[data-theme="sepia"]{ --bg:#f4ecd8; --panel:#efe6cf; --muted:#7b6f5a; --accent:#b85c00; --accent-2:#8b3b00; --text:#2b2b2b; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
-[data-theme="hc"]{ --bg:#000000; --panel:#0b0b0b; --muted:#9ae6ff; --accent:#ffff00; --accent-2:#ff00ff; --text:#ffffff; --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.06); }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg)}
-.app{height:100vh;display:grid;grid-template-columns:300px 1fr;gap:18px;padding:18px}
-.sidebar{background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
-.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#06202a,#0b2a3a);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);overflow:hidden}
-.logo img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.app{min-height:100vh;display:grid;grid-template-columns:260px 1fr;gap:18px;padding:18px}
+
+/* Sidebar */
+.sidebar{background:var(--panel);border-radius:12px;padding:14px;border:1px solid var(--border);display:flex;flex-direction:column;gap:12px}
 .brand{display:flex;gap:12px;align-items:center}
-.tabs{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.tab{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid transparent;font-weight:700;display:flex;align-items:center;gap:8px}
-.tab.active{background:var(--glass);color:var(--text)}
-.profile-card{display:flex;align-items:center;gap:12px;margin-top:auto;position:relative}
-.profile-avatar{width:56px;height:56px;border-radius:12px;background:#0b2a3a;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;border:none;cursor:pointer;overflow:hidden}
-.profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.profile-info{flex:1;min-width:0;overflow:hidden}
-.profile-info .name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.profile-info .email{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.profile-menu{position:absolute;right:16px;bottom:76px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:180px;box-shadow:0 8px 30px rgba(0,0,0,0.6);z-index:1300}
-.profile-menu[aria-hidden="true"]{display:none}
-.menu-item{background:transparent;border:none;color:var(--text);text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer}
-.menu-item:hover{background:rgba(255,255,255,0.02)}
-.btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#04263b;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
-.btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
-.btn.ghost.fav-active{ background: var(--accent); color: #04263b; border-color: rgba(0,0,0,0.08); }
-.main{display:flex;flex-direction:column;gap:12px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.topbar-left{display:flex;gap:12px;align-items:center}
-.topbar-right{display:flex;gap:8px;align-items:center}
-
-/* IMPORTANT: ensure content is a flex column and can shrink so chat pane can be constrained */
-.content{flex:1;background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.section-head{display:flex;justify-content:space-between;align-items:center}
-
-/* Chat layout: chat-window fills available space; messages scroll inside it */
-.chat-window{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
-.chat-messages{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
-.chat-row{display:flex;gap:12px;align-items:flex-start}
-.chat-row.me{flex-direction:row-reverse}
-.chat-avatar{width:48px;height:48px;border-radius:10px;background:#0b1220;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;overflow:hidden}
-.chat-avatar img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.chat-bubble{max-width:72%;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border:1px solid rgba(255,255,255,0.02)}
-.chat-bubble.me{background:linear-gradient(90deg,var(--accent),#6ee7b7);color:#04263b}
-.meta{font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;gap:8px;align-items:center}
-.timestamp{font-size:11px;color:var(--muted)}
-.upload-status{font-size:13px;color:var(--muted);margin-top:8px}
-
-/* chat controls: keep them visible at bottom of chat area */
-.chat-controls { display:flex; gap:8px; align-items:center; margin-top:8px; flex-shrink:0; flex-wrap:wrap; position:relative; z-index:10; background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent); padding:8px 0 0 0; }
-.chat-controls-inner { display:flex; gap:8px; align-items:center; width:100%; }
-.chat-controls input[type="text"] { padding:10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:inherit; outline:none; min-width:0; }
-.chat-controls .wide { width:220px; max-width:40vw; }
-
-/* grid tiles */
-#grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:12px; }
-.tile{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:10px}
-.tile .meta-file{ color:var(--muted); font-size:13px; margin-top:6px; word-break:break-all; }
-
-/* chat images constrained so they don't blow out layout */
-.chat-image{max-width:100%;max-height:40vh;height:auto;border-radius:8px;display:block}
-
-/* scrollbar styling (modern browsers) */
-.chat-messages::-webkit-scrollbar{width:10px}
-.chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:8px}
-.chat-messages::-webkit-scrollbar-track{background:transparent}
-
-/* theme-select active */
-.theme-select.active{ background:var(--glass); color:var(--text); border-color:transparent; }
-
-/* toast */
-.toast-container{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:1400}
-.toast{background:var(--panel);border:1px solid var(--border);padding:10px 14px;border-radius:10px;color:var(--text);box-shadow:0 8px 30px rgba(0,0,0,0.6);min-width:200px}
-.toast.success{border-left:4px solid #22c55e}
-.toast.warn{border-left:4px solid #f59e0b}
-@media (max-width:900px){
-  .app{grid-template-columns:1fr;grid-auto-rows:auto;padding:12px}
-}
-
-/* GIF results */
-#gifResults img { width:120px; height:80px; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.04); }
-#gifResults img:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,0.45); }
-#gifResults .gif-item { position:relative; }
-#gifResults .gif-loading { width:120px; height:80px; display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03); }
-
-/* search clear button */
+.logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#0b1b3a,#102a4a);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);overflow:hidden}
 .search-wrap{position:relative}
-.search-clear{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
+.search-wrap input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none}
+.search-clear{position:absolute;right:8px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
+.tabs{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.tab{padding:10px;border-radius:8px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid transparent;font-weight:700;display:flex;align-items:center;gap:8px}
+.tab.active{background:rgba(255,255,255,0.02);color:var(--text)}
+.profile-card{display:flex;align-items:center;gap:12px;margin-top:auto;position:relative}
+.profile-avatar{width:48px;height:48px;border-radius:10px;background:#071427;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;border:none;cursor:pointer;overflow:hidden}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.profile-info .name{font-weight:800}
+.profile-info .email{font-size:13px;color:var(--muted)}
+
+/* profile dropdown */
+.profile-menu{position:absolute;left:0;bottom:70px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,0.6);z-index:1300}
+.profile-menu[aria-hidden="true"]{display:none}
+.menu-item{background:transparent;border:none;color:var(--text);text-align:left;padding:8px 10px;border-radius:6px;cursor:pointer}
+.menu-item:hover{background:rgba(255,255,255,0.02)}
+.menu-guest{padding:8px 10px;border-top:1px solid rgba(255,255,255,0.02);color:var(--muted);font-size:13px}
+
+/* Main */
+.main{display:flex;flex-direction:column;gap:12px;min-height:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.content{flex:1;background:var(--panel);border-radius:12px;padding:12px;border:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+
+/* Grid tiles */
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+.tile{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:10px}
+.tile .meta-file{color:var(--muted);font-size:13px;margin-top:6px;word-break:break-all}
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
+.btn.small{padding:6px 8px;font-size:13px}
+
+/* Chat single-column */
+.chat-shell{display:grid;grid-template-columns:1fr;gap:12px;height:calc(100vh - 140px);min-height:420px}
+.chat-column{display:flex;flex-direction:column;background:transparent;border-radius:10px;overflow:hidden}
+.chat-header{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between}
+.chat-body{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+.msg-group{display:flex;gap:12px;align-items:flex-start}
+.msg-avatar{width:40px;height:40px;border-radius:8px;background:#071427;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;flex-shrink:0;overflow:hidden}
+.msg-block{max-width:78%;display:flex;flex-direction:column}
+.msg-meta{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.msg-bubble{background:var(--panel);padding:10px;border-radius:8px;margin-top:6px;border:1px solid rgba(255,255,255,0.02)}
+.msg-bubble.me{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none}
+.msg-image{max-width:420px;border-radius:8px;display:block;margin-top:8px}
+
+/* Fixed input: non-transparent, centered across main content */
+.fixed-input{
+  position:fixed;
+  bottom:18px;
+  left: calc(18px + 260px + 12px);
+  right: 18px;
+  background: var(--panel);
+  border-radius:12px;
+  padding:10px;
+  border:1px solid var(--border);
+  display:flex;
+  gap:8px;
+  align-items:center;
+  z-index:1400;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+.fixed-input input[type="text"], .fixed-input input[type="url"]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;outline:none}
+.fixed-input .small{width:160px}
+
+/* GIF & emoji panels */
+.panel-pop{position:fixed;bottom:78px;right:calc(18px + 18px);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:1500;max-width:420px;max-height:360px;overflow:auto}
+.panel-pop.hidden{display:none}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.emoji-btn{background:transparent;border:none;font-size:20px;cursor:pointer;padding:6px;border-radius:6px}
+.gif-grid{display:flex;flex-wrap:wrap;gap:8px}
+.gif-grid img{width:120px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+
+/* Modals */
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1500;background:rgba(0,0,0,0.45)}
+.modal{width:720px;max-width:96%;background:var(--panel);border-radius:12px;padding:18px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+.form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.small-note{font-size:13px;color:var(--muted)}
+
+/* Admin badge */
+.admin-badge{font-size:12px;padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,#2b8a4a,#1f6f3a);color:#fff}
+
+/* Moderation UI */
+.moderation-row{display:flex;gap:8px;align-items:center}
+.moderation-list{max-height:220px;overflow:auto;border:1px solid var(--border);padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
+
+/* Responsive */
+@media (max-width:1100px){
+  .app{grid-template-columns:1fr}
+  .fixed-input{left:18px;right:18px}
+  .chat-shell{grid-template-columns:1fr;grid-auto-rows:auto;height:auto}
+  .modal{width:96%}
+}
   </style>
 </head>
 <body>
   <div class="app" id="appRoot" role="application" aria-label="homewrk">
     <aside class="sidebar" aria-label="Navigation">
       <div class="brand">
-        <div id="brandLogo" class="logo" aria-hidden="true">HW</div>
+        <div class="logo" aria-hidden="true">HW</div>
         <div>
           <div style="font-weight:800" id="brandTitle">homewrk</div>
           <div class="small-note">launcher & chat</div>
         </div>
       </div>
 
-      <div style="margin-top:8px" class="search-wrap">
-        <input id="global-search" placeholder="Search..." style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+      <div class="search-wrap" style="margin-top:8px">
+        <input id="global-search" placeholder="Search games, tools, chat..." />
         <button id="searchClear" class="search-clear" title="Clear">✕</button>
       </div>
 
       <nav class="tabs" role="tablist" aria-label="Main categories" id="tabsContainer">
-        <div class="tab active" role="tab" data-target="games" data-default-label="Games">
-          <span class="tab-icon" aria-hidden="true"></span>
-          <span class="tab-label">Games</span>
-        </div>
-        <div class="tab" role="tab" data-target="tools" data-default-label="Tools">
-          <span class="tab-icon" aria-hidden="true"></span>
-          <span class="tab-label">Tools</span>
-        </div>
-        <div class="tab" role="tab" data-target="favorites" data-default-label="Favorites">
-          <span class="tab-icon" aria-hidden="true"></span>
-          <span class="tab-label">Favorites</span>
-        </div>
-        <div class="tab" role="tab" data-target="chat" data-default-label="Chat">
-          <span class="tab-icon" aria-hidden="true"></span>
-          <span class="tab-label">Chat</span>
-        </div>
+        <div class="tab active" role="tab" data-target="games"><span>🎮</span><span>Games</span></div>
+        <div class="tab" role="tab" data-target="tools"><span>🛠️</span><span>Tools</span></div>
+        <div class="tab" role="tab" data-target="favorites"><span>⭐</span><span>Favorites</span></div>
+        <div class="tab" role="tab" data-target="chat"><span>💬</span><span>Chat</span></div>
       </nav>
 
-      <!-- Profile card with menu -->
       <div class="profile-card" style="margin-top:auto">
         <button id="profileButton" class="profile-avatar" aria-haspopup="true" aria-expanded="false" title="Open profile menu">
           <span id="miniAvatar">G</span>
@@ -145,64 +147,69 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
           <div id="miniEmail" class="email">Not signed in</div>
         </div>
 
-        <div id="profileMenu" class="profile-menu" role="menu" aria-hidden="true">
+        <div id="profileMenu" class="profile-menu" role="menu" aria-hidden="true" style="display:none">
           <button id="menuAccount" class="menu-item" role="menuitem">Account</button>
           <button id="menuSettings" class="menu-item" role="menuitem">Settings</button>
+          <button id="menuAdminOpen" class="menu-item" role="menuitem">Admin</button>
           <button id="menuSignOut" class="menu-item" role="menuitem" style="display:none">Sign out</button>
           <button id="menuSignIn" class="menu-item" role="menuitem">Sign in</button>
+          <div class="menu-guest" id="menuGuestInfo">Guest — Not signed in</div>
         </div>
       </div>
     </aside>
 
     <main class="main">
       <div class="topbar">
-        <div class="topbar-left">
-          <div class="small-note">Welcome</div>
-        </div>
-        <div class="topbar-right">
-          <!-- reserved for future top controls -->
-        </div>
+        <div class="small-note">Welcome</div>
+        <div id="adminStatusWrap"></div>
       </div>
 
       <section id="content" class="content" aria-live="polite"></section>
     </main>
   </div>
 
+  <!-- fixed input -->
+  <div id="fixedInputBar" class="fixed-input" style="display:none" aria-hidden="true">
+    <button id="emojiToggle" class="btn ghost small" title="Emoji">😊</button>
+    <button id="gifToggle" class="btn ghost small" title="GIF">GIF</button>
+    <input id="fixedChatInput" type="text" placeholder="Message #global" />
+    <button id="fixedSendChat" class="btn small">Send</button>
+  </div>
+
+  <!-- GIF panel -->
+  <div id="gifPanel" class="panel-pop hidden" aria-hidden="true" style="right:18px"></div>
+
+  <!-- Emoji panel -->
+  <div id="emojiPanel" class="panel-pop hidden" aria-hidden="true" style="right:18px"></div>
+
   <!-- Auth modal -->
   <div id="authBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
       <h3 id="authTitle">Sign in or Create account</h3>
-
-      <div id="authForms">
-        <div class="form-row">
-          <label class="small-note">Email</label>
-          <input id="authEmail" type="email" placeholder="you@example.com" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        </div>
-
-        <div class="form-row">
-          <label class="small-note">Password</label>
-          <input id="authPass" type="password" placeholder="Password" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <button id="emailSignInBtn" class="btn">Sign in</button>
-          <button id="emailSignUpBtn" class="btn ghost">Create account</button>
-          <button id="closeAuthBtn" class="btn ghost">Close</button>
-        </div>
-
-        <div style="margin-top:6px">
-          <div style="margin-bottom:8px" class="small-note">Or sign in with</div>
-          <div style="display:flex;gap:8px">
-            <button id="googleSignInBtn" class="btn ghost">Google</button>
-          </div>
-        </div>
-
-        <div id="authStatus" class="small-note" style="margin-top:12px"></div>
+      <div class="form-row">
+        <label class="small-note">Email</label>
+        <input id="authEmail" type="email" placeholder="you@example.com" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
       </div>
+      <div class="form-row">
+        <label class="small-note">Password</label>
+        <input id="authPass" type="password" placeholder="Password" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <button id="emailSignInBtn" class="btn">Sign in</button>
+        <button id="emailSignUpBtn" class="btn ghost">Create account</button>
+        <button id="closeAuthBtn" class="btn ghost">Close</button>
+      </div>
+      <div style="margin-top:6px">
+        <div style="margin-bottom:8px" class="small-note">Or sign in with</div>
+        <div style="display:flex;gap:8px">
+          <button id="googleSignInBtn" class="btn ghost">Google</button>
+        </div>
+      </div>
+      <div id="authStatus" class="small-note" style="margin-top:12px"></div>
     </div>
   </div>
 
-  <!-- Settings modal (themes, accent, panic key, tab disguise, admin unlock) -->
+  <!-- Settings modal -->
   <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <h3 id="settingsTitle">Settings</h3>
@@ -221,7 +228,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       <div class="form-row">
         <label class="small-note">Accent color</label>
         <div style="display:flex;gap:8px;align-items:center">
-          <input id="settingsAccent" type="color" value="#1db954" style="width:72px;height:40px;border-radius:8px;border:1px solid var(--border)" />
+          <input id="settingsAccent" type="color" value="#5865f2" style="width:72px;height:40px;border-radius:8px;border:1px solid var(--border)" />
           <button id="resetAccentBtn" class="btn ghost" title="Reset to default">Reset</button>
         </div>
       </div>
@@ -232,7 +239,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <label class="small-note">Browser tab disguise</label>
 
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="disguiseTitle" placeholder="Tab title (what appears in browser tab)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <input id="disguiseTitle" placeholder="Tab title" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
           <button id="disguiseApplyTitle" class="btn ghost">Apply</button>
         </div>
 
@@ -241,8 +248,19 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
           <button id="disguiseApplyIcon" class="btn ghost">Apply</button>
         </div>
 
-        <div class="disguise-preview" style="margin-bottom:8px">
-          <div class="fav" id="disguisePreviewIcon"><!-- icon --></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <div class="small-note">Presets</div>
+          <div style="display:flex;gap:6px;margin-left:auto">
+            <button class="btn ghost preset-btn" data-title="Google Drive" data-icon="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">Drive</button>
+            <button class="btn ghost preset-btn" data-title="Gmail" data-icon="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico">Gmail</button>
+            <button class="btn ghost preset-btn" data-title="YouTube" data-icon="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png">YouTube</button>
+            <button class="btn ghost preset-btn" data-title="Google Docs" data-icon="https://www.gstatic.com/images/branding/product/1x/docs_2020q4_48dp.png">Docs</button>
+            <button class="btn ghost preset-btn" data-title="Slack" data-icon="https://a.slack-edge.com/80588/marketing/img/meta/favicon-32.png">Slack</button>
+          </div>
+        </div>
+
+        <div class="disguise-preview" style="display:flex;gap:12px;align-items:center">
+          <div class="fav" id="disguisePreviewIcon" style="width:36px;height:36px;border-radius:6px;background:#071427"></div>
           <div>
             <div id="disguisePreviewTitle" style="font-weight:700">Preview title</div>
             <div class="small-note">This will be the browser tab title and favicon</div>
@@ -251,14 +269,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
             <button id="disguiseResetBtn" class="btn ghost">Reset</button>
             <button id="disguiseClearBtn" class="btn ghost">Clear</button>
           </div>
-        </div>
-
-        <div class="small-note" style="margin-bottom:6px">Presets</div>
-        <div class="disguise-presets">
-          <button class="disguise-preset" data-title="Google Drive" data-icon="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">Google Drive</button>
-          <button class="disguise-preset" data-title="Gmail" data-icon="https://www.gstatic.com/images/branding/product/1x/gmail_48dp.png">Gmail</button>
-          <button class="disguise-preset" data-title="Google" data-icon="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png">Google</button>
-          <button class="disguise-preset" data-title="YouTube" data-icon="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg">YouTube</button>
         </div>
       </div>
 
@@ -269,23 +279,12 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div style="display:flex;gap:8px;align-items:center">
           <input id="panicKeyInput" maxlength="1" placeholder="single key" style="width:72px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
           <select id="panicAction" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit">
-            <option value="close">Close tab (preferred)</option>
+            <option value="close">Close tab</option>
             <option value="redirect">Redirect to URL</option>
           </select>
           <input id="panicRedirectUrl" placeholder="https://example.com" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
         </div>
         <div class="small-note">Press the panic key to immediately close the tab or redirect. Default key is a single quote: '</div>
-      </div>
-
-      <!-- Admin unlock area (client-side) -->
-      <div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:12px">
-        <div class="small-note" style="margin-bottom:8px">Admin Panel (code required)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="settingsAdminCode" placeholder="Enter admin code" type="password" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="settingsAdminUnlock" class="btn ghost">Unlock Admin</button>
-          <button id="settingsAdminClear" class="btn ghost" title="Clear saved admin access">Clear Access</button>
-        </div>
-        <div id="settingsAdminNote" class="small-note" style="margin-top:8px;color:var(--muted)">Enter the admin code to open the admin panel. Access is stored locally until cleared.</div>
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
@@ -299,45 +298,115 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
   <div id="accountBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
       <h3 id="accountTitle">Account Settings</h3>
-
       <div class="form-row">
         <label class="small-note">Display name (shown in chat)</label>
         <input id="accountDisplayName" type="text" placeholder="Your display name" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
       </div>
-
       <div class="form-row">
         <label class="small-note">Profile picture URL (public image)</label>
         <input id="accountPhotoUrl" type="url" placeholder="https://example.com/avatar.png" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
         <div class="small-note">Paste an image URL; it will be used directly in chat messages.</div>
       </div>
-
       <div style="display:flex;justify-content:flex-end;gap:8px">
         <button id="accountCancel" class="btn ghost">Cancel</button>
         <button id="accountSave" class="btn">Save</button>
       </div>
-
       <div id="accountStatus" class="small-note" style="margin-top:10px"></div>
     </div>
   </div>
 
-  <!-- Admin modal (client-side actions) -->
-  <div id="adminModalBackdrop" class="modal-backdrop" aria-hidden="true" style="z-index:1600">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
-      <h3 id="adminModalTitle">Admin Panel</h3>
+  <!-- Admin auth modal -->
+  <div id="adminAuthBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminAuthTitle">
+      <h3 id="adminAuthTitle">Admin Access</h3>
+      <div class="form-row">
+        <label class="small-note">Enter admin password</label>
+        <input id="adminPasswordInput" type="password" placeholder="Password" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="adminAuthUnlock" class="btn">Unlock</button>
+        <button id="adminAuthCancel" class="btn ghost">Cancel</button>
+      </div>
+      <div id="adminAuthStatus" class="small-note" style="margin-top:12px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <!-- Admin panel modal -->
+  <div id="adminPanelBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminPanelTitle">
+      <h3 id="adminPanelTitle">Admin Panel</h3>
 
       <div class="form-row">
-        <div class="small-note">Quick admin actions</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="small-note">Moderation console</div>
+
+        <!-- Search recent users (derived from messages) -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <input id="modUserSearch" placeholder="Search users by name or email (from messages)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <button id="modSearchBtn" class="btn small">Search</button>
+          <button id="modRefreshUsers" class="btn ghost small">Refresh</button>
+        </div>
+
+        <div class="moderation-row" style="gap:12px">
+          <div style="flex:1">
+            <div class="small-note">Matching users</div>
+            <div id="modUserList" class="moderation-list"></div>
+          </div>
+
+          <div style="width:360px">
+            <div class="small-note">Selected user</div>
+            <div id="modSelected" style="padding:8px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.01)">
+              <div id="modSelectedInfo" class="small-note">No user selected</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input id="modNewName" placeholder="New display name" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+                <input id="modNewPhoto" placeholder="New photo URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="modApplyName" class="btn small">Apply to messages</button>
+                <button id="modApplyPhoto" class="btn small">Apply photo</button>
+              </div>
+
+              <hr style="border:none;border-top:1px solid var(--border);margin:8px 0" />
+
+              <div style="display:flex;gap:8px">
+                <button id="modDeleteMessages" class="btn ghost small">Delete messages</button>
+                <button id="modBulkRename" class="btn ghost small">Bulk rename (messages)</button>
+                <button id="modBanUser" class="btn small">Ban user</button>
+              </div>
+
+              <div style="margin-top:8px">
+                <div class="small-note">Moderation log</div>
+                <div id="modLog" class="moderation-list" style="max-height:120px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           <button id="adminClearLocalMessages" class="btn ghost">Clear Local Chat DOM</button>
           <button id="adminClearLocalData" class="btn ghost">Clear Local Storage</button>
+          <button id="adminViewBanned" class="btn ghost">View Banned</button>
           <button id="adminCloseBtn" class="btn">Close</button>
         </div>
+
         <div id="adminActionStatus" class="small-note" style="margin-top:8px;color:var(--muted)"></div>
       </div>
     </div>
   </div>
 
-  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+  <!-- Banned list modal -->
+  <div id="bannedBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bannedTitle">
+      <h3 id="bannedTitle">Banned Users</h3>
+      <div class="form-row">
+        <div id="bannedList" class="moderation-list"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="bannedClose" class="btn ghost">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true" style="position:fixed;right:18px;bottom:18px;z-index:1600"></div>
 
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -345,150 +414,92 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-/* --------------------------- CONFIG --------------------------- */
+/* ================= CONFIG ================= */
 const firebaseConfig = { apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA", authDomain: "goon-7ddc3.firebaseapp.com", projectId: "goon-7ddc3", storageBucket: "goon-7ddc3.firebasestorage.app", messagingSenderId: "117099331820", appId: "1:117099331820:web:3af984b15a843d3d7b65c" };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* --------------------------- Data (games + tools) --------------------------- */
-const games = [
-  {label:'Sandbox',file:'sandbox.html'},
-  {label:'Snake Game Ripoff',file:'snake.html'},
-  {label:'Tic Tac Toe',file:'tic-tactoe.html'},
-  {label:'Minesweeper',file:'mines.html'},
-  {label:'2048',file:'2048.html'},
-  {label:'Bubble Shooter',file:'bubble-shooter.html'},
-  {label:'GUH Clicker',file:'guh-clicker.html'},
-  {label:'Flappy Bird',file:'flappy-bird.html'},
-  {label:'Chess',file:'chess.html'},
-  {label:'Hangman',file:'hangman.html'},
-  {label:'Block Breaker',file:'block-breaker.html'},
-  {label:'Casino',file:'casino.html'},
-  {label:'Wormscape',file:'wormscape.html'},
-  {label:'Arcade Racer',file:'arcade-racer.html'},
-  {label:'Tower Defense',file:'tower-defense.html'},
-  {label:'Space Shooter',file:'space-shooter.html'}
-];
+/* ================= DATA ================= */
+const games = [ {label:'Sandbox',file:'sandbox.html'},{label:'Snake Game Ripoff',file:'snake.html'},{label:'Tic Tac Toe',file:'tic-tactoe.html'},{label:'Minesweeper',file:'mines.html'},{label:'2048',file:'2048.html'},{label:'Bubble Shooter',file:'bubble-shooter.html'},{label:'GUH Clicker',file:'guh-clicker.html'},{label:'Flappy Bird',file:'flappy-bird.html'},{label:'Chess',file:'chess.html'},{label:'Hangman',file:'hangman.html'},{label:'Block Breaker',file:'block-breaker.html'},{label:'Casino',file:'casino.html'},{label:'Wormscape',file:'wormscape.html'},{label:'Arcade Racer',file:'arcade-racer.html'},{label:'Tower Defense',file:'tower-defense.html'},{label:'Space Shooter',file:'space-shooter.html'} ];
+const tools = [ {label:'Calculator',file:'calculator.html'},{label:'Clock',file:'clock.html'},{label:'File Converter',file:'converter.html'},{label:'Notepad',file:'notepad.html'},{label:'JSON Formatter',file:'json-formatter.html'},{label:'Regex Tester',file:'regex-tester.html'},{label:'Base64',file:'base64-tool.html'},{label:'LocalStorage Viewer',file:'localstorage-viewer.html'},{label:'IP Lookup',file:'ip-lookup.html'},{label:'Image Resizer',file:'image-resizer.html'},{label:'Image Cropper',file:'image-cropper.html'},{label:'QR Code Generator',file:'qr-generator.html'},{label:'Text To Speech',file:'text-to-speech.html'},{label:'FL Studio Recreation',file:'fl-studio.html'},{label:'QR Scanner',file:'qr-scanner.html'},{label:'Soundboard',file:'soundboard.html'} ];
 
-const tools = [
-  {label:'Calculator',file:'calculator.html'},
-  {label:'Clock',file:'clock.html'},
-  {label:'File Converter',file:'converter.html'},
-  {label:'Notepad',file:'notepad.html'},
-  {label:'JSON Formatter',file:'json-formatter.html'},
-  {label:'Regex Tester',file:'regex-tester.html'},
-  {label:'Base64',file:'base64-tool.html'},
-  {label:'LocalStorage Viewer',file:'localstorage-viewer.html'},
-  {label:'IP Lookup',file:'ip-lookup.html'},
-  {label:'Image Resizer',file:'image-resizer.html'},
-  {label:'Image Cropper',file:'image-cropper.html'},
-  {label:'QR Code Generator',file:'qr-generator.html'},
-  {label:'Text To Speech',file:'text-to-speech.html'},
-  {label:'FL Studio Recreation',file:'fl-studio.html'},
-  {label:'QR Scanner',file:'qr-scanner.html'},
-  {label:'Soundboard',file:'soundboard.html'}
-];
+/* ---------- Favorites persistence ---------- */
+const FAVS_KEY = 'homewrk.favs.v5';
+let favorites = [];
+function loadFavs(){
+  try{
+    const raw = localStorage.getItem(FAVS_KEY);
+    favorites = raw ? JSON.parse(raw) : [];
+    if(!Array.isArray(favorites)) favorites = [];
+  }catch(e){ favorites = []; }
+}
+function saveFavs(){ try{ localStorage.setItem(FAVS_KEY, JSON.stringify(favorites)); }catch(e){ console.error('saveFavs failed', e); } }
 
-let favorites = JSON.parse(localStorage.getItem('homewrk.favs')||'[]');
-function saveFavs(){ localStorage.setItem('homewrk.favs', JSON.stringify(favorites)); }
+/* ---------- Admin persistence ---------- */
+const ADMIN_LOCAL_KEY = 'homewrk.admin.v1';
+function setLocalAdmin(flag){
+  try{
+    if(flag) localStorage.setItem(ADMIN_LOCAL_KEY, '1');
+    else localStorage.removeItem(ADMIN_LOCAL_KEY);
+    renderAdminBadge();
+  }catch(e){}
+}
+function isLocalAdmin(){ return localStorage.getItem(ADMIN_LOCAL_KEY) === '1'; }
 
-/* --------------------------- DOM helpers --------------------------- */
+/* ---------- Moderation state ---------- */
+let bannedCache = new Set(); // uids
+async function loadBannedCache(){
+  try{
+    const snap = await db.collection('moderation_banned').get();
+    bannedCache.clear();
+    snap.forEach(d => bannedCache.add(d.id));
+  }catch(e){
+    console.warn('Failed to load banned list', e);
+  }
+}
+
+/* ---------- DOM helpers ---------- */
 const content = document.getElementById('content');
 const toastContainer = document.getElementById('toastContainer');
-
-function showToast(msg, type='info', ttl=3500){
+function showToast(msg, type='info', ttl=3000){
   const el = document.createElement('div');
-  el.className = 'toast ' + (type==='success'?'success': type==='warn'?'warn':'');
+  el.className = 'toast';
+  el.style.background = 'var(--panel)';
+  el.style.border = '1px solid var(--border)';
+  el.style.padding = '10px 14px';
+  el.style.borderRadius = '8px';
+  el.style.color = 'var(--text)';
+  el.style.boxShadow = '0 8px 30px rgba(0,0,0,0.6)';
+  el.style.marginTop = '6px';
   el.textContent = msg;
   toastContainer.appendChild(el);
   setTimeout(()=> { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; setTimeout(()=> el.remove(), 300); }, ttl);
 }
 
-/* --------------------------- Theme handling (dark default) --------------------------- */
-const SETTINGS_KEY = 'homewrk.settings.v3';
-const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v1';
+/* ---------- Settings & theme ---------- */
+const SETTINGS_KEY = 'homewrk.settings.v4';
+const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v3';
 const PANIC_KEY = 'homewrk.panic.v1';
-const ADMIN_LOCAL_KEY = 'homewrk.admin.access.v1';
-const defaultSettings = { theme:'dark', accent:'#1db954', notificationsEnabled:true, showEmailInProfile:true };
+const defaultSettings = { theme:'dark', accent:'#5865f2' };
 
 function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
 function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
-
 function shadeColor(hex, percent){ try{ const h = hex.replace('#',''); const num = parseInt(h,16); let r = (num>>16) + Math.round(255*percent/100); let g = ((num>>8)&0xff) + Math.round(255*percent/100); let b = (num&0xff) + Math.round(255*percent/100); r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b)); return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }catch(e){ return hex; } }
+function applyThemeFromSettings(){ const s = loadSettings(); const theme = s.theme || 'dark'; document.documentElement.setAttribute('data-theme', theme); document.documentElement.style.setProperty('--accent', s.accent || defaultSettings.accent); document.documentElement.style.setProperty('--accent-2', shadeColor(s.accent||defaultSettings.accent, -12)); }
 
-function applyThemeFromSettings(){
-  const s = loadSettings();
-  const theme = (s.theme === 'light') ? 'light' : (s.theme === 'solarized' ? 'solarized' : (s.theme === 'sepia' ? 'sepia' : (s.theme === 'hc' ? 'hc' : 'dark')));
-  document.documentElement.setAttribute('data-theme', theme);
-  document.documentElement.style.setProperty('--accent', s.accent || defaultSettings.accent);
-  document.documentElement.style.setProperty('--accent-2', shadeColor(s.accent||defaultSettings.accent, -12));
-}
+/* ---------- Tab disguise ---------- */
+function loadTabDisguise(){ try{ const raw = localStorage.getItem(TAB_DISGUISE_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+function saveTabDisguise(obj){ if(!obj) localStorage.removeItem(TAB_DISGUISE_KEY); else localStorage.setItem(TAB_DISGUISE_KEY, JSON.stringify(obj)); }
+function createFaviconLink(){ let link = document.getElementById('pageFavicon'); if(link) return link; link = document.createElement('link'); link.id = 'pageFavicon'; link.rel = 'icon'; link.href = 'data:,'; document.head.appendChild(link); return link; }
+function setFavicon(url){ const link = createFaviconLink(); link.href = url || 'data:,'; }
+function applyTabDisguise(){ const d = loadTabDisguise(); document.title = (d && d.title) ? d.title : 'homewrk'; if(d && d.icon){ const img = new Image(); img.onload = ()=> setFavicon(d.icon); img.onerror = ()=> setFavicon('data:,'); img.src = d.icon; } else setFavicon('data:,'); }
 
-/* --------------------------- Browser tab disguise (localStorage) --------------------------- */
-function loadTabDisguise(){
-  try{
-    const raw = localStorage.getItem(TAB_DISGUISE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){
-    return null;
-  }
-}
-function saveTabDisguise(obj){
-  if(!obj) localStorage.removeItem(TAB_DISGUISE_KEY);
-  else localStorage.setItem(TAB_DISGUISE_KEY, JSON.stringify(obj));
-}
-function applyTabDisguise(){
-  const d = loadTabDisguise();
-  const defaultTitle = 'homewrk';
-  const title = d && d.title ? d.title : defaultTitle;
-  document.title = title;
-  const faviconEl = document.getElementById('pageFavicon') || createFaviconLink();
-  if(d && d.icon){
-    setFavicon(d.icon);
-  } else {
-    setFavicon('data:,');
-  }
-}
-function setFavicon(url){
-  let link = document.getElementById('pageFavicon');
-  if(!link){
-    link = createFaviconLink();
-  }
-  link.href = url;
-}
-function createFaviconLink(){
-  const existing = document.getElementById('pageFavicon');
-  if(existing) return existing;
-  const link = document.createElement('link');
-  link.id = 'pageFavicon';
-  link.rel = 'icon';
-  link.href = 'data:,';
-  document.head.appendChild(link);
-  return link;
-}
-function setTabDisguise(title, iconUrl){
-  const obj = {};
-  if(title !== undefined) obj.title = title || '';
-  if(iconUrl !== undefined) obj.icon = iconUrl || '';
-  if((!obj.title || obj.title === '') && (!obj.icon || obj.icon === '')) {
-    saveTabDisguise(null);
-  } else {
-    saveTabDisguise(obj);
-  }
-  applyTabDisguise();
-}
-function clearTabDisguise(){
-  saveTabDisguise(null);
-  applyTabDisguise();
-}
+/* ---------- Utilities ---------- */
+function escapeHtml(str){ return String(str||'').replace(/[&<>\"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
 
-/* --------------------------- Utility: find item by file --------------------------- */
-function findItemByFile(file){
-  return games.find(g=>g.file===file) || tools.find(t=>t.file===file) || null;
-}
-
-/* --------------------------- Favorites UI helper --------------------------- */
+/* ---------- Favorites helpers (UI) ---------- */
+function findItemByFile(file){ return games.find(g=>g.file===file) || tools.find(t=>t.file===file) || null; }
 function updateFavButtons(file){
   const nodes = Array.from(document.querySelectorAll('.fav-btn'));
   nodes.forEach(btn => {
@@ -501,17 +512,7 @@ function updateFavButtons(file){
   });
 }
 
-/* --------------------------- Renderers --------------------------- */
-function renderActive(target){
-  if(!target) target = document.querySelector('.tab.active')?.dataset.target || 'games';
-  if(target === 'games') renderGames();
-  if(target === 'tools') renderTools();
-  if(target === 'favorites') renderFavorites();
-  if(target === 'chat') renderChat();
-}
-
-function escapeHtml(str){ return String(str||'').replace(/[&<>\"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
-
+/* ---------- Renderers ---------- */
 function createTile(item){
   const tile = document.createElement('div');
   tile.className = 'tile';
@@ -536,6 +537,19 @@ function createTile(item){
   favBtn.textContent = isFav ? 'Unfav' : 'Fav';
   if(isFav) favBtn.classList.add('fav-active');
   favBtn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
+
+  // Direct listener on each fav button to ensure persistence works reliably
+  favBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const file = favBtn.dataset.file;
+    const wasFav = favorites.includes(file);
+    if(wasFav) favorites = favorites.filter(f=>f!==file);
+    else favorites.push(file);
+    saveFavs();
+    updateFavButtons(file);
+    // If currently viewing favorites, update grid
+    if(document.querySelector('.tab.active')?.dataset.target === 'favorites') renderFavorites();
+  });
 
   actions.appendChild(openBtn);
   actions.appendChild(favBtn);
@@ -569,19 +583,66 @@ function renderFavorites(){
   favs.forEach(f => grid.appendChild(createTile(f)));
 }
 
-/* --------------------------- Chat (with length control & pagination) --------------------------- */
+/* ---------- Chat (single-column) ---------- */
 function messagesCollectionRef(){ return db.collection('chat').doc('main').collection('messages'); }
-
-/* Message storage and DOM map */
 const messageElements = new Map();
+const MAX_CHAT_MESSAGES = 300;
+let unsubscribeMessages = null;
 
-/* Chat length control & pagination settings */
-const MAX_CHAT_MESSAGES = 200;        // how many messages to keep in DOM
-const PAGE_SIZE = 100;               // how many older messages to fetch per "Load older"
-let oldestMessageTs = null;          // timestamp of the first message currently in the UI
-let loadingOlder = false;
+/* clear chat DOM state */
+function clearChatState(){
+  const chatMessagesEl = document.getElementById('chatMessages');
+  if(chatMessagesEl) chatMessagesEl.innerHTML = '';
+  messageElements.clear();
+}
 
+/* stop listener */
+function stopFirestoreListener(){ if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; } }
+
+/* fixed input handlers attach/detach */
+let _fixedHandlers = null;
+function attachFixedInputHandlers(){
+  detachFixedInputHandlers();
+  const fixedInput = document.getElementById('fixedChatInput');
+  const fixedSend = document.getElementById('fixedSendChat');
+  const gifToggle = document.getElementById('gifToggle');
+  const emojiToggle = document.getElementById('emojiToggle');
+
+  if(!fixedInput) return;
+  const onSendClick = async () => { await sendMessageFirestore(fixedInput.value); fixedInput.value=''; };
+  const onKeyDown = (e) => { if(e.key === 'Enter'){ sendMessageFirestore(fixedInput.value); fixedInput.value=''; } };
+  const onGifToggle = () => toggleGifPanel();
+  const onEmojiToggle = () => toggleEmojiPanel();
+
+  fixedSend.addEventListener('click', onSendClick);
+  fixedInput.addEventListener('keydown', onKeyDown);
+  gifToggle.addEventListener('click', onGifToggle);
+  emojiToggle.addEventListener('click', onEmojiToggle);
+
+  _fixedHandlers = { onSendClick, onKeyDown, onGifToggle, onEmojiToggle };
+}
+function detachFixedInputHandlers(){
+  if(!_fixedHandlers) return;
+  const fixedInput = document.getElementById('fixedChatInput');
+  const fixedSend = document.getElementById('fixedSendChat');
+  const gifToggle = document.getElementById('gifToggle');
+  const emojiToggle = document.getElementById('emojiToggle');
+  try{
+    if(fixedSend && _fixedHandlers.onSendClick) fixedSend.removeEventListener('click', _fixedHandlers.onSendClick);
+    if(fixedInput && _fixedHandlers.onKeyDown) fixedInput.removeEventListener('keydown', _fixedHandlers.onKeyDown);
+    if(gifToggle && _fixedHandlers.onGifToggle) gifToggle.removeEventListener('click', _fixedHandlers.onGifToggle);
+    if(emojiToggle && _fixedHandlers.onEmojiToggle) emojiToggle.removeEventListener('click', _fixedHandlers.onEmojiToggle);
+  }catch(e){}
+  _fixedHandlers = null;
+}
+
+/* send message */
 async function sendMessageFirestore(text, imageURL=null){
+  // check banned
+  if(auth.currentUser && bannedCache.has(auth.currentUser.uid)){
+    showToast('You are banned and cannot send messages.','warn',4000);
+    return;
+  }
   if(!auth.currentUser){
     openAuthModal('Please sign in to send messages.');
     return;
@@ -592,728 +653,184 @@ async function sendMessageFirestore(text, imageURL=null){
   try{ await messagesCollectionRef().add(payload); showToast('Message sent','success'); }catch(e){ console.error(e); showToast('Failed to send message','warn'); }
 }
 
-/* Trim DOM to keep only the last MAX_CHAT_MESSAGES messages */
-function trimChatMessages(){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  while(chatMessagesEl.children.length > MAX_CHAT_MESSAGES){
-    const first = chatMessagesEl.firstElementChild;
-    if(!first) break;
-    const id = first.dataset.msgId;
-    if(id) messageElements.delete(id);
-    first.remove();
-  }
-  // update oldestMessageTs after trimming
-  const firstRow = chatMessagesEl.firstElementChild;
-  if(firstRow){
-    const tsText = firstRow.dataset.ts;
-    if(tsText) oldestMessageTs = new Date(tsText);
+/* create message node */
+function makeMessageNode(msg){
+  const group = document.createElement('div');
+  group.className = 'msg-group';
+  group.dataset.msgId = msg.id;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  if(msg.photoURL){
+    avatar.innerHTML = `<img src="${msg.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="avatar">`;
   } else {
-    oldestMessageTs = null;
-  }
-}
-
-/* Helper to create the "Load older" control and wire it */
-function ensureLoadOlderControl(){
-  const chatWindow = document.querySelector('.chat-window');
-  if(!chatWindow) return;
-  let loadWrap = document.getElementById('loadOlderWrap');
-  if(!loadWrap){
-    loadWrap = document.createElement('div');
-    loadWrap.id = 'loadOlderWrap';
-    loadWrap.style.display = 'flex';
-    loadWrap.style.justifyContent = 'center';
-    loadWrap.style.marginBottom = '8px';
-    loadWrap.innerHTML = `<button id="loadOlderBtn" class="btn ghost">Load older messages</button>`;
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl) chatMessagesEl.parentNode.insertBefore(loadWrap, chatMessagesEl);
-    const btn = document.getElementById('loadOlderBtn');
-    if(btn) { btn.addEventListener('click', loadOlderMessages); btn._wired = true; }
-  } else {
-    // ensure button wired
-    const btn = document.getElementById('loadOlderBtn');
-    if(btn && !btn._wired){
-      btn.addEventListener('click', loadOlderMessages);
-      btn._wired = true;
-    }
-  }
-}
-
-/* Load older messages (prepends them) */
-async function loadOlderMessages(){
-  if(loadingOlder) return;
-  loadingOlder = true;
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) { loadingOlder = false; return; }
-
-  // If we don't have an oldest timestamp, nothing to load
-  if(!oldestMessageTs){
-    const firstRow = chatMessagesEl.firstElementChild;
-    if(firstRow){
-      const ts = firstRow.dataset.ts;
-      if(ts) oldestMessageTs = new Date(ts);
-    }
-  }
-  if(!oldestMessageTs){
-    showToast('No older messages available','info');
-    loadingOlder = false;
-    return;
+    avatar.textContent = (msg.name && msg.name.charAt(0)) ? msg.name.charAt(0).toUpperCase() : 'G';
   }
 
-  try{
-    // Query older messages: messages with ts < oldestMessageTs
-    const q = messagesCollectionRef()
-      .where('ts', '<', firebase.firestore.Timestamp.fromDate(oldestMessageTs))
-      .orderBy('ts', 'desc')
-      .limit(PAGE_SIZE);
-
-    const snap = await q.get();
-    if(snap.empty){
-      showToast('No older messages','info');
-      loadingOlder = false;
-      return;
-    }
-
-    // collect docs in reverse order so we prepend oldest-first
-    const docs = [];
-    snap.forEach(d => docs.push({ id: d.id, data: d.data() }));
-    docs.sort((a,b) => {
-      const ta = a.data.ts && a.data.ts.toDate ? a.data.ts.toDate() : new Date(0);
-      const tb = b.data.ts && b.data.ts.toDate ? b.data.ts.toDate() : new Date(0);
-      return ta - tb;
-    });
-
-    // prepend each message to UI
-    docs.forEach(doc => {
-      const data = doc.data;
-      const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null;
-      const msg = { id: doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null };
-      prependMessageToUI(msg);
-    });
-
-    // update oldestMessageTs to the first message's ts
-    const firstRow = chatMessagesEl.firstElementChild;
-    if(firstRow){
-      const tsAttr = firstRow.dataset.ts;
-      if(tsAttr) oldestMessageTs = new Date(tsAttr);
-    }
-
-    showToast('Loaded older messages','success');
-  }catch(err){
-    console.error('loadOlderMessages error', err);
-    showToast('Failed to load older messages','warn');
-  } finally {
-    loadingOlder = false;
-  }
-}
-
-/* Prepend message to UI (used by pagination) */
-function prependMessageToUI(msg){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  // avoid duplicates
-  if(messageElements.has(msg.id)) return;
-
-  const row = document.createElement('div');
-  row.className = 'chat-row ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  row.dataset.msgId = msg.id;
-  if(msg.ts) row.dataset.ts = msg.ts.toISOString();
-
-  const avatar = makeAvatarElement(msg.name, msg.photoURL, 48);
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  bubble.dataset.msgId = msg.id;
-
+  const block = document.createElement('div');
+  block.className = 'msg-block';
   const meta = document.createElement('div');
-  meta.className = 'meta';
-  const timeText = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  meta.innerHTML = `<strong class="msg-name">${escapeHtml(msg.name||'Guest')}</strong><span class="timestamp" data-ts="${msg.ts?msg.ts.toISOString():''}">${timeText}</span>`;
-  bubble.appendChild(meta);
+  meta.className = 'msg-meta';
+  const nameEl = document.createElement('strong');
+  nameEl.className = 'msg-name';
+  nameEl.textContent = msg.name || 'Guest';
+  const timeEl = document.createElement('span');
+  timeEl.className = 'timestamp';
+  timeEl.textContent = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  meta.appendChild(nameEl);
+  meta.appendChild(timeEl);
 
-  if(msg.text){
-    const body = document.createElement('div');
-    body.className='msg-text';
-    body.textContent = msg.text;
-    bubble.appendChild(body);
-  }
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  if(msg.uid && auth.currentUser && msg.uid === auth.currentUser.uid) bubble.classList.add('me');
+  if(msg.text) bubble.appendChild(document.createTextNode(msg.text));
   if(msg.imageURL){
     const img = document.createElement('img');
+    img.className = 'msg-image';
     img.src = msg.imageURL;
-    img.className='chat-image';
     bubble.appendChild(img);
   }
 
-  if(auth.currentUser && msg.uid === auth.currentUser.uid){
-    row.appendChild(bubble);
-    row.appendChild(avatar);
-  } else {
-    row.appendChild(avatar);
-    row.appendChild(bubble);
+  // moderation controls (visible to local admin)
+  if(isLocalAdmin()){
+    const modRow = document.createElement('div');
+    modRow.style.marginTop = '6px';
+    modRow.style.display = 'flex';
+    modRow.style.gap = '6px';
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn ghost small';
+    btnDel.textContent = 'Delete';
+    btnDel.addEventListener('click', async () => {
+      if(!confirm('Delete this message from Firestore? This is permanent.')) return;
+      try{
+        await messagesCollectionRef().doc(msg.id).delete();
+        showToast('Message deleted','success');
+      }catch(e){ console.error(e); showToast('Delete failed','warn'); }
+    });
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'btn ghost small';
+    btnEdit.textContent = 'Edit';
+    btnEdit.addEventListener('click', async () => {
+      const newText = prompt('Edit message text:', msg.text || '');
+      if(newText === null) return;
+      try{
+        await messagesCollectionRef().doc(msg.id).update({ text: newText });
+        showToast('Message updated','success');
+      }catch(e){ console.error(e); showToast('Update failed','warn'); }
+    });
+    modRow.appendChild(btnEdit);
+    modRow.appendChild(btnDel);
+    bubble.appendChild(modRow);
   }
 
-  // prepend
-  chatMessagesEl.insertBefore(row, chatMessagesEl.firstChild);
-  messageElements.set(msg.id, {row,bubble,avatar});
+  block.appendChild(meta);
+  block.appendChild(bubble);
+  group.appendChild(avatar);
+  group.appendChild(block);
+  return { group, avatar, block, bubble };
 }
 
-/* Replace startFirestoreListener to limit streamed messages and ensure load control exists */
-let unsubscribeMessages = null;
-function startFirestoreListener(){
-  if(unsubscribeMessages) return;
-  // use limitToLast so we only stream the most recent MAX_CHAT_MESSAGES
-  unsubscribeMessages = messagesCollectionRef().orderBy('ts','asc').limitToLast(MAX_CHAT_MESSAGES).onSnapshot(snap=>{
-    // if this is the first snapshot, ensure load control exists
-    ensureLoadOlderControl();
+/* append message and auto-scroll to bottom */
+function appendMessageToUI(msg){
+  const chatMessagesEl = document.getElementById('chatMessages');
+  if(!chatMessagesEl) return;
+  if(messageElements.has(msg.id)) return;
+  const node = makeMessageNode(msg);
+  node.group.dataset.msgId = msg.id;
+  chatMessagesEl.appendChild(node.group);
+  messageElements.set(msg.id, {node});
+  // always scroll to bottom on new messages
+  try{
+    const el = chatMessagesEl;
+    el.scrollTop = el.scrollHeight;
+  }catch(e){}
+  // trim if needed
+  while(chatMessagesEl.children.length > MAX_CHAT_MESSAGES){
+    chatMessagesEl.removeChild(chatMessagesEl.firstChild);
+  }
+}
 
+/* modify message */
+function modifyMessageInUI(msg){
+  const entry = messageElements.get(msg.id);
+  if(!entry) return appendMessageToUI(msg);
+  const { node } = entry;
+  const nameEl = node.block.querySelector('.msg-name');
+  if(nameEl) nameEl.textContent = msg.name || 'Guest';
+  const tsEl = node.block.querySelector('.timestamp');
+  if(tsEl) tsEl.textContent = msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  const bubble = node.bubble;
+  bubble.innerHTML = '';
+  if(msg.text) bubble.appendChild(document.createTextNode(msg.text));
+  if(msg.imageURL){
+    const img = document.createElement('img');
+    img.className = 'msg-image';
+    img.src = msg.imageURL;
+    bubble.appendChild(img);
+  }
+  // re-add moderation controls if admin
+  if(isLocalAdmin()){
+    const modRow = document.createElement('div');
+    modRow.style.marginTop = '6px';
+    modRow.style.display = 'flex';
+    modRow.style.gap = '6px';
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn ghost small';
+    btnDel.textContent = 'Delete';
+    btnDel.addEventListener('click', async () => {
+      if(!confirm('Delete this message from Firestore? This is permanent.')) return;
+      try{
+        await messagesCollectionRef().doc(msg.id).delete();
+        showToast('Message deleted','success');
+      }catch(e){ console.error(e); showToast('Delete failed','warn'); }
+    });
+    const btnEdit = document.createElement('button');
+    btnEdit.className = 'btn ghost small';
+    btnEdit.textContent = 'Edit';
+    btnEdit.addEventListener('click', async () => {
+      const newText = prompt('Edit message text:', msg.text || '');
+      if(newText === null) return;
+      try{
+        await messagesCollectionRef().doc(msg.id).update({ text: newText });
+        showToast('Message updated','success');
+      }catch(e){ console.error(e); showToast('Update failed','warn'); }
+    });
+    modRow.appendChild(btnEdit);
+    modRow.appendChild(btnDel);
+    bubble.appendChild(modRow);
+  }
+}
+
+/* remove message */
+function removeMessageFromUI(msg){
+  const entry = messageElements.get(msg.id);
+  if(entry && entry.node && entry.node.group){ entry.node.group.remove(); messageElements.delete(msg.id); }
+}
+
+/* start listener: order by ts asc but we will scroll to bottom after initial load */
+function startFirestoreListener(){
+  stopFirestoreListener();
+  unsubscribeMessages = messagesCollectionRef().orderBy('ts','asc').limitToLast(MAX_CHAT_MESSAGES).onSnapshot(snap=>{
+    // process changes
     snap.docChanges().forEach(change=>{
       const data = change.doc.data();
       const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null;
       const msg = { id: change.doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null };
-
       if(change.type === 'added'){
-        // avoid re-adding duplicates
-        if(!messageElements.has(msg.id)){
-          appendMessageToUI(msg);
-        }
+        appendMessageToUI(msg);
       }
       if(change.type === 'modified') modifyMessageInUI(msg);
       if(change.type === 'removed') removeMessageFromUI(msg);
     });
-
-    // after processing, trim DOM and set oldestMessageTs
-    trimChatMessages();
+    // ensure bottom
     const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl && chatMessagesEl.firstElementChild){
-      const tsAttr = chatMessagesEl.firstElementChild.dataset.ts;
-      if(tsAttr) oldestMessageTs = new Date(tsAttr);
-    }
+    if(chatMessagesEl) chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }, err => console.error('listener', err));
 }
 
-function stopFirestoreListener(){ if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; } }
-
-/* Append message to UI (updated to store ISO ts and trim) */
-function appendMessageToUI(msg){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  // avoid duplicates
-  if(messageElements.has(msg.id)) return;
-
-  const row = document.createElement('div');
-  row.className = 'chat-row ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  row.dataset.msgId = msg.id;
-  if(msg.ts) row.dataset.ts = msg.ts.toISOString();
-
-  const avatar = makeAvatarElement(msg.name, msg.photoURL, 48);
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + ((auth.currentUser && msg.uid === auth.currentUser.uid) ? 'me' : '');
-  bubble.dataset.msgId = msg.id;
-
-  const meta = document.createElement('div');
-  meta.className = 'meta';
-  meta.innerHTML = `<strong class="msg-name">${escapeHtml(msg.name||'Guest')}</strong><span class="timestamp" data-ts="${msg.ts?msg.ts.toISOString():''}">${msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''}</span>`;
-  bubble.appendChild(meta);
-
-  if(msg.text){
-    const body = document.createElement('div');
-    body.className='msg-text';
-    body.textContent = msg.text;
-    bubble.appendChild(body);
-  }
-  if(msg.imageURL){
-    const img = document.createElement('img');
-    img.src = msg.imageURL;
-    img.className='chat-image';
-    bubble.appendChild(img);
-  }
-
-  if(auth.currentUser && msg.uid === auth.currentUser.uid){
-    row.appendChild(bubble);
-    row.appendChild(avatar);
-  } else {
-    row.appendChild(avatar);
-    row.appendChild(bubble);
-  }
-
-  chatMessagesEl.appendChild(row);
-  messageElements.set(msg.id, {row,bubble,avatar});
-
-  // scroll to bottom
-  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-
-  // trim if too many messages
-  trimChatMessages();
-}
-
-/* Modify and remove helpers */
-function modifyMessageInUI(msg){
-  const entry = messageElements.get(msg.id);
-  if(!entry) return appendMessageToUI(msg);
-  const {bubble,avatar} = entry;
-  const nameEl = bubble.querySelector('.msg-name');
-  if(nameEl) nameEl.textContent = msg.name || 'Guest';
-  const tsEl = bubble.querySelector('.timestamp');
-  if(tsEl) tsEl.textContent = msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  const textEl = bubble.querySelector('.msg-text');
-  if(msg.text){
-    if(textEl) textEl.textContent = msg.text;
-    else { const d = document.createElement('div'); d.className='msg-text'; d.textContent = msg.text; bubble.appendChild(d); }
-  } else if(textEl) textEl.remove();
-  if(msg.photoURL){
-    avatar.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = msg.photoURL;
-    img.style.width='100%';
-    img.style.height='100%';
-    img.style.objectFit='cover';
-    img.style.borderRadius='10px';
-    avatar.appendChild(img);
-  } else {
-    avatar.textContent = (msg.name && msg.name.charAt(0)) ? msg.name.charAt(0).toUpperCase() : 'G';
-  }
-}
-
-function removeMessageFromUI(msg){
-  const entry = messageElements.get(msg.id);
-  if(entry && entry.row){ entry.row.remove(); messageElements.delete(msg.id); }
-}
-
-/* --------------------------- Utilities --------------------------- */
-function preloadImage(url, timeoutMs=6000){ return new Promise((resolve,reject)=>{ const img = new Image(); let done=false; const t = setTimeout(()=>{ if(done) return; done=true; img.src=''; reject(new Error('timeout')); }, timeoutMs); img.onload = ()=>{ if(done) return; done=true; clearTimeout(t); resolve(); }; img.onerror = ()=>{ if(done) return; done=true; clearTimeout(t); reject(new Error('error')); }; img.src = url; }); }
-
-/* --------------------------- makeAvatarElement (fixed missing helper) --------------------------- */
-function makeAvatarElement(name, photoURL, size = 48){
-  const el = document.createElement('div');
-  el.className = 'chat-avatar';
-  el.style.width = size + 'px';
-  el.style.height = size + 'px';
-  el.style.borderRadius = '10px';
-  el.style.overflow = 'hidden';
-  el.style.display = 'flex';
-  el.style.alignItems = 'center';
-  el.style.justifyContent = 'center';
-  el.style.fontWeight = '700';
-  el.style.background = '#0b1220';
-  if(photoURL){
-    const img = document.createElement('img');
-    img.src = photoURL;
-    img.alt = name || 'avatar';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    img.style.borderRadius = '8px';
-    el.appendChild(img);
-  } else {
-    el.textContent = (name && name.charAt(0)) ? name.charAt(0).toUpperCase() : 'G';
-  }
-  return el;
-}
-
-/* --------------------------- Auth UI helpers --------------------------- */
-const authBackdrop = document.getElementById('authBackdrop');
-const authEmail = document.getElementById('authEmail');
-const authPass = document.getElementById('authPass');
-const authStatus = document.getElementById('authStatus');
-
-function openAuthModal(message){
-  authStatus.textContent = message || '';
-  authBackdrop.style.display = 'flex';
-  authBackdrop.setAttribute('aria-hidden','false');
-}
-
-function closeAuthModal(){
-  authBackdrop.style.display = 'none';
-  authBackdrop.setAttribute('aria-hidden','true');
-  authStatus.textContent = '';
-  authEmail.value = '';
-  authPass.value = '';
-}
-
-/* --------------------------- Auth actions --------------------------- */
-document.getElementById('menuSignIn').addEventListener('click', () => { closeProfileMenu(); openAuthModal(); });
-document.getElementById('closeAuthBtn').addEventListener('click', closeAuthModal);
-
-document.getElementById('emailSignInBtn').addEventListener('click', async () => {
-  const email = (authEmail.value||'').trim();
-  const pass = authPass.value||'';
-  if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
-  authStatus.textContent = 'Signing in...';
-  try{
-    await auth.signInWithEmailAndPassword(email, pass);
-    authStatus.textContent = 'Signed in.';
-    closeAuthModal();
-    showToast('Signed in','success');
-  }catch(e){
-    console.error(e);
-    authStatus.textContent = e.message || 'Sign in failed';
-  }
-});
-
-document.getElementById('emailSignUpBtn').addEventListener('click', async () => {
-  const email = (authEmail.value||'').trim();
-  const pass = authPass.value||'';
-  if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
-  authStatus.textContent = 'Creating account...';
-  try{
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    try{ await cred.user.sendEmailVerification(); }catch(e){}
-    authStatus.textContent = 'Account created.';
-    closeAuthModal();
-    showToast('Account created','success');
-  }catch(e){
-    console.error(e);
-    authStatus.textContent = e.message || 'Sign up failed';
-  }
-});
-
-document.getElementById('googleSignInBtn').addEventListener('click', async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  authStatus.textContent = 'Signing in with Google...';
-  try{
-    await auth.signInWithPopup(provider);
-    authStatus.textContent = 'Signed in.';
-    closeAuthModal();
-    showToast('Signed in with Google','success');
-  }catch(e){
-    console.error(e);
-    authStatus.textContent = e.message || 'Google sign-in failed';
-  }
-});
-
-/* --------------------------- Profile menu & settings wiring --------------------------- */
-const profileButton = document.getElementById('profileButton');
-const profileMenu = document.getElementById('profileMenu');
-const menuSettings = document.getElementById('menuSettings');
-const menuSignOut = document.getElementById('menuSignOut');
-const menuSignIn = document.getElementById('menuSignIn');
-const menuAccount = document.getElementById('menuAccount');
-
-const settingsBackdrop = document.getElementById('settingsBackdrop');
-const settingsAccent = document.getElementById('settingsAccent');
-const settingsSave = document.getElementById('settingsSave');
-const settingsCancel = document.getElementById('settingsCancel');
-const resetAccentBtn = document.getElementById('resetAccentBtn');
-
-const accountBackdrop = document.getElementById('accountBackdrop');
-const accountDisplayName = document.getElementById('accountDisplayName');
-const accountPhotoUrl = document.getElementById('accountPhotoUrl');
-const accountSave = document.getElementById('accountSave');
-const accountCancel = document.getElementById('accountCancel');
-const accountStatus = document.getElementById('accountStatus');
-
-const disguiseTitle = document.getElementById('disguiseTitle');
-const disguiseFavicon = document.getElementById('disguiseFavicon');
-const disguiseApplyTitle = document.getElementById('disguiseApplyTitle');
-const disguiseApplyIcon = document.getElementById('disguiseApplyIcon');
-const disguisePreviewIcon = document.getElementById('disguisePreviewIcon');
-const disguisePreviewTitle = document.getElementById('disguisePreviewTitle');
-const disguiseResetBtn = document.getElementById('disguiseResetBtn');
-const disguiseClearBtn = document.getElementById('disguiseClearBtn');
-const disguisePresets = document.querySelectorAll('.disguise-preset');
-
-const panicKeyInput = document.getElementById('panicKeyInput');
-const panicAction = document.getElementById('panicAction');
-const panicRedirectUrl = document.getElementById('panicRedirectUrl');
-
-function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileButton.setAttribute('aria-expanded','false'); }
-function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileButton.setAttribute('aria-expanded','true'); }
-profileButton.addEventListener('click', (e) => {
-  const hidden = profileMenu.getAttribute('aria-hidden') === 'true';
-  if(hidden) openProfileMenu(); else closeProfileMenu();
-});
-document.addEventListener('click', (e) => {
-  if(!profileMenu.contains(e.target) && !profileButton.contains(e.target)) closeProfileMenu();
-});
-
-menuSignOut.addEventListener('click', async () => {
-  closeProfileMenu();
-  try { await auth.signOut(); showToast('Signed out','success'); } catch(e){ showToast('Sign out failed','warn'); }
-});
-menuSettings.addEventListener('click', () => {
-  closeProfileMenu();
-  const s = loadSettings();
-  settingsAccent.value = s.accent || defaultSettings.accent;
-  document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
-  const themeBtn = document.querySelector(`.theme-select[data-theme="${(s.theme||'dark')}"]`);
-  if(themeBtn) themeBtn.classList.add('active');
-
-  const d = loadTabDisguise();
-  disguiseTitle.value = d && d.title ? d.title : '';
-  disguiseFavicon.value = d && d.icon ? d.icon : '';
-  updateDisguisePreview();
-
-  // load panic settings
-  const panic = JSON.parse(localStorage.getItem(PANIC_KEY) || '{}');
-  panicKeyInput.value = panic.key || "'";
-  panicAction.value = panic.action || 'close';
-  panicRedirectUrl.value = panic.redirect || 'https://www.google.com';
-
-  // admin note update
-  const adminNote = document.getElementById('settingsAdminNote');
-  if(adminNote){
-    adminNote.textContent = localStorage.getItem(ADMIN_LOCAL_KEY) === '1' ? 'Admin access active (stored locally).' : 'Enter the admin code to open the admin panel. Access is stored locally until cleared.';
-  }
-
-  settingsBackdrop.setAttribute('aria-hidden','false');
-  settingsBackdrop.style.display = 'flex';
-});
-menuAccount.addEventListener('click', () => {
-  closeProfileMenu();
-  if(!auth.currentUser){
-    openAuthModal('Sign in to edit account settings.');
-    return;
-  }
-  const user = auth.currentUser;
-  accountDisplayName.value = user.displayName || '';
-  accountPhotoUrl.value = user.photoURL || '';
-  accountStatus.textContent = '';
-  accountBackdrop.setAttribute('aria-hidden','false');
-  accountBackdrop.style.display = 'flex';
-});
-
-settingsCancel.addEventListener('click', () => {
-  settingsBackdrop.setAttribute('aria-hidden','true');
-  settingsBackdrop.style.display = 'none';
-});
-settingsSave.addEventListener('click', () => {
-  const s = loadSettings();
-  s.accent = settingsAccent.value || s.accent;
-  // theme is read from document attribute (set by theme buttons)
-  s.theme = document.documentElement.getAttribute('data-theme') || 'dark';
-  saveSettings(s);
-  applyThemeFromSettings();
-
-  // save panic settings
-  const key = (panicKeyInput.value || "'").slice(0,1);
-  const action = panicAction.value || 'close';
-  const redirect = (panicRedirectUrl.value || '').trim() || 'https://www.google.com';
-  localStorage.setItem(PANIC_KEY, JSON.stringify({ key, action, redirect }));
-
-  settingsBackdrop.setAttribute('aria-hidden','true');
-  settingsBackdrop.style.display = 'none';
-  showToast('Settings saved','success');
-});
-resetAccentBtn.addEventListener('click', () => {
-  const s = loadSettings();
-  s.accent = defaultSettings.accent;
-  saveSettings(s);
-  settingsAccent.value = defaultSettings.accent;
-  applyThemeFromSettings();
-  showToast('Accent reset to default','success');
-});
-settingsBackdrop.addEventListener('click', (e) => { if(e.target === settingsBackdrop){ settingsBackdrop.setAttribute('aria-hidden','true'); settingsBackdrop.style.display = 'none'; } });
-
-/* theme buttons */
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('.theme-select');
-  if(!t) return;
-  document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
-  t.classList.add('active');
-  const theme = t.getAttribute('data-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', theme);
-});
-
-/* --------------------------- Disguise UI actions --------------------------- */
-function updateDisguisePreview(){
-  const d = loadTabDisguise();
-  const title = d && d.title ? d.title : (disguiseTitle.value || 'Preview title');
-  const icon = d && d.icon ? d.icon : (disguiseFavicon.value || '');
-  disguisePreviewTitle.textContent = title;
-  if(icon){
-    disguisePreviewIcon.innerHTML = `<img src="${icon}" alt="icon">`;
-  } else {
-    disguisePreviewIcon.innerHTML = '';
-  }
-}
-disguiseApplyTitle.addEventListener('click', () => {
-  const t = (disguiseTitle.value||'').trim();
-  setTabDisguise(t || '', undefined);
-  updateDisguisePreview();
-  showToast('Tab title applied','success');
-});
-disguiseApplyIcon.addEventListener('click', async () => {
-  const url = (disguiseFavicon.value||'').trim();
-  if(!url){
-    setTabDisguise(undefined, '');
-    updateDisguisePreview();
-    showToast('Favicon removed','success');
-    return;
-  }
-  try{
-    await preloadImage(url, 5000);
-    setTabDisguise(undefined, url);
-    updateDisguisePreview();
-    showToast('Favicon applied','success');
-  }catch(e){
-    showToast('Favicon failed to load','warn');
-  }
-});
-disguiseResetBtn.addEventListener('click', () => {
-  clearTabDisguise();
-  disguiseTitle.value = '';
-  disguiseFavicon.value = '';
-  updateDisguisePreview();
-  showToast('Tab disguise reset','success');
-});
-disguiseClearBtn.addEventListener('click', () => {
-  saveTabDisguise(null);
-  updateDisguisePreview();
-  showToast('Tab disguise cleared','success');
-});
-disguisePresets.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const title = btn.dataset.title || '';
-    const icon = btn.dataset.icon || '';
-    disguiseTitle.value = title;
-    disguiseFavicon.value = icon;
-    setTabDisguise(title, icon);
-    updateDisguisePreview();
-    showToast('Preset applied','success');
-  });
-});
-
-/* --------------------------- Account modal actions --------------------------- */
-document.getElementById('accountCancel').addEventListener('click', () => {
-  accountBackdrop.setAttribute('aria-hidden','true');
-  accountBackdrop.style.display = 'none';
-});
-document.getElementById('accountSave').addEventListener('click', async () => {
-  accountStatus.textContent = '';
-  if(!auth.currentUser){ accountStatus.textContent = 'You must be signed in to update account.'; return; }
-  const displayName = (accountDisplayName.value||'').trim();
-  const photoUrl = (accountPhotoUrl.value||'').trim();
-  if(photoUrl){
-    try{
-      await preloadImage(photoUrl, 5000);
-    }catch(e){
-      accountStatus.textContent = 'Profile image failed to load. Check the URL.';
-      return;
-    }
-  }
-  accountStatus.textContent = 'Saving...';
-  try{
-    await auth.currentUser.updateProfile({ displayName: displayName || null, photoURL: photoUrl || null });
-    updateMiniProfile();
-    accountStatus.textContent = 'Saved.';
-    setTimeout(()=> {
-      accountBackdrop.setAttribute('aria-hidden','true');
-      accountBackdrop.style.display = 'none';
-      accountStatus.textContent = '';
-    }, 700);
-    showToast('Account updated','success');
-  }catch(e){
-    console.error(e);
-    accountStatus.textContent = e.message || 'Failed to update account';
-  }
-});
-accountBackdrop.addEventListener('click', (e) => { if(e.target === accountBackdrop){ accountBackdrop.setAttribute('aria-hidden','true'); accountBackdrop.style.display = 'none'; } });
-
-/* --------------------------- Mini profile update --------------------------- */
-function updateMiniProfile(){
-  const user = auth.currentUser;
-  const avatarEl = document.getElementById('miniAvatar');
-  const nameEl = document.getElementById('miniName');
-  const emailEl = document.getElementById('miniEmail');
-  if(user){
-    nameEl.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
-    emailEl.textContent = user.email || '';
-    if(user.photoURL){
-      avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
-    } else {
-      avatarEl.textContent = (user.displayName||user.email||'U').charAt(0).toUpperCase();
-    }
-    menuSignOut.style.display = 'block';
-    menuSignIn.style.display = 'none';
-  } else {
-    nameEl.textContent = 'Guest';
-    emailEl.textContent = 'Not signed in';
-    avatarEl.textContent = 'G';
-    menuSignOut.style.display = 'none';
-    menuSignIn.style.display = 'block';
-  }
-}
-
-/* --------------------------- Search (works per category) --------------------------- */
-const searchInput = document.getElementById('global-search');
-const searchClearBtn = document.getElementById('searchClear');
-
-function normalize(s){ return String(s||'').toLowerCase().trim(); }
-
-function filterGridByQuery(query){
-  const grid = document.getElementById('grid');
-  if(!grid) return;
-  const q = normalize(query);
-  if(!q){
-    Array.from(grid.children).forEach(child => child.style.display = '');
-    return;
-  }
-  Array.from(grid.children).forEach(tile => {
-    const title = normalize(tile.querySelector('.tile-title')?.textContent || tile.querySelector('.tile-title')?.innerText);
-    const file = normalize(tile.querySelector('.meta-file')?.textContent || '');
-    const matches = title.includes(q) || file.includes(q);
-    tile.style.display = matches ? '' : 'none';
-  });
-}
-
-function filterChatByQuery(query){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  const q = normalize(query);
-  const rows = Array.from(chatMessagesEl.querySelectorAll('.chat-row'));
-  if(!q){
-    rows.forEach(r => r.style.display = '');
-    return;
-  }
-  rows.forEach(row => {
-    const name = normalize(row.querySelector('.msg-name')?.textContent || '');
-    const text = normalize(row.querySelector('.msg-text')?.textContent || '');
-    const matches = name.includes(q) || text.includes(q);
-    row.style.display = matches ? '' : 'none';
-  });
-}
-
-/* Debounce helper */
-function debounce(fn, wait=250){
-  let t = null;
-  return function(...args){
-    clearTimeout(t);
-    t = setTimeout(()=> fn.apply(this, args), wait);
-  };
-}
-
-/* Called whenever search input changes or tab changes */
-const applySearchToActive = debounce(() => {
-  const q = searchInput.value || '';
-  const active = document.querySelector('.tab.active')?.dataset.target || 'games';
-  if(active === 'chat'){
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(!chatMessagesEl) renderChat();
-    setTimeout(()=> filterChatByQuery(q), 50);
-  } else {
-    const grid = document.getElementById('grid');
-    if(!grid) renderActive(active);
-    setTimeout(()=> filterGridByQuery(q), 50);
-  }
-}, 200);
-
-/* Wire search input */
-if(searchInput){
-  searchInput.addEventListener('input', () => {
-    applySearchToActive();
-  });
-}
-if(searchClearBtn){
-  searchClearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    applySearchToActive();
-    searchInput.focus();
-  });
-}
-
-/* --------------------------- GIF support (Tenor demo) --------------------------- */
-const TENOR_API_KEY = 'LIVDSRZULELA'; // demo key; replace for production
-
-async function searchTenorGifs(query, limit = 12){
+/* ---------- GIF (Tenor) ---------- */
+const TENOR_API_KEY = 'LIVDSRZULELA';
+async function searchTenorGifs(query, limit = 16){
   if(!query || !query.trim()) return [];
   const q = encodeURIComponent(query.trim());
   const url = `https://g.tenor.com/v1/search?q=${q}&key=${TENOR_API_KEY}&limit=${limit}&media_filter=minimal`;
@@ -1333,226 +850,848 @@ async function searchTenorGifs(query, limit = 12){
   }
 }
 
-function renderGifResults(items){
-  const container = document.getElementById('gifResults');
-  if(!container) return;
-  container.innerHTML = '';
-  if(!items || items.length === 0){
-    container.innerHTML = '<div class="small-note" style="padding:6px">No GIFs found.</div>';
-    return;
-  }
-  items.forEach(it => {
-    const div = document.createElement('div');
-    div.className = 'gif-item';
-    const img = document.createElement('img');
-    img.src = it.thumb || it.gif;
-    img.alt = it.title || 'gif';
-    img.title = 'Click to send GIF';
-    img.addEventListener('click', async () => {
-      try{
-        await preloadImage(it.gif, 8000);
-        await sendMessageFirestore('', it.gif);
-        showToast('GIF sent','success');
-      }catch(e){
-        showToast('Failed to send GIF','warn');
-      }
+/* render gif panel */
+function renderGifPanel(items){
+  const panel = document.getElementById('gifPanel');
+  panel.innerHTML = '';
+  const searchRow = document.createElement('div');
+  searchRow.style.display = 'flex';
+  searchRow.style.gap = '8px';
+  const input = document.createElement('input');
+  input.placeholder = 'Search GIFs';
+  input.style.flex = '1';
+  input.style.padding = '8px';
+  input.style.borderRadius = '8px';
+  input.style.border = '1px solid var(--border)';
+  const btn = document.createElement('button');
+  btn.className = 'btn small';
+  btn.textContent = 'Search';
+  searchRow.appendChild(input);
+  searchRow.appendChild(btn);
+  panel.appendChild(searchRow);
+
+  const grid = document.createElement('div');
+  grid.className = 'gif-grid';
+  grid.style.marginTop = '10px';
+  panel.appendChild(grid);
+
+  btn.addEventListener('click', async () => {
+    grid.innerHTML = '<div class="small-note">Searching...</div>';
+    const items = await searchTenorGifs(input.value, 24);
+    grid.innerHTML = '';
+    items.forEach(it => {
+      const img = document.createElement('img');
+      img.src = it.thumb || it.gif;
+      img.title = 'Click to send GIF';
+      img.addEventListener('click', async () => {
+        try{
+          await sendMessageFirestore('', it.gif);
+          toggleGifPanel(false);
+          showToast('GIF sent','success');
+        }catch(e){ showToast('Failed to send GIF','warn'); }
+      });
+      grid.appendChild(img);
     });
-    div.appendChild(img);
-    container.appendChild(div);
+  });
+
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') btn.click(); });
+}
+
+/* ---------- Emoji panel (searchable) ---------- */
+/* (emoji list omitted here for brevity in analysis; same as previous) */
+const EMOJI_LIST = [ "😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","😗","😙","😚","🙂","🤗","🤩","🤔","🤨","😐","😑","😶","🙄","😏","😣","😥","😮","🤐","😯","😪","😫","😴","😌","😛","😜","😝","🤤","😒","😓","😔","😕","🙃","🤑","😲","☹️","🙁","😖","😞","😟","😤","😢","😭","😦","😧","😨","😩","🤯","😬","😰","😱","🥵","🥶","😳","🤪","😵","😡","😠","🤬","😷","🤒","🤕","🤢","🤮","🤧","😇","🤠","🤡","🤥","🤫","🤭","🧐","🤓",
+"👋","🤚","🖐️","✋","🖖","👌","🤌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","✋","👏","🙌","👐","🤝","🙏",
+"💪","🦾","🦵","🦿","🦶","👂","👃","🧠","🫀","🫁","👀","👁️","👅","👄","🧑","👨","👩","👶","🧒","👦","👧","🧑‍🦱","🧑‍🦰","🧑‍🦳","🧑‍🦲","👱‍♂️","👱‍♀️","🧔","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🤦","🤷","🧏","🙇",
+"🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐽","🐸","🐵","🐔","🐧","🐦","🐤","🐣","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🐛","🦋","🐌","🐞","🐜","🪲","🪳","🕷️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐠","🐟","🐬","🐳","🐋","🦈","🐊","🐅","🐆","🦓","🦍","🦧","🦣","🦛","🦏","🐘",
+"🌱","🌲","🌳","🌴","🌵","🌾","🌿","☘️","🍀","🍁","🍂","🍃","🌸","🌼","🌻","🌺","🌹","🥀","🌷","🌱","🌞","🌝","🌛","🌜","🌚","🌕","🌖","🌗","🌘","🌑","🌒","🌓","🌔","🌈","☀️","⛅","☁️","⚡","⛈️","🌩️","🌨️","❄️","☃️","🔥","💧","🌊",
+"🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🌽","🥕","🧄","🧅","🥔","🍠","🥐","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🥪","🥙","🌮","🌯","🥗","🍝","🍜","🍲","🍛","🍣","🍱","🍤","🍙","🍚","🍘","🍥","🥮","🍰","🎂","🍮","🍦","🍨","🍧","🍩","🍪","🍫","🍬","🍭","☕","🍵","🧃","🥤","🍺","🍻","🍷","🥂","🥃","🍸","🍹","🧉","🍾",
+"⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱","🏓","🏸","🥅","🏒","🏑","🏏","⛳","🏹","🎣","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🎿","🏂","🏋️","🏋️‍♀️","🏋️‍♂️","🚴","🚴‍♀️","🚴‍♂️","🚵","🚵‍♀️","🚵‍♂️","🏇","🏆","🥇","🥈","🥉",
+"💡","🔦","🏮","📱","💻","🖥️","🖨️","⌨️","🖱️","🕹️","🧭","📷","📹","🎥","📺","📻","🎙️","🎚️","🎛️","💿","📀","🧾","📁","📂","🗂️","🗃️","🗄️","🗑️","🔒","🔓","🔑","🧰","🧲","🧪","🔬","🔭","⚖️","🧮","🔋","🔌","💳","💸","💰","🧾","📦","📫","📮","✉️","📧","📨","📩","📤","📥","📬","📭",
+"❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⚛️","🔱","🔰","♻️","⚠️","🚫","✅","❌","⭕","🔺","🔻","🔸","🔹","🔶","🔷","🔔","🔕","🎵","🎶","🔊","🔉","🔈","🔇","📢","📣","📯","🔔","🛎️"
+];
+
+function renderEmojiPanel(searchTerm = ''){
+  const panel = document.getElementById('emojiPanel');
+  panel.innerHTML = '';
+  const row = document.createElement('div');
+  row.style.display = 'flex';
+  row.style.gap = '8px';
+  const input = document.createElement('input');
+  input.placeholder = 'Search emojis (char or name)';
+  input.style.flex = '1';
+  input.style.padding = '8px';
+  input.style.borderRadius = '8px';
+  input.style.border = '1px solid var(--border)';
+  input.value = searchTerm || '';
+  const clear = document.createElement('button');
+  clear.className = 'btn small';
+  clear.textContent = 'Clear';
+  row.appendChild(input);
+  row.appendChild(clear);
+  panel.appendChild(row);
+
+  const grid = document.createElement('div');
+  grid.className = 'emoji-grid';
+  grid.style.marginTop = '10px';
+  panel.appendChild(grid);
+
+  function populate(term){
+    grid.innerHTML = '';
+    const q = (term||'').trim().toLowerCase();
+    const list = q ? EMOJI_LIST.filter(e => e.includes(q) || emojiName(e).includes(q)) : EMOJI_LIST;
+    list.slice(0,400).forEach(e => {
+      const btn = document.createElement('button');
+      btn.className = 'emoji-btn';
+      btn.textContent = e;
+      btn.addEventListener('click', () => {
+        const inputEl = document.getElementById('fixedChatInput');
+        if(!inputEl) return;
+        const start = inputEl.selectionStart || inputEl.value.length;
+        const end = inputEl.selectionEnd || inputEl.value.length;
+        inputEl.value = inputEl.value.slice(0,start) + e + inputEl.value.slice(end);
+        inputEl.focus();
+      });
+      grid.appendChild(btn);
+    });
+    if(list.length === 0) grid.innerHTML = '<div class="small-note">No emojis found.</div>';
+  }
+
+  input.addEventListener('input', () => populate(input.value));
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') populate(input.value); });
+  clear.addEventListener('click', () => { input.value=''; populate(''); });
+
+  populate(searchTerm);
+}
+
+/* helper: small mapping for searchable names */
+function emojiName(ch){
+  const map = {
+    "😀":"grinning","😁":"grin","😂":"joy","🤣":"rofl","😊":"smile","😍":"heart","😢":"cry","😭":"sob","😡":"angry",
+    "👍":"thumbs up","👎":"thumbs down","❤️":"heart","🔥":"fire","✨":"sparkles","🎉":"party","🎮":"game","📚":"books",
+    "😴":"sleep","🤔":"think","🤖":"robot","🤩":"starstruck","😎":"cool","🤗":"hug","🤝":"handshake","🙏":"pray"
+  };
+  return map[ch] || ch;
+}
+
+/* toggle gif panel (exclusive) */
+function toggleGifPanel(force){
+  const gif = document.getElementById('gifPanel');
+  const emoji = document.getElementById('emojiPanel');
+  if(force === false){ gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true'); return; }
+  if(!gif.classList.contains('hidden')){
+    gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true');
+  } else {
+    // close emoji first
+    emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true');
+    gif.classList.remove('hidden'); gif.setAttribute('aria-hidden','false');
+    renderGifPanel([]);
+  }
+}
+
+/* toggle emoji panel (exclusive) */
+function toggleEmojiPanel(force){
+  const gif = document.getElementById('gifPanel');
+  const emoji = document.getElementById('emojiPanel');
+  if(force === false){ emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true'); return; }
+  if(!emoji.classList.contains('hidden')){
+    emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true');
+  } else {
+    gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true');
+    emoji.classList.remove('hidden'); emoji.setAttribute('aria-hidden','false');
+    renderEmojiPanel('');
+  }
+}
+
+/* ---------- Image preload ---------- */
+function preloadImage(url, timeoutMs=6000){ return new Promise((resolve,reject)=>{ const img = new Image(); let done=false; const t = setTimeout(()=>{ if(done) return; done=true; img.src=''; reject(new Error('timeout')); }, timeoutMs); img.onload = ()=>{ if(done) return; done=true; clearTimeout(t); resolve(); }; img.onerror = ()=>{ if(done) return; done=true; clearTimeout(t); reject(new Error('error')); }; img.src = url; }); }
+
+/* ---------- Auth UI ---------- */
+const authBackdrop = document.getElementById('authBackdrop');
+const authEmail = document.getElementById('authEmail');
+const authPass = document.getElementById('authPass');
+const authStatus = document.getElementById('authStatus');
+
+function openAuthModal(message){
+  authStatus.textContent = message || '';
+  authBackdrop.style.display = 'flex';
+  authBackdrop.setAttribute('aria-hidden','false');
+}
+function closeAuthModal(){
+  authBackdrop.style.display = 'none';
+  authBackdrop.setAttribute('aria-hidden','true');
+  authStatus.textContent = '';
+  authEmail.value = '';
+  authPass.value = '';
+}
+
+/* ---------- Profile menu wiring ---------- */
+(function(){
+  const profileButton = document.getElementById('profileButton');
+  const profileMenu = document.getElementById('profileMenu');
+  const menuAccount = document.getElementById('menuAccount');
+  const menuSettings = document.getElementById('menuSettings');
+  const menuAdminOpen = document.getElementById('menuAdminOpen');
+  const menuSignIn = document.getElementById('menuSignIn');
+  const menuSignOut = document.getElementById('menuSignOut');
+  const accountBackdrop = document.getElementById('accountBackdrop');
+  const settingsBackdrop = document.getElementById('settingsBackdrop');
+
+  function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileMenu.style.display = 'flex'; profileButton.setAttribute('aria-expanded','true'); }
+  function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileMenu.style.display = 'none'; profileButton.setAttribute('aria-expanded','false'); }
+
+  profileButton.addEventListener('click', (e) => { e.stopPropagation(); const hidden = profileMenu.getAttribute('aria-hidden') === 'true' || profileMenu.style.display === 'none'; if(hidden) openProfileMenu(); else closeProfileMenu(); });
+  document.addEventListener('click', (e) => { if(!profileMenu.contains(e.target) && !profileButton.contains(e.target)) closeProfileMenu(); });
+
+  if(menuAccount){
+    menuAccount.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeProfileMenu();
+      if(typeof auth !== 'undefined' && !auth.currentUser){ if(authBackdrop){ authBackdrop.style.display = 'flex'; authBackdrop.setAttribute('aria-hidden','false'); } return; }
+      if(accountBackdrop){ accountBackdrop.style.display = 'flex'; accountBackdrop.setAttribute('aria-hidden','false'); }
+    });
+  }
+
+  if(menuSettings){
+    menuSettings.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeProfileMenu();
+      if(settingsBackdrop){ settingsBackdrop.style.display = 'flex'; settingsBackdrop.setAttribute('aria-hidden','false'); }
+      try{ if(typeof loadSettings === 'function'){ const s = loadSettings(); const accent = document.getElementById('settingsAccent'); if(accent) accent.value = s.accent || '#5865f2'; } }catch(err){}
+    });
+  }
+
+  if(menuAdminOpen){
+    menuAdminOpen.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeProfileMenu();
+      // open admin auth modal
+      document.getElementById('adminAuthBackdrop').style.display = 'flex';
+      document.getElementById('adminAuthBackdrop').setAttribute('aria-hidden','false');
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminAuthStatus').textContent = '';
+    });
+  }
+
+  if(menuSignIn){
+    menuSignIn.addEventListener('click', (e) => { e.stopPropagation(); closeProfileMenu(); if(authBackdrop){ authBackdrop.style.display = 'flex'; authBackdrop.setAttribute('aria-hidden','false'); } });
+  }
+
+  if(menuSignOut){
+    menuSignOut.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      closeProfileMenu();
+      try{ if(typeof auth !== 'undefined' && auth.signOut){ await auth.signOut(); showToast('Signed out','success'); } }catch(err){ console.error('Sign out failed', err); showToast('Sign out failed','warn'); }
+    });
+  }
+
+  if(typeof auth !== 'undefined' && auth.onAuthStateChanged){
+    auth.onAuthStateChanged(user => {
+      try{
+        if(menuSignIn) menuSignIn.style.display = user ? 'none' : 'block';
+        if(menuSignOut) menuSignOut.style.display = user ? 'block' : 'none';
+        if(typeof updateMiniProfile === 'function') updateMiniProfile();
+      }catch(e){ console.error(e); }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ closeProfileMenu(); } });
+  closeProfileMenu();
+})();
+
+/* ---------- Settings wiring (presets, apply, save behavior) ---------- */
+const settingsAccent = document.getElementById('settingsAccent');
+const settingsSave = document.getElementById('settingsSave');
+const settingsCancel = document.getElementById('settingsCancel');
+const resetAccentBtn = document.getElementById('resetAccentBtn');
+const disguiseTitle = document.getElementById('disguiseTitle');
+const disguiseFavicon = document.getElementById('disguiseFavicon');
+const disguiseApplyTitle = document.getElementById('disguiseApplyTitle');
+const disguiseApplyIcon = document.getElementById('disguiseApplyIcon');
+const disguisePreviewIcon = document.getElementById('disguisePreviewIcon');
+const disguisePreviewTitle = document.getElementById('disguisePreviewTitle');
+const disguiseResetBtn = document.getElementById('disguiseResetBtn');
+const disguiseClearBtn = document.getElementById('disguiseClearBtn');
+
+function updateDisguisePreview(){
+  const d = loadTabDisguise();
+  const title = d && d.title ? d.title : (disguiseTitle.value || 'Preview title');
+  const icon = d && d.icon ? d.icon : (disguiseFavicon.value || '');
+  disguisePreviewTitle.textContent = title;
+  if(icon) disguisePreviewIcon.innerHTML = `<img src="${icon}" alt="icon" style="width:100%;height:100%;object-fit:cover">`; else disguisePreviewIcon.innerHTML = '';
+}
+disguiseApplyTitle.addEventListener('click', () => { const t = (disguiseTitle.value||'').trim(); setTabDisguise(t || '', undefined); updateDisguisePreview(); showToast('Tab title applied','success'); });
+disguiseApplyIcon.addEventListener('click', async () => {
+  const url = (disguiseFavicon.value||'').trim();
+  if(!url){ setTabDisguise(undefined, ''); updateDisguisePreview(); showToast('Favicon removed','success'); return; }
+  try{ await preloadImage(url, 5000); setTabDisguise(undefined, url); updateDisguisePreview(); showToast('Favicon applied','success'); }catch(e){ showToast('Favicon failed to load','warn'); }
+});
+disguiseResetBtn.addEventListener('click', () => { saveTabDisguise(null); disguiseTitle.value = ''; disguiseFavicon.value = ''; updateDisguisePreview(); applyTabDisguise(); showToast('Tab disguise reset','success'); });
+disguiseClearBtn.addEventListener('click', () => { saveTabDisguise(null); updateDisguisePreview(); applyTabDisguise(); showToast('Tab disguise cleared','success'); });
+
+resetAccentBtn.addEventListener('click', () => { const s = loadSettings(); s.accent = defaultSettings.accent; saveSettings(s); settingsAccent.value = defaultSettings.accent; applyThemeFromSettings(); showToast('Accent reset to default','success'); });
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('.theme-select');
+  if(!t) return;
+  document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  const theme = t.getAttribute('data-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+});
+
+/* preset buttons wiring */
+document.addEventListener('click', (e) => {
+  const p = e.target.closest('.preset-btn');
+  if(!p) return;
+  const title = p.dataset.title || '';
+  const icon = p.dataset.icon || '';
+  disguiseTitle.value = title;
+  disguiseFavicon.value = icon;
+  updateDisguisePreview();
+  showToast('Preset applied to preview','success');
+});
+
+/* settings save: apply, persist, close, notify */
+settingsCancel.addEventListener('click', () => {
+  document.getElementById('settingsBackdrop').style.display = 'none';
+  document.getElementById('settingsBackdrop').setAttribute('aria-hidden','true');
+});
+settingsSave.addEventListener('click', () => {
+  const s = loadSettings();
+  s.accent = settingsAccent.value || s.accent;
+  s.theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  saveSettings(s);
+  applyThemeFromSettings();
+
+  const key = (document.getElementById('panicKeyInput').value || "'").slice(0,1);
+  const action = document.getElementById('panicAction').value || 'close';
+  const redirect = (document.getElementById('panicRedirectUrl').value || '').trim() || 'https://www.google.com';
+  localStorage.setItem(PANIC_KEY, JSON.stringify({ key, action, redirect }));
+
+  // apply tab disguise inputs to storage
+  const t = (disguiseTitle.value||'').trim();
+  const i = (disguiseFavicon.value||'').trim();
+  if(!t && !i) saveTabDisguise(null);
+  else saveTabDisguise({ title: t, icon: i });
+
+  applyTabDisguise();
+
+  // close settings and notify
+  document.getElementById('settingsBackdrop').style.display = 'none';
+  document.getElementById('settingsBackdrop').setAttribute('aria-hidden','true');
+  showToast('Changes applied','success');
+});
+
+/* ---------- Admin auth & panel wiring ---------- */
+/*
+  The admin password is "anotheryear123".
+  It's stored obfuscated in the client code as char codes to avoid plain text in the DOM.
+  Unlocking sets a local admin flag in localStorage (homewrk.admin.v1).
+*/
+(function wireAdmin(){
+  const adminAuthBackdrop = document.getElementById('adminAuthBackdrop');
+  const adminAuthInput = document.getElementById('adminPasswordInput');
+  const adminAuthUnlock = document.getElementById('adminAuthUnlock');
+  const adminAuthCancel = document.getElementById('adminAuthCancel');
+  const adminAuthStatus = document.getElementById('adminAuthStatus');
+
+  const adminPanelBackdrop = document.getElementById('adminPanelBackdrop');
+  const adminCloseBtn = document.getElementById('adminCloseBtn');
+  const adminClearLocalMessages = document.getElementById('adminClearLocalMessages');
+  const adminClearLocalData = document.getElementById('adminClearLocalData');
+  const adminActionStatus = document.getElementById('adminActionStatus');
+
+  const modSearchBtn = document.getElementById('modSearchBtn');
+  const modUserSearch = document.getElementById('modUserSearch');
+  const modUserList = document.getElementById('modUserList');
+  const modRefreshUsers = document.getElementById('modRefreshUsers');
+  const modSelectedInfo = document.getElementById('modSelectedInfo');
+  const modSelected = document.getElementById('modSelected');
+  const modNewName = document.getElementById('modNewName');
+  const modNewPhoto = document.getElementById('modNewPhoto');
+  const modApplyName = document.getElementById('modApplyName');
+  const modApplyPhoto = document.getElementById('modApplyPhoto');
+  const modDeleteMessages = document.getElementById('modDeleteMessages');
+  const modBulkRename = document.getElementById('modBulkRename');
+  const modBanUser = document.getElementById('modBanUser');
+  const modLog = document.getElementById('modLog');
+
+  const bannedBackdrop = document.getElementById('bannedBackdrop');
+  const bannedList = document.getElementById('bannedList');
+  const bannedClose = document.getElementById('bannedClose');
+  const adminViewBanned = document.getElementById('adminViewBanned');
+
+  // obfuscated password char codes for "anotheryear123"
+  const _adminCharCodes = [97,110,111,116,104,101,114,121,101,97,114,49,50,51];
+  function getExpectedAdminCode(){ return String.fromCharCode(..._adminCharCodes); }
+
+  // moderation helpers
+  let lastUserResults = []; // { uid, name, email, sampleMsgId }
+  let selectedUser = null; // { uid, name, email }
+
+  async function searchUsersFromMessages(query){
+    // query messages for name/email matches (client-side)
+    const q = (query||'').toLowerCase().trim();
+    const results = new Map();
+    try{
+      const snap = await messagesCollectionRef().orderBy('ts','desc').limit(500).get();
+      snap.forEach(doc => {
+        const d = doc.data();
+        const uid = d.uid || ('anon-'+(d.name||'').slice(0,6));
+        const name = d.name || '';
+        const email = d.email || '';
+        const key = uid;
+        if(!results.has(key)){
+          if(!q || name.toLowerCase().includes(q) || (email && email.toLowerCase().includes(q))){
+            results.set(key, { uid, name, email, sampleMsgId: doc.id });
+          }
+        }
+      });
+    }catch(e){
+      console.error('searchUsersFromMessages', e);
+    }
+    return Array.from(results.values()).slice(0,200);
+  }
+
+  function renderUserResults(list){
+    lastUserResults = list;
+    modUserList.innerHTML = '';
+    if(list.length === 0){ modUserList.innerHTML = '<div class="small-note">No users found.</div>'; return; }
+    list.forEach(u => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.alignItems = 'center';
+      row.style.padding = '6px';
+      row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+      const left = document.createElement('div');
+      left.innerHTML = `<div style="font-weight:700">${escapeHtml(u.name||'(no name)')}</div><div class="small-note">${escapeHtml(u.email||u.uid)}</div>`;
+      const right = document.createElement('div');
+      const selBtn = document.createElement('button');
+      selBtn.className = 'btn small';
+      selBtn.textContent = 'Select';
+      selBtn.addEventListener('click', () => {
+        selectedUser = { uid: u.uid, name: u.name, email: u.email, sampleMsgId: u.sampleMsgId };
+        modSelectedInfo.innerHTML = `<div style="font-weight:800">${escapeHtml(u.name||u.uid)}</div><div class="small-note">${escapeHtml(u.email||u.uid)}</div>`;
+        modNewName.value = u.name || '';
+        modNewPhoto.value = '';
+      });
+      right.appendChild(selBtn);
+      row.appendChild(left);
+      row.appendChild(right);
+      modUserList.appendChild(row);
+    });
+  }
+
+  async function applyNameToMessages(uid, newName){
+    if(!uid) return;
+    if(!confirm(`Apply new display name "${newName}" to all messages from this user?`)) return;
+    adminActionStatus.textContent = 'Applying name to messages...';
+    try{
+      const snap = await messagesCollectionRef().where('uid','==',uid).get();
+      const batch = db.batch();
+      snap.forEach(doc => {
+        batch.update(doc.ref, { name: newName });
+      });
+      await batch.commit();
+      adminActionStatus.textContent = 'Name applied to messages.';
+      logModAction(`Renamed uid ${uid} -> "${newName}" (${snap.size} messages)`);
+      showToast('Name applied to messages','success');
+    }catch(e){
+      console.error(e);
+      adminActionStatus.textContent = 'Failed to apply name.';
+      showToast('Failed to apply name','warn');
+    }
+  }
+
+  async function applyPhotoToMessages(uid, photoUrl){
+    if(!uid) return;
+    if(!confirm(`Apply new profile photo to all messages from this user?`)) return;
+    adminActionStatus.textContent = 'Applying photo to messages...';
+    try{
+      await preloadImage(photoUrl, 5000);
+    }catch(e){
+      adminActionStatus.textContent = 'Photo failed to load.';
+      showToast('Photo failed to load','warn');
+      return;
+    }
+    try{
+      const snap = await messagesCollectionRef().where('uid','==',uid).get();
+      const batch = db.batch();
+      snap.forEach(doc => {
+        batch.update(doc.ref, { photoURL: photoUrl });
+      });
+      await batch.commit();
+      adminActionStatus.textContent = 'Photo applied to messages.';
+      logModAction(`Changed photo for uid ${uid} (${snap.size} messages)`);
+      showToast('Photo applied to messages','success');
+    }catch(e){
+      console.error(e);
+      adminActionStatus.textContent = 'Failed to apply photo.';
+      showToast('Failed to apply photo','warn');
+    }
+  }
+
+  async function deleteMessagesByUser(uid){
+    if(!uid) return;
+    if(!confirm('Delete all messages from this user? This is permanent.')) return;
+    adminActionStatus.textContent = 'Deleting messages...';
+    try{
+      const snap = await messagesCollectionRef().where('uid','==',uid).get();
+      const batchSize = 500;
+      // delete in batches
+      const docs = snap.docs;
+      for(let i=0;i<docs.length;i+=batchSize){
+        const batch = db.batch();
+        docs.slice(i,i+batchSize).forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+      adminActionStatus.textContent = 'Messages deleted.';
+      logModAction(`Deleted ${docs.length} messages for uid ${uid}`);
+      showToast('Messages deleted','success');
+    }catch(e){
+      console.error(e);
+      adminActionStatus.textContent = 'Failed to delete messages.';
+      showToast('Failed to delete messages','warn');
+    }
+  }
+
+  async function banUser(uid){
+    if(!uid) return;
+    if(!confirm('Ban this user? They will be prevented from sending messages.')) return;
+    adminActionStatus.textContent = 'Banning user...';
+    try{
+      await db.collection('moderation_banned').doc(uid).set({ ts: firebase.firestore.FieldValue.serverTimestamp() });
+      bannedCache.add(uid);
+      adminActionStatus.textContent = 'User banned.';
+      logModAction(`Banned uid ${uid}`);
+      showToast('User banned','success');
+    }catch(e){
+      console.error(e);
+      adminActionStatus.textContent = 'Failed to ban user.';
+      showToast('Failed to ban user','warn');
+    }
+  }
+
+  async function unbanUser(uid){
+    if(!uid) return;
+    if(!confirm('Unban this user?')) return;
+    adminActionStatus.textContent = 'Unbanning user...';
+    try{
+      await db.collection('moderation_banned').doc(uid).delete();
+      bannedCache.delete(uid);
+      adminActionStatus.textContent = 'User unbanned.';
+      logModAction(`Unbanned uid ${uid}`);
+      showToast('User unbanned','success');
+    }catch(e){
+      console.error(e);
+      adminActionStatus.textContent = 'Failed to unban user.';
+      showToast('Failed to unban user','warn');
+    }
+  }
+
+  function logModAction(text){
+    const row = document.createElement('div');
+    row.style.padding = '6px';
+    row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+    row.textContent = `${new Date().toLocaleString()}: ${text}`;
+    modLog.insertBefore(row, modLog.firstChild);
+  }
+
+  async function renderBannedList(){
+    bannedList.innerHTML = '';
+    try{
+      const snap = await db.collection('moderation_banned').get();
+      if(snap.empty){ bannedList.innerHTML = '<div class="small-note">No banned users.</div>'; return; }
+      snap.forEach(doc => {
+        const uid = doc.id;
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '6px';
+        row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+        row.innerHTML = `<div class="small-note">${escapeHtml(uid)}</div>`;
+        const btn = document.createElement('button');
+        btn.className = 'btn small';
+        btn.textContent = 'Unban';
+        btn.addEventListener('click', () => unbanUser(uid));
+        row.appendChild(btn);
+        bannedList.appendChild(row);
+      });
+    }catch(e){
+      console.error(e);
+      bannedList.innerHTML = '<div class="small-note">Failed to load banned list.</div>';
+    }
+  }
+
+  adminAuthUnlock.addEventListener('click', async () => {
+    const entered = (adminAuthInput.value || '').trim();
+    if(!entered){ adminAuthStatus.textContent = 'Enter password.'; return; }
+    if(entered === getExpectedAdminCode()){
+      setLocalAdmin(true);
+      adminAuthStatus.textContent = 'Unlocked.';
+      adminAuthBackdrop.style.display = 'none';
+      adminAuthBackdrop.setAttribute('aria-hidden','true');
+      // open admin panel
+      adminPanelBackdrop.style.display = 'flex';
+      adminPanelBackdrop.setAttribute('aria-hidden','false');
+      adminAuthInput.value = '';
+      showToast('Admin unlocked','success');
+      // load banned cache
+      await loadBannedCache();
+    } else {
+      adminAuthStatus.textContent = 'Incorrect password.';
+      showToast('Incorrect admin password','warn');
+    }
+  });
+
+  adminAuthCancel.addEventListener('click', () => {
+    adminAuthBackdrop.style.display = 'none';
+    adminAuthBackdrop.setAttribute('aria-hidden','true');
+    adminAuthStatus.textContent = '';
+    adminAuthInput.value = '';
+  });
+
+  adminCloseBtn.addEventListener('click', () => {
+    adminPanelBackdrop.style.display = 'none';
+    adminPanelBackdrop.setAttribute('aria-hidden','true');
+  });
+
+  adminClearLocalMessages.addEventListener('click', () => {
+    const chatMessagesEl = document.getElementById('chatMessages');
+    if(chatMessagesEl){ chatMessagesEl.innerHTML = ''; messageElements.clear(); adminActionStatus.textContent = 'Chat DOM cleared (local only).'; showToast('Chat DOM cleared','success'); } else { adminActionStatus.textContent = 'No chat DOM found.'; }
+  });
+
+  adminClearLocalData.addEventListener('click', () => {
+    try{
+      localStorage.removeItem(FAVS_KEY);
+      localStorage.removeItem(SETTINGS_KEY);
+      localStorage.removeItem(TAB_DISGUISE_KEY);
+      localStorage.removeItem(PANIC_KEY);
+      localStorage.removeItem(ADMIN_LOCAL_KEY);
+      favorites = [];
+      saveFavs();
+      adminActionStatus.textContent = 'Local data cleared.';
+      showToast('Local app data cleared','success');
+      renderAdminBadge();
+    }catch(e){ adminActionStatus.textContent = 'Failed to clear local data.'; }
+  });
+
+  // user search
+  modSearchBtn.addEventListener('click', async () => {
+    const q = (modUserSearch.value||'').trim();
+    modUserList.innerHTML = '<div class="small-note">Searching...</div>';
+    const users = await searchUsersFromMessages(q);
+    renderUserResults(users);
+  });
+  modRefreshUsers.addEventListener('click', async () => {
+    modUserList.innerHTML = '<div class="small-note">Refreshing...</div>';
+    const users = await searchUsersFromMessages('');
+    renderUserResults(users);
+  });
+
+  modApplyName.addEventListener('click', async () => {
+    if(!selectedUser){ alert('Select a user first'); return; }
+    const newName = (modNewName.value||'').trim();
+    if(!newName){ alert('Enter a new name'); return; }
+    await applyNameToMessages(selectedUser.uid, newName);
+  });
+
+  modApplyPhoto.addEventListener('click', async () => {
+    if(!selectedUser){ alert('Select a user first'); return; }
+    const newPhoto = (modNewPhoto.value||'').trim();
+    if(!newPhoto){ alert('Enter a photo URL'); return; }
+    await applyPhotoToMessages(selectedUser.uid, newPhoto);
+  });
+
+  modDeleteMessages.addEventListener('click', async () => {
+    if(!selectedUser){ alert('Select a user first'); return; }
+    await deleteMessagesByUser(selectedUser.uid);
+  });
+
+  modBulkRename.addEventListener('click', async () => {
+    if(!selectedUser){ alert('Select a user first'); return; }
+    const newName = (modNewName.value||'').trim();
+    if(!newName){ alert('Enter a new name'); return; }
+    await applyNameToMessages(selectedUser.uid, newName);
+  });
+
+  modBanUser.addEventListener('click', async () => {
+    if(!selectedUser){ alert('Select a user first'); return; }
+    await banUser(selectedUser.uid);
+  });
+
+  adminViewBanned.addEventListener('click', async () => {
+    await renderBannedList();
+    bannedBackdrop.style.display = 'flex';
+    bannedBackdrop.setAttribute('aria-hidden','false');
+  });
+
+  bannedClose.addEventListener('click', () => {
+    bannedBackdrop.style.display = 'none';
+    bannedBackdrop.setAttribute('aria-hidden','true');
+  });
+
+  // expose a small helper to open admin panel if already unlocked
+  window.__openAdminPanelIfUnlocked = function(){
+    if(isLocalAdmin()){
+      adminPanelBackdrop.style.display = 'flex';
+      adminPanelBackdrop.setAttribute('aria-hidden','false');
+      loadBannedCache();
+    } else {
+      adminAuthBackdrop.style.display = 'flex';
+      adminAuthBackdrop.setAttribute('aria-hidden','false');
+    }
+  };
+})();
+
+/* ---------- Search & helpers ---------- */
+const searchInput = document.getElementById('global-search');
+const searchClearBtn = document.getElementById('searchClear');
+
+function normalize(s){ return String(s||'').toLowerCase().trim(); }
+function filterGridByQuery(query){
+  const grid = document.getElementById('grid');
+  if(!grid) return;
+  const q = normalize(query);
+  if(!q){ Array.from(grid.children).forEach(child => child.style.display = ''); return; }
+  Array.from(grid.children).forEach(tile => {
+    const title = normalize(tile.querySelector('.tile-title')?.textContent || tile.querySelector('.tile-title')?.innerText);
+    const file = normalize(tile.querySelector('.meta-file')?.textContent || '');
+    const matches = title.includes(q) || file.includes(q);
+    tile.style.display = matches ? '' : 'none';
   });
 }
-
-function wireGifSearchUI(){
-  const gifInput = document.getElementById('chatGifSearch');
-  const gifBtn = document.getElementById('searchGifBtn');
-  const gifResults = document.getElementById('gifResults');
-  if(!gifInput || !gifBtn || !gifResults) return;
-
-  const deb = debounce(async () => {
-    const q = (gifInput.value||'').trim();
-    if(!q){ gifResults.innerHTML = ''; return; }
-    gifResults.innerHTML = '<div class="gif-loading">Searching...</div>';
-    const items = await searchTenorGifs(q, 16);
-    renderGifResults(items);
-  }, 300);
-
-  gifInput.addEventListener('input', deb);
-  gifBtn.addEventListener('click', deb);
+function filterChatByQuery(query){
+  const chatMessagesEl = document.getElementById('chatMessages');
+  if(!chatMessagesEl) return;
+  const q = normalize(query);
+  const rows = Array.from(chatMessagesEl.querySelectorAll('.msg-group'));
+  if(!q){ rows.forEach(r => r.style.display = ''); return; }
+  rows.forEach(row => {
+    const name = normalize(row.querySelector('.msg-name')?.textContent || '');
+    const text = normalize(row.querySelector('.msg-bubble')?.textContent || '');
+    const matches = name.includes(q) || text.includes(q);
+    row.style.display = matches ? '' : 'none';
+  });
 }
-
-/* --------------------------- Panic key handling --------------------------- */
-function loadPanicSettings(){
-  try{
-    const raw = localStorage.getItem(PANIC_KEY);
-    if(!raw) return { key: "'", action: 'close', redirect: 'https://www.google.com' };
-    return JSON.parse(raw);
-  }catch(e){
-    return { key: "'", action: 'close', redirect: 'https://www.google.com' };
+function debounce(fn, wait=250){ let t = null; return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this, args), wait); }; }
+const applySearchToActive = debounce(() => {
+  const q = searchInput.value || '';
+  const active = document.querySelector('.tab.active')?.dataset.target || 'games';
+  if(active === 'chat'){
+    const chatMessagesEl = document.getElementById('chatMessages');
+    if(!chatMessagesEl) renderChat();
+    setTimeout(()=> filterChatByQuery(q), 50);
+  } else {
+    const grid = document.getElementById('grid');
+    if(!grid) renderActive(active);
+    setTimeout(()=> filterGridByQuery(q), 50);
   }
+}, 200);
+
+/* ---------- Render active tab ---------- */
+function renderActive(target){
+  if(!target) target = document.querySelector('.tab.active')?.dataset.target || 'games';
+  const fixedBar = document.getElementById('fixedInputBar');
+  if(fixedBar) fixedBar.style.display = 'none';
+  if(target !== 'chat'){
+    detachFixedInputHandlers();
+    stopFirestoreListener();
+    clearChatState();
+    toggleGifPanel(false);
+    toggleEmojiPanel(false);
+  }
+  if(target === 'games') renderGames();
+  if(target === 'tools') renderTools();
+  if(target === 'favorites') renderFavorites();
+  if(target === 'chat') renderChat();
 }
+
+/* ---------- Chat renderer ---------- */
+function renderChat(){
+  clearChatState();
+  content.innerHTML = `
+    <div class="chat-shell" id="chatShell">
+      <div class="chat-column">
+        <div class="chat-header">
+          <div><strong>#global</strong><div class="small-note">Global chat</div></div>
+          <div class="small-note"></div>
+        </div>
+        <div class="chat-body chat-body-padding" id="chatMessages" aria-live="polite"></div>
+      </div>
+    </div>
+    <div id="gifResults" style="display:none"></div>
+  `;
+
+  // show fixed input bar
+  const fixedBar = document.getElementById('fixedInputBar');
+  fixedBar.style.display = 'flex';
+  fixedBar.setAttribute('aria-hidden','false');
+
+  // attach handlers
+  attachFixedInputHandlers();
+
+  // start listener and scroll to bottom on load
+  startFirestoreListener();
+
+  // ensure panels hidden initially
+  toggleGifPanel(false);
+  toggleEmojiPanel(false);
+}
+
+/* ---------- Panic key ---------- */
+function loadPanicSettings(){ try{ const raw = localStorage.getItem(PANIC_KEY); return raw ? JSON.parse(raw) : { key: "'", action: 'close', redirect: 'https://www.google.com' }; }catch(e){ return { key: "'", action: 'close', redirect: 'https://www.google.com' }; } }
 function handlePanic(){
   const p = loadPanicSettings();
-  if(p.action === 'close'){
-    try{
-      window.close();
-      // if window.close didn't work (most tabs), fallback to redirect
-      setTimeout(()=> { window.location.href = p.redirect || 'https://www.google.com'; }, 200);
-    }catch(e){
-      window.location.href = p.redirect || 'https://www.google.com';
-    }
-  } else {
+  if(!p || !p.key) return;
+  if(p.action === 'redirect'){
+    // redirect explicitly when user chose redirect
     window.location.href = p.redirect || 'https://www.google.com';
+    return;
+  }
+  // action === 'close' - attempt to close the tab/window
+  try{
+    try { window.open('', '_self'); } catch(e){}
+    window.close();
+    setTimeout(() => {
+      if(!window.closed){
+        showToast('Unable to close tab (browser blocked).', 'warn', 4000);
+      }
+    }, 300);
+  }catch(e){
+    showToast('Unable to close tab (browser blocked).', 'warn', 4000);
   }
 }
 document.addEventListener('keydown', (e) => {
   const p = loadPanicSettings();
-  // ignore if focus is in an input/textarea/select
   const tag = (document.activeElement && document.activeElement.tagName) || '';
   if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable) return;
   if(!p || !p.key) return;
-  if(e.key === p.key){
-    handlePanic();
-  }
+  if(e.key === p.key) handlePanic();
 });
 
-/* --------------------------- Admin panel (client-side passcode) --------------------------- */
-// Obfuscated passcode pieces (character codes for "sigmadownsyndrome")
-const _adminCharCodes = [115,105,103,109,97,100,111,119,110,115,121,110,100,114,111,109,101];
-function getExpectedAdminCode(){ return String.fromCharCode(..._adminCharCodes); }
-function setLocalAdminAccess(enabled){ if(enabled) localStorage.setItem(ADMIN_LOCAL_KEY, '1'); else localStorage.removeItem(ADMIN_LOCAL_KEY); }
-function hasLocalAdminAccess(){ return localStorage.getItem(ADMIN_LOCAL_KEY) === '1'; }
-function openAdminModal(){ const b = document.getElementById('adminModalBackdrop'); if(!b) return; b.style.display = 'flex'; b.setAttribute('aria-hidden','false'); document.getElementById('adminActionStatus').textContent = ''; }
-function closeAdminModal(){ const b = document.getElementById('adminModalBackdrop'); if(!b) return; b.style.display = 'none'; b.setAttribute('aria-hidden','true'); }
-
-function wireAdminUI(){
-  const unlockBtn = document.getElementById('settingsAdminUnlock');
-  const codeInput = document.getElementById('settingsAdminCode');
-  const clearBtn = document.getElementById('settingsAdminClear');
-  const adminClose = document.getElementById('adminCloseBtn');
-  const adminClearLocalMessages = document.getElementById('adminClearLocalMessages');
-  const adminClearLocalData = document.getElementById('adminClearLocalData');
-
-  if(unlockBtn && codeInput){
-    unlockBtn.addEventListener('click', () => {
-      const entered = (codeInput.value || '').trim();
-      if(!entered){ showToast('Enter admin code','warn'); return; }
-      const expected = getExpectedAdminCode();
-      if(entered === expected){
-        setLocalAdminAccess(true);
-        showToast('Admin unlocked','success');
-        openAdminModal();
-        codeInput.value = '';
-        const note = document.getElementById('settingsAdminNote');
-        if(note) note.textContent = 'Admin access active (stored locally).';
-      } else {
-        showToast('Incorrect admin code','warn');
-      }
-    });
-    codeInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ unlockBtn.click(); } });
-  }
-
-  if(clearBtn){
-    clearBtn.addEventListener('click', () => {
-      setLocalAdminAccess(false);
-      const note = document.getElementById('settingsAdminNote');
-      if(note) note.textContent = 'Enter the admin code to open the admin panel. Access is stored locally until cleared.';
-      showToast('Admin access cleared locally','success');
-    });
-  }
-
-  if(adminClose){
-    adminClose.addEventListener('click', closeAdminModal);
-  }
-
-  if(adminClearLocalMessages){
-    adminClearLocalMessages.addEventListener('click', () => {
-      const chatMessagesEl = document.getElementById('chatMessages');
-      if(chatMessagesEl){
-        chatMessagesEl.innerHTML = '';
-        messageElements.clear();
-        showToast('Chat DOM cleared (local only)','success');
-      } else {
-        showToast('No chat DOM found','warn');
-      }
-    });
-  }
-
-  if(adminClearLocalData){
-    adminClearLocalData.addEventListener('click', () => {
-      localStorage.removeItem('homewrk.favs');
-      localStorage.removeItem(SETTINGS_KEY);
-      localStorage.removeItem(TAB_DISGUISE_KEY);
-      localStorage.removeItem(PANIC_KEY);
-      setLocalAdminAccess(false);
-      showToast('Local app data cleared','success');
-    });
+/* ---------- Admin badge render ---------- */
+function renderAdminBadge(){
+  const wrap = document.getElementById('adminStatusWrap');
+  wrap.innerHTML = '';
+  if(isLocalAdmin()){
+    const b = document.createElement('div');
+    b.className = 'admin-badge';
+    b.textContent = 'Admin';
+    b.style.cursor = 'pointer';
+    b.title = 'Open admin panel';
+    b.addEventListener('click', () => { window.__openAdminPanelIfUnlocked(); });
+    wrap.appendChild(b);
   }
 }
 
-function maybeShowAdminFromSettings(){
-  if(hasLocalAdminAccess()){
-    const note = document.getElementById('settingsAdminNote');
-    if(note) note.textContent = 'Admin access active (stored locally).';
-  }
-}
-
-/* --------------------------- Chat renderer (builds chat UI) --------------------------- */
-function renderChat(){
-  content.innerHTML = `
-  <div class="section-head"><h2 style="margin:0">Global Chat</h2></div>
-  <div class="chat-window" style="margin-top:12px">
-    <div id="loadOlderWrap" style="display:none"></div>
-    <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
-
-    <div class="chat-controls" style="margin-top:8px">
-      <div class="chat-controls-inner">
-        <input id="chatInput" placeholder="Say something..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        <input id="chatImageUrl" placeholder="Paste image URL" class="wide" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-        <button class="btn ghost" id="sendImageUrlBtn">Send Image</button>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-left:8px">
-          <input id="chatGifSearch" placeholder="Search GIFs (optional)" style="width:220px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
-          <button id="searchGifBtn" class="btn ghost">Search GIFs</button>
-        </div>
-
-        <button class="btn" id="sendChat">Send</button>
-      </div>
-    </div>
-
-    <div id="gifResults" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
-
-    <div style="margin-top:6px;color:var(--muted);font-size:13px">Image uploading via URL only for now.</div>
-    <div id="chatUploadHint" class="upload-status"></div>
-  </div>
-  `;
-
-  const chatMessagesEl = document.getElementById('chatMessages');
-  const chatInput = document.getElementById('chatInput');
-  const sendBtn = document.getElementById('sendChat');
-  const sendImageBtn = document.getElementById('sendImageUrlBtn');
-  const chatImageInput = document.getElementById('chatImageUrl');
-
-  // wire send actions
-  sendBtn.addEventListener('click', () => { sendMessageFirestore(chatInput.value); chatInput.value=''; });
-  chatInput.addEventListener('keydown', e => { if(e.key==='Enter') { sendMessageFirestore(chatInput.value); chatInput.value=''; } });
-  sendImageBtn.addEventListener('click', async () => {
-    const url = (chatImageInput.value||'').trim(); if(!url) return;
-    try{ await preloadImage(url); await sendMessageFirestore('', url); chatImageInput.value = ''; showToast('Image sent','success'); }catch(e){ showToast('Image failed to load','warn'); }
-  });
-
-  // wire gif search UI (simple Tenor demo key; replace if you add a picker)
-  wireGifSearchUI();
-
-  // start listener
-  if(unsubscribeMessages) stopFirestoreListener();
-  startFirestoreListener();
-
-  // ensure load older control exists and is wired
-  setTimeout(()=> ensureLoadOlderControl(), 80);
-}
-
-/* --------------------------- Event wiring & init --------------------------- */
+/* ---------- Init & wiring ---------- */
 document.addEventListener('DOMContentLoaded', () => {
+  // load favorites before rendering anything
+  loadFavs();
+
   applyThemeFromSettings();
   applyTabDisguise();
 
@@ -1562,77 +1701,87 @@ document.addEventListener('DOMContentLoaded', () => {
     renderActive(t.dataset.target);
   }));
 
-  wireTabClicksForSearch();
-
-  // content click handlers (open/fav)
+  // content click handlers (open)
   content.addEventListener('click', e=> {
     const openBtn = e.target.closest('.open-btn');
-    const favBtn = e.target.closest('.fav-btn');
-
-    if(favBtn){
-      const file = favBtn.getAttribute('data-file');
-      const wasFav = favorites.includes(file);
-
-      if(wasFav) favorites = favorites.filter(f=>f!==file);
-      else favorites.push(file);
-      saveFavs();
-
-      updateFavButtons(file);
-
-      const active = document.querySelector('.tab.active')?.dataset.target;
-      if(active === 'favorites'){
-        if(wasFav){
-          const tiles = Array.from(document.querySelectorAll('.tile'));
-          tiles.forEach(t => {
-            const btn = t.querySelector('.fav-btn');
-            if(btn && btn.dataset.file === file) t.remove();
-          });
-          const grid = document.getElementById('grid');
-          if(grid && grid.children.length === 0) grid.innerHTML = '<div style="padding:12px">No favorites yet.</div>';
-        } else {
-          const item = findItemByFile(file);
-          if(item){
-            const grid = document.getElementById('grid');
-            if(grid){
-              grid.prepend(createTile(item));
-            }
-          }
-        }
-      }
-
-      return;
-    }
-
     if(openBtn){
       const file = openBtn.getAttribute('data-file');
       window.location.href = file;
     }
   });
 
-  // initial render
+  if(searchInput) searchInput.addEventListener('input', () => applySearchToActive());
+  if(searchClearBtn) searchClearBtn.addEventListener('click', () => { searchInput.value = ''; applySearchToActive(); searchInput.focus(); });
+
+  document.getElementById('menuSignIn').addEventListener('click', () => { document.getElementById('profileMenu').style.display = 'none'; openAuthModal(); });
+  document.getElementById('closeAuthBtn').addEventListener('click', closeAuthModal);
+
+  document.getElementById('emailSignInBtn').addEventListener('click', async () => {
+    const email = (authEmail.value||'').trim();
+    const pass = authPass.value||'';
+    if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
+    authStatus.textContent = 'Signing in...';
+    try{ await auth.signInWithEmailAndPassword(email, pass); authStatus.textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Sign in failed'; }
+  });
+
+  document.getElementById('emailSignUpBtn').addEventListener('click', async () => {
+    const email = (authEmail.value||'').trim();
+    const pass = authPass.value||'';
+    if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
+    authStatus.textContent = 'Creating account...';
+    try{ const cred = await auth.createUserWithEmailAndPassword(email, pass); try{ await cred.user.sendEmailVerification(); }catch(e){} authStatus.textContent = 'Account created.'; closeAuthModal(); showToast('Account created','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Sign up failed'; }
+  });
+
+  document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    authStatus.textContent = 'Signing in with Google...';
+    try{ await auth.signInWithPopup(provider); authStatus.textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in with Google','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Google sign-in failed'; }
+  });
+
   renderActive('games');
 
-  // auth state
-  auth.onAuthStateChanged(user => { updateMiniProfile(); });
+  auth.onAuthStateChanged(async user => { updateMiniProfile(); await loadBannedCache(); });
 
-  // close auth modal on backdrop click
-  authBackdrop.addEventListener('click', (e) => { if(e.target === authBackdrop) closeAuthModal(); });
+  if(!localStorage.getItem(PANIC_KEY)) localStorage.setItem(PANIC_KEY, JSON.stringify({ key: "'", action: 'close', redirect: 'https://www.google.com' }));
 
-  // wire disguise preview updates when inputs change
-  disguiseTitle.addEventListener('input', updateDisguisePreview);
-  disguiseFavicon.addEventListener('input', updateDisguisePreview);
-
-  // load panic defaults if not set
-  if(!localStorage.getItem(PANIC_KEY)){
-    localStorage.setItem(PANIC_KEY, JSON.stringify({ key: "'", action: 'close', redirect: 'https://www.google.com' }));
-  }
-
-  // wire admin UI after a short delay so DOM elements exist
-  setTimeout(()=>{ try{ wireAdminUI(); maybeShowAdminFromSettings(); }catch(e){ console.error('admin wiring failed', e); } }, 120);
-
-  // apply any existing search query
-  if(searchInput && searchInput.value) setTimeout(()=> applySearchToActive(), 100);
+  updateDisguisePreview();
+  renderAdminBadge();
 });
+
+/* ---------- Mini profile ---------- */
+function updateMiniProfile(){
+  const user = auth.currentUser;
+  const avatarEl = document.getElementById('miniAvatar');
+  const nameEl = document.getElementById('miniName');
+  const emailEl = document.getElementById('miniEmail');
+  const menuGuestInfo = document.getElementById('menuGuestInfo');
+  if(user){
+    nameEl.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+    emailEl.textContent = user.email || '';
+    if(user.photoURL) avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar">`; else avatarEl.textContent = (user.displayName||user.email||'U').charAt(0).toUpperCase();
+    document.getElementById('menuSignOut').style.display = 'block';
+    document.getElementById('menuSignIn').style.display = 'none';
+    if(menuGuestInfo) menuGuestInfo.textContent = `${user.displayName || (user.email||'User')} — ${user.email||''}`;
+  } else {
+    nameEl.textContent = 'Guest';
+    emailEl.textContent = 'Not signed in';
+    avatarEl.textContent = 'G';
+    document.getElementById('menuSignOut').style.display = 'none';
+    document.getElementById('menuSignIn').style.display = 'block';
+    if(menuGuestInfo) menuGuestInfo.textContent = 'Guest — Not signed in';
+  }
+  renderAdminBadge();
+}
+
+/* ---------- Helpers ---------- */
+function setTabDisguise(title, iconUrl){
+  const obj = {};
+  if(title !== undefined) obj.title = title || '';
+  if(iconUrl !== undefined) obj.icon = iconUrl || '';
+  if((!obj.title || obj.title === '') && (!obj.icon || obj.icon === '')) saveTabDisguise(null);
+  else saveTabDisguise(obj);
+  applyTabDisguise();
+}
   </script>
 </body>
 </html>
