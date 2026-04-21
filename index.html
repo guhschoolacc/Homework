@@ -637,6 +637,13 @@ function ensureLoadOlderControl(){
     if(chatMessagesEl) chatMessagesEl.parentNode.insertBefore(loadWrap, chatMessagesEl);
     const btn = document.getElementById('loadOlderBtn');
     if(btn) btn.addEventListener('click', loadOlderMessages);
+  } else {
+    // ensure button wired
+    const btn = document.getElementById('loadOlderBtn');
+    if(btn && !btn._wired){
+      btn.addEventListener('click', loadOlderMessages);
+      btn._wired = true;
+    }
   }
 }
 
@@ -881,6 +888,34 @@ function removeMessageFromUI(msg){
 
 /* --------------------------- Utilities --------------------------- */
 function preloadImage(url, timeoutMs=6000){ return new Promise((resolve,reject)=>{ const img = new Image(); let done=false; const t = setTimeout(()=>{ if(done) return; done=true; img.src=''; reject(new Error('timeout')); }, timeoutMs); img.onload = ()=>{ if(done) return; done=true; clearTimeout(t); resolve(); }; img.onerror = ()=>{ if(done) return; done=true; clearTimeout(t); reject(new Error('error')); }; img.src = url; }); }
+
+/* --------------------------- makeAvatarElement (fixed missing helper) --------------------------- */
+function makeAvatarElement(name, photoURL, size = 48){
+  const el = document.createElement('div');
+  el.className = 'chat-avatar';
+  el.style.width = size + 'px';
+  el.style.height = size + 'px';
+  el.style.borderRadius = '10px';
+  el.style.overflow = 'hidden';
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.justifyContent = 'center';
+  el.style.fontWeight = '700';
+  el.style.background = '#0b1220';
+  if(photoURL){
+    const img = document.createElement('img');
+    img.src = photoURL;
+    img.alt = name || 'avatar';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.style.borderRadius = '8px';
+    el.appendChild(img);
+  } else {
+    el.textContent = (name && name.charAt(0)) ? name.charAt(0).toUpperCase() : 'G';
+  }
+  return el;
+}
 
 /* --------------------------- Auth UI helpers --------------------------- */
 const authBackdrop = document.getElementById('authBackdrop');
@@ -1283,10 +1318,84 @@ if(searchClearBtn){
   });
 }
 
-/* --------------------------- GIF support note
-   The chat supports pasting a direct GIF URL into the "Paste image URL" field.
-   A Tenor/Giphy picker can be added later.
---------------------------- */
+/* Re-apply search when switching tabs */
+function wireTabClicksForSearch(){
+  Array.from(document.querySelectorAll('.tab')).forEach(t => {
+    t.addEventListener('click', () => {
+      setTimeout(() => applySearchToActive(), 60);
+    });
+  });
+}
+
+/* --------------------------- GIF support (Tenor demo) --------------------------- */
+const TENOR_API_KEY = 'LIVDSRZULELA'; // demo key; replace for production
+
+async function searchTenorGifs(query, limit = 12){
+  if(!query || !query.trim()) return [];
+  const q = encodeURIComponent(query.trim());
+  const url = `https://g.tenor.com/v1/search?q=${q}&key=${TENOR_API_KEY}&limit=${limit}&media_filter=minimal`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Tenor search failed');
+    const data = await res.json();
+    return (data.results || []).map(r => {
+      const media = r.media && r.media[0];
+      const gif = media && (media.gif && media.gif.url) || (media && media.mediumgif && media.mediumgif.url) || null;
+      const thumb = media && (media.tinygif && media.tinygif.url) || gif;
+      return { id: r.id, gif, thumb, title: r.title || '' };
+    }).filter(x => x.gif);
+  }catch(e){
+    console.error('Tenor search error', e);
+    return [];
+  }
+}
+
+function renderGifResults(items){
+  const container = document.getElementById('gifResults');
+  if(!container) return;
+  container.innerHTML = '';
+  if(!items || items.length === 0){
+    container.innerHTML = '<div class="small-note" style="padding:6px">No GIFs found.</div>';
+    return;
+  }
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'gif-item';
+    const img = document.createElement('img');
+    img.src = it.thumb || it.gif;
+    img.alt = it.title || 'gif';
+    img.title = 'Click to send GIF';
+    img.addEventListener('click', async () => {
+      try{
+        await preloadImage(it.gif, 8000);
+        await sendMessageFirestore('', it.gif);
+        showToast('GIF sent','success');
+      }catch(e){
+        showToast('Failed to send GIF','warn');
+      }
+    });
+    div.appendChild(img);
+    container.appendChild(div);
+  });
+}
+
+function wireGifSearchUI(){
+  const gifInput = document.getElementById('chatGifSearch');
+  const gifBtn = document.getElementById('searchGifBtn');
+  const gifResults = document.getElementById('gifResults');
+  if(!gifInput || !gifBtn || !gifResults) return;
+
+  const deb = debounce(async () => {
+    const q = (gifInput.value||'').trim();
+    if(!q){ gifResults.innerHTML = ''; return; }
+    gifResults.innerHTML = '<div class="gif-loading">Searching...</div>';
+    const items = await searchTenorGifs(q, 16);
+    renderGifResults(items);
+  }, 300);
+
+  gifInput.addEventListener('input', deb);
+  gifBtn.addEventListener('click', deb);
+}
 
 /* --------------------------- Panic key handling --------------------------- */
 function loadPanicSettings(){
@@ -1324,40 +1433,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* --------------------------- Admin panel (client-side passcode) --------------------------- */
-/*
-  NOTE: This is client-side only. The passcode is reconstructed from char codes
-  at runtime to make casual discovery harder. This is obfuscation only — it
-  does not make the secret impossible to find. For real security, verify on a server.
-*/
-
 // Obfuscated passcode pieces (character codes for "sigmadownsyndrome")
 const _adminCharCodes = [115,105,103,109,97,100,111,119,110,115,121,110,100,114,111,109,101];
-
-function getExpectedAdminCode(){
-  return String.fromCharCode(..._adminCharCodes);
-}
-
-function setLocalAdminAccess(enabled){
-  if(enabled) localStorage.setItem(ADMIN_LOCAL_KEY, '1');
-  else localStorage.removeItem(ADMIN_LOCAL_KEY);
-}
-function hasLocalAdminAccess(){
-  return localStorage.getItem(ADMIN_LOCAL_KEY) === '1';
-}
-
-function openAdminModal(){
-  const b = document.getElementById('adminModalBackdrop');
-  if(!b) return;
-  b.style.display = 'flex';
-  b.setAttribute('aria-hidden','false');
-  document.getElementById('adminActionStatus').textContent = '';
-}
-function closeAdminModal(){
-  const b = document.getElementById('adminModalBackdrop');
-  if(!b) return;
-  b.style.display = 'none';
-  b.setAttribute('aria-hidden','true');
-}
+function getExpectedAdminCode(){ return String.fromCharCode(..._adminCharCodes); }
+function setLocalAdminAccess(enabled){ if(enabled) localStorage.setItem(ADMIN_LOCAL_KEY, '1'); else localStorage.removeItem(ADMIN_LOCAL_KEY); }
+function hasLocalAdminAccess(){ return localStorage.getItem(ADMIN_LOCAL_KEY) === '1'; }
+function openAdminModal(){ const b = document.getElementById('adminModalBackdrop'); if(!b) return; b.style.display = 'flex'; b.setAttribute('aria-hidden','false'); document.getElementById('adminActionStatus').textContent = ''; }
+function closeAdminModal(){ const b = document.getElementById('adminModalBackdrop'); if(!b) return; b.style.display = 'none'; b.setAttribute('aria-hidden','true'); }
 
 function wireAdminUI(){
   const unlockBtn = document.getElementById('settingsAdminUnlock');
@@ -1370,10 +1452,7 @@ function wireAdminUI(){
   if(unlockBtn && codeInput){
     unlockBtn.addEventListener('click', () => {
       const entered = (codeInput.value || '').trim();
-      if(!entered){
-        showToast('Enter admin code','warn');
-        return;
-      }
+      if(!entered){ showToast('Enter admin code','warn'); return; }
       const expected = getExpectedAdminCode();
       if(entered === expected){
         setLocalAdminAccess(true);
@@ -1484,76 +1563,6 @@ function renderChat(){
   startFirestoreListener();
 }
 
-/* --------------------------- GIF search (Tenor demo) --------------------------- */
-const TENOR_API_KEY = 'LIVDSRZULELA'; // demo key; replace for production
-
-async function searchTenorGifs(query, limit = 12){
-  if(!query || !query.trim()) return [];
-  const q = encodeURIComponent(query.trim());
-  const url = `https://g.tenor.com/v1/search?q=${q}&key=${TENOR_API_KEY}&limit=${limit}&media_filter=minimal`;
-  try{
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('Tenor search failed');
-    const data = await res.json();
-    return (data.results || []).map(r => {
-      const media = r.media && r.media[0];
-      const gif = media && (media.gif && media.gif.url) || (media && media.mediumgif && media.mediumgif.url) || null;
-      const thumb = media && (media.tinygif && media.tinygif.url) || gif;
-      return { id: r.id, gif, thumb, title: r.title || '' };
-    }).filter(x => x.gif);
-  }catch(e){
-    console.error('Tenor search error', e);
-    return [];
-  }
-}
-
-function renderGifResults(items){
-  const container = document.getElementById('gifResults');
-  if(!container) return;
-  container.innerHTML = '';
-  if(!items || items.length === 0){
-    container.innerHTML = '<div class="small-note" style="padding:6px">No GIFs found.</div>';
-    return;
-  }
-  items.forEach(it => {
-    const div = document.createElement('div');
-    div.className = 'gif-item';
-    const img = document.createElement('img');
-    img.src = it.thumb || it.gif;
-    img.alt = it.title || 'gif';
-    img.title = 'Click to send GIF';
-    img.addEventListener('click', async () => {
-      try{
-        await preloadImage(it.gif, 8000);
-        await sendMessageFirestore('', it.gif);
-        showToast('GIF sent','success');
-      }catch(e){
-        showToast('Failed to send GIF','warn');
-      }
-    });
-    div.appendChild(img);
-    container.appendChild(div);
-  });
-}
-
-function wireGifSearchUI(){
-  const gifInput = document.getElementById('chatGifSearch');
-  const gifBtn = document.getElementById('searchGifBtn');
-  const gifResults = document.getElementById('gifResults');
-  if(!gifInput || !gifBtn || !gifResults) return;
-
-  const deb = debounce(async () => {
-    const q = (gifInput.value||'').trim();
-    if(!q){ gifResults.innerHTML = ''; return; }
-    gifResults.innerHTML = '<div class="gif-loading">Searching...</div>';
-    const items = await searchTenorGifs(q, 16);
-    renderGifResults(items);
-  }, 300);
-
-  gifInput.addEventListener('input', deb);
-  gifBtn.addEventListener('click', deb);
-}
-
 /* --------------------------- Event wiring & init --------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   applyThemeFromSettings();
@@ -1565,10 +1574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderActive(t.dataset.target);
   }));
 
-  // wire tab search reapply
-  Array.from(document.querySelectorAll('.tab')).forEach(t => {
-    t.addEventListener('click', () => { setTimeout(() => applySearchToActive(), 60); });
-  });
+  wireTabClicksForSearch();
 
   // content click handlers (open/fav)
   content.addEventListener('click', e=> {
