@@ -358,6 +358,8 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
               <div id="modSelectedInfo" class="small-note">No user selected</div>
               <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="modNewName" placeholder="New display name" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="modNewPhoto" placeholder="New photo URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
               </div>
               <div style="display:flex;gap:8px;margin-top:8px">
@@ -425,7 +427,7 @@ const games = [ {label:'Sandbox',file:'sandbox.html'},{label:'Snake Game Ripoff'
 const tools = [ {label:'Calculator',file:'calculator.html'},{label:'Clock',file:'clock.html'},{label:'File Converter',file:'converter.html'},{label:'Notepad',file:'notepad.html'},{label:'JSON Formatter',file:'json-formatter.html'},{label:'Regex Tester',file:'regex-tester.html'},{label:'Base64',file:'base64-tool.html'},{label:'LocalStorage Viewer',file:'localstorage-viewer.html'},{label:'IP Lookup',file:'ip-lookup.html'},{label:'Image Resizer',file:'image-resizer.html'},{label:'Image Cropper',file:'image-cropper.html'},{label:'QR Code Generator',file:'qr-generator.html'},{label:'Text To Speech',file:'text-to-speech.html'},{label:'FL Studio Recreation',file:'fl-studio.html'},{label:'QR Scanner',file:'qr-scanner.html'},{label:'Soundboard',file:'soundboard.html'} ];
 
 /* ---------- Favorites persistence ---------- */
-const FAVS_KEY = 'homewrk.favs.v5';
+const FAVS_KEY = 'homewrk.favs.v6';
 let favorites = [];
 function loadFavs(){
   try{
@@ -478,8 +480,8 @@ function showToast(msg, type='info', ttl=3000){
 }
 
 /* ---------- Settings & theme ---------- */
-const SETTINGS_KEY = 'homewrk.settings.v4';
-const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v3';
+const SETTINGS_KEY = 'homewrk.settings.v5';
+const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v4';
 const PANIC_KEY = 'homewrk.panic.v1';
 const defaultSettings = { theme:'dark', accent:'#5865f2' };
 
@@ -898,8 +900,8 @@ function renderGifPanel(items){
 }
 
 /* ---------- Emoji panel (searchable) ---------- */
-/* (emoji list omitted here for brevity in analysis; same as previous) */
-const EMOJI_LIST = [ "😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","😗","😙","😚","🙂","🤗","🤩","🤔","🤨","😐","😑","😶","🙄","😏","😣","😥","😮","🤐","😯","😪","😫","😴","😌","😛","😜","😝","🤤","😒","😓","😔","😕","🙃","🤑","😲","☹️","🙁","😖","😞","😟","😤","😢","😭","😦","😧","😨","😩","🤯","😬","😰","😱","🥵","🥶","😳","🤪","😵","😡","😠","🤬","😷","🤒","🤕","🤢","🤮","🤧","😇","🤠","🤡","🤥","🤫","🤭","🧐","🤓",
+const EMOJI_LIST = [
+"😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","😗","😙","😚","🙂","🤗","🤩","🤔","🤨","😐","😑","😶","🙄","😏","😣","😥","😮","🤐","😯","😪","😫","😴","😌","😛","😜","😝","🤤","😒","😓","😔","😕","🙃","🤑","😲","☹️","🙁","😖","😞","😟","😤","😢","😭","😦","😧","😨","😩","🤯","😬","😰","😱","🥵","🥶","😳","🤪","😵","😡","😠","🤬","😷","🤒","🤕","🤢","🤮","🤧","😇","🤠","🤡","🤥","🤫","🤭","🧐","🤓",
 "👋","🤚","🖐️","✋","🖖","👌","🤌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","✋","👏","🙌","👐","🤝","🙏",
 "💪","🦾","🦵","🦿","🦶","👂","👃","🧠","🫀","🫁","👀","👁️","👅","👄","🧑","👨","👩","👶","🧒","👦","👧","🧑‍🦱","🧑‍🦰","🧑‍🦳","🧑‍🦲","👱‍♂️","👱‍♀️","🧔","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🤦","🤷","🧏","🙇",
 "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐽","🐸","🐵","🐔","🐧","🐦","🐤","🐣","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🐛","🦋","🐌","🐞","🐜","🪲","🪳","🕷️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐠","🐟","🐬","🐳","🐋","🦈","🐊","🐅","🐆","🦓","🦍","🦧","🦣","🦛","🦏","🐘",
@@ -1187,6 +1189,7 @@ settingsSave.addEventListener('click', () => {
   The admin password is "anotheryear123".
   It's stored obfuscated in the client code as char codes to avoid plain text in the DOM.
   Unlocking sets a local admin flag in localStorage (homewrk.admin.v1).
+  NOTE: Client-side admin is for development/testing only. For production, use server-side admin checks.
 */
 (function wireAdmin(){
   const adminAuthBackdrop = document.getElementById('adminAuthBackdrop');
@@ -1226,24 +1229,24 @@ settingsSave.addEventListener('click', () => {
   function getExpectedAdminCode(){ return String.fromCharCode(..._adminCharCodes); }
 
   // moderation helpers
-  let lastUserResults = []; // { uid, name, email, sampleMsgId }
-  let selectedUser = null; // { uid, name, email }
+  let lastUserResults = []; // { uid, name, email, sampleMsgId, photoURL }
+  let selectedUser = null; // { uid, name, email, photoURL }
 
   async function searchUsersFromMessages(query){
-    // query messages for name/email matches (client-side)
     const q = (query||'').toLowerCase().trim();
     const results = new Map();
     try{
-      const snap = await messagesCollectionRef().orderBy('ts','desc').limit(500).get();
+      const snap = await messagesCollectionRef().orderBy('ts','desc').limit(800).get();
       snap.forEach(doc => {
         const d = doc.data();
         const uid = d.uid || ('anon-'+(d.name||'').slice(0,6));
         const name = d.name || '';
         const email = d.email || '';
+        const photoURL = d.photoURL || '';
         const key = uid;
         if(!results.has(key)){
           if(!q || name.toLowerCase().includes(q) || (email && email.toLowerCase().includes(q))){
-            results.set(key, { uid, name, email, sampleMsgId: doc.id });
+            results.set(key, { uid, name, email, sampleMsgId: doc.id, photoURL });
           }
         }
       });
@@ -1271,10 +1274,8 @@ settingsSave.addEventListener('click', () => {
       selBtn.className = 'btn small';
       selBtn.textContent = 'Select';
       selBtn.addEventListener('click', () => {
-        selectedUser = { uid: u.uid, name: u.name, email: u.email, sampleMsgId: u.sampleMsgId };
-        modSelectedInfo.innerHTML = `<div style="font-weight:800">${escapeHtml(u.name||u.uid)}</div><div class="small-note">${escapeHtml(u.email||u.uid)}</div>`;
-        modNewName.value = u.name || '';
-        modNewPhoto.value = '';
+        selectedUser = { uid: u.uid, name: u.name, email: u.email, sampleMsgId: u.sampleMsgId, photoURL: u.photoURL };
+        showSelectedUserDetails(selectedUser);
       });
       right.appendChild(selBtn);
       row.appendChild(left);
@@ -1338,9 +1339,8 @@ settingsSave.addEventListener('click', () => {
     adminActionStatus.textContent = 'Deleting messages...';
     try{
       const snap = await messagesCollectionRef().where('uid','==',uid).get();
-      const batchSize = 500;
-      // delete in batches
       const docs = snap.docs;
+      const batchSize = 500;
       for(let i=0;i<docs.length;i+=batchSize){
         const batch = db.batch();
         docs.slice(i,i+batchSize).forEach(d => batch.delete(d.ref));
@@ -1396,6 +1396,8 @@ settingsSave.addEventListener('click', () => {
     row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
     row.textContent = `${new Date().toLocaleString()}: ${text}`;
     modLog.insertBefore(row, modLog.firstChild);
+    // Optionally write to Firestore moderation log (commented out; enable if you want server-side audit)
+    // db.collection('moderation_logs').add({ text, ts: firebase.firestore.FieldValue.serverTimestamp(), actor: auth.currentUser ? auth.currentUser.uid : null }).catch(()=>{});
   }
 
   async function renderBannedList(){
@@ -1423,6 +1425,85 @@ settingsSave.addEventListener('click', () => {
       console.error(e);
       bannedList.innerHTML = '<div class="small-note">Failed to load banned list.</div>';
     }
+  }
+
+  // show selected user details and wire quick actions
+  function showSelectedUserDetails(user){
+    const infoEl = document.getElementById('modSelectedInfo');
+    infoEl.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="width:72px;height:72px;border-radius:8px;overflow:hidden;background:#071427;flex-shrink:0" id="modPfpWrap">
+          ${user.photoURL ? `<img src="${escapeHtml(user.photoURL)}" alt="pfp" style="width:100%;height:100%;object-fit:cover">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800">${(user.name||'U').charAt(0).toUpperCase()}</div>`}
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:800">${escapeHtml(user.name || '(no name)')}</div>
+          <div class="small-note">${escapeHtml(user.email || user.uid)}</div>
+          <div class="small-note" id="modLastMsg">Loading last message...</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button id="adminSendReset" class="btn small">Send password reset</button>
+        <button id="adminRequestTemp" class="btn ghost small">Request temp password (server)</button>
+        <button id="adminShowUid" class="btn ghost small">Copy UID</button>
+      </div>
+    `;
+    modNewName.value = user.name || '';
+    modNewPhoto.value = user.photoURL || '';
+
+    // load last message text (optional)
+    if(user.sampleMsgId){
+      db.collection('chat').doc('main').collection('messages').doc(user.sampleMsgId).get().then(d => {
+        if(d.exists){
+          const data = d.data();
+          const el = document.getElementById('modLastMsg');
+          el.textContent = (data && data.text) ? `Sample: ${data.text.slice(0,120)}` : 'No sample message text';
+        }
+      }).catch(()=>{});
+    }
+
+    // wire buttons
+    const sendResetBtn = document.getElementById('adminSendReset');
+    const requestTempBtn = document.getElementById('adminRequestTemp');
+    const copyUidBtn = document.getElementById('adminShowUid');
+
+    sendResetBtn.addEventListener('click', async () => {
+      if(!user.email){ alert('No email available for this user.'); return; }
+      try{
+        await firebase.auth().sendPasswordResetEmail(user.email);
+        showToast('Password reset email sent to ' + user.email, 'success', 4000);
+        logModAction(`Sent password reset to ${user.email}`);
+      }catch(err){
+        console.error(err);
+        showToast('Failed to send reset email: ' + (err.message||''), 'warn', 5000);
+      }
+    });
+
+    requestTempBtn.addEventListener('click', async () => {
+      if(!confirm('Request a temporary password for this user (server-side action)?')) return;
+      try{
+        // Placeholder: call your server endpoint that uses Admin SDK to set a temp password.
+        // You must implement /admin/set-temp-password on your server and protect it.
+        const resp = await fetch('/admin/set-temp-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: user.uid })
+        });
+        const json = await resp.json();
+        if(resp.ok){
+          showToast('Temporary password set on server. Deliver it securely to the user.', 'success', 6000);
+          logModAction(`Requested temp password for uid ${user.uid}`);
+        } else {
+          showToast('Server failed: ' + (json.error || resp.statusText), 'warn', 6000);
+        }
+      }catch(e){
+        console.error(e);
+        showToast('Request failed', 'warn', 4000);
+      }
+    });
+
+    copyUidBtn.addEventListener('click', () => {
+      navigator.clipboard?.writeText(user.uid || '')?.then(()=> showToast('UID copied','success'))?.catch(()=>{});
+    });
   }
 
   adminAuthUnlock.addEventListener('click', async () => {
