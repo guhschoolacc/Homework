@@ -93,6 +93,13 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 
+/* admin modal */
+#adminBackdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1500;background:rgba(0,0,0,0.55)}
+#adminBackdrop[aria-hidden="false"]{display:flex}
+.admin-list{max-height:320px;overflow:auto;border:1px solid var(--border);padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
+.admin-row{display:flex;align-items:center;gap:8px;padding:6px;border-radius:6px}
+.admin-row .email{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text)}
+.admin-row .meta{font-size:12px;color:var(--muted)}
 /* search clear button */
 .search-wrap{position:relative}
 .search-clear{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
@@ -147,6 +154,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div id="profileMenu" class="profile-menu" role="menu" aria-hidden="true">
           <button id="menuAccount" class="menu-item" role="menuitem">Account</button>
           <button id="menuSettings" class="menu-item" role="menuitem">Settings</button>
+          <button id="menuAdmin" class="menu-item" role="menuitem" style="display:none">Admin Panel</button>
           <button id="menuSignOut" class="menu-item" role="menuitem" style="display:none">Sign out</button>
           <button id="menuSignIn" class="menu-item" role="menuitem">Sign in</button>
         </div>
@@ -281,6 +289,31 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
+  <!-- Admin modal -->
+  <div id="adminBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <h3 id="adminTitle">Admin Panel — Whitelisted Users</h3>
+
+      <div class="form-row">
+        <label class="small-note">Add a whitelisted email</label>
+        <div style="display:flex;gap:8px">
+          <input id="adminAddEmail" placeholder="user@example.com" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <button id="adminAddBtn" class="btn">Add</button>
+        </div>
+        <div class="small-note">Only users in this whitelist will see the admin panel.</div>
+      </div>
+
+      <div class="form-row">
+        <label class="small-note">Current whitelist</label>
+        <div id="adminList" class="admin-list" aria-live="polite"></div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button id="adminClose" class="btn ghost">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Firebase (compat) -->
@@ -352,6 +385,7 @@ function showToast(msg, type='info', ttl=3500){
 /* --------------------------- Theme handling (dark default) --------------------------- */
 const SETTINGS_KEY = 'homewrk.settings.v3';
 const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v1';
+const ADMIN_COLLECTION = 'admins'; // Firestore collection name for whitelist
 const defaultSettings = { theme:'dark', accent:'#1db954', notificationsEnabled:true, showEmailInProfile:true };
 
 function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
@@ -423,6 +457,75 @@ function setTabDisguise(title, iconUrl){
 function clearTabDisguise(){
   saveTabDisguise(null);
   applyTabDisguise();
+}
+
+/* --------------------------- Admin helpers (Firestore whitelist) --------------------------- */
+/*
+  Admin model:
+  Collection: 'admins'
+  Document ID: email (safe-encoded) OR auto-id with field { email: string, addedBy: uid/email, ts: Timestamp }
+  For simplicity we will use doc id = email (encoded) and store { email, addedBy, ts }.
+*/
+function emailToDocId(email){
+  return encodeURIComponent(email.toLowerCase());
+}
+
+async function ensureInitialAdmin(defaultAdminEmail){
+  // If admins collection empty, add the provided default admin email.
+  try{
+    const snapshot = await db.collection(ADMIN_COLLECTION).limit(1).get();
+    if(snapshot.empty && defaultAdminEmail){
+      const id = emailToDocId(defaultAdminEmail);
+      await db.collection(ADMIN_COLLECTION).doc(id).set({ email: defaultAdminEmail.toLowerCase(), addedBy: 'system', ts: firebase.firestore.FieldValue.serverTimestamp() });
+      console.info('Initial admin created:', defaultAdminEmail);
+    }
+  }catch(e){
+    console.error('ensureInitialAdmin error', e);
+  }
+}
+
+let isAdmin = false;
+let currentUserEmail = null;
+let adminUnsubscribe = null;
+
+async function checkIfAdmin(email){
+  if(!email) return false;
+  try{
+    const id = emailToDocId(email);
+    const doc = await db.collection(ADMIN_COLLECTION).doc(id).get();
+    return doc.exists;
+  }catch(e){
+    console.error('checkIfAdmin', e);
+    return false;
+  }
+}
+
+function startAdminListener(onChange){
+  if(adminUnsubscribe) return;
+  adminUnsubscribe = db.collection(ADMIN_COLLECTION).onSnapshot(snap => {
+    const list = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if(data && data.email) list.push(data.email);
+    });
+    onChange && onChange(list);
+  }, err => console.error('admin listener', err));
+}
+
+function stopAdminListener(){
+  if(adminUnsubscribe){ adminUnsubscribe(); adminUnsubscribe = null; }
+}
+
+async function addAdmin(email){
+  if(!email) throw new Error('Email required');
+  const id = emailToDocId(email);
+  await db.collection(ADMIN_COLLECTION).doc(id).set({ email: email.toLowerCase(), addedBy: (auth.currentUser && auth.currentUser.email) || 'unknown', ts: firebase.firestore.FieldValue.serverTimestamp() });
+}
+
+async function removeAdmin(email){
+  if(!email) throw new Error('Email required');
+  const id = emailToDocId(email);
+  await db.collection(ADMIN_COLLECTION).doc(id).delete();
 }
 
 /* --------------------------- Utility: find item by file --------------------------- */
@@ -741,6 +844,7 @@ const menuSettings = document.getElementById('menuSettings');
 const menuSignOut = document.getElementById('menuSignOut');
 const menuSignIn = document.getElementById('menuSignIn');
 const menuAccount = document.getElementById('menuAccount');
+const menuAdmin = document.getElementById('menuAdmin');
 
 const settingsBackdrop = document.getElementById('settingsBackdrop');
 const settingsAccent = document.getElementById('settingsAccent');
@@ -751,9 +855,15 @@ const resetAccentBtn = document.getElementById('resetAccentBtn');
 const accountBackdrop = document.getElementById('accountBackdrop');
 const accountDisplayName = document.getElementById('accountDisplayName');
 const accountPhotoUrl = document.getElementById('accountPhotoUrl');
-const accountSave = document.getElementById('accountSave');
-const accountCancel = document.getElementById('accountCancel');
+const accountSaveBtn = document.getElementById('accountSave');
+const accountCancelBtn = document.getElementById('accountCancel');
 const accountStatus = document.getElementById('accountStatus');
+
+const adminBackdrop = document.getElementById('adminBackdrop');
+const adminAddEmail = document.getElementById('adminAddEmail');
+const adminAddBtn = document.getElementById('adminAddBtn');
+const adminListEl = document.getElementById('adminList');
+const adminClose = document.getElementById('adminClose');
 
 const disguiseTitle = document.getElementById('disguiseTitle');
 const disguiseFavicon = document.getElementById('disguiseFavicon');
@@ -807,7 +917,17 @@ menuAccount.addEventListener('click', () => {
   accountBackdrop.setAttribute('aria-hidden','false');
   accountBackdrop.style.display = 'flex';
 });
+menuAdmin.addEventListener('click', () => {
+  closeProfileMenu();
+  // only show admin modal if user is admin (menuAdmin is only visible when isAdmin true)
+  adminAddEmail.value = '';
+  adminListEl.innerHTML = '<div class="small-note">Loading...</div>';
+  adminBackdrop.setAttribute('aria-hidden','false');
+  adminBackdrop.style.display = 'flex';
+  // populate list via listener (already started)
+});
 
+/* settings actions */
 settingsCancel.addEventListener('click', () => {
   settingsBackdrop.setAttribute('aria-hidden','true');
   settingsBackdrop.style.display = 'none';
@@ -901,12 +1021,68 @@ disguisePresets.forEach(btn => {
   });
 });
 
+/* --------------------------- Admin modal actions --------------------------- */
+adminClose.addEventListener('click', () => {
+  adminBackdrop.setAttribute('aria-hidden','true');
+  adminBackdrop.style.display = 'none';
+});
+adminBackdrop.addEventListener('click', (e) => { if(e.target === adminBackdrop){ adminBackdrop.setAttribute('aria-hidden','true'); adminBackdrop.style.display = 'none'; } });
+
+adminAddBtn.addEventListener('click', async () => {
+  const email = (adminAddEmail.value||'').trim().toLowerCase();
+  if(!email){ showToast('Enter an email','warn'); return; }
+  try{
+    await addAdmin(email);
+    adminAddEmail.value = '';
+    showToast('Added to whitelist','success');
+  }catch(e){
+    console.error(e);
+    showToast('Failed to add admin','warn');
+  }
+});
+
+/* render admin list into adminListEl */
+function renderAdminList(emails){
+  if(!adminListEl) return;
+  adminListEl.innerHTML = '';
+  if(!emails || emails.length === 0){
+    adminListEl.innerHTML = '<div class="small-note">No whitelisted users.</div>';
+    return;
+  }
+  emails.sort();
+  emails.forEach(email => {
+    const row = document.createElement('div');
+    row.className = 'admin-row';
+    const eSpan = document.createElement('div');
+    eSpan.className = 'email';
+    eSpan.textContent = email;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn ghost';
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', async () => {
+      if(!confirm(`Remove ${email} from whitelist?`)) return;
+      try{
+        await removeAdmin(email);
+        showToast('Removed','success');
+      }catch(err){
+        console.error(err);
+        showToast('Failed to remove','warn');
+      }
+    });
+    row.appendChild(eSpan);
+    row.appendChild(removeBtn);
+    adminListEl.appendChild(row);
+  });
+}
+
 /* --------------------------- Account modal actions --------------------------- */
-accountCancel.addEventListener('click', () => {
+accountCancelBtn.addEventListener('click', () => {
   accountBackdrop.setAttribute('aria-hidden','true');
   accountBackdrop.style.display = 'none';
 });
-accountSave.addEventListener('click', async () => {
+accountSaveBtn.addEventListener('click', async () => {
   accountStatus.textContent = '';
   if(!auth.currentUser){ accountStatus.textContent = 'You must be signed in to update account.'; return; }
   const displayName = (accountDisplayName.value||'').trim();
@@ -1049,9 +1225,14 @@ function wireTabClicksForSearch(){
 }
 
 /* --------------------------- Event wiring & init --------------------------- */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   applyThemeFromSettings();
   applyTabDisguise();
+
+  // ensure initial admin exists (user requested their email be whitelisted)
+  // Replace the defaultAdminEmail below with the email you want pre-whitelisted.
+  // The user provided: stievercaden@gmail.com
+  await ensureInitialAdmin('stievercaden@gmail.com');
 
   Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', () => {
     Array.from(document.querySelectorAll('.tab')).forEach(x=>x.classList.remove('active'));
@@ -1110,7 +1291,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderActive('games');
 
   // auth state
-  auth.onAuthStateChanged(user => { updateMiniProfile(); });
+  auth.onAuthStateChanged(async user => {
+    updateMiniProfile();
+    currentUserEmail = user && user.email ? user.email.toLowerCase() : null;
+    // check admin status
+    isAdmin = false;
+    if(currentUserEmail){
+      try{
+        isAdmin = await checkIfAdmin(currentUserEmail);
+      }catch(e){ console.error('admin check failed', e); }
+    }
+    // show/hide admin menu
+    menuAdmin.style.display = isAdmin ? 'block' : 'none';
+
+    // start admin listener to populate admin list in modal (only if user is admin)
+    if(isAdmin){
+      startAdminListener(list => {
+        renderAdminList(list);
+      });
+    } else {
+      stopAdminListener();
+    }
+  });
 
   // close auth modal on backdrop click
   authBackdrop.addEventListener('click', (e) => { if(e.target === authBackdrop) closeAuthModal(); });
