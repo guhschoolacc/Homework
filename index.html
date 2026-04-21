@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>homewrk — full</title>
+  <title>homewrk</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- favicon placeholder; script will update href when disguise applied -->
+  <link id="pageFavicon" rel="icon" href="data:," />
   <style>
 :root{ --bg:#071021; --panel:#0e1620; --muted:#9aa4b2; --accent:#1db954; --accent-2:#17a44a; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.04); --radius:12px; --text:#e6eef6; }
 [data-theme="light"]{ --bg:#f6f8fb; --panel:#ffffff; --muted:#6b7280; --accent:#0ea5e9; --accent-2:#3b82f6; --text:#0b1220; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
@@ -73,7 +75,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .chat-controls input[type="text"] { padding:10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:inherit; outline:none; min-width:0; }
 .chat-controls .wide { width:220px; max-width:40vw; }
 
-/* auth modal */
+/* modal/backdrop */
 .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1200;background:rgba(0,0,0,0.45)}
 .modal{width:520px;max-width:96%;background:var(--panel);border-radius:12px;padding:18px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
 .modal h3{margin:0 0 12px 0}
@@ -85,12 +87,12 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 #accountBackdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1400;background:rgba(0,0,0,0.45)}
 #accountBackdrop[aria-hidden="false"]{display:flex}
 
-/* tab masking UI */
-.mask-preview{display:flex;gap:8px;align-items:center}
-.mask-preview .preview-icon{width:36px;height:36px;border-radius:8px;background:#0b1220;overflow:hidden}
-.mask-preview .preview-icon img{width:100%;height:100%;object-fit:cover}
-.mask-presets{display:flex;gap:8px;flex-wrap:wrap}
-.mask-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
+/* disguise preview */
+.disguise-preview{display:flex;gap:12px;align-items:center}
+.disguise-preview .fav{width:36px;height:36px;border-radius:6px;background:#0b1220;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.disguise-preview .fav img{width:100%;height:100%;object-fit:cover}
+.disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
   </style>
 </head>
 <body>
@@ -105,19 +107,19 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       </div>
 
       <nav class="tabs" role="tablist" aria-label="Main categories" id="tabsContainer">
-        <div class="tab active" role="tab" data-target="games" data-default-label="Games" data-default-icon="">
+        <div class="tab active" role="tab" data-target="games" data-default-label="Games">
           <span class="tab-icon" aria-hidden="true"></span>
           <span class="tab-label">Games</span>
         </div>
-        <div class="tab" role="tab" data-target="tools" data-default-label="Tools" data-default-icon="">
+        <div class="tab" role="tab" data-target="tools" data-default-label="Tools">
           <span class="tab-icon" aria-hidden="true"></span>
           <span class="tab-label">Tools</span>
         </div>
-        <div class="tab" role="tab" data-target="favorites" data-default-label="Favorites" data-default-icon="">
+        <div class="tab" role="tab" data-target="favorites" data-default-label="Favorites">
           <span class="tab-icon" aria-hidden="true"></span>
           <span class="tab-label">Favorites</span>
         </div>
-        <div class="tab" role="tab" data-target="chat" data-default-label="Chat" data-default-icon="">
+        <div class="tab" role="tab" data-target="chat" data-default-label="Chat">
           <span class="tab-icon" aria-hidden="true"></span>
           <span class="tab-label">Chat</span>
         </div>
@@ -187,8 +189,8 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
-  <!-- Settings modal (includes tab masking) -->
-  <div id="settingsBackdrop" aria-hidden="true">
+  <!-- Settings modal (browser tab disguise included) -->
+  <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <h3 id="settingsTitle">Settings</h3>
 
@@ -211,45 +213,36 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       <hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />
 
       <div class="form-row">
-        <label class="small-note">Tab masking (rename tabs and change icons)</label>
+        <label class="small-note">Browser tab disguise</label>
 
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <select id="maskTabSelect" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit">
-            <option value="games">Games</option>
-            <option value="tools">Tools</option>
-            <option value="favorites">Favorites</option>
-            <option value="chat">Chat</option>
-          </select>
+          <input id="disguiseTitle" placeholder="Tab title (what appears in browser tab)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <button id="disguiseApplyTitle" class="btn ghost">Apply</button>
         </div>
 
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="maskNameInput" placeholder="Custom tab name" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="maskApplyName" class="btn ghost">Apply</button>
+          <input id="disguiseFavicon" placeholder="Favicon image URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <button id="disguiseApplyIcon" class="btn ghost">Apply</button>
         </div>
 
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="maskIconUrl" placeholder="Icon image URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="maskApplyIcon" class="btn ghost">Apply</button>
-        </div>
-
-        <div class="mask-preview" style="margin-bottom:8px">
-          <div class="preview-icon" id="maskPreviewIcon"><!-- preview --></div>
+        <div class="disguise-preview" style="margin-bottom:8px">
+          <div class="fav" id="disguisePreviewIcon"><!-- icon --></div>
           <div>
-            <div id="maskPreviewName" style="font-weight:700">Preview</div>
-            <div class="small-note" id="maskPreviewTab">Tab</div>
+            <div id="disguisePreviewTitle" style="font-weight:700">Preview title</div>
+            <div class="small-note">This will be the browser tab title and favicon</div>
           </div>
           <div style="margin-left:auto;display:flex;gap:8px">
-            <button id="maskResetBtn" class="btn ghost">Reset</button>
-            <button id="maskClearAllBtn" class="btn ghost">Clear All</button>
+            <button id="disguiseResetBtn" class="btn ghost">Reset</button>
+            <button id="disguiseClearBtn" class="btn ghost">Clear</button>
           </div>
         </div>
 
         <div class="small-note" style="margin-bottom:6px">Presets</div>
-        <div class="mask-presets">
-          <button class="preset-btn" data-name="Google Drive" data-icon="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">Google Drive</button>
-          <button class="preset-btn" data-name="Gmail" data-icon="https://www.gstatic.com/images/branding/product/1x/gmail_48dp.png">Gmail</button>
-          <button class="preset-btn" data-name="Google" data-icon="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png">Google</button>
-          <button class="preset-btn" data-name="YouTube" data-icon="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg">YouTube</button>
+        <div class="disguise-presets">
+          <button class="disguise-preset" data-title="Google Drive" data-icon="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">Google Drive</button>
+          <button class="disguise-preset" data-title="Gmail" data-icon="https://www.gstatic.com/images/branding/product/1x/gmail_48dp.png">Gmail</button>
+          <button class="disguise-preset" data-title="Google" data-icon="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png">Google</button>
+          <button class="disguise-preset" data-title="YouTube" data-icon="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg">YouTube</button>
         </div>
       </div>
 
@@ -261,7 +254,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
   </div>
 
   <!-- Account modal -->
-  <div id="accountBackdrop" aria-hidden="true">
+  <div id="accountBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
       <h3 id="accountTitle">Account Settings</h3>
 
@@ -355,7 +348,7 @@ function showToast(msg, type='info', ttl=3500){
 
 /* --------------------------- Theme handling (dark default) --------------------------- */
 const SETTINGS_KEY = 'homewrk.settings.v3';
-const TAB_MASK_KEY = 'homewrk.tabmasks.v1';
+const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v1';
 const defaultSettings = { theme:'dark', accent:'#1db954', notificationsEnabled:true, showEmailInProfile:true };
 
 function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
@@ -371,66 +364,66 @@ function applyThemeFromSettings(){
   document.documentElement.style.setProperty('--accent-2', shadeColor(s.accent||defaultSettings.accent, -12));
 }
 
-/* --------------------------- Tab masking (localStorage) --------------------------- */
-function loadTabMasks(){
+/* --------------------------- Browser tab disguise (localStorage) --------------------------- */
+function loadTabDisguise(){
   try{
-    const raw = localStorage.getItem(TAB_MASK_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(TAB_DISGUISE_KEY);
+    return raw ? JSON.parse(raw) : null;
   }catch(e){
-    return {};
+    return null;
   }
 }
-function saveTabMasks(masks){
-  localStorage.setItem(TAB_MASK_KEY, JSON.stringify(masks));
+function saveTabDisguise(obj){
+  if(!obj) localStorage.removeItem(TAB_DISGUISE_KEY);
+  else localStorage.setItem(TAB_DISGUISE_KEY, JSON.stringify(obj));
 }
-function applyTabMasks(){
-  const masks = loadTabMasks();
-  const tabs = document.querySelectorAll('#tabsContainer .tab');
-  tabs.forEach(tab => {
-    const key = tab.dataset.target;
-    const labelEl = tab.querySelector('.tab-label');
-    const iconEl = tab.querySelector('.tab-icon');
-    const defaultLabel = tab.dataset.defaultLabel || labelEl.textContent;
-    if(masks[key] && masks[key].name){
-      labelEl.textContent = masks[key].name;
-    } else {
-      labelEl.textContent = defaultLabel;
-    }
-    // icon
-    if(masks[key] && masks[key].icon){
-      iconEl.innerHTML = `<img src="${masks[key].icon}" alt="${labelEl.textContent}">`;
-    } else {
-      iconEl.innerHTML = '';
-    }
-  });
-
-  // brand logo/title masks (optional)
-  const brand = document.getElementById('brandLogo');
-  const brandTitle = document.getElementById('brandTitle');
-  if(masks._brand){
-    if(masks._brand.icon){
-      brand.innerHTML = `<img src="${masks._brand.icon}" alt="brand">`;
-    } else {
-      brand.innerHTML = 'HW';
-    }
-    if(masks._brand.name) brandTitle.textContent = masks._brand.name;
+function applyTabDisguise(){
+  const d = loadTabDisguise();
+  const defaultTitle = 'homewrk';
+  const title = d && d.title ? d.title : defaultTitle;
+  document.title = title;
+  const faviconEl = document.getElementById('pageFavicon') || createFaviconLink();
+  if(d && d.icon){
+    setFavicon(d.icon);
+    // preview area update handled elsewhere
+  } else {
+    // reset to default blank or app icon
+    setFavicon('data:,');
   }
 }
-
-/* helper to set a mask for a tab */
-function setTabMask(tabKey, name, iconUrl){
-  const masks = loadTabMasks();
-  masks[tabKey] = masks[tabKey] || {};
-  if(name === null) delete masks[tabKey].name; else if(name !== undefined) masks[tabKey].name = name;
-  if(iconUrl === null) delete masks[tabKey].icon; else if(iconUrl !== undefined) masks[tabKey].icon = iconUrl;
-  // if object empty, remove
-  if(masks[tabKey] && Object.keys(masks[tabKey]).length === 0) delete masks[tabKey];
-  saveTabMasks(masks);
-  applyTabMasks();
+function setFavicon(url){
+  // update or create link#pageFavicon
+  let link = document.getElementById('pageFavicon');
+  if(!link){
+    link = createFaviconLink();
+  }
+  link.href = url;
 }
-function clearAllTabMasks(){
-  localStorage.removeItem(TAB_MASK_KEY);
-  applyTabMasks();
+function createFaviconLink(){
+  const existing = document.getElementById('pageFavicon');
+  if(existing) return existing;
+  const link = document.createElement('link');
+  link.id = 'pageFavicon';
+  link.rel = 'icon';
+  link.href = 'data:,';
+  document.head.appendChild(link);
+  return link;
+}
+function setTabDisguise(title, iconUrl){
+  const obj = {};
+  if(title !== undefined) obj.title = title || '';
+  if(iconUrl !== undefined) obj.icon = iconUrl || '';
+  // if both empty, clear
+  if((!obj.title || obj.title === '') && (!obj.icon || obj.icon === '')) {
+    saveTabDisguise(null);
+  } else {
+    saveTabDisguise(obj);
+  }
+  applyTabDisguise();
+}
+function clearTabDisguise(){
+  saveTabDisguise(null);
+  applyTabDisguise();
 }
 
 /* --------------------------- Utility: find item by file --------------------------- */
@@ -762,17 +755,15 @@ const accountSave = document.getElementById('accountSave');
 const accountCancel = document.getElementById('accountCancel');
 const accountStatus = document.getElementById('accountStatus');
 
-const maskTabSelect = document.getElementById('maskTabSelect');
-const maskNameInput = document.getElementById('maskNameInput');
-const maskIconUrl = document.getElementById('maskIconUrl');
-const maskApplyName = document.getElementById('maskApplyName');
-const maskApplyIcon = document.getElementById('maskApplyIcon');
-const maskPreviewIcon = document.getElementById('maskPreviewIcon');
-const maskPreviewName = document.getElementById('maskPreviewName');
-const maskPreviewTab = document.getElementById('maskPreviewTab');
-const maskResetBtn = document.getElementById('maskResetBtn');
-const maskClearAllBtn = document.getElementById('maskClearAllBtn');
-const presetButtons = document.querySelectorAll('.preset-btn');
+const disguiseTitle = document.getElementById('disguiseTitle');
+const disguiseFavicon = document.getElementById('disguiseFavicon');
+const disguiseApplyTitle = document.getElementById('disguiseApplyTitle');
+const disguiseApplyIcon = document.getElementById('disguiseApplyIcon');
+const disguisePreviewIcon = document.getElementById('disguisePreviewIcon');
+const disguisePreviewTitle = document.getElementById('disguisePreviewTitle');
+const disguiseResetBtn = document.getElementById('disguiseResetBtn');
+const disguiseClearBtn = document.getElementById('disguiseClearBtn');
+const disguisePresets = document.querySelectorAll('.disguise-preset');
 
 function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileButton.setAttribute('aria-expanded','false'); }
 function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileButton.setAttribute('aria-expanded','true'); }
@@ -795,12 +786,12 @@ menuSettings.addEventListener('click', () => {
   document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
   const themeBtn = document.querySelector(`.theme-select[data-theme="${(s.theme||'dark')}"]`);
   if(themeBtn) themeBtn.classList.add('active');
-  // populate mask preview with current selection
-  const masks = loadTabMasks();
-  const sel = maskTabSelect.value;
-  maskNameInput.value = (masks[sel] && masks[sel].name) ? masks[sel].name : '';
-  maskIconUrl.value = (masks[sel] && masks[sel].icon) ? masks[sel].icon : '';
-  updateMaskPreview(sel);
+
+  // populate disguise preview with current disguise
+  const d = loadTabDisguise();
+  disguiseTitle.value = d && d.title ? d.title : '';
+  disguiseFavicon.value = d && d.icon ? d.icon : '';
+  updateDisguisePreview();
   settingsBackdrop.setAttribute('aria-hidden','false');
   settingsBackdrop.style.display = 'flex';
 });
@@ -852,86 +843,68 @@ document.addEventListener('click', (e) => {
   document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
 });
 
-/* --------------------------- Tab masking UI actions --------------------------- */
-function updateMaskPreview(tabKey){
-  const masks = loadTabMasks();
-  const name = (masks[tabKey] && masks[tabKey].name) ? masks[tabKey].name : document.querySelector(`.tab[data-target="${tabKey}"] .tab-label`).textContent;
-  const icon = (masks[tabKey] && masks[tabKey].icon) ? masks[tabKey].icon : '';
-  maskPreviewName.textContent = name || 'Preview';
-  maskPreviewTab.textContent = tabKey;
+/* --------------------------- Disguise UI actions --------------------------- */
+function updateDisguisePreview(){
+  const d = loadTabDisguise();
+  const title = d && d.title ? d.title : (disguiseTitle.value || 'Preview title');
+  const icon = d && d.icon ? d.icon : (disguiseFavicon.value || '');
+  disguisePreviewTitle.textContent = title;
   if(icon){
-    maskPreviewIcon.innerHTML = `<img src="${icon}" alt="icon">`;
+    disguisePreviewIcon.innerHTML = `<img src="${icon}" alt="icon">`;
   } else {
-    maskPreviewIcon.innerHTML = '';
+    disguisePreviewIcon.innerHTML = '';
   }
 }
-maskTabSelect.addEventListener('change', () => {
-  const sel = maskTabSelect.value;
-  const masks = loadTabMasks();
-  maskNameInput.value = (masks[sel] && masks[sel].name) ? masks[sel].name : '';
-  maskIconUrl.value = (masks[sel] && masks[sel].icon) ? masks[sel].icon : '';
-  updateMaskPreview(sel);
+disguiseApplyTitle.addEventListener('click', () => {
+  const t = (disguiseTitle.value||'').trim();
+  setTabDisguise(t || '', undefined);
+  updateDisguisePreview();
+  showToast('Tab title applied','success');
 });
-maskApplyName.addEventListener('click', () => {
-  const sel = maskTabSelect.value;
-  const name = (maskNameInput.value||'').trim();
-  setTabMask(sel, name || null, undefined);
-  updateMaskPreview(sel);
-  showToast('Tab name updated','success');
-});
-maskApplyIcon.addEventListener('click', async () => {
-  const sel = maskTabSelect.value;
-  const url = (maskIconUrl.value||'').trim();
-  if(!url){ setTabMask(sel, undefined, null); updateMaskPreview(sel); showToast('Icon removed','success'); return; }
+disguiseApplyIcon.addEventListener('click', async () => {
+  const url = (disguiseFavicon.value||'').trim();
+  if(!url){
+    // remove icon
+    setTabDisguise(undefined, '');
+    updateDisguisePreview();
+    showToast('Favicon removed','success');
+    return;
+  }
   try{
     await preloadImage(url, 5000);
-    setTabMask(sel, undefined, url);
-    updateMaskPreview(sel);
-    showToast('Tab icon updated','success');
+    setTabDisguise(undefined, url);
+    updateDisguisePreview();
+    showToast('Favicon applied','success');
   }catch(e){
-    showToast('Icon failed to load','warn');
+    showToast('Favicon failed to load','warn');
   }
 });
-maskResetBtn.addEventListener('click', () => {
-  const sel = maskTabSelect.value;
-  setTabMask(sel, null, null);
-  maskNameInput.value = '';
-  maskIconUrl.value = '';
-  updateMaskPreview(sel);
-  showToast('Tab reset to default','success');
+disguiseResetBtn.addEventListener('click', () => {
+  // reset to default app title and favicon
+  clearTabDisguise();
+  disguiseTitle.value = '';
+  disguiseFavicon.value = '';
+  updateDisguisePreview();
+  showToast('Tab disguise reset','success');
 });
-maskClearAllBtn.addEventListener('click', () => {
-  clearAllTabMasks();
-  maskNameInput.value = '';
-  maskIconUrl.value = '';
-  updateMaskPreview(maskTabSelect.value);
-  showToast('All tab masks cleared','success');
+disguiseClearBtn.addEventListener('click', () => {
+  // clear stored disguise but keep preview inputs
+  saveTabDisguise(null);
+  updateDisguisePreview();
+  showToast('Tab disguise cleared','success');
 });
-
-/* presets */
-presetButtons.forEach(btn => {
+disguisePresets.forEach(btn => {
   btn.addEventListener('click', () => {
-    const name = btn.dataset.name;
-    const icon = btn.dataset.icon;
-    const sel = maskTabSelect.value;
-    setTabMask(sel, name, icon);
-    maskNameInput.value = name;
-    maskIconUrl.value = icon;
-    updateMaskPreview(sel);
+    const title = btn.dataset.title || '';
+    const icon = btn.dataset.icon || '';
+    disguiseTitle.value = title;
+    disguiseFavicon.value = icon;
+    // apply immediately
+    setTabDisguise(title, icon);
+    updateDisguisePreview();
     showToast('Preset applied','success');
   });
 });
-
-/* brand masking: allow saving brand mask via special key _brand */
-function setBrandMask(name, iconUrl){
-  const masks = loadTabMasks();
-  masks._brand = masks._brand || {};
-  if(name === null) delete masks._brand.name; else if(name !== undefined) masks._brand.name = name;
-  if(iconUrl === null) delete masks._brand.icon; else if(iconUrl !== undefined) masks._brand.icon = iconUrl;
-  if(masks._brand && Object.keys(masks._brand).length === 0) delete masks._brand;
-  saveTabMasks(masks);
-  applyTabMasks();
-}
 
 /* --------------------------- Account modal actions --------------------------- */
 accountCancel.addEventListener('click', () => {
@@ -997,7 +970,7 @@ function updateMiniProfile(){
 /* --------------------------- Event wiring & init --------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   applyThemeFromSettings();
-  applyTabMasks();
+  applyTabDisguise();
 
   Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', () => {
     Array.from(document.querySelectorAll('.tab')).forEach(x=>x.classList.remove('active'));
@@ -1058,6 +1031,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // close auth modal on backdrop click
   authBackdrop.addEventListener('click', (e) => { if(e.target === authBackdrop) closeAuthModal(); });
+
+  // wire disguise preview updates when inputs change
+  disguiseTitle.addEventListener('input', updateDisguisePreview);
+  disguiseFavicon.addEventListener('input', updateDisguisePreview);
 });
   </script>
 </body>
