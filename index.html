@@ -9,6 +9,9 @@
   <style>
 :root{ --bg:#071021; --panel:#0e1620; --muted:#9aa4b2; --accent:#1db954; --accent-2:#17a44a; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.04); --radius:12px; --text:#e6eef6; }
 [data-theme="light"]{ --bg:#f6f8fb; --panel:#ffffff; --muted:#6b7280; --accent:#0ea5e9; --accent-2:#3b82f6; --text:#0b1220; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
+[data-theme="solarized"]{ --bg:#002b36; --panel:#073642; --muted:#93a1a1; --accent:#b58900; --accent-2:#cb4b16; --text:#fdf6e3; --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.03); }
+[data-theme="sepia"]{ --bg:#f4ecd8; --panel:#efe6cf; --muted:#7b6f5a; --accent:#b85c00; --accent-2:#8b3b00; --text:#2b2b2b; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
+[data-theme="hc"]{ --bg:#000000; --panel:#0b0b0b; --muted:#9ae6ff; --accent:#ffff00; --accent-2:#ff00ff; --text:#ffffff; --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.06); }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg)}
 .app{height:100vh;display:grid;grid-template-columns:300px 1fr;gap:18px;padding:18px}
@@ -19,8 +22,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .tabs{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .tab{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid transparent;font-weight:700;display:flex;align-items:center;gap:8px}
 .tab.active{background:var(--glass);color:var(--text)}
-.tab .tab-icon{width:20px;height:20px;border-radius:6px;background:transparent;display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
-.tab .tab-icon img{width:100%;height:100%;object-fit:cover;border-radius:4px}
 .profile-card{display:flex;align-items:center;gap:12px;margin-top:auto;position:relative}
 .profile-avatar{width:56px;height:56px;border-radius:12px;background:#0b2a3a;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;border:none;cursor:pointer;overflow:hidden}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:8px}
@@ -38,7 +39,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .topbar-left{display:flex;gap:12px;align-items:center}
 .topbar-right{display:flex;gap:8px;align-items:center}
-.top-admin-btn{display:none;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 .content{flex:1;background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .section-head{display:flex;justify-content:space-between;align-items:center}
 .chat-window{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
@@ -97,13 +97,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .disguise-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .disguise-presets button{padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 
-/* admin modal */
-#adminBackdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1500;background:rgba(0,0,0,0.55)}
-#adminBackdrop[aria-hidden="false"]{display:flex}
-.admin-list{max-height:320px;overflow:auto;border:1px solid var(--border);padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
-.admin-row{display:flex;align-items:center;gap:8px;padding:6px;border-radius:6px}
-.admin-row .email{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text)}
-.admin-row .meta{font-size:12px;color:var(--muted)}
 /* search clear button */
 .search-wrap{position:relative}
 .search-clear{position:absolute;right:10px;top:8px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px}
@@ -158,7 +151,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div id="profileMenu" class="profile-menu" role="menu" aria-hidden="true">
           <button id="menuAccount" class="menu-item" role="menuitem">Account</button>
           <button id="menuSettings" class="menu-item" role="menuitem">Settings</button>
-          <button id="menuAdmin" class="menu-item" role="menuitem" style="display:none">Admin Panel</button>
           <button id="menuSignOut" class="menu-item" role="menuitem" style="display:none">Sign out</button>
           <button id="menuSignIn" class="menu-item" role="menuitem">Sign in</button>
         </div>
@@ -168,11 +160,10 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     <main class="main">
       <div class="topbar">
         <div class="topbar-left">
-          <input id="global-search-top" placeholder="Search..." style="display:none" />
+          <div class="small-note">Welcome</div>
         </div>
         <div class="topbar-right">
-          <!-- Admin button that appears top-right for whitelisted users -->
-          <button id="topAdminBtn" class="top-admin-btn" title="Open Admin Panel">Admin</button>
+          <!-- reserved for future top controls -->
         </div>
       </div>
 
@@ -214,7 +205,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
-  <!-- Settings modal (browser tab disguise included) -->
+  <!-- Settings modal (themes, accent, panic key, tab disguise) -->
   <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <h3 id="settingsTitle">Settings</h3>
@@ -224,6 +215,9 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn ghost theme-select" data-theme="dark">Dark</button>
           <button class="btn ghost theme-select" data-theme="light">Light</button>
+          <button class="btn ghost theme-select" data-theme="solarized">Solarized</button>
+          <button class="btn ghost theme-select" data-theme="sepia">Sepia</button>
+          <button class="btn ghost theme-select" data-theme="hc">High Contrast</button>
         </div>
       </div>
 
@@ -271,6 +265,21 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         </div>
       </div>
 
+      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />
+
+      <div class="form-row">
+        <label class="small-note">Panic key</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="panicKeyInput" maxlength="1" placeholder="single key" style="width:72px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+          <select id="panicAction" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit">
+            <option value="close">Close tab (preferred)</option>
+            <option value="redirect">Redirect to URL</option>
+          </select>
+          <input id="panicRedirectUrl" placeholder="https://example.com" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
+        </div>
+        <div class="small-note">Press the panic key to immediately close the tab or redirect. Default key is a single quote: '</div>
+      </div>
+
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
         <button id="settingsCancel" class="btn ghost">Cancel</button>
         <button id="settingsSave" class="btn">Save</button>
@@ -300,31 +309,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       </div>
 
       <div id="accountStatus" class="small-note" style="margin-top:10px"></div>
-    </div>
-  </div>
-
-  <!-- Admin modal -->
-  <div id="adminBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
-      <h3 id="adminTitle">Admin Panel — Whitelisted Users</h3>
-
-      <div class="form-row">
-        <label class="small-note">Add a whitelisted email</label>
-        <div style="display:flex;gap:8px">
-          <input id="adminAddEmail" placeholder="user@example.com" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="adminAddBtn" class="btn">Add</button>
-        </div>
-        <div class="small-note">Only users in this whitelist will see the admin panel.</div>
-      </div>
-
-      <div class="form-row">
-        <label class="small-note">Current whitelist</label>
-        <div id="adminList" class="admin-list" aria-live="polite"></div>
-      </div>
-
-      <div style="display:flex;justify-content:flex-end;gap:8px">
-        <button id="adminClose" class="btn ghost">Close</button>
-      </div>
     </div>
   </div>
 
@@ -399,7 +383,7 @@ function showToast(msg, type='info', ttl=3500){
 /* --------------------------- Theme handling (dark default) --------------------------- */
 const SETTINGS_KEY = 'homewrk.settings.v3';
 const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v1';
-const ADMIN_COLLECTION = 'admins'; // Firestore collection name for whitelist
+const PANIC_KEY = 'homewrk.panic.v1';
 const defaultSettings = { theme:'dark', accent:'#1db954', notificationsEnabled:true, showEmailInProfile:true };
 
 function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
@@ -409,7 +393,7 @@ function shadeColor(hex, percent){ try{ const h = hex.replace('#',''); const num
 
 function applyThemeFromSettings(){
   const s = loadSettings();
-  const theme = (s.theme === 'light') ? 'light' : 'dark';
+  const theme = (s.theme === 'light') ? 'light' : (s.theme === 'solarized' ? 'solarized' : (s.theme === 'sepia' ? 'sepia' : (s.theme === 'hc' ? 'hc' : 'dark')));
   document.documentElement.setAttribute('data-theme', theme);
   document.documentElement.style.setProperty('--accent', s.accent || defaultSettings.accent);
   document.documentElement.style.setProperty('--accent-2', shadeColor(s.accent||defaultSettings.accent, -12));
@@ -471,81 +455,6 @@ function setTabDisguise(title, iconUrl){
 function clearTabDisguise(){
   saveTabDisguise(null);
   applyTabDisguise();
-}
-
-/* --------------------------- Admin helpers (Firestore whitelist) --------------------------- */
-/*
-  Admin model:
-  Collection: 'admins'
-  Document ID: email (encoded) OR auto-id with field { email: string, addedBy: uid/email, ts: Timestamp }
-  For simplicity we use doc id = encodeURIComponent(email.toLowerCase()) and store { email, addedBy, ts }.
-
-  WHERE TO WHITELIST PEOPLE:
-  - You can add initial whitelisted emails directly in code by calling ensureInitialAdmin('you@example.com')
-    (see the call near the end of the script inside DOMContentLoaded).
-  - Or add/remove entries in Firestore under the collection named "admins".
-    Each document id should be the encoded email (encodeURIComponent(email.toLowerCase())) and contain { email, addedBy, ts }.
-*/
-function emailToDocId(email){
-  return encodeURIComponent(email.toLowerCase());
-}
-
-async function ensureInitialAdmin(defaultAdminEmail){
-  // If admins collection empty, add the provided default admin email.
-  try{
-    const snapshot = await db.collection(ADMIN_COLLECTION).limit(1).get();
-    if(snapshot.empty && defaultAdminEmail){
-      const id = emailToDocId(defaultAdminEmail);
-      await db.collection(ADMIN_COLLECTION).doc(id).set({ email: defaultAdminEmail.toLowerCase(), addedBy: 'system', ts: firebase.firestore.FieldValue.serverTimestamp() });
-      console.info('Initial admin created:', defaultAdminEmail);
-    }
-  }catch(e){
-    console.error('ensureInitialAdmin error', e);
-  }
-}
-
-let isAdmin = false;
-let currentUserEmail = null;
-let adminUnsubscribe = null;
-
-async function checkIfAdmin(email){
-  if(!email) return false;
-  try{
-    const id = emailToDocId(email);
-    const doc = await db.collection(ADMIN_COLLECTION).doc(id).get();
-    return doc.exists;
-  }catch(e){
-    console.error('checkIfAdmin', e);
-    return false;
-  }
-}
-
-function startAdminListener(onChange){
-  if(adminUnsubscribe) return;
-  adminUnsubscribe = db.collection(ADMIN_COLLECTION).onSnapshot(snap => {
-    const list = [];
-    snap.forEach(d => {
-      const data = d.data();
-      if(data && data.email) list.push(data.email);
-    });
-    onChange && onChange(list);
-  }, err => console.error('admin listener', err));
-}
-
-function stopAdminListener(){
-  if(adminUnsubscribe){ adminUnsubscribe(); adminUnsubscribe = null; }
-}
-
-async function addAdmin(email){
-  if(!email) throw new Error('Email required');
-  const id = emailToDocId(email);
-  await db.collection(ADMIN_COLLECTION).doc(id).set({ email: email.toLowerCase(), addedBy: (auth.currentUser && auth.currentUser.email) || 'unknown', ts: firebase.firestore.FieldValue.serverTimestamp() });
-}
-
-async function removeAdmin(email){
-  if(!email) throw new Error('Email required');
-  const id = emailToDocId(email);
-  await db.collection(ADMIN_COLLECTION).doc(id).delete();
 }
 
 /* --------------------------- Utility: find item by file --------------------------- */
@@ -864,7 +773,6 @@ const menuSettings = document.getElementById('menuSettings');
 const menuSignOut = document.getElementById('menuSignOut');
 const menuSignIn = document.getElementById('menuSignIn');
 const menuAccount = document.getElementById('menuAccount');
-const menuAdmin = document.getElementById('menuAdmin');
 
 const settingsBackdrop = document.getElementById('settingsBackdrop');
 const settingsAccent = document.getElementById('settingsAccent');
@@ -875,15 +783,9 @@ const resetAccentBtn = document.getElementById('resetAccentBtn');
 const accountBackdrop = document.getElementById('accountBackdrop');
 const accountDisplayName = document.getElementById('accountDisplayName');
 const accountPhotoUrl = document.getElementById('accountPhotoUrl');
-const accountSaveBtn = document.getElementById('accountSave');
-const accountCancelBtn = document.getElementById('accountCancel');
+const accountSave = document.getElementById('accountSave');
+const accountCancel = document.getElementById('accountCancel');
 const accountStatus = document.getElementById('accountStatus');
-
-const adminBackdrop = document.getElementById('adminBackdrop');
-const adminAddEmail = document.getElementById('adminAddEmail');
-const adminAddBtn = document.getElementById('adminAddBtn');
-const adminListEl = document.getElementById('adminList');
-const adminClose = document.getElementById('adminClose');
 
 const disguiseTitle = document.getElementById('disguiseTitle');
 const disguiseFavicon = document.getElementById('disguiseFavicon');
@@ -895,7 +797,9 @@ const disguiseResetBtn = document.getElementById('disguiseResetBtn');
 const disguiseClearBtn = document.getElementById('disguiseClearBtn');
 const disguisePresets = document.querySelectorAll('.disguise-preset');
 
-const topAdminBtn = document.getElementById('topAdminBtn');
+const panicKeyInput = document.getElementById('panicKeyInput');
+const panicAction = document.getElementById('panicAction');
+const panicRedirectUrl = document.getElementById('panicRedirectUrl');
 
 function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileButton.setAttribute('aria-expanded','false'); }
 function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileButton.setAttribute('aria-expanded','true'); }
@@ -923,6 +827,13 @@ menuSettings.addEventListener('click', () => {
   disguiseTitle.value = d && d.title ? d.title : '';
   disguiseFavicon.value = d && d.icon ? d.icon : '';
   updateDisguisePreview();
+
+  // load panic settings
+  const panic = JSON.parse(localStorage.getItem(PANIC_KEY) || '{}');
+  panicKeyInput.value = panic.key || "'";
+  panicAction.value = panic.action || 'close';
+  panicRedirectUrl.value = panic.redirect || 'https://www.google.com';
+
   settingsBackdrop.setAttribute('aria-hidden','false');
   settingsBackdrop.style.display = 'flex';
 });
@@ -939,21 +850,7 @@ menuAccount.addEventListener('click', () => {
   accountBackdrop.setAttribute('aria-hidden','false');
   accountBackdrop.style.display = 'flex';
 });
-menuAdmin.addEventListener('click', () => {
-  closeProfileMenu();
-  openAdminModal();
-});
-topAdminBtn.addEventListener('click', openAdminModal);
 
-function openAdminModal(){
-  // only open if user is admin (button/menu visibility is controlled elsewhere)
-  adminAddEmail.value = '';
-  adminListEl.innerHTML = '<div class="small-note">Loading...</div>';
-  adminBackdrop.setAttribute('aria-hidden','false');
-  adminBackdrop.style.display = 'flex';
-}
-
-/* settings actions */
 settingsCancel.addEventListener('click', () => {
   settingsBackdrop.setAttribute('aria-hidden','true');
   settingsBackdrop.style.display = 'none';
@@ -961,9 +858,17 @@ settingsCancel.addEventListener('click', () => {
 settingsSave.addEventListener('click', () => {
   const s = loadSettings();
   s.accent = settingsAccent.value || s.accent;
+  // theme is read from document attribute (set by theme buttons)
   s.theme = document.documentElement.getAttribute('data-theme') || 'dark';
   saveSettings(s);
   applyThemeFromSettings();
+
+  // save panic settings
+  const key = (panicKeyInput.value || "'").slice(0,1);
+  const action = panicAction.value || 'close';
+  const redirect = (panicRedirectUrl.value || '').trim() || 'https://www.google.com';
+  localStorage.setItem(PANIC_KEY, JSON.stringify({ key, action, redirect }));
+
   settingsBackdrop.setAttribute('aria-hidden','true');
   settingsBackdrop.style.display = 'none';
   showToast('Settings saved','success');
@@ -985,7 +890,7 @@ document.addEventListener('click', (e) => {
   document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
   t.classList.add('active');
   const theme = t.getAttribute('data-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', theme);
 });
 
 /* --------------------------- Disguise UI actions --------------------------- */
@@ -1046,60 +951,6 @@ disguisePresets.forEach(btn => {
     showToast('Preset applied','success');
   });
 });
-
-/* --------------------------- Admin modal actions --------------------------- */
-adminClose.addEventListener('click', () => {
-  adminBackdrop.setAttribute('aria-hidden','true');
-  adminBackdrop.style.display = 'none';
-});
-adminBackdrop.addEventListener('click', (e) => { if(e.target === adminBackdrop){ adminBackdrop.setAttribute('aria-hidden','true'); adminBackdrop.style.display = 'none'; } });
-
-adminAddBtn.addEventListener('click', async () => {
-  const email = (adminAddEmail.value||'').trim().toLowerCase();
-  if(!email){ showToast('Enter an email','warn'); return; }
-  try{
-    await addAdmin(email);
-    adminAddEmail.value = '';
-    showToast('Added to whitelist','success');
-  }catch(e){
-    console.error(e);
-    showToast('Failed to add admin','warn');
-  }
-});
-
-/* render admin list into adminListEl */
-function renderAdminList(emails){
-  if(!adminListEl) return;
-  adminListEl.innerHTML = '';
-  if(!emails || emails.length === 0){
-    adminListEl.innerHTML = '<div class="small-note">No whitelisted users.</div>';
-    return;
-  }
-  emails.sort();
-  emails.forEach(email => {
-    const row = document.createElement('div');
-    row.className = 'admin-row';
-    const eSpan = document.createElement('div');
-    eSpan.className = 'email';
-    eSpan.textContent = email;
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn ghost';
-    removeBtn.textContent = 'Remove';
-    removeBtn.addEventListener('click', async () => {
-      if(!confirm(`Remove ${email} from whitelist?`)) return;
-      try{
-        await removeAdmin(email);
-        showToast('Removed','success');
-      }catch(err){
-        console.error(err);
-        showToast('Failed to remove','warn');
-      }
-    });
-    row.appendChild(eSpan);
-    row.appendChild(removeBtn);
-    adminListEl.appendChild(row);
-  });
-}
 
 /* --------------------------- Account modal actions --------------------------- */
 document.getElementById('accountCancel').addEventListener('click', () => {
@@ -1248,20 +1099,46 @@ function wireTabClicksForSearch(){
   });
 }
 
+/* --------------------------- Panic key handling --------------------------- */
+function loadPanicSettings(){
+  try{
+    const raw = localStorage.getItem(PANIC_KEY);
+    if(!raw) return { key: "'", action: 'close', redirect: 'https://www.google.com' };
+    return JSON.parse(raw);
+  }catch(e){
+    return { key: "'", action: 'close', redirect: 'https://www.google.com' };
+  }
+}
+function handlePanic(){
+  const p = loadPanicSettings();
+  if(p.action === 'close'){
+    try{
+      window.close();
+      // if window.close didn't work (most tabs), fallback to redirect
+      setTimeout(()=> { window.location.href = p.redirect || 'https://www.google.com'; }, 200);
+    }catch(e){
+      window.location.href = p.redirect || 'https://www.google.com';
+    }
+  } else {
+    window.location.href = p.redirect || 'https://www.google.com';
+  }
+}
+document.addEventListener('keydown', (e) => {
+  const p = loadPanicSettings();
+  // ignore if focus is in an input/textarea/select
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable) return;
+  if(!p || !p.key) return;
+  // compare by key (single character) or by code if user used special key
+  if(e.key === p.key){
+    handlePanic();
+  }
+});
+
 /* --------------------------- Event wiring & init --------------------------- */
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   applyThemeFromSettings();
   applyTabDisguise();
-
-  // IMPORTANT: Where to whitelist people
-  // 1) In code for a one-time initial admin: change the email below in ensureInitialAdmin(...) to pre-whitelist an address.
-  //    Example: ensureInitialAdmin('stievercaden@gmail.com');
-  // 2) Or manage the whitelist directly in Firestore:
-  //    - Open your Firebase console -> Firestore -> collection named "admins"
-  //    - Add documents with id = encodeURIComponent(email.toLowerCase()) and field { email: "user@example.com", addedBy: "...", ts: Timestamp }
-  //
-  // The call below will create the initial admin if the admins collection is empty.
-  await ensureInitialAdmin('stievercaden@gmail.com');
 
   Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', () => {
     Array.from(document.querySelectorAll('.tab')).forEach(x=>x.classList.remove('active'));
@@ -1320,29 +1197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderActive('games');
 
   // auth state
-  auth.onAuthStateChanged(async user => {
-    updateMiniProfile();
-    currentUserEmail = user && user.email ? user.email.toLowerCase() : null;
-    // check admin status
-    isAdmin = false;
-    if(currentUserEmail){
-      try{
-        isAdmin = await checkIfAdmin(currentUserEmail);
-      }catch(e){ console.error('admin check failed', e); }
-    }
-    // show/hide admin menu and top-right admin button
-    menuAdmin.style.display = isAdmin ? 'block' : 'none';
-    topAdminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-
-    // start admin listener to populate admin list in modal (only if user is admin)
-    if(isAdmin){
-      startAdminListener(list => {
-        renderAdminList(list);
-      });
-    } else {
-      stopAdminListener();
-    }
-  });
+  auth.onAuthStateChanged(user => { updateMiniProfile(); });
 
   // close auth modal on backdrop click
   authBackdrop.addEventListener('click', (e) => { if(e.target === authBackdrop) closeAuthModal(); });
@@ -1350,6 +1205,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // wire disguise preview updates when inputs change
   disguiseTitle.addEventListener('input', updateDisguisePreview);
   disguiseFavicon.addEventListener('input', updateDisguisePreview);
+
+  // load panic defaults if not set
+  if(!localStorage.getItem(PANIC_KEY)){
+    localStorage.setItem(PANIC_KEY, JSON.stringify({ key: "'", action: 'close', redirect: 'https://www.google.com' }));
+  }
 
   // apply any existing search query
   if(searchInput && searchInput.value) setTimeout(()=> applySearchToActive(), 100);
