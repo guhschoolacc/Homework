@@ -35,6 +35,10 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
 .btn.ghost.fav-active{ background: var(--accent); color: #04263b; border-color: rgba(0,0,0,0.08); }
 .main{display:flex;flex-direction:column;gap:12px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar-left{display:flex;gap:12px;align-items:center}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.top-admin-btn{display:none;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
 .content{flex:1;background:var(--panel);border-radius:12px;padding:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .section-head{display:flex;justify-content:space-between;align-items:center}
 .chat-window{display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
@@ -162,6 +166,16 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </aside>
 
     <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <input id="global-search-top" placeholder="Search..." style="display:none" />
+        </div>
+        <div class="topbar-right">
+          <!-- Admin button that appears top-right for whitelisted users -->
+          <button id="topAdminBtn" class="top-admin-btn" title="Open Admin Panel">Admin</button>
+        </div>
+      </div>
+
       <section id="content" class="content" aria-live="polite"></section>
     </main>
   </div>
@@ -463,8 +477,14 @@ function clearTabDisguise(){
 /*
   Admin model:
   Collection: 'admins'
-  Document ID: email (safe-encoded) OR auto-id with field { email: string, addedBy: uid/email, ts: Timestamp }
-  For simplicity we will use doc id = email (encoded) and store { email, addedBy, ts }.
+  Document ID: email (encoded) OR auto-id with field { email: string, addedBy: uid/email, ts: Timestamp }
+  For simplicity we use doc id = encodeURIComponent(email.toLowerCase()) and store { email, addedBy, ts }.
+
+  WHERE TO WHITELIST PEOPLE:
+  - You can add initial whitelisted emails directly in code by calling ensureInitialAdmin('you@example.com')
+    (see the call near the end of the script inside DOMContentLoaded).
+  - Or add/remove entries in Firestore under the collection named "admins".
+    Each document id should be the encoded email (encodeURIComponent(email.toLowerCase())) and contain { email, addedBy, ts }.
 */
 function emailToDocId(email){
   return encodeURIComponent(email.toLowerCase());
@@ -875,6 +895,8 @@ const disguiseResetBtn = document.getElementById('disguiseResetBtn');
 const disguiseClearBtn = document.getElementById('disguiseClearBtn');
 const disguisePresets = document.querySelectorAll('.disguise-preset');
 
+const topAdminBtn = document.getElementById('topAdminBtn');
+
 function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileButton.setAttribute('aria-expanded','false'); }
 function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileButton.setAttribute('aria-expanded','true'); }
 profileButton.addEventListener('click', (e) => {
@@ -919,13 +941,17 @@ menuAccount.addEventListener('click', () => {
 });
 menuAdmin.addEventListener('click', () => {
   closeProfileMenu();
-  // only show admin modal if user is admin (menuAdmin is only visible when isAdmin true)
+  openAdminModal();
+});
+topAdminBtn.addEventListener('click', openAdminModal);
+
+function openAdminModal(){
+  // only open if user is admin (button/menu visibility is controlled elsewhere)
   adminAddEmail.value = '';
   adminListEl.innerHTML = '<div class="small-note">Loading...</div>';
   adminBackdrop.setAttribute('aria-hidden','false');
   adminBackdrop.style.display = 'flex';
-  // populate list via listener (already started)
-});
+}
 
 /* settings actions */
 settingsCancel.addEventListener('click', () => {
@@ -1056,8 +1082,6 @@ function renderAdminList(emails){
     const eSpan = document.createElement('div');
     eSpan.className = 'email';
     eSpan.textContent = email;
-    const meta = document.createElement('div');
-    meta.className = 'meta';
     const removeBtn = document.createElement('button');
     removeBtn.className = 'btn ghost';
     removeBtn.textContent = 'Remove';
@@ -1078,11 +1102,11 @@ function renderAdminList(emails){
 }
 
 /* --------------------------- Account modal actions --------------------------- */
-accountCancelBtn.addEventListener('click', () => {
+document.getElementById('accountCancel').addEventListener('click', () => {
   accountBackdrop.setAttribute('aria-hidden','true');
   accountBackdrop.style.display = 'none';
 });
-accountSaveBtn.addEventListener('click', async () => {
+document.getElementById('accountSave').addEventListener('click', async () => {
   accountStatus.textContent = '';
   if(!auth.currentUser){ accountStatus.textContent = 'You must be signed in to update account.'; return; }
   const displayName = (accountDisplayName.value||'').trim();
@@ -1229,9 +1253,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyThemeFromSettings();
   applyTabDisguise();
 
-  // ensure initial admin exists (user requested their email be whitelisted)
-  // Replace the defaultAdminEmail below with the email you want pre-whitelisted.
-  // The user provided: stievercaden@gmail.com
+  // IMPORTANT: Where to whitelist people
+  // 1) In code for a one-time initial admin: change the email below in ensureInitialAdmin(...) to pre-whitelist an address.
+  //    Example: ensureInitialAdmin('stievercaden@gmail.com');
+  // 2) Or manage the whitelist directly in Firestore:
+  //    - Open your Firebase console -> Firestore -> collection named "admins"
+  //    - Add documents with id = encodeURIComponent(email.toLowerCase()) and field { email: "user@example.com", addedBy: "...", ts: Timestamp }
+  //
+  // The call below will create the initial admin if the admins collection is empty.
   await ensureInitialAdmin('stievercaden@gmail.com');
 
   Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', () => {
@@ -1301,8 +1330,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         isAdmin = await checkIfAdmin(currentUserEmail);
       }catch(e){ console.error('admin check failed', e); }
     }
-    // show/hide admin menu
+    // show/hide admin menu and top-right admin button
     menuAdmin.style.display = isAdmin ? 'block' : 'none';
+    topAdminBtn.style.display = isAdmin ? 'inline-flex' : 'none';
 
     // start admin listener to populate admin list in modal (only if user is admin)
     if(isAdmin){
