@@ -3,112 +3,551 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Arcade Racer</title>
+<title>Arcade Racer — Moto X3M Style</title>
 <style>
-  :root{--bg:#0b0f1a;--neon:#00f0ff;--accent:#ff3d81}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#02030a 0%,#071026 100%);font-family:Inter,system-ui,Arial}
-  #game{display:block;margin:24px auto;background:#071026;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-  .ui{width:800px;margin:0 auto;color:#cfe9ff;text-align:center}
-  canvas{display:block;background:linear-gradient(180deg,#0b1220 0%,#071026 100%);border-radius:8px}
-  .hud{display:flex;justify-content:space-between;padding:8px 12px;color:#9fd8ff;font-weight:600}
-  button{background:var(--neon);border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer}
+  :root{
+    --bg1:#071026; --bg2:#0b1220; --neon:#00f0ff; --accent:#ff3d81;
+    --panel: rgba(10,18,30,0.7);
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),#020617);font-family:Inter,system-ui,Arial;color:#cfe9ff}
+  #container{max-width:1000px;margin:18px auto;padding:12px}
+  canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  .ui{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+  .panel{background:var(--panel);padding:8px 12px;border-radius:10px;backdrop-filter:blur(6px)}
+  button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+  .menu{display:flex;gap:12px;align-items:center}
+  .levels{display:flex;gap:8px;flex-wrap:wrap}
+  .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
+  .hud{display:flex;gap:12px;align-items:center}
+  .big{font-size:18px;font-weight:800;color:var(--neon)}
+  .small{font-size:13px;color:#9fb8d9}
+  #touchControls{display:none;position:fixed;left:0;right:0;bottom:18px;pointer-events:none}
+  .touchBtn{pointer-events:auto;display:inline-block;background:rgba(255,255,255,0.06);padding:14px;border-radius:50%;margin:6px}
+  @media (max-width:700px){ #touchControls{display:flex;justify-content:center} }
 </style>
 </head>
 <body>
-<div class="ui">
-  <h2 style="color:var(--neon);margin:8px 0">Arcade Racer</h2>
-  <div class="hud"><div>Score: <span id="score">0</span></div><div>Speed: <span id="spd">1</span>x</div></div>
-  <canvas id="game" width="800" height="500"></canvas>
-  <div style="margin:12px 0"><button id="restart">Restart</button></div>
-  <p style="color:#9fb8d9">Controls: ← → or A D. Avoid cars; collect green pickups.</p>
+<div id="container">
+  <div class="ui">
+    <div class="panel">
+      <div class="big">Arcade Racer — Moto X3M Style</div>
+      <div class="small">Physics, levels, neon visuals</div>
+    </div>
+    <div class="panel hud">
+      <div>Score: <span id="score">0</span></div>
+      <div>Level: <span id="levelName">1</span></div>
+      <div>Speed: <span id="speed">0</span> px/s</div>
+      <div><button id="menuBtn">Menu</button></div>
+    </div>
+  </div>
+
+  <canvas id="game" width="1000" height="520"></canvas>
+
+  <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+    <div class="panel menu" id="mainMenu">
+      <button id="startBtn">Start</button>
+      <div class="levels" id="levelsList"></div>
+      <button id="muteBtn">Mute</button>
+    </div>
+    <div class="panel small">Controls: ←/→ or A/D to lean, ↑/W to throttle, ↓/S to brake. Tap on mobile.</div>
+  </div>
+</div>
+
+<div id="touchControls">
+  <div class="touchBtn" id="leftTouch">◀</div>
+  <div class="touchBtn" id="throttleTouch">▲</div>
+  <div class="touchBtn" id="rightTouch">▶</div>
 </div>
 
 <script>
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-let w=canvas.width,h=canvas.height,keys={},score=0,speed=3,gameOver=false;
-const player={x:w/2-22,y:h-120,w:44,h:88,color:'#ff3d81'};
-const enemies=[],pickups=[];
+/* =========================
+   Arcade Racer — Core
+   ========================= */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = canvas.width, H = canvas.height;
 
-document.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
-document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-document.getElementById('restart').onclick=init;
+window.addEventListener('resize', ()=>{ /* keep canvas fixed pixel size for physics */ });
 
-function rnd(min,max){return Math.random()*(max-min)+min}
+/* ---------- Game State ---------- */
+let state = 'menu'; // menu, playing, paused, levelComplete, gameOver
+let currentLevel = 0;
+let score = 0;
+let mute = false;
 
-function spawnEnemy(){
-  enemies.push({x:rnd(80,w-140),y:-120,w:48,h:96,spd:rnd(speed+1,speed+3),col:'#222'});
+/* ---------- Level Definitions ----------
+   Each level: width, goalX, terrain points (x,y)
+   Terrain is a height map; y measured from top.
+*/
+const levels = [
+  {
+    name: 'Training Hill',
+    width: 3000,
+    goalX: 2600,
+    startX: 80,
+    terrain: generateTerrain(3000, [
+      {x:0,y:380},{x:200,y:360},{x:400,y:380},{x:600,y:320},{x:800,y:380},
+      {x:1100,y:420},{x:1300,y:360},{x:1500,y:420},{x:1800,y:360},{x:2200,y:380},
+      {x:2600,y:300},{x:3000,y:380}
+    ])
+  },
+  {
+    name: 'Ramp Rush',
+    width: 4200,
+    goalX: 4000,
+    startX: 60,
+    terrain: generateTerrain(4200, [
+      {x:0,y:380},{x:300,y:360},{x:600,y:300},{x:800,y:420},{x:1100,y:320},
+      {x:1400,y:380},{x:1700,y:300},{x:2000,y:420},{x:2400,y:360},{x:2800,y:300},
+      {x:3200,y:420},{x:3600,y:360},{x:4200,y:380}
+    ])
+  },
+  {
+    name: 'Gap Gauntlet',
+    width: 5000,
+    goalX: 4800,
+    startX: 80,
+    terrain: generateTerrain(5000, [
+      {x:0,y:380},{x:200,y:380},{x:400,y:380},{x:600,y:420},{x:700,y:520}, // gap (deep)
+      {x:900,y:380},{x:1200,y:320},{x:1500,y:420},{x:1700,y:520},{x:1900,y:380},
+      {x:2300,y:360},{x:2600,y:300},{x:3000,y:420},{x:3400,y:360},{x:3800,y:300},
+      {x:4200,y:420},{x:4600,y:360},{x:5000,y:380}
+    ])
+  }
+];
+
+/* ---------- Utility: generateTerrain ----------
+   Smoothly interpolate given control points into a height map array for every x.
+*/
+function generateTerrain(width, points){
+  // points: array of {x,y} sorted by x
+  const map = new Float32Array(width+1);
+  for(let i=0;i<points.length-1;i++){
+    const a=points[i], b=points[i+1];
+    const dx = b.x - a.x;
+    for(let x=a.x; x<=b.x; x++){
+      const t = (x - a.x) / dx;
+      // smoothstep interpolation
+      const s = t*t*(3-2*t);
+      map[x] = a.y*(1-s) + b.y*s;
+    }
+  }
+  // fill any gaps
+  for(let x=0;x<=width;x++) if(!map[x]) map[x]=H-140;
+  return map;
 }
-function spawnPickup(){ pickups.push({x:rnd(100,w-120),y:-60,r:12,spd:2.2}); }
 
-function init(){
-  enemies.length=0;pickups.length=0;score=0;speed=3;gameOver=false;
-  player.x=w/2-22;
-  for(let i=0;i<3;i++)spawnEnemy();
+/* ---------- Camera & Parallax ---------- */
+const camera = {x:0,y:0,shake:0};
+function worldToScreen(wx, wy){ return {x: wx - camera.x + 200, y: wy - camera.y}; }
+
+/* ---------- Player / Bike Physics ---------- */
+const bike = {
+  x: 100, y: 0, vx: 0, vy: 0,
+  angle: 0, angVel: 0,
+  width: 80, height: 36,
+  wheelBase: 48,
+  onGround: false,
+  fuel: 100
+};
+
+const physics = {
+  gravity: 0.9,
+  mass: 1.0,
+  throttlePower: 0.18,
+  brakePower: 0.28,
+  airDrag: 0.995,
+  angularDrag: 0.98,
+  suspension: 0.18,
+  maxLean: 0.9
+};
+
+/* ---------- Particles ---------- */
+const particles = [];
+function spawnParticle(x,y,dx,dy,color,life=40){
+  particles.push({x,y,dx,dy,color,life,age:0});
+}
+
+/* ---------- Input ---------- */
+const keys = {};
+addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+document.getElementById('leftTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowleft']=true});
+document.getElementById('leftTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowleft']=false});
+document.getElementById('rightTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowright']=true});
+document.getElementById('rightTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowright']=false});
+document.getElementById('throttleTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowup']=true});
+document.getElementById('throttleTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowup']=false});
+
+/* ---------- Menu & UI ---------- */
+const startBtn = document.getElementById('startBtn');
+const menuBtn = document.getElementById('menuBtn');
+const levelsList = document.getElementById('levelsList');
+const scoreEl = document.getElementById('score');
+const levelNameEl = document.getElementById('levelName');
+const speedEl = document.getElementById('speed');
+const muteBtn = document.getElementById('muteBtn');
+
+startBtn.onclick = ()=>{ startLevel(currentLevel); };
+menuBtn.onclick = ()=>{ openMenu(); };
+muteBtn.onclick = ()=>{ mute = !mute; muteBtn.textContent = mute ? 'Unmute' : 'Mute'; };
+
+/* populate level buttons */
+levels.forEach((lv,i)=>{
+  const b = document.createElement('button');
+  b.className='levelBtn';
+  b.textContent = (i+1)+'. '+lv.name;
+  b.onclick = ()=>{ currentLevel = i; startLevel(i); };
+  levelsList.appendChild(b);
+});
+
+/* ---------- Audio (simple) ---------- */
+const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+function playBeep(freq=440, time=0.06, vol=0.08){
+  if(mute || !audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type='sine'; o.frequency.value=freq;
+  g.gain.value=vol;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + time);
+}
+
+/* ---------- Level Control ---------- */
+let levelData = null;
+function startLevel(idx){
+  levelData = JSON.parse(JSON.stringify(levels[idx])); // clone
+  bike.x = levelData.startX || 80;
+  bike.y = levelData.terrain[Math.floor(bike.x)] - 80;
+  bike.vx = 0; bike.vy = 0; bike.angle = 0; bike.angVel = 0; bike.onGround = false;
+  camera.x = Math.max(0, bike.x - 200);
+  score = 0;
+  state = 'playing';
+  levelNameEl.textContent = (idx+1)+' - '+levelData.name;
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  playBeep(880,0.08,0.06);
+}
+
+/* ---------- Physics Helpers ---------- */
+function groundAt(x){
+  const xi = Math.floor(Math.max(0, Math.min(levelData.width, x)));
+  return levelData.terrain[xi];
+}
+
+/* ---------- Game Loop ---------- */
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(40, now - last) / 16.666; // normalized to ~60fps
+  last = now;
+  update(dt);
+  render();
   requestAnimationFrame(loop);
 }
-function rectsCollide(a,b){return a.x<a.x+a.w && b.x<b.x+b.w && a.y<a.y+a.h && b.y<b.y+b.h} // placeholder
+requestAnimationFrame(loop);
 
-function drawRoad(){
-  ctx.fillStyle='#071026';ctx.fillRect(0,0,w,h);
-  // road
-  ctx.fillStyle='#0b1220';ctx.fillRect(80,0,w-160,h);
-  // side glow
-  ctx.fillStyle='rgba(0,240,255,0.04)';ctx.fillRect(70,0,10,h);ctx.fillRect(w-80,0,10,h);
-  // center dashed
-  ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=6;ctx.setLineDash([30,20]);
-  ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke();ctx.setLineDash([]);
+/* ---------- Update ---------- */
+function update(dt){
+  if(state !== 'playing') return;
+
+  // Input
+  const left = keys['arrowleft'] || keys['a'];
+  const right = keys['arrowright'] || keys['d'];
+  const throttle = keys['arrowup'] || keys['w'];
+  const brake = keys['arrowdown'] || keys['s'];
+
+  // Apply torque for lean
+  const leanInput = (right ? 1 : 0) - (left ? 1 : 0);
+  bike.angVel += leanInput * 0.02 * dt;
+  bike.angVel *= physics.angularDrag;
+
+  // Throttle / brake affect forward velocity
+  const forward = throttle ? physics.throttlePower : 0;
+  const braking = brake ? physics.brakePower : 0;
+  bike.vx += forward * dt;
+  bike.vx *= physics.airDrag;
+
+  // Gravity
+  bike.vy += physics.gravity * dt;
+
+  // Integrate
+  bike.x += bike.vx * dt * 1.2;
+  bike.y += bike.vy * dt;
+  bike.angle += bike.angVel * dt;
+  bike.angle = Math.max(-physics.maxLean, Math.min(physics.maxLean, bike.angle));
+
+  // Ground collision & suspension
+  const groundY = groundAt(bike.x + bike.width*0.5);
+  const bikeBottom = bike.y + bike.height;
+  if(bikeBottom > groundY){
+    // on ground
+    bike.onGround = true;
+    // simple spring: push up
+    const penetration = bikeBottom - groundY;
+    bike.y -= penetration * physics.suspension * dt * 1.5;
+    // damp vertical velocity
+    bike.vy *= 0.4;
+    // friction slows vx
+    bike.vx *= 0.995;
+    // align angle to slope
+    const slope = (groundAt(bike.x+20) - groundAt(bike.x-20)) / 40;
+    const targetAngle = Math.atan2(-slope, 1);
+    bike.angle += (targetAngle - bike.angle) * 0.08 * dt;
+    // spawn dust when landing or moving fast
+    if(Math.abs(bike.vy) > 3 && Math.random() < 0.3) spawnParticle(bike.x+20, groundY-6, (Math.random()-0.5)*1.5, -1.2, 'rgba(200,255,200,0.9)', 30);
+  } else {
+    bike.onGround = false;
+    // air control: small torque from throttle/brake
+    bike.angVel += (throttle ? -0.01 : 0) * dt;
+    bike.angVel += (brake ? 0.01 : 0) * dt;
+  }
+
+  // Camera follows
+  camera.x += (bike.x - camera.x - 200) * 0.06 * dt;
+  camera.y = 0;
+
+  // Particles update
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.dx * dt;
+    p.y += p.dy * dt;
+    p.dy += 0.06 * dt;
+    p.age += dt;
+    if(p.age > p.life) particles.splice(i,1);
+  }
+
+  // Score & goal
+  score += Math.max(0, bike.vx * 0.02) * dt;
+  scoreEl.textContent = Math.floor(score);
+  speedEl.textContent = Math.abs(bike.vx).toFixed(1);
+
+  if(bike.x >= levelData.goalX){
+    state = 'levelComplete';
+    playBeep(1200,0.12,0.08);
+    setTimeout(()=>{ currentLevel = Math.min(levels.length-1, currentLevel+1); openMenu(); }, 800);
+  }
+
+  // Crash detection: flip too far or fall into deep gap
+  if(Math.abs(bike.angle) > 1.6 || bike.y > H + 200){
+    state = 'gameOver';
+    playBeep(120,0.4,0.12);
+    setTimeout(()=> openMenu(), 900);
+  }
+
+  // spawn small sparks when hitting obstacles at speed
+  if(Math.random() < 0.02 && bike.onGround && Math.abs(bike.vx) > 6){
+    spawnParticle(bike.x + Math.random()*40, groundAt(bike.x) - 6, (Math.random()-0.5)*2, -Math.random()*1.5, 'rgba(255,200,120,0.95)', 30);
+  }
 }
 
-function drawCar(x,y,wid,hei,col){
-  // simple stylized car
-  ctx.fillStyle=col;ctx.fillRect(x,y,wid,hei);
-  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(x+6,y+10,wid-12,hei-20);
-  ctx.fillStyle='#fff';ctx.fillRect(x+8,y+6,8,8);ctx.fillRect(x+wid-16,y+6,8,8);
-}
+/* ---------- Render ---------- */
+function render(){
+  // clear
+  ctx.clearRect(0,0,W,H);
 
-function loop(t){
-  if(gameOver){ ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle= '#fff'; ctx.font='36px Inter'; ctx.fillText('Game Over - Score: '+score,w/2-180,h/2);
-    return;
-  }
-  // update
-  if(keys['arrowleft']||keys['a']) player.x-=6;
-  if(keys['arrowright']||keys['d']) player.x+=6;
-  player.x=Math.max(90,Math.min(w-90-player.w,player.x));
-  // spawn logic
-  if(Math.random()<0.02+score/20000) spawnEnemy();
-  if(Math.random()<0.01) spawnPickup();
-  enemies.forEach(e=>{ e.y+=e.spd+speed*0.2; if(e.y>h+200) e.y=-200,e.x=rnd(90,w-140),score+=5; });
-  pickups.forEach(p=>p.y+=p.spd);
-  // collisions
-  enemies.forEach(e=>{ if(!(player.x+player.w<e.x||player.x>e.x+e.w||player.y+player.h<e.y||player.y>e.y+e.h)){
-      gameOver=true;
-    }});
-  for(let i=pickups.length-1;i>=0;i--){
-    const p=pickups[i];
-    if(Math.hypot((p.x)-(player.x+player.w/2),(p.y)-(player.y+player.h/2))<40){ score+=20; pickups.splice(i,1); }
-    else if(p.y>h+50) pickups.splice(i,1);
-  }
-  // speed ramp
-  speed += 0.0008;
-  document.getElementById('score').textContent=Math.floor(score);
-  document.getElementById('spd').textContent=speed.toFixed(2);
+  // background gradient
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#071026'); g.addColorStop(1,'#020617');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // draw
-  drawRoad();
-  // enemies
-  enemies.forEach(e=>drawCar(e.x,e.y,e.w,e.h,'#222'));
-  // pickups
-  pickups.forEach(p=>{
-    ctx.fillStyle='#00ff88'; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+  // parallax mountains
+  drawParallax();
+
+  // draw terrain
+  drawTerrain();
+
+  // draw goal flag
+  const goalScreen = worldToScreen(levelData.goalX, groundAt(levelData.goalX));
+  ctx.save();
+  ctx.translate(goalScreen.x, goalScreen.y);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.fillRect(-6,-80,12,80);
+  ctx.fillStyle = 'linear-gradient(#ff3d81,#00f0ff)';
+  ctx.beginPath();
+  ctx.moveTo(6,-70); ctx.lineTo(36,-50); ctx.lineTo(6,-30); ctx.closePath();
+  ctx.fillStyle = '#ff3d81'; ctx.fill();
+  ctx.restore();
+
+  // draw particles
+  particles.forEach(p=>{
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 1 - (p.age / p.life);
+    ctx.beginPath(); ctx.arc(p.x - camera.x + 200, p.y, 3,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
   });
-  // player
-  drawCar(player.x,player.y,player.w,player.h,player.color);
 
-  requestAnimationFrame(loop);
+  // draw bike shadow
+  const bikeScreen = worldToScreen(bike.x, bike.y);
+  ctx.save();
+  ctx.translate(bikeScreen.x + bike.width*0.5, bikeScreen.y + bike.height*0.9);
+  ctx.rotate(bike.angle);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(-bike.width*0.5, 6, bike.width, 8);
+  ctx.restore();
+
+  // draw bike (stylized)
+  drawBike(bikeScreen.x, bikeScreen.y, bike.angle);
+
+  // HUD overlays
+  if(state === 'menu' || state === 'paused'){
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(120,60,760,380);
+    ctx.fillStyle = '#fff';
+    ctx.font = '28px Inter';
+    ctx.fillText(state === 'menu' ? 'Main Menu' : 'Paused', 160, 110);
+  }
+  if(state === 'levelComplete'){
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = '36px Inter';
+    ctx.fillText('Level Complete!', W/2 - 140, H/2 - 10);
+    ctx.font = '20px Inter';
+    ctx.fillStyle = '#cfe9ff';
+    ctx.fillText('Score: '+Math.floor(score), W/2 - 60, H/2 + 30);
+  }
+  if(state === 'gameOver'){
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = '36px Inter';
+    ctx.fillText('Crashed!', W/2 - 70, H/2 - 10);
+    ctx.font = '20px Inter';
+    ctx.fillStyle = '#cfe9ff';
+    ctx.fillText('Score: '+Math.floor(score), W/2 - 60, H/2 + 30);
+  }
 }
 
-init();
+/* ---------- Draw Helpers ---------- */
+function drawParallax(){
+  // distant mountains
+  for(let layer=0; layer<3; layer++){
+    const speed = 0.1 + layer*0.06;
+    ctx.beginPath();
+    const baseY = 120 + layer*40;
+    ctx.moveTo(0, H);
+    for(let x=0; x<=W; x+=40){
+      const wx = camera.x * speed + x;
+      const h = 40 + Math.sin((wx*0.002)+layer) * (20 + layer*10);
+      ctx.lineTo(x, baseY + h);
+    }
+    ctx.lineTo(W,H);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${20+layer*20},${30+layer*30},${60+layer*40},${0.08 + layer*0.04})`;
+    ctx.fill();
+  }
+}
+
+function drawTerrain(){
+  ctx.save();
+  ctx.translate(200 - camera.x, 0);
+  // ground fill
+  ctx.beginPath();
+  ctx.moveTo(-200, H);
+  for(let x=0; x<=levelData.width; x+=4){
+    const y = groundAt(x);
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(levelData.width+200, H);
+  ctx.closePath();
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0b1220'); g.addColorStop(1,'#071026');
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  // road edge glow
+  ctx.strokeStyle = 'rgba(0,240,255,0.06)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  for(let x=0; x<=levelData.width; x+=8){
+    const y = groundAt(x);
+    if(x===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // small obstacles (rocks)
+  for(let x=200; x<levelData.width; x+=400){
+    const y = groundAt(x);
+    ctx.fillStyle = '#2b2b2b';
+    ctx.beginPath(); ctx.ellipse(x, y-8, 12,8,0,0,Math.PI*2); ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawBike(sx, sy, angle){
+  ctx.save();
+  ctx.translate(sx + bike.width*0.5, sy + bike.height*0.5);
+  ctx.rotate(angle);
+  // body
+  ctx.fillStyle = '#ff3d81';
+  roundRect(ctx, -bike.width*0.5, -bike.height*0.5, bike.width, bike.height, 8);
+  ctx.fillStyle = '#001';
+  roundRect(ctx, -bike.width*0.5 + 8, -bike.height*0.5 + 8, bike.width-16, bike.height-16, 6);
+  // wheels
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.arc(-bike.width*0.25, bike.height*0.35, 14,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(bike.width*0.25, bike.height*0.35, 14,0,Math.PI*2); ctx.fill();
+  // wheel rims
+  ctx.fillStyle = '#9fb8d9';
+  ctx.beginPath(); ctx.arc(-bike.width*0.25, bike.height*0.35, 6,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(bike.width*0.25, bike.height*0.35, 6,0,Math.PI*2); ctx.fill();
+  // neon accent
+  ctx.strokeStyle = 'rgba(0,240,255,0.9)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(-bike.width*0.5+2, -bike.height*0.5+2, bike.width-4, bike.height-4);
+  ctx.restore();
+}
+
+/* ---------- Helpers ---------- */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ---------- Menu functions ---------- */
+function openMenu(){
+  state = 'menu';
+  // show menu panel
+  document.getElementById('mainMenu').style.display = 'flex';
+}
+function hideMenu(){
+  document.getElementById('mainMenu').style.display = 'none';
+}
+
+/* ---------- Start with menu ---------- */
+openMenu();
+
+/* ---------- Optional: keyboard shortcuts ---------- */
+addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){ if(state === 'playing') { state='paused'; openMenu(); } else if(state==='paused'){ state='playing'; hideMenu(); } }
+  if(e.key === 'r'){ if(state==='playing' || state==='gameOver') startLevel(currentLevel); }
+});
+
+/* ---------- Touch: hide menu on start ---------- */
+startBtn.addEventListener('click', ()=>{ hideMenu(); });
+
+/* ---------- Initialize canvas size to device pixel ratio ---------- */
+(function setCanvasDPR(){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+})();
+
+/* ---------- Small polish: spawn ambient particles occasionally ---------- */
+setInterval(()=>{ if(state==='playing' && Math.random()<0.6) spawnParticle(camera.x + Math.random()*800, 60 + Math.random()*40, (Math.random()-0.5)*0.2, 0.2, 'rgba(0,240,255,0.06)', 120); }, 200);
+
+/* ---------- Expose for debugging ---------- */
+window._game = { bike, levels, startLevel, state };
 </script>
 </body>
 </html>
