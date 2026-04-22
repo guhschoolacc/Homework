@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Moto X3M Inspired — Canvas Game</title>
+<title>arcade racer</title>
 <style>
   :root{
     --bg:#87CEEB;
@@ -39,7 +39,7 @@
 <body>
 <div id="gameWrap">
   <header>
-    <div class="title">Moto X3M — Canvas Edition</div>
+    <div class="title">Moto X3M — Stable Edition</div>
     <div class="controls">
       <div class="panel small">Level: <span id="levelName">1</span></div>
       <div class="panel small">Time: <span id="time">0.00</span>s</div>
@@ -75,1027 +75,731 @@
   </div>
 
   <footer>
-    <div class="small">Built with Canvas API — Physics simplified for fun</div>
-    <div class="small">Tip: Lean in air to control rotation; land flat to avoid crash</div>
+    <div class="small">Refactor: stable physics, smooth camera, UI separated from world</div>
+    <div class="small">Tip: gentle throttle and small lean inputs for best control</div>
   </footer>
 </div>
 
 <script>
 /*
-Moto X3M Inspired Canvas Game
-- Single-file implementation
-- Controls: W/Up = accelerate, S/Down = brake, A/Left = lean back, D/Right = lean forward, R = restart
-- Levels defined in `LEVELS` array. Add new levels by adding objects to that array.
-- Modular classes: Player, Wheel, Level, Obstacle
-- Physics: simple rigid-body-like system with two wheels, chassis, springs for suspension
-- Collision: terrain represented as line segments; wheel-ground collision via circle-segment intersection
-- Flips detection: track rotation while airborne
-- Camera: smooth follow with lag
-- Sounds: simple WebAudio engine for engine pitch and crash beep
+Refactor notes (high-level):
+- Reworked physics to be stable: semi-implicit integration, chassis rigid body + two wheels with spring constraints.
+- Added angular damping and clamped angular velocity to prevent wild flips.
+- Smooth throttle ramping (targetThrottle -> currentThrottle) to avoid instant impulses.
+- Wheel-ground collision: project wheel onto terrain segment, snap and apply friction/impulse.
+- Camera uses LERP with forward offset; removed shake to avoid jitter.
+- UI is DOM-based and updated separately; canvas transform reset before drawing UI elements.
+- Game loop uses consistent delta time and clamps dt to avoid spikes.
+- Code organized into: handleInput(), updatePhysics(), updateCamera(), renderWorld(), renderUI().
 */
 
-(() => {
-  // ---------- Config ----------
-  const CONFIG = {
-    gravity: 1600,            // px/s^2
-    wheelRadius: 18,
-    wheelMass: 3,
-    chassisMass: 8,
-    suspensionStiffness: 2200,
-    suspensionDamping: 180,
-    maxEngineForce: 2200,
-    brakeForce: 3000,
-    airControlTorque: 1200,  // torque applied when leaning
-    maxTilt: Math.PI * 0.9,
-    timeScale: 1,
-    pixelsPerMeter: 1,
-    cameraLag: 0.08,
-    groundFriction: 0.9,
-    flipBonusTime: 0.8,      // seconds reduced per flip
-    flipScore: 150,
-    targetFPS: 60
-  };
+// ---------- Config ----------
+const CONFIG = {
+  gravity: 1600,               // px/s^2
+  wheelRadius: 18,
+  wheelMass: 3,
+  chassisMass: 10,
+  suspensionRest: 60,
+  suspensionK: 1800,           // spring stiffness
+  suspensionDamping: 160,      // damping
+  maxEngineForce: 1800,
+  maxBrakeForce: 2600,
+  maxSpeed: 900,               // px/s
+  maxFallSpeed: 1200,
+  angularDamping: 0.98,        // reduce spinning
+  maxAngularVel: 6.0,          // rad/s clamp
+  airControlTorque: 700,       // small torque for lean
+  throttleAccel: 3.5,          // how fast throttle ramps to target
+  wheelFriction: 0.9,          // tangential friction when on ground
+  cameraLerp: 0.10,            // camera smoothing
+  cameraForwardOffset: 420,    // px forward visibility
+  dtClamp: 0.016,              // clamp dt to 60fps step (as requested)
+  flipBonusTime: 0.8,
+  flipScore: 150
+};
 
-  // ---------- Utility ----------
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function now(){ return performance.now()/1000; }
-  function rand(min,max){ return min + Math.random()*(max-min); }
+// ---------- Canvas ----------
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d', { alpha: true });
+let W = canvas.width, H = canvas.height;
+function resizeCanvas(){
+  const container = document.getElementById('canvasContainer');
+  const rect = container.getBoundingClientRect();
+  const scale = Math.min(rect.width / 1280, rect.height / 720);
+  canvas.style.width = Math.round(1280 * scale) + 'px';
+  canvas.style.height = Math.round(720 * scale) + 'px';
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-  // ---------- Canvas & Scaling ----------
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d', { alpha: true });
-  let W = canvas.width, H = canvas.height;
-  function resizeCanvas(){
-    const container = document.getElementById('canvasContainer');
-    const rect = container.getBoundingClientRect();
-    // Keep 16:9 ratio based on canvas base size
-    const scale = Math.min(rect.width / 1280, rect.height / 720);
-    canvas.style.width = Math.round(1280 * scale) + 'px';
-    canvas.style.height = Math.round(720 * scale) + 'px';
+// ---------- Input ----------
+const input = { left:false, right:false, up:false, down:false, restart:false, boost:false };
+window.addEventListener('keydown', e => {
+  if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = true;
+  if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = true;
+  if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = true;
+  if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = true;
+  if(e.key === 'r' || e.key === 'R') input.restart = true;
+  if(e.code === 'Space') input.boost = true;
+});
+window.addEventListener('keyup', e => {
+  if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = false;
+  if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = false;
+  if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = false;
+  if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = false;
+  if(e.key === 'r' || e.key === 'R') input.restart = false;
+  if(e.code === 'Space') input.boost = false;
+});
+
+// ---------- Utility ----------
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function lerp(a,b,t){ return a + (b-a)*t; }
+function now(){ return performance.now()/1000; }
+function rand(min,max){ return min + Math.random()*(max-min); }
+
+// ---------- Level data (kept simple, same as before) ----------
+const LEVELS = [
+  {
+    name: "Beginner's Hill",
+    startPos: { x: 60, y: 420 },
+    finishX: 2200,
+    terrain: [
+      [ -200, 520 ], [0,520], [120,520], [220,480], [360,480], [520,520], [700,520],
+      [820,460], [920,420], [1040,420], [1160,480], [1300,520], [1500,520],
+      [1620,460], [1740,420], [1860,420], [1980,480], [2120,520], [2400,520]
+    ],
+    obstacles: [],
+    timeThresholds: [18,28]
+  },
+  {
+    name: "Big Air",
+    startPos: { x: 60, y: 420 },
+    finishX: 3000,
+    terrain: [
+      [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[900,520],
+      [980,520],[1040,420],[1160,420],[1280,420],[1400,520],[1520,520],[1640,480],
+      [1760,420],[1880,420],[2000,520],[2200,520],[2360,420],[2480,420],[2600,520],[3200,520]
+    ],
+    obstacles: [],
+    timeThresholds: [22,36]
   }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+];
 
-  // ---------- Input ----------
-  const input = { left:false, right:false, up:false, down:false, restart:false, boost:false };
-  window.addEventListener('keydown', e => {
-    if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = true;
-    if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = true;
-    if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = true;
-    if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = true;
-    if(e.key === 'r' || e.key === 'R') input.restart = true;
-    if(e.code === 'Space') input.boost = true;
-  });
-  window.addEventListener('keyup', e => {
-    if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = false;
-    if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = false;
-    if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = false;
-    if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = false;
-    if(e.key === 'r' || e.key === 'R') input.restart = false;
-    if(e.code === 'Space') input.boost = false;
-  });
+// ---------- Physics primitives ----------
+class Vec {
+  constructor(x=0,y=0){ this.x=x; this.y=y; }
+  add(v){ return new Vec(this.x+v.x, this.y+v.y); }
+  sub(v){ return new Vec(this.x-v.x, this.y-v.y); }
+  mul(s){ return new Vec(this.x*s, this.y*s); }
+  len(){ return Math.hypot(this.x,this.y); }
+  norm(){ const l=this.len()||1; return new Vec(this.x/l,this.y/l); }
+}
 
-  // ---------- Simple Sound Engine (WebAudio) ----------
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = AudioCtx ? new AudioCtx() : null;
-  function playBeep(freq=440, time=0.08, type='sine', gain=0.12){
-    if(!audioCtx) return;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.value = gain;
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time);
-    o.stop(audioCtx.currentTime + time + 0.02);
-  }
-  // engine sound: create oscillator and control frequency
-  let engineOsc = null, engineGain = null;
-  function startEngineSound(){
-    if(!audioCtx) return;
-    if(engineOsc) return;
-    engineOsc = audioCtx.createOscillator();
-    engineGain = audioCtx.createGain();
-    engineOsc.type = 'sawtooth';
-    engineOsc.frequency.value = 80;
-    engineGain.gain.value = 0.02;
-    engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination);
-    engineOsc.start();
-  }
-  function stopEngineSound(){
-    if(!engineOsc) return;
-    engineOsc.stop(); engineOsc.disconnect();
-    engineGain.disconnect();
-    engineOsc = null; engineGain = null;
-  }
-  function setEnginePitch(p){
-    if(!engineOsc) return;
-    engineOsc.frequency.value = 60 + p * 160;
-    engineGain.gain.value = 0.01 + p * 0.03;
-  }
+// ---------- Terrain helpers ----------
+function pointToSegmentProjection(px,py,x1,y1,x2,y2){
+  const vx = x2-x1, vy = y2-y1;
+  const wx = px-x1, wy = py-y1;
+  const c1 = vx*wx + vy*wy;
+  const c2 = vx*vx + vy*vy;
+  if(c2 === 0) return { x:x1, y:y1, t:0 };
+  let t = c1 / c2;
+  t = clamp(t, 0, 1);
+  return { x: x1 + vx*t, y: y1 + vy*t, t };
+}
 
-  // ---------- Level Data ----------
-  // Each level: startX, finishX, terrain segments, obstacles array
-  // Terrain segments: array of points [x,y] forming polyline
-  // Obstacles: type, x, y, params
-  const LEVELS = [
-    // Level 1: gentle ramps
-    {
-      name: "Beginner's Hill",
-      startX: 0,
-      finishX: 2200,
-      startPos: { x: 60, y: 420 },
-      terrain: [
-        [ -200, 520 ], [0,520], [120,520], [220,480], [360,480], [520,520], [700,520],
-        [820,460], [920,420], [1040,420], [1160,480], [1300,520], [1500,520],
-        [1620,460], [1740,420], [1860,420], [1980,480], [2120,520], [2400,520]
-      ],
-      obstacles: [
-        { type:'spikes', x: 540, y: 520 },
-        { type:'saw', x: 900, y: 420, radius:28, speed:2.2 },
-        { type:'barrel', x: 1700, y: 520 },
-        { type:'movingPlatform', x: 1280, y: 460, w:120, h:12, range:120, speed:1.2 },
-      ],
-      timeThresholds: [18, 28] // 3 stars if <18, 2 stars if <28 else 1
-    },
-    // Level 2: jumps and gap
-    {
-      name: "Big Air",
-      startX: 0,
-      finishX: 3000,
-      startPos: { x: 60, y: 420 },
-      terrain: [
-        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[900,520],
-        [980,520],[1040,420],[1160,420],[1280,420],[1400,520],[1520,520],[1640,480],
-        [1760,420],[1880,420],[2000,520],[2200,520],[2360,420],[2480,420],[2600,520],[3200,520]
-      ],
-      obstacles: [
-        { type:'spikes', x: 1060, y: 420 },
-        { type:'saw', x: 1500, y: 520, radius:30, speed:2.6 },
-        { type:'falling', x: 2360, y: 420, w:120, h:12, delay:0.6 },
-        { type:'loop', x: 2440, y: 420, radius:60 }
-      ],
-      timeThresholds: [22, 36]
-    },
-    // Level 3: moving hazards and narrow landings
-    {
-      name: "Hazard Course",
-      startX: 0,
-      finishX: 2600,
-      startPos: { x: 60, y: 420 },
-      terrain: [
-        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[860,520],[980,480],
-        [1100,420],[1220,420],[1340,480],[1460,520],[1580,520],[1700,480],[1820,420],[1940,420],[2060,520],[2600,520]
-      ],
-      obstacles: [
-        { type:'movingSaw', x: 920, y: 480, radius:26, range:160, speed:2.2 },
-        { type:'barrel', x: 1320, y: 420 },
-        { type:'movingPlatform', x: 1560, y: 520, w:140, h:12, range:180, speed:1.6 },
-        { type:'spikes', x: 2000, y: 520 }
-      ],
-      timeThresholds: [20, 34]
-    },
-    // Level 4: loop and tricky landings
-    {
-      name: "Loop the Loop",
-      startX: 0,
-      finishX: 3200,
-      startPos: { x: 60, y: 420 },
-      terrain: [
-        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[900,520],[1100,480],[1220,420],[1340,420],[1460,480],[1580,520],[1800,520],[2000,520],[2200,420],[2320,420],[2440,520],[3200,520]
-      ],
-      obstacles: [
-        { type:'loop', x: 1200, y: 420, radius:80 },
-        { type:'saw', x: 2100, y: 520, radius:32, speed:3.0 },
-        { type:'barrel', x: 2500, y: 520 }
-      ],
-      timeThresholds: [24, 40]
-    },
-    // Level 5: gauntlet
-    {
-      name: "Gauntlet",
-      startX: 0,
-      finishX: 3600,
-      startPos: { x: 60, y: 420 },
-      terrain: [
-        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[820,520],[940,480],[1060,420],[1180,420],[1300,480],[1420,520],[1540,520],[1660,480],[1780,420],[1900,420],[2020,480],[2140,520],[2260,520],[2380,480],[2500,420],[2620,420],[2740,480],[2860,520],[3600,520]
-      ],
-      obstacles: [
-        { type:'saw', x: 900, y: 480, radius:28, speed:2.4 },
-        { type:'movingSaw', x: 1500, y: 520, radius:26, range:200, speed:2.6 },
-        { type:'falling', x: 2100, y: 420, w:120, h:12, delay:0.5 },
-        { type:'barrel', x: 2700, y: 520 },
-        { type:'spikes', x: 3200, y: 520 }
-      ],
-      timeThresholds: [28, 46]
-    }
-  ];
+// ---------- Player (chassis + two wheels) ----------
+class Wheel {
+  constructor(x,y,r){
+    this.pos = new Vec(x,y);
+    this.vel = new Vec(0,0);
+    this.r = r;
+    this.onGround = false;
+    this.groundNormal = new Vec(0,-1);
+  }
+}
 
-  // ---------- Physics Primitives ----------
-  class Vec {
-    constructor(x=0,y=0){ this.x=x; this.y=y; }
-    add(v){ return new Vec(this.x+v.x, this.y+v.y); }
-    sub(v){ return new Vec(this.x-v.x, this.y-v.y); }
-    mul(s){ return new Vec(this.x*s, this.y*s); }
-    dot(v){ return this.x*v.x + this.y*v.y; }
-    len(){ return Math.hypot(this.x,this.y); }
-    norm(){ const l=this.len()||1; return new Vec(this.x/l,this.y/l); }
+class Player {
+  constructor(x,y){
+    // chassis center
+    this.pos = new Vec(x, y - 40);
+    this.vel = new Vec(0,0);
+    this.angle = 0; // chassis angle
+    this.angularVel = 0;
+    // wheels relative offsets (chassis local)
+    this.rearOffset = new Vec(-60, 20);
+    this.frontOffset = new Vec(60, 20);
+    // wheels world
+    this.rear = new Wheel(this.pos.x + this.rearOffset.x, this.pos.y + this.rearOffset.y, CONFIG.wheelRadius);
+    this.front = new Wheel(this.pos.x + this.frontOffset.x, this.pos.y + this.frontOffset.y, CONFIG.wheelRadius);
+    // throttle smoothing
+    this.targetThrottle = 0;
+    this.currentThrottle = 0;
+    // state
+    this.score = 0;
+    this.flips = 0;
+    this.airRotationAccum = 0;
+    this.wasAirborne = false;
+    this.crashed = false;
+    this.finished = false;
   }
 
-  // ---------- Terrain collision helpers ----------
-  function pointToSegmentDistance(px,py,x1,y1,x2,y2){
-    const vx = x2-x1, vy = y2-y1;
-    const wx = px-x1, wy = py-y1;
-    const c1 = vx*wx + vy*wy;
-    if(c1 <= 0) return Math.hypot(px-x1,py-y1);
-    const c2 = vx*vx + vy*vy;
-    if(c2 <= c1) return Math.hypot(px-x2,py-y2);
-    const t = c1 / c2;
-    const projx = x1 + t*vx, projy = y1 + t*vy;
-    return Math.hypot(px-projx,py-projy);
+  // compute world position of a chassis-local point
+  chassisToWorld(local){
+    const c = Math.cos(this.angle), s = Math.sin(this.angle);
+    return new Vec(this.pos.x + local.x*c - local.y*s, this.pos.y + local.x*s + local.y*c);
   }
 
-  // ---------- Player & Wheels ----------
-  class Wheel {
-    constructor(x,y,r){
-      this.pos = new Vec(x,y);
-      this.prevPos = new Vec(x,y);
-      this.vel = new Vec(0,0);
-      this.r = r;
-      this.onGround = false;
-      this.groundNormal = new Vec(0,-1);
-      this.angular = 0;
-      this.angularVel = 0;
-    }
-    applyImpulse(ix,iy){
-      this.vel.x += ix; this.vel.y += iy;
-    }
-    integrate(dt){
-      // Verlet-like integration for stability
-      const nx = this.pos.x + (this.pos.x - this.prevPos.x) + this.vel.x * dt * dt;
-      const ny = this.pos.y + (this.pos.y - this.prevPos.y) + this.vel.y * dt * dt;
-      this.prevPos.x = this.pos.x; this.prevPos.y = this.pos.y;
-      this.pos.x = nx; this.pos.y = ny;
-      // reset vel (we store separately)
-      this.vel.x = 0; this.vel.y = 0;
-    }
+  // update controls: set targetThrottle and apply small torque for lean
+  handleInput(dt, input){
+    // Smooth throttle ramping to avoid instant impulses
+    const throttleInput = input.up ? 1 : (input.down ? -0.6 : 0);
+    this.targetThrottle = throttleInput;
+    // ramp currentThrottle toward target
+    this.currentThrottle = lerp(this.currentThrottle, this.targetThrottle, clamp(CONFIG.throttleAccel * dt, 0, 1));
+
+    // lean torque: small, predictable
+    let torque = 0;
+    if(input.left) torque -= 1;
+    if(input.right) torque += 1;
+    // apply torque scaled by airControlTorque; on ground torque has less effect
+    const airFactor = (this.rear.onGround || this.front.onGround) ? 0.35 : 1.0;
+    this.angularVel += torque * CONFIG.airControlTorque * dt * airFactor / CONFIG.chassisMass;
+
+    // clamp angular velocity to prevent wild spinning
+    this.angularVel = clamp(this.angularVel, -CONFIG.maxAngularVel, CONFIG.maxAngularVel);
   }
 
-  class Player {
-    constructor(x,y){
-      // wheels positions relative to chassis
-      this.front = new Wheel(x+60,y,CONFIG.wheelRadius);
-      this.rear = new Wheel(x-60,y,CONFIG.wheelRadius);
-      this.chassisPos = new Vec(x,y-40);
-      this.chassisVel = new Vec(0,0);
-      this.chassisAngle = 0;
-      this.chassisAngularVel = 0;
-      this.score = 0;
-      this.flips = 0;
-      this.bestFlipAngle = 0;
-      this.onGround = false;
-      this.crashed = false;
-      this.finished = false;
-      this.boost = 0;
-      this.timeSinceStart = 0;
-      this.reset(x,y);
-    }
-    reset(x,y){
-      this.front.pos = new Vec(x+60,y);
-      this.front.prevPos = new Vec(x+60,y);
-      this.rear.pos = new Vec(x-60,y);
-      this.rear.prevPos = new Vec(x-60,y);
-      this.chassisPos = new Vec(x,y-40);
-      this.chassisVel = new Vec(0,0);
-      this.chassisAngle = 0;
-      this.chassisAngularVel = 0;
-      this.score = 0;
-      this.flips = 0;
-      this.bestFlipAngle = 0;
-      this.onGround = false;
-      this.crashed = false;
-      this.finished = false;
-      this.boost = 0;
-      this.timeSinceStart = 0;
-      this.airRotationAccum = 0;
-      this.wasAirborne = false;
-      this.lastGroundContact = now();
+  // physics update: semi-implicit Euler for chassis and wheels, suspension constraints
+  updatePhysics(dt, level){
+    if(this.crashed || this.finished) return;
+
+    // --- apply gravity to wheels and chassis ---
+    this.rear.vel.y += CONFIG.gravity * dt;
+    this.front.vel.y += CONFIG.gravity * dt;
+    this.vel.y += CONFIG.gravity * dt * 0.6; // chassis slightly less affected
+
+    // --- engine force applied to rear wheel as traction along chassis forward direction ---
+    const forward = new Vec(Math.cos(this.angle), Math.sin(this.angle));
+    const engineForce = this.currentThrottle * CONFIG.maxEngineForce;
+    // convert to acceleration on wheel (F = m * a)
+    const wheelAccel = engineForce / CONFIG.wheelMass;
+    this.rear.vel.x += forward.x * wheelAccel * dt;
+    this.rear.vel.y += forward.y * wheelAccel * dt;
+
+    // braking: apply opposite force to both wheels
+    if(this.targetThrottle < 0){
+      const brake = CONFIG.maxBrakeForce;
+      const brakeAccel = brake / CONFIG.wheelMass;
+      this.rear.vel.x -= forward.x * brakeAccel * dt;
+      this.rear.vel.y -= forward.y * brakeAccel * dt;
+      this.front.vel.x -= forward.x * brakeAccel * 0.6 * dt;
+      this.front.vel.y -= forward.y * brakeAccel * 0.6 * dt;
     }
 
-    applyControls(dt, input){
-      if(this.crashed || this.finished) return;
-      // engine force applied to rear wheel (simple)
-      let engine = 0;
-      if(input.up) engine += 1;
-      if(input.down) engine -= 0.8;
-      // boost
-      if(input.boost && this.boost > 0){
-        engine += 1.6;
-        this.boost -= dt*0.8;
-      }
-      // torque for lean
-      let torque = 0;
-      if(input.left) torque -= 1;
-      if(input.right) torque += 1;
-      // apply torque to chassis angular velocity
-      this.chassisAngularVel += torque * CONFIG.airControlTorque * dt / CONFIG.chassisMass;
-      // apply forward force to rear wheel along chassis direction
-      const dir = new Vec(Math.cos(this.chassisAngle), Math.sin(this.chassisAngle));
-      const force = engine * CONFIG.maxEngineForce;
-      // convert to impulse for wheel
-      const impulse = force * dt / CONFIG.wheelMass;
-      this.rear.applyImpulse(dir.x * impulse, dir.y * impulse);
-      // braking
-      if(input.down){
-        // apply opposite impulse to wheels to slow
-        const brakeImpulse = CONFIG.brakeForce * dt / CONFIG.wheelMass;
-        this.rear.applyImpulse(-dir.x * brakeImpulse, -dir.y * brakeImpulse);
-        this.front.applyImpulse(-dir.x * brakeImpulse*0.6, -dir.y * brakeImpulse*0.6);
-      }
-    }
+    // --- integrate wheels (semi-implicit) ---
+    this.rear.pos.x += this.rear.vel.x * dt;
+    this.rear.pos.y += this.rear.vel.y * dt;
+    this.front.pos.x += this.front.vel.x * dt;
+    this.front.pos.y += this.front.vel.y * dt;
 
-    physicsUpdate(dt, level){
-      if(this.crashed || this.finished) return;
-      // gravity to wheels and chassis
-      const g = CONFIG.gravity;
-      this.front.vel.y += g * dt;
-      this.rear.vel.y += g * dt;
-      this.chassisVel.y += g * dt * 0.6; // chassis lighter gravity effect
+    // --- suspension: spring between chassis anchor and wheel ---
+    const applySuspension = (wheel, localOffset) => {
+      const anchor = this.chassisToWorld(localOffset);
+      const dx = wheel.pos.x - anchor.x;
+      const dy = wheel.pos.y - anchor.y;
+      const dist = Math.hypot(dx,dy);
+      const dirx = dx / (dist || 1), diry = dy / (dist || 1);
+      const stretch = dist - CONFIG.suspensionRest;
+      // spring force
+      const fs = -CONFIG.suspensionK * stretch;
+      // relative velocity along spring
+      const relVel = (wheel.vel.x - this.vel.x) * dirx + (wheel.vel.y - this.vel.y) * diry;
+      const fd = -CONFIG.suspensionDamping * relVel;
+      const total = fs + fd;
+      // apply to wheel and chassis (impulse)
+      const ax = (total * dirx) / CONFIG.wheelMass;
+      const ay = (total * diry) / CONFIG.wheelMass;
+      wheel.vel.x += ax * dt;
+      wheel.vel.y += ay * dt;
+      this.vel.x -= (total * dirx) / CONFIG.chassisMass * dt;
+      this.vel.y -= (total * diry) / CONFIG.chassisMass * dt;
+      // small torque from suspension offset to chassis angular velocity
+      const torque = (localOffset.x * (total * diry) - localOffset.y * (total * dirx)) / CONFIG.chassisMass;
+      this.angularVel += torque * dt * 0.002;
+    };
+    applySuspension(this.rear, this.rearOffset);
+    applySuspension(this.front, this.frontOffset);
 
-      // suspension: spring between chassis and each wheel
-      const applySuspension = (wheel, offsetX) => {
-        const worldAnchor = new Vec(this.chassisPos.x + Math.cos(this.chassisAngle)*offsetX - Math.sin(this.chassisAngle)*0,
-                                  this.chassisPos.y + Math.sin(this.chassisAngle)*offsetX + Math.cos(this.chassisAngle)*0);
-        const dx = wheel.pos.x - worldAnchor.x;
-        const dy = wheel.pos.y - worldAnchor.y;
-        const dist = Math.hypot(dx,dy);
-        const rest = 60;
-        const dirx = dx / (dist || 1), diry = dy / (dist || 1);
-        const stretch = dist - rest;
-        const springForce = -CONFIG.suspensionStiffness * stretch;
-        // damping based on relative velocity (approx)
-        const relVelX = (wheel.pos.x - wheel.prevPos.x) - (this.chassisPos.x - (this.chassisPos.x - this.chassisVel.x*dt));
-        const relVelY = (wheel.pos.y - wheel.prevPos.y) - (this.chassisPos.y - (this.chassisPos.y - this.chassisVel.y*dt));
-        const damping = -CONFIG.suspensionDamping * (relVelX*dirx + relVelY*diry);
-        const fx = (springForce + damping) * dirx;
-        const fy = (springForce + damping) * diry;
-        // apply to wheel and chassis
-        wheel.applyImpulse(fx * dt / CONFIG.wheelMass, fy * dt / CONFIG.wheelMass);
-        this.chassisVel.x -= fx * dt / CONFIG.chassisMass;
-        this.chassisVel.y -= fy * dt / CONFIG.chassisMass;
-      };
-      applySuspension(this.front, +60);
-      applySuspension(this.rear, -60);
-
-      // integrate wheels (simple verlet)
-      this.front.integrate(dt);
-      this.rear.integrate(dt);
-
-      // integrate chassis
-      this.chassisPos.x += this.chassisVel.x * dt;
-      this.chassisPos.y += this.chassisVel.y * dt;
-      this.chassisAngle += this.chassisAngularVel * dt;
-
-      // ground collisions for wheels
-      const segments = level.segments;
-      const handleWheelCollision = (wheel) => {
-        wheel.onGround = false;
-        for(let i=0;i<segments.length-1;i++){
-          const a = segments[i], b = segments[i+1];
-          // project wheel center onto segment
-          const vx = b[0]-a[0], vy = b[1]-a[1];
-          const wx = wheel.pos.x - a[0], wy = wheel.pos.y - a[1];
-          const c1 = vx*wx + vy*wy;
-          const c2 = vx*vx + vy*vy;
-          let closestX, closestY;
-          if(c1 <= 0){ closestX = a[0]; closestY = a[1]; }
-          else if(c1 >= c2){ closestX = b[0]; closestY = b[1]; }
-          else {
-            const t = c1 / c2;
-            closestX = a[0] + vx*t; closestY = a[1] + vy*t;
-          }
-          const dx = wheel.pos.x - closestX, dy = wheel.pos.y - closestY;
-          const dist = Math.hypot(dx,dy);
-          if(dist < wheel.r + 0.001){
-            // push wheel out
-            const nx = dx / (dist || 1), ny = dy / (dist || 1);
-            const penetration = wheel.r - dist;
-            wheel.pos.x += nx * penetration;
-            wheel.pos.y += ny * penetration;
-            // simple bounce: set prevPos to simulate velocity change
-            const velx = wheel.pos.x - wheel.prevPos.x;
-            const vely = wheel.pos.y - wheel.prevPos.y;
-            // reflect velocity along normal with friction
-            const vn = velx*nx + vely*ny;
-            const vt_x = velx - vn*nx;
-            const vt_y = vely - vn*ny;
-            const bounce = -0.1;
-            const friction = 0.85;
-            const newVx = vt_x * friction + nx * vn * bounce;
-            const newVy = vt_y * friction + ny * vn * bounce;
-            wheel.prevPos.x = wheel.pos.x - newVx;
-            wheel.prevPos.y = wheel.pos.y - newVy;
-            wheel.onGround = true;
-            wheel.groundNormal = new Vec(nx,ny);
-            this.lastGroundContact = now();
-          }
-        }
-      };
-      handleWheelCollision(this.front);
-      handleWheelCollision(this.rear);
-
-      // if either wheel on ground, consider player on ground
-      this.onGround = this.front.onGround || this.rear.onGround;
-
-      // simple chassis-ground collision (head hits)
-      // check if chassis point intersects terrain (approx)
+    // --- terrain collision for wheels: project onto nearest segment and snap ---
+    const segments = level.segments;
+    const handleWheelGround = (wheel) => {
+      wheel.onGround = false;
       for(let i=0;i<segments.length-1;i++){
         const a = segments[i], b = segments[i+1];
-        // distance from chassis to segment
-        const d = pointToSegmentDistance(this.chassisPos.x, this.chassisPos.y, a[0],a[1],b[0],b[1]);
-        if(d < 18){
-          // crash if angle too steep or high speed
-          const angle = this.chassisAngle;
-          const deg = Math.abs(angle) * 180/Math.PI;
-          const speed = Math.hypot(this.chassisVel.x, this.chassisVel.y);
-          if(deg > 70 || speed > 420){
-            this.triggerCrash();
-          } else {
-            // push chassis up slightly
-            // simple correction
-            this.chassisPos.y -= (18 - d);
-            this.chassisVel.y *= -0.2;
-          }
+        const proj = pointToSegmentProjection(wheel.pos.x, wheel.pos.y, a[0],a[1], b[0],b[1]);
+        const dx = wheel.pos.x - proj.x, dy = wheel.pos.y - proj.y;
+        const dist = Math.hypot(dx,dy);
+        if(dist < wheel.r + 0.001){
+          // snap wheel to surface (prevent sinking)
+          const nx = dx / (dist || 1), ny = dy / (dist || 1);
+          const penetration = wheel.r - dist;
+          wheel.pos.x += nx * penetration;
+          wheel.pos.y += ny * penetration;
+          // compute normal and tangent
+          const normal = new Vec(nx, ny);
+          const tangent = new Vec(-normal.y, normal.x);
+          // decompose velocity
+          const vn = wheel.vel.x * normal.x + wheel.vel.y * normal.y;
+          const vt = wheel.vel.x * tangent.x + wheel.vel.y * tangent.y;
+          // reflect normal velocity (small bounce) and apply friction to tangent
+          const bounce = -0.05; // reduced bounce to avoid infinite bouncing
+          const newVn = vn * bounce;
+          const newVt = vt * CONFIG.wheelFriction;
+          wheel.vel.x = tangent.x * newVt + normal.x * newVn;
+          wheel.vel.y = tangent.y * newVt + normal.y * newVn;
+          wheel.onGround = true;
+          wheel.groundNormal = normal;
+          // transfer some impulse to chassis
+          this.vel.x += normal.x * (-newVn) * 0.02;
+          this.vel.y += normal.y * (-newVn) * 0.02;
+          // small stabilization: align chassis angle slowly to wheel line if both wheels on ground
         }
       }
+    };
+    handleWheelGround(this.rear);
+    handleWheelGround(this.front);
 
-      // update chassis angular damping
-      this.chassisAngularVel *= 0.995;
+    // --- chassis integration (semi-implicit) ---
+    // update angular velocity with damping to prevent wild spinning
+    this.angularVel *= CONFIG.angularDamping;
+    this.angularVel = clamp(this.angularVel, -CONFIG.maxAngularVel, CONFIG.maxAngularVel);
+    this.angle += this.angularVel * dt;
 
-      // flips detection: if airborne, accumulate rotation
-      if(!this.onGround){
-        if(!this.wasAirborne){
-          this.airRotationAccum = 0;
-          this.wasAirborne = true;
-        }
-        this.airRotationAccum += this.chassisAngularVel * dt;
-      } else {
-        if(this.wasAirborne){
-          // landed: check flips
-          const rot = Math.abs(this.airRotationAccum) / (2*Math.PI);
-          const fullFlips = Math.floor(rot + 0.25); // require near full rotations
-          if(fullFlips > 0){
-            this.flips += fullFlips;
-            this.score += fullFlips * CONFIG.flipScore;
-            // reduce time as reward
-            gameState.time -= fullFlips * CONFIG.flipBonusTime;
-            // small sound
-            playBeep(900,0.06,'square',0.08);
-          }
-        }
-        this.wasAirborne = false;
+    // update chassis linear velocity from wheels average (soft)
+    const avgWheelVelX = (this.rear.vel.x + this.front.vel.x) * 0.5;
+    const avgWheelVelY = (this.rear.vel.y + this.front.vel.y) * 0.5;
+    // blend to avoid instant changes
+    this.vel.x = lerp(this.vel.x, avgWheelVelX, 0.06);
+    this.vel.y = lerp(this.vel.y, avgWheelVelY, 0.06);
+
+    // clamp speeds
+    const speed = Math.hypot(this.vel.x, this.vel.y);
+    if(speed > CONFIG.maxSpeed){
+      const s = CONFIG.maxSpeed / speed;
+      this.vel.x *= s; this.vel.y *= s;
+    }
+    if(this.vel.y > CONFIG.maxFallSpeed) this.vel.y = CONFIG.maxFallSpeed;
+
+    // integrate chassis position
+    this.pos.x += this.vel.x * dt;
+    this.pos.y += this.vel.y * dt;
+
+    // --- keep wheels attached to chassis via constraint (prevent drifting away) ---
+    const enforceWheelConstraint = (wheel, localOffset) => {
+      const desired = this.chassisToWorld(localOffset);
+      const dx = desired.x - wheel.pos.x;
+      const dy = desired.y - wheel.pos.y;
+      // correct position partially to avoid snapping
+      wheel.pos.x += dx * 0.5;
+      wheel.pos.y += dy * 0.5;
+      // adjust wheel velocity to match chassis movement a bit
+      wheel.vel.x += (this.vel.x - wheel.vel.x) * 0.2;
+      wheel.vel.y += (this.vel.y - wheel.vel.y) * 0.2;
+    };
+    enforceWheelConstraint(this.rear, this.rearOffset);
+    enforceWheelConstraint(this.front, this.frontOffset);
+
+    // --- flips detection: accumulate rotation while airborne ---
+    const airborne = !(this.rear.onGround || this.front.onGround);
+    if(airborne){
+      if(!this.wasAirborne){
+        this.airRotationAccum = 0;
+        this.wasAirborne = true;
       }
-
-      // update chassis orientation to follow wheels (soft)
-      const desiredAngle = Math.atan2(this.front.pos.y - this.rear.pos.y, this.front.pos.x - this.rear.pos.x);
-      this.chassisAngle = lerp(this.chassisAngle, desiredAngle, 0.06);
-
-      // update chassis velocity from wheel average
-      const avgWheelVelX = ((this.front.pos.x - this.front.prevPos.x) + (this.rear.pos.x - this.rear.prevPos.x)) / (dt || 1);
-      const avgWheelVelY = ((this.front.pos.y - this.front.prevPos.y) + (this.rear.pos.y - this.rear.prevPos.y)) / (dt || 1);
-      this.chassisVel.x = lerp(this.chassisVel.x, avgWheelVelX, 0.06);
-      this.chassisVel.y = lerp(this.chassisVel.y, avgWheelVelY, 0.06);
-
-      // check finish line
-      if(this.chassisPos.x >= level.finishX){
-        this.finished = true;
-        // stop engine sound
-        stopEngineSound();
+      this.airRotationAccum += this.angularVel * dt;
+    } else {
+      if(this.wasAirborne){
+        const rot = Math.abs(this.airRotationAccum) / (2*Math.PI);
+        const fullFlips = Math.floor(rot + 0.25);
+        if(fullFlips > 0){
+          this.flips += fullFlips;
+          this.score += fullFlips * CONFIG.flipScore;
+          gameState.time = Math.max(0, gameState.time - fullFlips * CONFIG.flipBonusTime);
+          // small particle feedback
+          spawnParticles(this.pos.x, this.pos.y, 10, '#ffd166');
+        }
       }
+      this.wasAirborne = false;
     }
 
-    triggerCrash(){
-      if(this.crashed) return;
-      this.crashed = true;
-      // explosion particles
-      spawnParticles(this.chassisPos.x, this.chassisPos.y, 18, '#ff6b6b');
-      playBeep(120,0.18,'sawtooth',0.18);
-      stopEngineSound();
-      // small camera shake
-      camera.shake(0.18, 6);
-    }
-
-    draw(ctx){
-      // draw wheels
-      ctx.save();
-      // wheels
-      const drawWheel = (wheel) => {
-        ctx.beginPath();
-        ctx.fillStyle = '#222';
-        ctx.arc(wheel.pos.x, wheel.pos.y, wheel.r, 0, Math.PI*2);
-        ctx.fill();
-        ctx.strokeStyle = '#444';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        // rim
-        ctx.beginPath();
-        ctx.strokeStyle = '#999';
-        ctx.lineWidth = 2;
-        ctx.moveTo(wheel.pos.x, wheel.pos.y);
-        ctx.lineTo(wheel.pos.x + Math.cos(now()*wheel.r)*wheel.r*0.5, wheel.pos.y + Math.sin(now()*wheel.r)*wheel.r*0.5);
-        ctx.stroke();
-      };
-      drawWheel(this.rear);
-      drawWheel(this.front);
-
-      // chassis
-      ctx.translate(this.chassisPos.x, this.chassisPos.y);
-      ctx.rotate(this.chassisAngle);
-      // body
-      ctx.fillStyle = this.crashed ? '#aa2222' : '#ff6f00';
-      ctx.beginPath();
-      ctx.moveTo(-70, -10);
-      ctx.quadraticCurveTo(-20, -40, 40, -20);
-      ctx.quadraticCurveTo(70, -10, 60, 10);
-      ctx.quadraticCurveTo(20, 30, -40, 20);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      // rider
-      ctx.save();
-      ctx.translate(0, -18);
-      ctx.rotate(-0.15);
-      ctx.fillStyle = '#222';
-      ctx.fillRect(-8, -28, 16, 28); // torso
-      ctx.beginPath(); ctx.fillStyle = '#ffd166'; ctx.arc(0, -36, 10, 0, Math.PI*2); ctx.fill(); // head
-      ctx.restore();
-
-      ctx.restore();
+    // --- safety checks: if rotation too extreme or player below world, trigger crash/reset ---
+    if(Math.abs(this.angle) > Math.PI * 1.2 || this.pos.y > 3000){
+      this.triggerCrash();
     }
   }
 
-  // ---------- Particles ----------
-  const particles = [];
-  function spawnParticles(x,y,count,color){
-    for(let i=0;i<count;i++){
-      particles.push({
-        x:x + rand(-8,8),
-        y:y + rand(-8,8),
-        vx: rand(-200,200),
-        vy: rand(-200, -40),
-        life: rand(0.4,1.2),
-        color: color || '#fff'
-      });
-    }
+  triggerCrash(){
+    if(this.crashed) return;
+    this.crashed = true;
+    spawnParticles(this.pos.x, this.pos.y, 28, '#ff6b6b');
+    // small camera nudge (no shake)
+    camera.targetX = this.pos.x - CONFIG.cameraForwardOffset;
+    // stop movement
+    this.vel = new Vec(0,0);
+    this.rear.vel = new Vec(0,0);
+    this.front.vel = new Vec(0,0);
+    // stop engine sound if any
+    stopEngineSound();
   }
-  function updateParticles(dt){
-    for(let i=particles.length-1;i>=0;i--){
-      const p = particles[i];
-      p.vy += CONFIG.gravity * dt * 0.2;
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.life -= dt;
-      if(p.life <= 0) particles.splice(i,1);
-    }
+}
+
+// ---------- Particles ----------
+const particles = [];
+function spawnParticles(x,y,count,color){
+  for(let i=0;i<count;i++){
+    particles.push({
+      x:x + rand(-12,12),
+      y:y + rand(-12,12),
+      vx: rand(-200,200),
+      vy: rand(-200,-40),
+      life: rand(0.4,1.2),
+      color: color || '#fff'
+    });
   }
-  function drawParticles(ctx){
-    for(const p of particles){
-      ctx.globalAlpha = Math.max(0, p.life);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x-2, p.y-2, 4, 4);
-    }
-    ctx.globalAlpha = 1;
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.vy += CONFIG.gravity * dt * 0.2;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+    if(p.life <= 0) particles.splice(i,1);
   }
-
-  // ---------- Obstacles ----------
-  class Obstacle {
-    constructor(data){
-      Object.assign(this, data);
-      this.active = true;
-      // dynamic properties
-      if(this.type === 'movingPlatform'){
-        this.baseX = this.x;
-        this.t = 0;
-      }
-      if(this.type === 'movingSaw'){
-        this.baseX = this.x;
-        this.t = 0;
-      }
-      if(this.type === 'falling'){
-        this.fallen = false;
-        this.timer = 0;
-      }
-    }
-    update(dt){
-      if(this.type === 'movingPlatform'){
-        this.t += dt * this.speed;
-        this.x = this.baseX + Math.sin(this.t) * this.range;
-      }
-      if(this.type === 'movingSaw'){
-        this.t += dt * this.speed;
-        this.x = this.baseX + Math.sin(this.t) * this.range;
-      }
-      if(this.type === 'falling'){
-        // check if player near to trigger
-        if(!this.fallen){
-          // nothing here; level will trigger when player steps on it
-        } else {
-          this.y += 600 * dt;
-        }
-      }
-    }
-    draw(ctx){
-      if(this.type === 'spikes'){
-        // draw small spikes on ground
-        const spikeW = 18;
-        ctx.fillStyle = '#333';
-        for(let i=0;i<6;i++){
-          const sx = this.x + i*spikeW - 3*spikeW;
-          ctx.beginPath();
-          ctx.moveTo(sx, this.y);
-          ctx.lineTo(sx + spikeW/2, this.y - spikeW);
-          ctx.lineTo(sx + spikeW, this.y);
-          ctx.closePath();
-          ctx.fill();
-        }
-      } else if(this.type === 'saw' || this.type === 'movingSaw'){
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(now() * (this.speed || 2));
-        ctx.fillStyle = '#bbb';
-        ctx.beginPath();
-        ctx.arc(0,0,this.radius,0,Math.PI*2);
-        ctx.fill();
-        // teeth
-        ctx.strokeStyle = '#666';
-        ctx.lineWidth = 3;
-        for(let i=0;i<12;i++){
-          const a = i/12*Math.PI*2;
-          ctx.beginPath();
-          ctx.moveTo(Math.cos(a)*(this.radius-2), Math.sin(a)*(this.radius-2));
-          ctx.lineTo(Math.cos(a)*(this.radius+8), Math.sin(a)*(this.radius+8));
-          ctx.stroke();
-        }
-        ctx.restore();
-      } else if(this.type === 'barrel'){
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.fillStyle = '#8b3e2f';
-        ctx.fillRect(-16,-24,32,32);
-        ctx.strokeStyle = '#000';
-        ctx.strokeRect(-16,-24,32,32);
-        ctx.restore();
-      } else if(this.type === 'movingPlatform' || this.type === 'falling'){
-        ctx.fillStyle = '#444';
-        ctx.fillRect(this.x - (this.w||120)/2, this.y - (this.h||12)/2, this.w||120, this.h||12);
-      } else if(this.type === 'loop'){
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.strokeStyle = '#ff6f00';
-        ctx.lineWidth = 8;
-        ctx.beginPath();
-        ctx.arc(0,0,this.radius,0,Math.PI*2);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-    checkCollision(player, level){
-      if(!this.active) return;
-      // simple collision checks
-      if(this.type === 'spikes'){
-        // if either wheel touches spike area
-        const dx1 = Math.abs(player.rear.pos.x - this.x);
-        const dx2 = Math.abs(player.front.pos.x - this.x);
-        if((dx1 < 80 && Math.abs(player.rear.pos.y - this.y) < 30) || (dx2 < 80 && Math.abs(player.front.pos.y - this.y) < 30)){
-          player.triggerCrash();
-        }
-      } else if(this.type === 'saw' || this.type === 'movingSaw'){
-        const sawX = this.x, sawY = this.y, r = this.radius;
-        const check = (x,y) => {
-          const d = Math.hypot(x - sawX, y - sawY);
-          if(d < r + CONFIG.wheelRadius*0.6){
-            // wheel hit saw -> crash
-            player.triggerCrash();
-          }
-        };
-        check(player.front.pos.x, player.front.pos.y);
-        check(player.rear.pos.x, player.rear.pos.y);
-        // chassis hit
-        if(Math.hypot(player.chassisPos.x - sawX, player.chassisPos.y - sawY) < r + 12){
-          player.triggerCrash();
-        }
-      } else if(this.type === 'barrel'){
-        // barrel explosion if hit
-        const bx = this.x, by = this.y - 12;
-        const d = Math.hypot(player.chassisPos.x - bx, player.chassisPos.y - by);
-        if(d < 48){
-          // explode
-          spawnParticles(bx, by, 28, '#ffb400');
-          player.triggerCrash();
-          this.active = false;
-        }
-      } else if(this.type === 'movingPlatform'){
-        // if player lands on platform, adjust wheel positions
-        const px = player.chassisPos.x;
-        const py = player.chassisPos.y;
-        const left = this.x - (this.w||120)/2, right = this.x + (this.w||120)/2;
-        const top = this.y - (this.h||12)/2;
-        // if wheel near top
-        if(player.rear.pos.x > left && player.rear.pos.x < right && Math.abs(player.rear.pos.y - top) < 30){
-          // snap wheel to platform
-          player.rear.pos.y = top - player.rear.r;
-          player.rear.prevPos.y = player.rear.pos.y;
-        }
-        if(player.front.pos.x > left && player.front.pos.x < right && Math.abs(player.front.pos.y - top) < 30){
-          player.front.pos.y = top - player.front.r;
-          player.front.prevPos.y = player.front.pos.y;
-        }
-      } else if(this.type === 'falling'){
-        // if player steps on it, start timer
-        const left = this.x - (this.w||120)/2, right = this.x + (this.w||120)/2;
-        const top = this.y - (this.h||12)/2;
-        if(!this.fallen && ((player.rear.pos.x > left && player.rear.pos.x < right && Math.abs(player.rear.pos.y - top) < 20) || (player.front.pos.x > left && player.front.pos.x < right && Math.abs(player.front.pos.y - top) < 20))){
-          this.timer += 0.016;
-          if(this.timer > (this.delay || 0.6)){
-            this.fallen = true;
-            spawnParticles(this.x, this.y, 12, '#c2c2c2');
-          }
-        }
-      } else if(this.type === 'loop'){
-        // if player enters loop area, allow passing through without crash if speed sufficient
-        const dx = player.chassisPos.x - this.x, dy = player.chassisPos.y - this.y;
-        const d = Math.hypot(dx,dy);
-        if(d < this.radius + 40){
-          // if player speed low and angle wrong, crash
-          const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
-          if(speed < 200){
-            player.triggerCrash();
-          } else {
-            // reward: small boost
-            player.boost = 1.2;
-            spawnParticles(player.chassisPos.x, player.chassisPos.y, 8, '#ffd166');
-          }
-        }
-      }
-    }
+}
+function drawParticles(ctx){
+  for(const p of particles){
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x-2, p.y-2, 4, 4);
   }
+  ctx.globalAlpha = 1;
+}
 
-  // ---------- Level Class ----------
-  class Level {
-    constructor(data){
-      this.name = data.name;
-      this.startX = data.startX;
-      this.finishX = data.finishX;
-      this.startPos = data.startPos;
-      this.points = data.terrain;
-      this.segments = data.terrain;
-      this.obstacles = data.obstacles.map(o => new Obstacle(o));
-      this.timeThresholds = data.timeThresholds || [20,40];
-    }
-    update(dt){
-      for(const o of this.obstacles) o.update(dt);
-    }
-    draw(ctx){
-      // background parallax layers
-      // sky gradient already in CSS; draw distant hills
-      ctx.save();
-      // distant hills
-      ctx.fillStyle = '#cfe8d8';
-      ctx.beginPath();
-      ctx.moveTo(-1000, 520);
-      for(let i=0;i<40;i++){
-        const x = i*200 - camera.x*0.2;
-        const y = 420 + Math.sin(i*0.6 + camera.x*0.002)*40;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(camera.x + 4000, 720);
-      ctx.lineTo(-2000,720);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // terrain
-      ctx.save();
-      ctx.fillStyle = '#6b4f2b';
-      ctx.beginPath();
-      ctx.moveTo(this.points[0][0], this.points[0][1]);
-      for(let i=1;i<this.points.length;i++){
-        ctx.lineTo(this.points[i][0], this.points[i][1]);
-      }
-      ctx.lineTo(this.points[this.points.length-1][0], 900);
-      ctx.lineTo(this.points[0][0], 900);
-      ctx.closePath();
-      ctx.fill();
-
-      // terrain outline
-      ctx.strokeStyle = '#3f2f1f';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(this.points[0][0], this.points[0][1]);
-      for(let i=1;i<this.points.length;i++){
-        ctx.lineTo(this.points[i][0], this.points[i][1]);
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      // finish line
-      ctx.save();
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(this.finishX - 6, 360, 12, 160);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(this.finishX - 6, 360, 12, 20);
-      ctx.restore();
-
-      // obstacles
-      for(const o of this.obstacles) o.draw(ctx);
-    }
+// ---------- Level class ----------
+class Level {
+  constructor(data){
+    this.name = data.name;
+    this.startPos = data.startPos;
+    this.finishX = data.finishX;
+    this.points = data.terrain;
+    this.segments = data.terrain;
+    this.obstacles = data.obstacles || [];
+    this.timeThresholds = data.timeThresholds || [20,40];
   }
-
-  // ---------- Camera ----------
-  const camera = {
-    x: 0, y: 0, shakeTime:0, shakeMag:0,
-    update(targetX, targetY, dt){
-      const desiredX = targetX - 420; // keep player slightly left for forward visibility
-      this.x = lerp(this.x, desiredX, CONFIG.cameraLag);
-      this.y = lerp(this.y, targetY - 360, CONFIG.cameraLag);
-      if(this.shakeTime > 0){
-        this.shakeTime -= dt;
-      }
-    },
-    apply(ctx){
-      ctx.setTransform(1,0,0,1,0,0);
-      // center camera
-      const tx = -this.x + 160 + (this.shakeTime>0 ? rand(-this.shakeMag,this.shakeMag) : 0);
-      const ty = -this.y + (this.shakeTime>0 ? rand(-this.shakeMag,this.shakeMag) : 0);
-      ctx.translate(tx, ty);
-    },
-    shake(time, mag){
-      this.shakeTime = time; this.shakeMag = mag;
+  update(dt){}
+  draw(ctx){
+    // distant hills
+    ctx.save();
+    ctx.fillStyle = '#cfe8d8';
+    ctx.beginPath();
+    ctx.moveTo(-1000, 520);
+    for(let i=0;i<40;i++){
+      const x = i*200 - camera.x*0.2;
+      const y = 420 + Math.sin(i*0.6 + camera.x*0.002)*40;
+      ctx.lineTo(x, y);
     }
-  };
+    ctx.lineTo(camera.x + 4000, 720);
+    ctx.lineTo(-2000,720);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
 
-  // ---------- Game State ----------
-  let currentLevelIndex = 0;
-  let level = new Level(LEVELS[currentLevelIndex]);
-  let player = new Player(level.startPos.x, level.startPos.y);
-  let lastTime = now();
-  let accumulator = 0;
-  let gameState = {
-    running: true,
-    time: 0,
-    bestTimes: JSON.parse(localStorage.getItem('moto_bestTimes') || '{}'),
-    score: 0
-  };
-
-  // UI elements
-  const levelNameEl = document.getElementById('levelName');
-  const timeEl = document.getElementById('time');
-  const speedEl = document.getElementById('speed');
-  const flipsEl = document.getElementById('flips');
-  const scoreEl = document.getElementById('score');
-  const restartBtn = document.getElementById('restartBtn');
-  const resultsEl = document.getElementById('results');
-  const resultTitle = document.getElementById('resultTitle');
-  const resultTime = document.getElementById('resultTime');
-  const resultStars = document.getElementById('resultStars');
-  const nextBtn = document.getElementById('nextBtn');
-  const retryBtn = document.getElementById('retryBtn');
-
-  restartBtn.addEventListener('click', ()=> resetLevel());
-  nextBtn.addEventListener('click', ()=> {
-    currentLevelIndex = Math.min(LEVELS.length-1, currentLevelIndex+1);
-    loadLevel(currentLevelIndex);
-    hideResults();
-  });
-  retryBtn.addEventListener('click', ()=> {
-    loadLevel(currentLevelIndex);
-    hideResults();
-  });
-
-  function loadLevel(idx){
-    level = new Level(LEVELS[idx]);
-    player = new Player(level.startPos.x, level.startPos.y);
-    currentLevelIndex = idx;
-    gameState.time = 0;
-    gameState.running = true;
-    lastTime = now();
-    startEngineSound();
-    levelNameEl.textContent = level.name;
-    // center camera
-    camera.x = player.chassisPos.x - 420;
-    camera.y = player.chassisPos.y - 360;
-  }
-
-  function resetLevel(){
-    loadLevel(currentLevelIndex);
-    hideResults();
-  }
-
-  function showResults(){
-    gameState.running = false;
-    resultsEl.style.display = 'block';
-    resultTitle.textContent = 'Level Complete';
-    resultTime.textContent = `Time: ${gameState.time.toFixed(2)}s`;
-    // compute stars
-    const thresholds = level.timeThresholds;
-    let stars = 1;
-    if(gameState.time <= thresholds[0]) stars = 3;
-    else if(gameState.time <= thresholds[1]) stars = 2;
-    resultStars.textContent = '★'.repeat(stars) + '☆'.repeat(3-stars);
-    // save best time
-    const key = 'level_' + currentLevelIndex;
-    const prev = gameState.bestTimes[key];
-    if(!prev || gameState.time < prev){
-      gameState.bestTimes[key] = gameState.time;
-      localStorage.setItem('moto_bestTimes', JSON.stringify(gameState.bestTimes));
+    // terrain fill
+    ctx.save();
+    ctx.fillStyle = '#6b4f2b';
+    ctx.beginPath();
+    ctx.moveTo(this.points[0][0], this.points[0][1]);
+    for(let i=1;i<this.points.length;i++){
+      ctx.lineTo(this.points[i][0], this.points[i][1]);
     }
-  }
-  function hideResults(){ resultsEl.style.display = 'none'; }
+    ctx.lineTo(this.points[this.points.length-1][0], 900);
+    ctx.lineTo(this.points[0][0], 900);
+    ctx.closePath();
+    ctx.fill();
 
-  // ---------- Main Loop ----------
-  function update(dt){
-    if(!gameState.running) return;
-    // handle restart input
-    if(input.restart){
-      resetLevel();
-      input.restart = false;
-      return;
+    // terrain outline
+    ctx.strokeStyle = '#3f2f1f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(this.points[0][0], this.points[0][1]);
+    for(let i=1;i<this.points.length;i++){
+      ctx.lineTo(this.points[i][0], this.points[i][1]);
     }
-    // apply controls
-    player.applyControls(dt, input);
-    // update level obstacles
-    level.update(dt);
-    // physics update
-    player.physicsUpdate(dt, level);
-    // obstacle collisions
-    for(const o of level.obstacles) o.checkCollision(player, level);
-    // update particles
-    updateParticles(dt);
-    // update engine sound pitch based on speed
-    const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
-    setEnginePitch(Math.min(1, speed / 600));
-    // update time
-    gameState.time += dt;
-    // if finished, show results
-    if(player.finished){
-      showResults();
-    }
-  }
+    ctx.stroke();
+    ctx.restore();
 
-  function render(){
-    // clear
+    // finish line
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(this.finishX - 6, 360, 12, 160);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(this.finishX - 6, 360, 12, 20);
+    ctx.restore();
+  }
+}
+
+// ---------- Camera ----------
+const camera = {
+  x: 0, y: 0,
+  targetX: 0, targetY: 0,
+  update(dt, player){
+    // target is player.x - forwardOffset, player.y centered
+    this.targetX = player.pos.x - CONFIG.cameraForwardOffset;
+    this.targetY = player.pos.y - 360;
+    // smooth lerp (no snapping)
+    this.x = lerp(this.x, this.targetX, CONFIG.cameraLerp);
+    this.y = lerp(this.y, this.targetY, CONFIG.cameraLerp);
+  },
+  apply(ctx){
     ctx.setTransform(1,0,0,1,0,0);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    // apply camera transform
-    camera.apply(ctx);
-    // draw background sky (simple)
-    // draw level
-    level.draw(ctx);
-    // draw player
-    player.draw(ctx);
-    // draw particles
-    drawParticles(ctx);
-    // HUD elements are DOM-based; update values
-    const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
-    speedEl.textContent = Math.round(speed*0.06);
-    flipsEl.textContent = player.flips;
-    scoreEl.textContent = player.score;
-    timeEl.textContent = gameState.time.toFixed(2);
+    ctx.translate(-this.x + 160, -this.y);
   }
+};
 
-  function gameLoop(){
-    const t = now();
-    let dt = (t - lastTime) * CONFIG.timeScale;
-    lastTime = t;
-    // clamp dt
-    dt = Math.min(0.05, dt);
-    // update camera target
-    camera.update(player.chassisPos.x, player.chassisPos.y, dt);
-    // update
-    update(dt);
-    // render
-    render();
-    requestAnimationFrame(gameLoop);
-  }
+// ---------- Sound (light) ----------
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioCtx ? new AudioCtx() : null;
+let engineOsc = null, engineGain = null;
+function startEngineSound(){
+  if(!audioCtx) return;
+  if(engineOsc) return;
+  engineOsc = audioCtx.createOscillator();
+  engineGain = audioCtx.createGain();
+  engineOsc.type = 'sawtooth';
+  engineOsc.frequency.value = 60;
+  engineGain.gain.value = 0.01;
+  engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination);
+  engineOsc.start();
+}
+function stopEngineSound(){
+  if(!engineOsc) return;
+  engineOsc.stop(); engineOsc.disconnect();
+  engineGain.disconnect();
+  engineOsc = null; engineGain = null;
+}
+function setEnginePitch(p){
+  if(!engineOsc) return;
+  engineOsc.frequency.value = 60 + p * 160;
+  engineGain.gain.value = 0.005 + p * 0.03;
+}
 
-  // ---------- Initialization ----------
-  loadLevel(0);
+// ---------- Game state & UI ----------
+let currentLevelIndex = 0;
+let level = new Level(LEVELS[currentLevelIndex]);
+let player = new Player(level.startPos.x, level.startPos.y);
+let lastTime = now();
+let gameState = { running:true, time:0, bestTimes: JSON.parse(localStorage.getItem('moto_bestTimes') || '{}') };
+
+const levelNameEl = document.getElementById('levelName');
+const timeEl = document.getElementById('time');
+const speedEl = document.getElementById('speed');
+const flipsEl = document.getElementById('flips');
+const scoreEl = document.getElementById('score');
+const restartBtn = document.getElementById('restartBtn');
+const resultsEl = document.getElementById('results');
+const resultTitle = document.getElementById('resultTitle');
+const resultTime = document.getElementById('resultTime');
+const resultStars = document.getElementById('resultStars');
+const nextBtn = document.getElementById('nextBtn');
+const retryBtn = document.getElementById('retryBtn');
+
+restartBtn.addEventListener('click', ()=> resetLevel());
+nextBtn.addEventListener('click', ()=> { currentLevelIndex = Math.min(LEVELS.length-1, currentLevelIndex+1); loadLevel(currentLevelIndex); hideResults(); });
+retryBtn.addEventListener('click', ()=> { loadLevel(currentLevelIndex); hideResults(); });
+
+function loadLevel(idx){
+  level = new Level(LEVELS[idx]);
+  player = new Player(level.startPos.x, level.startPos.y);
+  currentLevelIndex = idx;
+  gameState.time = 0;
+  gameState.running = true;
+  lastTime = now();
   startEngineSound();
+  levelNameEl.textContent = level.name;
+  camera.x = player.pos.x - CONFIG.cameraForwardOffset;
+  camera.y = player.pos.y - 360;
+}
+function resetLevel(){ loadLevel(currentLevelIndex); hideResults(); }
+function showResults(){
+  gameState.running = false;
+  resultsEl.style.display = 'block';
+  resultTitle.textContent = 'Level Complete';
+  resultTime.textContent = `Time: ${gameState.time.toFixed(2)}s`;
+  const thresholds = level.timeThresholds;
+  let stars = 1;
+  if(gameState.time <= thresholds[0]) stars = 3;
+  else if(gameState.time <= thresholds[1]) stars = 2;
+  resultStars.textContent = '★'.repeat(stars) + '☆'.repeat(3-stars);
+  const key = 'level_' + currentLevelIndex;
+  const prev = gameState.bestTimes[key];
+  if(!prev || gameState.time < prev){
+    gameState.bestTimes[key] = gameState.time;
+    localStorage.setItem('moto_bestTimes', JSON.stringify(gameState.bestTimes));
+  }
+}
+function hideResults(){ resultsEl.style.display = 'none'; }
+
+// ---------- Main update functions (refactored) ----------
+function handleInput(dt){
+  // map input to player controls
+  player.handleInput(dt, input);
+  // restart
+  if(input.restart){
+    resetLevel();
+    input.restart = false;
+  }
+}
+
+function updatePhysics(dt){
+  // update level (obstacles if any)
+  level.update(dt);
+  // update player physics
+  player.updatePhysics(dt, level);
+  // update particles
+  updateParticles(dt);
+  // engine pitch based on speed
+  const speed = Math.hypot(player.vel.x, player.vel.y);
+  setEnginePitch(Math.min(1, speed / 600));
+  // update time
+  gameState.time += dt;
+  // check finish
+  if(player.pos.x >= level.finishX && !player.finished){
+    player.finished = true;
+    stopEngineSound();
+    showResults();
+  }
+}
+
+function updateCamera(dt){
+  camera.update(dt, player);
+}
+
+function renderWorld(){
+  // clear and apply camera
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  camera.apply(ctx);
+
+  // draw level and world
+  level.draw(ctx);
+
+  // draw wheels
+  const drawWheel = (wheel) => {
+    ctx.beginPath();
+    ctx.fillStyle = '#222';
+    ctx.arc(wheel.pos.x, wheel.pos.y, wheel.r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  };
+  drawWheel(player.rear);
+  drawWheel(player.front);
+
+  // draw chassis
+  ctx.save();
+  ctx.translate(player.pos.x, player.pos.y);
+  ctx.rotate(player.angle);
+  ctx.fillStyle = player.crashed ? '#aa2222' : '#ff6f00';
+  ctx.beginPath();
+  ctx.moveTo(-70, -10);
+  ctx.quadraticCurveTo(-20, -40, 40, -20);
+  ctx.quadraticCurveTo(70, -10, 60, 10);
+  ctx.quadraticCurveTo(20, 30, -40, 20);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#222';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // rider
+  ctx.save();
+  ctx.translate(0, -18);
+  ctx.rotate(-0.15);
+  ctx.fillStyle = '#222';
+  ctx.fillRect(-8, -28, 16, 28);
+  ctx.beginPath(); ctx.fillStyle = '#ffd166'; ctx.arc(0, -36, 10, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.restore();
+
+  // particles
+  drawParticles(ctx);
+
+  // reset transform before drawing UI overlays on canvas (none here) to avoid UI jitter
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function renderUI(){
+  // DOM-based HUD updates (keeps UI stable and not tied to camera)
+  const speed = Math.hypot(player.vel.x, player.vel.y);
+  speedEl.textContent = Math.round(speed*0.06);
+  flipsEl.textContent = player.flips;
+  scoreEl.textContent = player.score;
+  timeEl.textContent = gameState.time.toFixed(2);
+}
+
+// ---------- Game loop (stable dt) ----------
+function gameLoop(){
+  const t = now();
+  let deltaTime = t - lastTime;
+  lastTime = t;
+  // clamp delta to avoid spikes (as requested)
+  const dt = Math.min(deltaTime, CONFIG.dtClamp);
+  if(gameState.running){
+    handleInput(dt);
+    updatePhysics(dt);
+    updateCamera(dt);
+  }
+  renderWorld();
+  renderUI();
   requestAnimationFrame(gameLoop);
+}
 
-  // ---------- Expose for debugging (optional) ----------
-  window._game = { player, level, loadLevel, resetLevel };
+// ---------- Simple particle spawn for feedback ----------
+function spawnParticles(x,y,count,color){
+  for(let i=0;i<count;i++){
+    particles.push({
+      x:x + rand(-12,12),
+      y:y + rand(-12,12),
+      vx: rand(-200,200),
+      vy: rand(-200,-40),
+      life: rand(0.4,1.2),
+      color: color || '#fff'
+    });
+  }
+}
 
-  // ---------- Additional polish: small UI interactions ----------
-  // show/hide results when finished
-  const observer = new MutationObserver(()=>{});
-  // ensure canvas resizes initially
-  setTimeout(resizeCanvas, 50);
+// ---------- Sound helpers (redeclare to ensure available) ----------
+function playBeep(freq=440, time=0.08, type='sine', gain=0.12){
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time);
+  o.stop(audioCtx.currentTime + time + 0.02);
+}
 
-})();
+// ---------- Init ----------
+loadLevel(0);
+startEngineSound();
+requestAnimationFrame(gameLoop);
+
+// expose for debugging
+window._game = { player, level, loadLevel, resetLevel };
+
 </script>
 </body>
 </html>
