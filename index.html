@@ -10,10 +10,15 @@
 :root{
   --bg:#0f1724; --panel:#0b1220; --muted:#9aa4b2; --accent:#5865f2; --accent-2:#4752c4;
   --glass: rgba(255,255,255,0.02); --border: rgba(255,255,255,0.04); --text:#e6eef6; --radius:10px;
+  --font-size:15px;
 }
 [data-theme="light"]{ --bg:#f6f8fb; --panel:#ffffff; --muted:#6b7280; --accent:#0ea5e9; --accent-2:#3b82f6; --text:#0b1220; --glass: rgba(2,6,23,0.02); --border: rgba(2,6,23,0.06); }
+[data-theme="solarized"]{ --bg:#002b36; --panel:#073642; --muted:#93a1a1; --accent:#b58900; --accent-2:#cb4b16; --text:#eee8d5; }
+[data-theme="dracula"]{ --bg:#282a36; --panel:#44475a; --muted:#bfb6ff; --accent:#ff79c6; --accent-2:#8be9fd; --text:#f8f8f2; }
+[data-theme="high-contrast"]{ --bg:#000000; --panel:#111111; --muted:#9aa4b2; --accent:#00ff00; --accent-2:#00ffff; --text:#ffffff; }
+
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg)}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg);font-size:var(--font-size)}
 .app{min-height:100vh;display:grid;grid-template-columns:260px 1fr;gap:18px;padding:18px}
 
 /* Sidebar */
@@ -55,7 +60,10 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 /* Chat single-column */
 .chat-shell{display:grid;grid-template-columns:1fr;gap:12px;height:calc(100vh - 140px);min-height:420px}
 .chat-column{display:flex;flex-direction:column;background:transparent;border-radius:10px;overflow:hidden}
-.chat-header{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between}
+.chat-header{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.chat-header .right{display:flex;align-items:center;gap:8px}
+
+/* chat body */
 .chat-body{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
 .msg-group{display:flex;gap:12px;align-items:flex-start}
 .msg-avatar{width:40px;height:40px;border-radius:8px;background:#071427;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;flex-shrink:0;overflow:hidden}
@@ -64,8 +72,9 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 .msg-bubble{background:var(--panel);padding:10px;border-radius:8px;margin-top:6px;border:1px solid rgba(255,255,255,0.02)}
 .msg-bubble.me{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none}
 .msg-image{max-width:420px;border-radius:8px;display:block;margin-top:8px}
+.msg-quote{padding:8px;border-left:3px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);border-radius:6px;font-size:13px;color:var(--muted);margin-bottom:6px}
 
-/* Fixed input: non-transparent, centered across main content */
+/* Fixed input */
 .fixed-input{
   position:fixed;
   bottom:18px;
@@ -82,35 +91,24 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
   box-shadow:0 10px 40px rgba(0,0,0,0.6);
 }
 .fixed-input input[type="text"], .fixed-input input[type="url"]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;outline:none}
-.fixed-input .small{width:160px}
+.reply-preview{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);margin-right:8px}
 
-/* GIF & emoji panels */
-.panel-pop{position:fixed;bottom:78px;right:calc(18px + 18px);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:1500;max-width:420px;max-height:360px;overflow:auto}
-.panel-pop.hidden{display:none}
-.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
-.emoji-btn{background:transparent;border:none;font-size:20px;cursor:pointer;padding:6px;border-radius:6px}
-.gif-grid{display:flex;flex-wrap:wrap;gap:8px}
-.gif-grid img{width:120px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
-
-/* Modals */
+/* Settings modal (smaller, categories) */
 .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1500;background:rgba(0,0,0,0.45)}
-.modal{width:720px;max-width:96%;background:var(--panel);border-radius:12px;padding:18px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6)}
-.form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-.small-note{font-size:13px;color:var(--muted)}
-
-/* Admin badge */
-.admin-badge{font-size:12px;padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,#2b8a4a,#1f6f3a);color:#fff}
-
-/* Moderation UI */
-.moderation-row{display:flex;gap:8px;align-items:center}
-.moderation-list{max-height:220px;overflow:auto;border:1px solid var(--border);padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
+.settings-modal{width:520px;max-width:96%;background:var(--panel);border-radius:12px;padding:12px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6);display:flex;gap:12px}
+.settings-sidebar{width:160px;border-right:1px solid rgba(255,255,255,0.02);padding-right:8px;display:flex;flex-direction:column;gap:6px}
+.settings-sidebar button{background:transparent;border:none;color:var(--muted);text-align:left;padding:8px;border-radius:6px;cursor:pointer}
+.settings-sidebar button.active{color:var(--text);background:rgba(255,255,255,0.02)}
+.settings-content{flex:1;padding-left:8px;overflow:auto}
+.settings-row{margin-bottom:12px}
+.settings-row label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+.settings-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 
 /* Responsive */
 @media (max-width:1100px){
   .app{grid-template-columns:1fr}
   .fixed-input{left:18px;right:18px}
-  .chat-shell{grid-template-columns:1fr;grid-auto-rows:auto;height:auto}
-  .modal{width:96%}
+  .settings-modal{width:96%}
 }
   </style>
 </head>
@@ -126,7 +124,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
       </div>
 
       <div class="search-wrap" style="margin-top:8px">
-        <input id="global-search" placeholder="Search games, tools, chat..." />
+        <input id="global-search" placeholder="Search games, tools, chat..." aria-label="Search" />
         <button id="searchClear" class="search-clear" title="Clear">✕</button>
       </div>
 
@@ -150,7 +148,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
         <div id="profileMenu" class="profile-menu" role="menu" aria-hidden="true" style="display:none">
           <button id="menuAccount" class="menu-item" role="menuitem">Account</button>
           <button id="menuSettings" class="menu-item" role="menuitem">Settings</button>
-          <button id="menuAdminOpen" class="menu-item" role="menuitem">Admin</button>
           <button id="menuSignOut" class="menu-item" role="menuitem" style="display:none">Sign out</button>
           <button id="menuSignIn" class="menu-item" role="menuitem">Sign in</button>
           <div class="menu-guest" id="menuGuestInfo">Guest — Not signed in</div>
@@ -161,7 +158,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     <main class="main">
       <div class="topbar">
         <div class="small-note">Welcome</div>
-        <div id="adminStatusWrap"></div>
+        <div id="settingsWrap"></div>
       </div>
 
       <section id="content" class="content" aria-live="polite"></section>
@@ -170,9 +167,15 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
 
   <!-- fixed input -->
   <div id="fixedInputBar" class="fixed-input" style="display:none" aria-hidden="true">
+    <div id="replyPreviewWrap" style="display:none" class="reply-preview" aria-hidden="true">
+      <div style="font-size:13px;color:var(--muted)">Replying to <strong id="replyToName"></strong>:</div>
+      <div id="replyToSnippet" style="font-size:13px;color:var(--muted);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button id="cancelReplyBtn" class="btn ghost small" title="Cancel reply">✕</button>
+    </div>
+
     <button id="emojiToggle" class="btn ghost small" title="Emoji">😊</button>
     <button id="gifToggle" class="btn ghost small" title="GIF">GIF</button>
-    <input id="fixedChatInput" type="text" placeholder="Message #global" />
+    <input id="fixedChatInput" type="text" placeholder="Message #global" aria-label="Chat input" />
     <button id="fixedSendChat" class="btn small">Send</button>
   </div>
 
@@ -209,91 +212,6 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
-  <!-- Settings modal -->
-  <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-      <h3 id="settingsTitle">Settings</h3>
-
-      <div class="form-row">
-        <label class="small-note">Theme</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn ghost theme-select" data-theme="dark">Dark</button>
-          <button class="btn ghost theme-select" data-theme="light">Light</button>
-          <button class="btn ghost theme-select" data-theme="solarized">Solarized</button>
-          <button class="btn ghost theme-select" data-theme="sepia">Sepia</button>
-          <button class="btn ghost theme-select" data-theme="hc">High Contrast</button>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <label class="small-note">Accent color</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="settingsAccent" type="color" value="#5865f2" style="width:72px;height:40px;border-radius:8px;border:1px solid var(--border)" />
-          <button id="resetAccentBtn" class="btn ghost" title="Reset to default">Reset</button>
-        </div>
-      </div>
-
-      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />
-
-      <div class="form-row">
-        <label class="small-note">Browser tab disguise</label>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="disguiseTitle" placeholder="Tab title" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="disguiseApplyTitle" class="btn ghost">Apply</button>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="disguiseFavicon" placeholder="Favicon image URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="disguiseApplyIcon" class="btn ghost">Apply</button>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <div class="small-note">Presets</div>
-          <div style="display:flex;gap:6px;margin-left:auto">
-            <button class="btn ghost preset-btn" data-title="Google Drive" data-icon="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png">Drive</button>
-            <button class="btn ghost preset-btn" data-title="Gmail" data-icon="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico">Gmail</button>
-            <button class="btn ghost preset-btn" data-title="YouTube" data-icon="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png">YouTube</button>
-            <button class="btn ghost preset-btn" data-title="Google Docs" data-icon="https://www.gstatic.com/images/branding/product/1x/docs_2020q4_48dp.png">Docs</button>
-            <button class="btn ghost preset-btn" data-title="Slack" data-icon="https://a.slack-edge.com/80588/marketing/img/meta/favicon-32.png">Slack</button>
-          </div>
-        </div>
-
-        <div class="disguise-preview" style="display:flex;gap:12px;align-items:center">
-          <div class="fav" id="disguisePreviewIcon" style="width:36px;height:36px;border-radius:6px;background:#071427"></div>
-          <div>
-            <div id="disguisePreviewTitle" style="font-weight:700">Preview title</div>
-            <div class="small-note">This will be the browser tab title and favicon</div>
-          </div>
-          <div style="margin-left:auto;display:flex;gap:8px">
-            <button id="disguiseResetBtn" class="btn ghost">Reset</button>
-            <button id="disguiseClearBtn" class="btn ghost">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      <hr style="border:none;border-top:1px solid var(--border);margin:12px 0" />
-
-      <div class="form-row">
-        <label class="small-note">Panic key</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="panicKeyInput" maxlength="1" placeholder="single key" style="width:72px;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <select id="panicAction" style="padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit">
-            <option value="close">Close tab</option>
-            <option value="redirect">Redirect to URL</option>
-          </select>
-          <input id="panicRedirectUrl" placeholder="https://example.com" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-        </div>
-        <div class="small-note">Press the panic key to immediately close the tab or redirect. Default key is a single quote: '</div>
-      </div>
-
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
-        <button id="settingsCancel" class="btn ghost">Cancel</button>
-        <button id="settingsSave" class="btn">Save</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Account modal -->
   <div id="accountBackdrop" class="modal-backdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
@@ -315,95 +233,101 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
     </div>
   </div>
 
-  <!-- Admin auth modal -->
-  <div id="adminAuthBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminAuthTitle">
-      <h3 id="adminAuthTitle">Admin Access</h3>
-      <div class="form-row">
-        <label class="small-note">Enter admin password</label>
-        <input id="adminPasswordInput" type="password" placeholder="Password" style="padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;outline:none" />
+  <!-- Settings modal (smaller, categorized) -->
+  <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="settings-sidebar" role="navigation" aria-label="Settings categories">
+        <button data-cat="general" class="active">General</button>
+        <button data-cat="appearance">Appearance</button>
+        <button data-cat="chat">Chat</button>
+        <button data-cat="advanced">Advanced</button>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="adminAuthUnlock" class="btn">Unlock</button>
-        <button id="adminAuthCancel" class="btn ghost">Cancel</button>
-      </div>
-      <div id="adminAuthStatus" class="small-note" style="margin-top:12px;color:var(--muted)"></div>
-    </div>
-  </div>
 
-  <!-- Admin panel modal -->
-  <div id="adminPanelBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminPanelTitle">
-      <h3 id="adminPanelTitle">Admin Panel</h3>
+      <div class="settings-content" id="settingsContent">
+        <h3 id="settingsTitle">General</h3>
 
-      <div class="form-row">
-        <div class="small-note">Moderation console</div>
-
-        <!-- Search recent users (derived from messages) -->
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input id="modUserSearch" placeholder="Search users by name or email (from messages)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-          <button id="modSearchBtn" class="btn small">Search</button>
-          <button id="modRefreshUsers" class="btn ghost small">Refresh</button>
-        </div>
-
-        <div class="moderation-row" style="gap:12px">
-          <div style="flex:1">
-            <div class="small-note">Matching users</div>
-            <div id="modUserList" class="moderation-list"></div>
+        <!-- General -->
+        <div data-panel="general">
+          <div class="settings-row">
+            <label>Welcome message</label>
+            <input id="settingsWelcome" type="checkbox" /> <span class="small-note">Show "Welcome back" on load</span>
           </div>
 
-          <div style="width:360px">
-            <div class="small-note">Selected user</div>
-            <div id="modSelected" style="padding:8px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.01)">
-              <div id="modSelectedInfo" class="small-note">No user selected</div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <input id="modNewName" placeholder="New display name" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <input id="modNewPhoto" placeholder="New photo URL" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit" />
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button id="modApplyName" class="btn small">Apply to messages</button>
-                <button id="modApplyPhoto" class="btn small">Apply photo</button>
-              </div>
-
-              <hr style="border:none;border-top:1px solid var(--border);margin:8px 0" />
-
-              <div style="display:flex;gap:8px">
-                <button id="modDeleteMessages" class="btn ghost small">Delete messages</button>
-                <button id="modBulkRename" class="btn ghost small">Bulk rename (messages)</button>
-                <button id="modBanUser" class="btn small">Ban user</button>
-              </div>
-
-              <div style="margin-top:8px">
-                <div class="small-note">Moderation log</div>
-                <div id="modLog" class="moderation-list" style="max-height:120px"></div>
-              </div>
-            </div>
+          <div class="settings-row">
+            <label>Message load limit</label>
+            <select id="settingsMsgLimit" style="padding:8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:inherit">
+              <option value="100">100 messages</option>
+              <option value="200">200 messages</option>
+              <option value="300">300 messages</option>
+              <option value="500">500 messages</option>
+            </select>
           </div>
         </div>
 
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-          <button id="adminClearLocalMessages" class="btn ghost">Clear Local Chat DOM</button>
-          <button id="adminClearLocalData" class="btn ghost">Clear Local Storage</button>
-          <button id="adminViewBanned" class="btn ghost">View Banned</button>
-          <button id="adminCloseBtn" class="btn">Close</button>
+        <!-- Appearance -->
+        <div data-panel="appearance" style="display:none">
+          <div class="settings-row">
+            <label>Theme</label>
+            <select id="settingsTheme" style="padding:8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:inherit">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="solarized">Solarized</option>
+              <option value="dracula">Dracula</option>
+              <option value="high-contrast">High Contrast</option>
+            </select>
+          </div>
+
+          <div class="settings-row">
+            <label>Accent color</label>
+            <input id="settingsAccent" type="color" value="#5865f2" style="width:64px;height:40px;border-radius:6px;border:1px solid var(--border);background:transparent" />
+          </div>
+
+          <div class="settings-row">
+            <label>Font size</label>
+            <select id="settingsFontSize" style="padding:8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:inherit">
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </div>
+
+          <div class="settings-row">
+            <label>Compact mode</label>
+            <input id="settingsCompact" type="checkbox" /> <span class="small-note">Reduce spacing and avatar sizes</span>
+          </div>
         </div>
 
-        <div id="adminActionStatus" class="small-note" style="margin-top:8px;color:var(--muted)"></div>
-      </div>
-    </div>
-  </div>
+        <!-- Chat -->
+        <div data-panel="chat" style="display:none">
+          <div class="settings-row">
+            <label>Show avatars</label>
+            <input id="settingsAvatars" type="checkbox" /> <span class="small-note">Toggle user avatars in chat</span>
+          </div>
 
-  <!-- Banned list modal -->
-  <div id="bannedBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bannedTitle">
-      <h3 id="bannedTitle">Banned Users</h3>
-      <div class="form-row">
-        <div id="bannedList" class="moderation-list"></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button id="bannedClose" class="btn ghost">Close</button>
+          <div class="settings-row">
+            <label>Show timestamps</label>
+            <input id="settingsTimestamps" type="checkbox" /> <span class="small-note">Show message timestamps</span>
+          </div>
+
+          <div class="settings-row">
+            <label>Auto-play GIFs</label>
+            <input id="settingsAutoGif" type="checkbox" /> <span class="small-note">Automatically play GIFs in chat</span>
+          </div>
         </div>
+
+        <!-- Advanced -->
+        <div data-panel="advanced" style="display:none">
+          <div class="settings-row">
+            <label>Developer options</label>
+            <div class="small-note">No advanced toggles exposed here yet.</div>
+          </div>
+        </div>
+
+        <div class="settings-actions">
+          <button id="settingsCancel" class="btn ghost">Cancel</button>
+          <button id="settingsSave" class="btn">Save</button>
+        </div>
+        <div id="settingsStatus" class="small-note" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
@@ -414,57 +338,53 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe U
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
   <script>
 /* ================= CONFIG ================= */
-const firebaseConfig = { apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA", authDomain: "goon-7ddc3.firebaseapp.com", projectId: "goon-7ddc3", storageBucket: "goon-7ddc3.firebasestorage.app", messagingSenderId: "117099331820", appId: "1:117099331820:web:3af984b15a843d3d7b65c" };
+const firebaseConfig = {
+  apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+  authDomain: "goon-7ddc3.firebaseapp.com",
+  projectId: "goon-7ddc3",
+  storageBucket: "goon-7ddc3.firebasestorage.app",
+  messagingSenderId: "117099331820",
+  appId: "1:117099331820:web:3af984b15a843d3d7b65c"
+};
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const rdb = firebase.database();
 
 /* ================= DATA ================= */
-const games = [ {label:'Sandbox',file:'sandbox.html'},{label:'Snake Game Ripoff',file:'snake.html'},{label:'Tic Tac Toe',file:'tic-tactoe.html'},{label:'Minesweeper',file:'mines.html'},{label:'2048',file:'2048.html'},{label:'Bubble Shooter',file:'bubble-shooter.html'},{label:'GUH Clicker',file:'guh-clicker.html'},{label:'Flappy Bird',file:'flappy-bird.html'},{label:'Chess',file:'chess.html'},{label:'Hangman',file:'hangman.html'},{label:'Block Breaker',file:'block-breaker.html'},{label:'Casino',file:'casino.html'},{label:'Wormscape',file:'wormscape.html'},{label:'Arcade Racer',file:'arcade-racer.html'},{label:'Tower Defense',file:'tower-defense.html'},{label:'Space Shooter',file:'space-shooter.html'} ];
-const tools = [ {label:'Calculator',file:'calculator.html'},{label:'Clock',file:'clock.html'},{label:'File Converter',file:'converter.html'},{label:'Notepad',file:'notepad.html'},{label:'JSON Formatter',file:'json-formatter.html'},{label:'Regex Tester',file:'regex-tester.html'},{label:'Base64',file:'base64-tool.html'},{label:'LocalStorage Viewer',file:'localstorage-viewer.html'},{label:'IP Lookup',file:'ip-lookup.html'},{label:'Image Resizer',file:'image-resizer.html'},{label:'Image Cropper',file:'image-cropper.html'},{label:'QR Code Generator',file:'qr-generator.html'},{label:'Text To Speech',file:'text-to-speech.html'},{label:'FL Studio Recreation',file:'fl-studio.html'},{label:'QR Scanner',file:'qr-scanner.html'},{label:'Soundboard',file:'soundboard.html'} ];
+const games = [
+  {label:'Sandbox',file:'sandbox.html'},{label:'Snake Game Ripoff',file:'snake.html'},{label:'Tic Tac Toe',file:'tic-tactoe.html'},
+  {label:'Minesweeper',file:'mines.html'},{label:'2048',file:'2048.html'},{label:'Bubble Shooter',file:'bubble-shooter.html'},
+  {label:'GUH Clicker',file:'guh-clicker.html'},{label:'Flappy Bird',file:'flappy-bird.html'},{label:'Chess',file:'chess.html'},
+  {label:'Hangman',file:'hangman.html'},{label:'Block Breaker',file:'block-breaker.html'},{label:'Casino',file:'casino.html'},
+  {label:'Wormscape',file:'wormscape.html'},{label:'Arcade Racer',file:'arcade-racer.html'},{label:'Tower Defense',file:'tower-defense.html'},
+  {label:'Space Shooter',file:'space-shooter.html'}
+];
+const tools = [
+  {label:'Calculator',file:'calculator.html'},{label:'Clock',file:'clock.html'},{label:'File Converter',file:'converter.html'},
+  {label:'Notepad',file:'notepad.html'},{label:'JSON Formatter',file:'json-formatter.html'},{label:'Regex Tester',file:'regex-tester.html'},
+  {label:'Base64',file:'base64-tool.html'},{label:'LocalStorage Viewer',file:'localstorage-viewer.html'},{label:'IP Lookup',file:'ip-lookup.html'},
+  {label:'Image Resizer',file:'image-resizer.html'},{label:'Image Cropper',file:'image-cropper.html'},{label:'QR Code Generator',file:'qr-generator.html'},
+  {label:'Text To Speech',file:'text-to-speech.html'},{label:'FL Studio Recreation',file:'fl-studio.html'},{label:'QR Scanner',file:'qr-scanner.html'},
+  {label:'Soundboard',file:'soundboard.html'}
+];
 
-/* ---------- Favorites persistence ---------- */
+/* ---------- Keys & state ---------- */
 const FAVS_KEY = 'homewrk.favs.v6';
+const SETTINGS_KEY = 'homewrk.settings.v7';
 let favorites = [];
-function loadFavs(){
-  try{
-    const raw = localStorage.getItem(FAVS_KEY);
-    favorites = raw ? JSON.parse(raw) : [];
-    if(!Array.isArray(favorites)) favorites = [];
-  }catch(e){ favorites = []; }
-}
-function saveFavs(){ try{ localStorage.setItem(FAVS_KEY, JSON.stringify(favorites)); }catch(e){ console.error('saveFavs failed', e); } }
+let bannedCache = new Set();
+let unsubscribeMessages = null;
+let currentDmListener = null;
+let MAX_CHAT_MESSAGES = 300;
+const messageElements = new Map();
 
-/* ---------- Admin persistence ---------- */
-const ADMIN_LOCAL_KEY = 'homewrk.admin.v1';
-function setLocalAdmin(flag){
-  try{
-    if(flag) localStorage.setItem(ADMIN_LOCAL_KEY, '1');
-    else localStorage.removeItem(ADMIN_LOCAL_KEY);
-    renderAdminBadge();
-  }catch(e){}
-}
-function isLocalAdmin(){ return localStorage.getItem(ADMIN_LOCAL_KEY) === '1'; }
-
-/* ---------- Moderation state ---------- */
-let bannedCache = new Set(); // uids
-async function loadBannedCache(){
-  try{
-    const snap = await db.collection('moderation_banned').get();
-    bannedCache.clear();
-    snap.forEach(d => bannedCache.add(d.id));
-  }catch(e){
-    console.warn('Failed to load banned list', e);
-  }
-}
-
-/* ---------- DOM helpers ---------- */
-const content = document.getElementById('content');
-const toastContainer = document.getElementById('toastContainer');
-function showToast(msg, type='info', ttl=3000){
+/* ---------- Utilities ---------- */
+function showToast(msg, ttl=3000){
   const el = document.createElement('div');
   el.className = 'toast';
   el.style.background = 'var(--panel)';
@@ -475,256 +395,175 @@ function showToast(msg, type='info', ttl=3000){
   el.style.boxShadow = '0 8px 30px rgba(0,0,0,0.6)';
   el.style.marginTop = '6px';
   el.textContent = msg;
-  toastContainer.appendChild(el);
+  document.getElementById('toastContainer').appendChild(el);
   setTimeout(()=> { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; setTimeout(()=> el.remove(), 300); }, ttl);
 }
+function escapeHtml(s){ return String(s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function debounce(fn, wait=200){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; }
 
-/* ---------- Settings & theme ---------- */
-const SETTINGS_KEY = 'homewrk.settings.v5';
-const TAB_DISGUISE_KEY = 'homewrk.tabdisguise.v4';
-const PANIC_KEY = 'homewrk.panic.v1';
-const defaultSettings = { theme:'dark', accent:'#5865f2' };
+/* ---------- Favorites ---------- */
+function loadFavs(){ try{ const raw = localStorage.getItem(FAVS_KEY); favorites = raw ? JSON.parse(raw) : []; if(!Array.isArray(favorites)) favorites = []; }catch(e){ favorites = []; } }
+function saveFavs(){ try{ localStorage.setItem(FAVS_KEY, JSON.stringify(favorites)); }catch(e){} }
+function isFav(file){ return favorites.includes(file); }
 
-function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw? {...defaultSettings, ...JSON.parse(raw)} : {...defaultSettings}; }catch(e){ return {...defaultSettings}; } }
-function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
-function shadeColor(hex, percent){ try{ const h = hex.replace('#',''); const num = parseInt(h,16); let r = (num>>16) + Math.round(255*percent/100); let g = ((num>>8)&0xff) + Math.round(255*percent/100); let b = (num&0xff) + Math.round(255*percent/100); r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b)); return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }catch(e){ return hex; } }
-function applyThemeFromSettings(){ const s = loadSettings(); const theme = s.theme || 'dark'; document.documentElement.setAttribute('data-theme', theme); document.documentElement.style.setProperty('--accent', s.accent || defaultSettings.accent); document.documentElement.style.setProperty('--accent-2', shadeColor(s.accent||defaultSettings.accent, -12)); }
+/* ---------- Settings ---------- */
+function defaultSettings(){
+  return {
+    theme: 'dark',
+    accent: '#5865f2',
+    fontSize: 'medium',
+    compact: false,
+    showAvatars: true,
+    showTimestamps: true,
+    welcomeMessage: true,
+    autoPlayGifs: false,
+    messageLimit: 300
+  };
+}
+function loadSettings(){ try{ const raw = localStorage.getItem(SETTINGS_KEY); return raw ? {...defaultSettings(), ...JSON.parse(raw)} : defaultSettings(); }catch(e){ return defaultSettings(); } }
+function saveSettings(s){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){} }
+function applySettingsToUI(){
+  const s = loadSettings();
+  document.documentElement.setAttribute('data-theme', s.theme || 'dark');
+  document.documentElement.style.setProperty('--accent', s.accent || '#5865f2');
+  document.documentElement.classList.remove('font-small','font-medium','font-large');
+  if(s.fontSize === 'small') document.documentElement.classList.add('font-small');
+  else if(s.fontSize === 'large') document.documentElement.classList.add('font-large');
+  else document.documentElement.classList.add('font-medium');
+  if(s.compact) document.documentElement.classList.add('compact'); else document.documentElement.classList.remove('compact');
+  if(s.showTimestamps) document.documentElement.classList.remove('hide-timestamps'); else document.documentElement.classList.add('hide-timestamps');
+  if(s.welcomeMessage) document.querySelector('.topbar .small-note').textContent = 'Welcome'; else document.querySelector('.topbar .small-note').textContent = '';
+  MAX_CHAT_MESSAGES = Number(s.messageLimit) || 300;
 
-/* ---------- Tab disguise ---------- */
-function loadTabDisguise(){ try{ const raw = localStorage.getItem(TAB_DISGUISE_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
-function saveTabDisguise(obj){ if(!obj) localStorage.removeItem(TAB_DISGUISE_KEY); else localStorage.setItem(TAB_DISGUISE_KEY, JSON.stringify(obj)); }
-function createFaviconLink(){ let link = document.getElementById('pageFavicon'); if(link) return link; link = document.createElement('link'); link.id = 'pageFavicon'; link.rel = 'icon'; link.href = 'data:,'; document.head.appendChild(link); return link; }
-function setFavicon(url){ const link = createFaviconLink(); link.href = url || 'data:,'; }
-function applyTabDisguise(){ const d = loadTabDisguise(); document.title = (d && d.title) ? d.title : 'homewrk'; if(d && d.icon){ const img = new Image(); img.onload = ()=> setFavicon(d.icon); img.onerror = ()=> setFavicon('data:,'); img.src = d.icon; } else setFavicon('data:,'); }
-
-/* ---------- Utilities ---------- */
-function escapeHtml(str){ return String(str||'').replace(/[&<>\"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
-
-/* ---------- Favorites helpers (UI) ---------- */
-function findItemByFile(file){ return games.find(g=>g.file===file) || tools.find(t=>t.file===file) || null; }
-function updateFavButtons(file){
-  const nodes = Array.from(document.querySelectorAll('.fav-btn'));
-  nodes.forEach(btn => {
-    if(btn.dataset.file === file){
-      const isFav = favorites.includes(file);
-      btn.textContent = isFav ? 'Unfav' : 'Fav';
-      btn.classList.toggle('fav-active', isFav);
-      btn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
-    }
-  });
+  // populate modal controls if present
+  const themeSelect = document.getElementById('settingsTheme');
+  const accentInput = document.getElementById('settingsAccent');
+  const fontSelect = document.getElementById('settingsFontSize');
+  const compactCheckbox = document.getElementById('settingsCompact');
+  const avatarsCheckbox = document.getElementById('settingsAvatars');
+  const tsCheckbox = document.getElementById('settingsTimestamps');
+  const welcomeCheckbox = document.getElementById('settingsWelcome');
+  const autoGifCheckbox = document.getElementById('settingsAutoGif');
+  const msgLimitSelect = document.getElementById('settingsMsgLimit');
+  if(themeSelect) themeSelect.value = s.theme || 'dark';
+  if(accentInput) accentInput.value = s.accent || '#5865f2';
+  if(fontSelect) fontSelect.value = s.fontSize || 'medium';
+  if(compactCheckbox) compactCheckbox.checked = !!s.compact;
+  if(avatarsCheckbox) avatarsCheckbox.checked = !!s.showAvatars;
+  if(tsCheckbox) tsCheckbox.checked = !!s.showTimestamps;
+  if(welcomeCheckbox) welcomeCheckbox.checked = !!s.welcomeMessage;
+  if(autoGifCheckbox) autoGifCheckbox.checked = !!s.autoPlayGifs;
+  if(msgLimitSelect) msgLimitSelect.value = String(s.messageLimit || 300);
 }
 
-/* ---------- Renderers ---------- */
+/* ---------- Search helpers ---------- */
+const searchInput = document.getElementById('global-search');
+const searchClearBtn = document.getElementById('searchClear');
+function normalize(s){ return String(s||'').toLowerCase().trim(); }
+function filterGridByQuery(q){
+  const grid = document.getElementById('grid'); if(!grid) return;
+  const qn = normalize(q);
+  if(!qn){ Array.from(grid.children).forEach(c=>c.style.display=''); return; }
+  Array.from(grid.children).forEach(tile=>{
+    const title = normalize(tile.querySelector('.tile-title')?.textContent || '');
+    const file = normalize(tile.querySelector('.meta-file')?.textContent || '');
+    tile.style.display = (title.includes(qn) || file.includes(qn)) ? '' : 'none';
+  });
+}
+function filterChatByQuery(q){
+  const chat = document.getElementById('chatMessages'); if(!chat) return;
+  const qn = normalize(q);
+  Array.from(chat.querySelectorAll('.msg-group')).forEach(row=>{
+    const name = normalize(row.querySelector('.msg-name')?.textContent || '');
+    const text = normalize(row.querySelector('.msg-bubble')?.textContent || '');
+    row.style.display = (!qn || name.includes(qn) || text.includes(qn)) ? '' : 'none';
+  });
+}
+const applySearchToActive = debounce(()=>{
+  const q = searchInput.value || '';
+  const active = document.querySelector('.tab.active')?.dataset.target || 'games';
+  if(active === 'chat'){ filterChatByQuery(q); } else { filterGridByQuery(q); }
+}, 180);
+
+/* ---------- Renderers: Games / Tools / Favorites ---------- */
 function createTile(item){
-  const tile = document.createElement('div');
-  tile.className = 'tile';
-  const title = document.createElement('div');
-  title.innerHTML = `<div class="tile-title">${escapeHtml(item.label)}</div><div class="meta-file">${escapeHtml(item.file)}</div>`;
-  const actions = document.createElement('div');
-  actions.style.marginTop = '8px';
-  actions.style.display = 'flex';
-  actions.style.gap = '8px';
-
-  const openBtn = document.createElement('button');
-  openBtn.className = 'btn open-btn';
-  openBtn.type = 'button';
-  openBtn.textContent = 'Open';
-  openBtn.dataset.file = item.file;
-
-  const favBtn = document.createElement('button');
-  favBtn.className = 'btn ghost fav-btn';
-  favBtn.type = 'button';
-  favBtn.dataset.file = item.file;
-  const isFav = favorites.includes(item.file);
-  favBtn.textContent = isFav ? 'Unfav' : 'Fav';
-  if(isFav) favBtn.classList.add('fav-active');
-  favBtn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
-
-  // Direct listener on each fav button to ensure persistence works reliably
-  favBtn.addEventListener('click', (e) => {
+  const tile = document.createElement('div'); tile.className='tile';
+  const title = document.createElement('div'); title.innerHTML = `<div class="tile-title">${escapeHtml(item.label)}</div><div class="meta-file">${escapeHtml(item.file)}</div>`;
+  const actions = document.createElement('div'); actions.style.marginTop='8px'; actions.style.display='flex'; actions.style.gap='8px';
+  const openBtn = document.createElement('button'); openBtn.className='btn open-btn'; openBtn.type='button'; openBtn.textContent='Open'; openBtn.dataset.file = item.file;
+  const favBtn = document.createElement('button'); favBtn.className='btn ghost fav-btn'; favBtn.type='button'; favBtn.dataset.file = item.file;
+  const favState = isFav(item.file);
+  favBtn.textContent = favState ? 'Unfav' : 'Fav'; favBtn.setAttribute('aria-pressed', favState ? 'true' : 'false');
+  favBtn.addEventListener('click', e=>{
     e.stopPropagation();
     const file = favBtn.dataset.file;
-    const wasFav = favorites.includes(file);
-    if(wasFav) favorites = favorites.filter(f=>f!==file);
-    else favorites.push(file);
+    if(isFav(file)) favorites = favorites.filter(f=>f!==file); else favorites.push(file);
     saveFavs();
-    updateFavButtons(file);
-    // If currently viewing favorites, update grid
+    favBtn.textContent = isFav(file) ? 'Unfav' : 'Fav';
+    favBtn.setAttribute('aria-pressed', isFav(file) ? 'true' : 'false');
     if(document.querySelector('.tab.active')?.dataset.target === 'favorites') renderFavorites();
   });
-
-  actions.appendChild(openBtn);
-  actions.appendChild(favBtn);
-
-  tile.appendChild(title);
-  tile.appendChild(actions);
+  actions.appendChild(openBtn); actions.appendChild(favBtn);
+  tile.appendChild(title); tile.appendChild(actions);
   return tile;
 }
-
 function renderGames(){
   content.innerHTML = `<div class="section-head"><h2 style="margin:0">Games</h2></div><div id="grid"></div>`;
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('grid'); grid.innerHTML='';
   games.forEach(g => grid.appendChild(createTile(g)));
 }
-
 function renderTools(){
   content.innerHTML = `<div class="section-head"><h2 style="margin:0">Tools</h2></div><div id="grid"></div>`;
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('grid'); grid.innerHTML='';
   tools.forEach(t => grid.appendChild(createTile(t)));
 }
-
 function renderFavorites(){
   const all = [...games, ...tools];
   const favs = all.filter(i => favorites.includes(i.file));
   content.innerHTML = `<div class="section-head"><h2 style="margin:0">Favorites</h2></div><div id="grid"></div>`;
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById('grid'); grid.innerHTML='';
   if(favs.length === 0){ grid.innerHTML = '<div style="padding:12px">No favorites yet.</div>'; return; }
   favs.forEach(f => grid.appendChild(createTile(f)));
 }
 
-/* ---------- Chat (single-column) ---------- */
+/* ---------- Chat UI & logic (global chat) ---------- */
 function messagesCollectionRef(){ return db.collection('chat').doc('main').collection('messages'); }
-const messageElements = new Map();
-const MAX_CHAT_MESSAGES = 300;
-let unsubscribeMessages = null;
 
-/* clear chat DOM state */
-function clearChatState(){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(chatMessagesEl) chatMessagesEl.innerHTML = '';
-  messageElements.clear();
-}
-
-/* stop listener */
-function stopFirestoreListener(){ if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; } }
-
-/* fixed input handlers attach/detach */
-let _fixedHandlers = null;
-function attachFixedInputHandlers(){
-  detachFixedInputHandlers();
-  const fixedInput = document.getElementById('fixedChatInput');
-  const fixedSend = document.getElementById('fixedSendChat');
-  const gifToggle = document.getElementById('gifToggle');
-  const emojiToggle = document.getElementById('emojiToggle');
-
-  if(!fixedInput) return;
-  const onSendClick = async () => { await sendMessageFirestore(fixedInput.value); fixedInput.value=''; };
-  const onKeyDown = (e) => { if(e.key === 'Enter'){ sendMessageFirestore(fixedInput.value); fixedInput.value=''; } };
-  const onGifToggle = () => toggleGifPanel();
-  const onEmojiToggle = () => toggleEmojiPanel();
-
-  fixedSend.addEventListener('click', onSendClick);
-  fixedInput.addEventListener('keydown', onKeyDown);
-  gifToggle.addEventListener('click', onGifToggle);
-  emojiToggle.addEventListener('click', onEmojiToggle);
-
-  _fixedHandlers = { onSendClick, onKeyDown, onGifToggle, onEmojiToggle };
-}
-function detachFixedInputHandlers(){
-  if(!_fixedHandlers) return;
-  const fixedInput = document.getElementById('fixedChatInput');
-  const fixedSend = document.getElementById('fixedSendChat');
-  const gifToggle = document.getElementById('gifToggle');
-  const emojiToggle = document.getElementById('emojiToggle');
-  try{
-    if(fixedSend && _fixedHandlers.onSendClick) fixedSend.removeEventListener('click', _fixedHandlers.onSendClick);
-    if(fixedInput && _fixedHandlers.onKeyDown) fixedInput.removeEventListener('keydown', _fixedHandlers.onKeyDown);
-    if(gifToggle && _fixedHandlers.onGifToggle) gifToggle.removeEventListener('click', _fixedHandlers.onGifToggle);
-    if(emojiToggle && _fixedHandlers.onEmojiToggle) emojiToggle.removeEventListener('click', _fixedHandlers.onEmojiToggle);
-  }catch(e){}
-  _fixedHandlers = null;
-}
-
-/* send message */
-async function sendMessageFirestore(text, imageURL=null){
-  // check banned
-  if(auth.currentUser && bannedCache.has(auth.currentUser.uid)){
-    showToast('You are banned and cannot send messages.','warn',4000);
-    return;
-  }
-  if(!auth.currentUser){
-    openAuthModal('Please sign in to send messages.');
-    return;
-  }
-  const trimmed = (text||'').trim(); if(!trimmed && !imageURL) return;
-  const user = auth.currentUser;
-  const payload = { text: trimmed||'', ts: firebase.firestore.FieldValue.serverTimestamp(), uid: user?user.uid:null, name: user?(user.displayName||user.email||'User'):'Guest', photoURL: user?user.photoURL||null:null, imageURL: imageURL||null };
-  try{ await messagesCollectionRef().add(payload); showToast('Message sent','success'); }catch(e){ console.error(e); showToast('Failed to send message','warn'); }
-}
-
-/* create message node */
 function makeMessageNode(msg){
-  const group = document.createElement('div');
-  group.className = 'msg-group';
-  group.dataset.msgId = msg.id;
+  const group = document.createElement('div'); group.className='msg-group'; group.dataset.msgId = msg.id;
+  if(msg.uid) group.dataset.uid = msg.uid;
+  const avatar = document.createElement('div'); avatar.className='msg-avatar';
+  const s = loadSettings();
+  if(s.showAvatars && msg.photoURL) avatar.innerHTML = `<img src="${escapeHtml(msg.photoURL)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="avatar">`;
+  else avatar.textContent = (msg.name && msg.name.charAt(0)) ? msg.name.charAt(0).toUpperCase() : 'G';
+  avatar.style.cursor = 'pointer';
+  avatar.addEventListener('click', (e)=>{ e.stopPropagation(); openUserCardModal(msg.uid, msg.name, msg.photoURL); });
 
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  if(msg.photoURL){
-    avatar.innerHTML = `<img src="${msg.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:8px" alt="avatar">`;
-  } else {
-    avatar.textContent = (msg.name && msg.name.charAt(0)) ? msg.name.charAt(0).toUpperCase() : 'G';
+  const block = document.createElement('div'); block.className='msg-block';
+  if(msg.replyToName || msg.replyToSnippet){
+    const q = document.createElement('div'); q.className='msg-quote';
+    q.innerHTML = `<div style="font-weight:700;font-size:13px;color:var(--muted)">${escapeHtml(msg.replyToName||'Unknown')}</div><div style="margin-top:4px">${escapeHtml((msg.replyToSnippet||'').slice(0,200))}</div>`;
+    block.appendChild(q);
   }
 
-  const block = document.createElement('div');
-  block.className = 'msg-block';
-  const meta = document.createElement('div');
-  meta.className = 'msg-meta';
-  const nameEl = document.createElement('strong');
-  nameEl.className = 'msg-name';
-  nameEl.textContent = msg.name || 'Guest';
-  const timeEl = document.createElement('span');
-  timeEl.className = 'timestamp';
-  timeEl.textContent = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  meta.appendChild(nameEl);
-  meta.appendChild(timeEl);
+  const meta = document.createElement('div'); meta.className='msg-meta';
+  const nameEl = document.createElement('strong'); nameEl.className='msg-name'; nameEl.textContent = msg.name || 'Guest';
+  const timeEl = document.createElement('span'); timeEl.className='timestamp'; timeEl.textContent = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  if(!s.showTimestamps) timeEl.style.display = 'none';
+  meta.appendChild(nameEl); meta.appendChild(timeEl);
 
-  const bubble = document.createElement('div');
-  bubble.className = 'msg-bubble';
+  const bubble = document.createElement('div'); bubble.className='msg-bubble';
   if(msg.uid && auth.currentUser && msg.uid === auth.currentUser.uid) bubble.classList.add('me');
+
   if(msg.text) bubble.appendChild(document.createTextNode(msg.text));
-  if(msg.imageURL){
-    const img = document.createElement('img');
-    img.className = 'msg-image';
-    img.src = msg.imageURL;
-    bubble.appendChild(img);
-  }
+  if(msg.imageURL){ const img = document.createElement('img'); img.className='msg-image'; img.src = msg.imageURL; if(!s.autoPlayGifs) img.loading = 'lazy'; bubble.appendChild(img); }
 
-  // moderation controls (visible to local admin)
-  if(isLocalAdmin()){
-    const modRow = document.createElement('div');
-    modRow.style.marginTop = '6px';
-    modRow.style.display = 'flex';
-    modRow.style.gap = '6px';
-    const btnDel = document.createElement('button');
-    btnDel.className = 'btn ghost small';
-    btnDel.textContent = 'Delete';
-    btnDel.addEventListener('click', async () => {
-      if(!confirm('Delete this message from Firestore? This is permanent.')) return;
-      try{
-        await messagesCollectionRef().doc(msg.id).delete();
-        showToast('Message deleted','success');
-      }catch(e){ console.error(e); showToast('Delete failed','warn'); }
-    });
-    const btnEdit = document.createElement('button');
-    btnEdit.className = 'btn ghost small';
-    btnEdit.textContent = 'Edit';
-    btnEdit.addEventListener('click', async () => {
-      const newText = prompt('Edit message text:', msg.text || '');
-      if(newText === null) return;
-      try{
-        await messagesCollectionRef().doc(msg.id).update({ text: newText });
-        showToast('Message updated','success');
-      }catch(e){ console.error(e); showToast('Update failed','warn'); }
-    });
-    modRow.appendChild(btnEdit);
-    modRow.appendChild(btnDel);
-    bubble.appendChild(modRow);
-  }
+  const controls = document.createElement('div'); controls.style.marginTop='6px'; controls.style.display='flex'; controls.style.gap='6px';
+  const replyBtn = document.createElement('button'); replyBtn.className='btn ghost small'; replyBtn.textContent='Reply';
+  replyBtn.addEventListener('click', (e)=>{ e.stopPropagation(); startReplyToMessage(msg.id, msg.name||'Guest', (msg.text||'').slice(0,200)); document.getElementById('fixedChatInput').focus(); });
+  controls.appendChild(replyBtn);
 
+  bubble.appendChild(controls);
   block.appendChild(meta);
   block.appendChild(bubble);
   group.appendChild(avatar);
@@ -732,1104 +571,397 @@ function makeMessageNode(msg){
   return { group, avatar, block, bubble };
 }
 
-/* append message and auto-scroll to bottom */
 function appendMessageToUI(msg){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
+  const chatMessagesEl = document.getElementById('chatMessages'); if(!chatMessagesEl) return;
   if(messageElements.has(msg.id)) return;
   const node = makeMessageNode(msg);
   node.group.dataset.msgId = msg.id;
   chatMessagesEl.appendChild(node.group);
-  messageElements.set(msg.id, {node});
-  // always scroll to bottom on new messages
-  try{
-    const el = chatMessagesEl;
-    el.scrollTop = el.scrollHeight;
-  }catch(e){}
-  // trim if needed
-  while(chatMessagesEl.children.length > MAX_CHAT_MESSAGES){
-    chatMessagesEl.removeChild(chatMessagesEl.firstChild);
-  }
+  messageElements.set(msg.id, { node });
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  while(chatMessagesEl.children.length > MAX_CHAT_MESSAGES) chatMessagesEl.removeChild(chatMessagesEl.firstChild);
 }
 
-/* modify message */
 function modifyMessageInUI(msg){
   const entry = messageElements.get(msg.id);
   if(!entry) return appendMessageToUI(msg);
   const { node } = entry;
-  const nameEl = node.block.querySelector('.msg-name');
-  if(nameEl) nameEl.textContent = msg.name || 'Guest';
-  const tsEl = node.block.querySelector('.timestamp');
-  if(tsEl) tsEl.textContent = msg.ts? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  const nameEl = node.block.querySelector('.msg-name'); if(nameEl) nameEl.textContent = msg.name || 'Guest';
+  const tsEl = node.block.querySelector('.timestamp'); if(tsEl) tsEl.textContent = msg.ts ? (new Date(msg.ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+  if(!loadSettings().showTimestamps && tsEl) tsEl.style.display = 'none'; else if(tsEl) tsEl.style.display = '';
+  const existingQuote = node.block.querySelector('.msg-quote');
+  if(existingQuote) existingQuote.remove();
+  if(msg.replyToName || msg.replyToSnippet){
+    const q = document.createElement('div'); q.className='msg-quote';
+    q.innerHTML = `<div style="font-weight:700;font-size:13px;color:var(--muted)">${escapeHtml(msg.replyToName||'Unknown')}</div><div style="margin-top:4px">${escapeHtml((msg.replyToSnippet||'').slice(0,200))}</div>`;
+    const meta = node.block.querySelector('.msg-meta');
+    if(meta) node.block.insertBefore(q, meta);
+    else node.block.insertBefore(q, node.block.firstChild);
+  }
   const bubble = node.bubble;
   bubble.innerHTML = '';
   if(msg.text) bubble.appendChild(document.createTextNode(msg.text));
-  if(msg.imageURL){
-    const img = document.createElement('img');
-    img.className = 'msg-image';
-    img.src = msg.imageURL;
-    bubble.appendChild(img);
-  }
-  // re-add moderation controls if admin
-  if(isLocalAdmin()){
-    const modRow = document.createElement('div');
-    modRow.style.marginTop = '6px';
-    modRow.style.display = 'flex';
-    modRow.style.gap = '6px';
-    const btnDel = document.createElement('button');
-    btnDel.className = 'btn ghost small';
-    btnDel.textContent = 'Delete';
-    btnDel.addEventListener('click', async () => {
-      if(!confirm('Delete this message from Firestore? This is permanent.')) return;
-      try{
-        await messagesCollectionRef().doc(msg.id).delete();
-        showToast('Message deleted','success');
-      }catch(e){ console.error(e); showToast('Delete failed','warn'); }
-    });
-    const btnEdit = document.createElement('button');
-    btnEdit.className = 'btn ghost small';
-    btnEdit.textContent = 'Edit';
-    btnEdit.addEventListener('click', async () => {
-      const newText = prompt('Edit message text:', msg.text || '');
-      if(newText === null) return;
-      try{
-        await messagesCollectionRef().doc(msg.id).update({ text: newText });
-        showToast('Message updated','success');
-      }catch(e){ console.error(e); showToast('Update failed','warn'); }
-    });
-    modRow.appendChild(btnEdit);
-    modRow.appendChild(btnDel);
-    bubble.appendChild(modRow);
-  }
+  if(msg.imageURL){ const img = document.createElement('img'); img.className='msg-image'; img.src = msg.imageURL; if(!loadSettings().autoPlayGifs) img.loading = 'lazy'; bubble.appendChild(img); }
+  const controls = document.createElement('div'); controls.style.marginTop='6px'; controls.style.display='flex'; controls.style.gap='6px';
+  const replyBtn = document.createElement('button'); replyBtn.className='btn ghost small'; replyBtn.textContent='Reply';
+  replyBtn.addEventListener('click', (e)=>{ e.stopPropagation(); startReplyToMessage(msg.id, msg.name||'Guest', (msg.text||'').slice(0,200)); document.getElementById('fixedChatInput').focus(); });
+  controls.appendChild(replyBtn);
+  bubble.appendChild(controls);
 }
 
-/* remove message */
-function removeMessageFromUI(msg){
-  const entry = messageElements.get(msg.id);
-  if(entry && entry.node && entry.node.group){ entry.node.group.remove(); messageElements.delete(msg.id); }
-}
+function removeMessageFromUI(msg){ const entry = messageElements.get(msg.id); if(entry && entry.node && entry.node.group){ entry.node.group.remove(); messageElements.delete(msg.id); } }
 
-/* start listener: order by ts asc but we will scroll to bottom after initial load */
 function startFirestoreListener(){
   stopFirestoreListener();
   unsubscribeMessages = messagesCollectionRef().orderBy('ts','asc').limitToLast(MAX_CHAT_MESSAGES).onSnapshot(snap=>{
-    // process changes
     snap.docChanges().forEach(change=>{
       const data = change.doc.data();
-      const ts = data.ts && data.ts.toDate ? data.ts.toDate() : null;
-      const msg = { id: change.doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null };
-      if(change.type === 'added'){
-        appendMessageToUI(msg);
-      }
+      const ts = data.ts && data.ts.toDate ? data.ts.toDate() : (data.ts ? new Date(data.ts) : null);
+      const msg = { id: change.doc.id, text: data.text, name: data.name, uid: data.uid, ts, photoURL: data.photoURL||null, imageURL: data.imageURL||null, replyToId: data.replyToId||null, replyToName: data.replyToName||null, replyToSnippet: data.replyToSnippet||null };
+      if(change.type === 'added') appendMessageToUI(msg);
       if(change.type === 'modified') modifyMessageInUI(msg);
       if(change.type === 'removed') removeMessageFromUI(msg);
     });
-    // ensure bottom
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl) chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    const chatMessagesEl = document.getElementById('chatMessages'); if(chatMessagesEl) chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }, err => console.error('listener', err));
 }
+function stopFirestoreListener(){ if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; } }
 
-/* ---------- GIF (Tenor) ---------- */
+/* ---------- Reply helpers ---------- */
+window.__replyState = null;
+function startReplyToMessage(id, name, snippet){ window.__replyState = { id, name, snippet }; const wrap = document.getElementById('replyPreviewWrap'); wrap.style.display='flex'; wrap.setAttribute('aria-hidden','false'); document.getElementById('replyToName').textContent = name; document.getElementById('replyToSnippet').textContent = snippet; }
+function cancelReply(){ window.__replyState = null; const wrap = document.getElementById('replyPreviewWrap'); wrap.style.display='none'; wrap.setAttribute('aria-hidden','true'); document.getElementById('replyToName').textContent=''; document.getElementById('replyToSnippet').textContent=''; }
+
+/* ---------- Send message ---------- */
+async function sendMessageFirestore(text, imageURL=null){
+  if(auth.currentUser && bannedCache.has(auth.currentUser.uid)){ showToast('You are banned'); return; }
+  if(!auth.currentUser){ openAuthModal('Sign in to send messages'); return; }
+  const trimmed = (text||'').trim(); if(!trimmed && !imageURL) return;
+  const user = auth.currentUser;
+  const payload = { text: trimmed||'', ts: firebase.firestore.FieldValue.serverTimestamp(), uid: user.uid, name: user.displayName || user.email || 'User', photoURL: user.photoURL || null, imageURL: imageURL || null };
+  if(window.__replyState && window.__replyState.id){ payload.replyToId = window.__replyState.id; payload.replyToName = window.__replyState.name; payload.replyToSnippet = (window.__replyState.snippet||'').slice(0,400); }
+  try{ await messagesCollectionRef().add(payload); cancelReply(); showToast('Sent'); }catch(e){ console.error(e); showToast('Send failed'); }
+}
+
+/* ---------- DM threads (optional) ---------- */
+function makeThreadId(a,b){ return [a,b].sort().join('_'); }
+async function ensureDmThread(a,b){
+  const id = makeThreadId(a,b);
+  const ref = db.collection('dmThreads').doc(id);
+  const snap = await ref.get();
+  if(!snap.exists) await ref.set({ participants: [a,b], lastMessage:'', lastTs: firebase.firestore.FieldValue.serverTimestamp(), type:'dm' });
+  return id;
+}
+async function openOrCreateDmWith(otherUid){
+  if(!auth.currentUser){ openAuthModal('Sign in to message users'); return; }
+  if(otherUid === auth.currentUser.uid){ showToast('Cannot DM yourself'); return; }
+  const threadId = await ensureDmThread(auth.currentUser.uid, otherUid);
+  openDmUI(threadId, otherUid);
+}
+function openDmUI(threadId, otherUid){
+  const modal = document.createElement('div'); modal.className='modal-backdrop'; modal.style.display='flex';
+  modal.innerHTML = `<div class="modal" style="width:520px;max-width:96%"><h3>Direct message</h3><div id="dmMessages" style="height:320px;overflow:auto;padding:8px;border:1px solid rgba(255,255,255,0.03);background:var(--panel);"></div><div style="display:flex;gap:8px;margin-top:8px"><input id="dmInput" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border)" placeholder="Message"/><button id="dmSend" class="btn small">Send</button><button id="dmClose" class="btn ghost small">Close</button></div></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#dmClose').addEventListener('click', ()=>{ detachDmListener(); modal.remove(); });
+  modal.querySelector('#dmSend').addEventListener('click', async ()=>{
+    const input = modal.querySelector('#dmInput'); const text = (input.value||'').trim(); if(!text) return;
+    await sendDmMessage(threadId, text); input.value=''; 
+  });
+  modal.querySelector('#dmInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') modal.querySelector('#dmSend').click(); });
+  attachDmListener(threadId, modal.querySelector('#dmMessages'));
+}
+function attachDmListener(threadId, containerEl){
+  detachDmListener();
+  const msgsRef = db.collection('dmThreads').doc(threadId).collection('messages').orderBy('ts','asc').limitToLast(200);
+  currentDmListener = msgsRef.onSnapshot(snap=>{
+    containerEl.innerHTML = '';
+    snap.docs.forEach(doc=>{
+      const d = doc.data(); const isMe = auth.currentUser && d.uid === auth.currentUser.uid;
+      const row = document.createElement('div'); row.style.marginBottom='8px';
+      row.innerHTML = `<div style="font-size:13px;color:var(--muted)">${escapeHtml(d.uid)}</div><div style="padding:8px;border-radius:8px;background:${isMe ? 'linear-gradient(90deg,var(--accent),var(--accent-2))' : 'var(--panel)'};color:${isMe ? '#fff' : 'var(--text)'}">${escapeHtml(d.text)}</div>`;
+      containerEl.appendChild(row);
+    });
+    containerEl.scrollTop = containerEl.scrollHeight;
+  }, err => console.error('dm listener', err));
+}
+function detachDmListener(){ if(currentDmListener){ currentDmListener(); currentDmListener = null; } }
+async function sendDmMessage(threadId, text){
+  if(!auth.currentUser){ openAuthModal('Sign in to send messages'); return; }
+  const uid = auth.currentUser.uid;
+  const payload = { uid, text, ts: firebase.firestore.FieldValue.serverTimestamp(), photoURL: auth.currentUser.photoURL || null };
+  await db.collection('dmThreads').doc(threadId).collection('messages').add(payload);
+  await db.collection('dmThreads').doc(threadId).update({ lastMessage: text.slice(0,200), lastTs: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+}
+
+/* ---------- User card modal ---------- */
+function openUserCardModal(uid, name, photoURL){
+  const modal = document.createElement('div'); modal.className='modal-backdrop'; modal.style.display='flex';
+  modal.innerHTML = `<div class="modal" style="width:420px;max-width:96%"><h3>User</h3><div style="display:flex;gap:12px;align-items:center"><div style="width:72px;height:72px;border-radius:8px;overflow:hidden;background:#071427">${photoURL?`<img src="${escapeHtml(photoURL)}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800">${escapeHtml((name||'U').charAt(0).toUpperCase())}</div>`}</div><div><div style="font-weight:800">${escapeHtml(name||'(no name)')}</div><div class="small-note">${escapeHtml(uid||'')}</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><button id="ucDm" class="btn small">Message</button><button id="ucClose" class="btn ghost small">Close</button></div></div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#ucClose').addEventListener('click', ()=>modal.remove());
+  modal.querySelector('#ucDm').addEventListener('click', ()=>{ modal.remove(); if(!auth.currentUser){ openAuthModal('Sign in to message users'); return; } if(uid === auth.currentUser.uid){ showToast('Cannot DM yourself'); return; } openOrCreateDmWith(uid); });
+}
+
+/* ---------- Load banned list ---------- */
+async function loadBannedCache(){
+  try{ const snap = await db.collection('moderation_banned').get(); bannedCache.clear(); snap.forEach(d=>bannedCache.add(d.id)); }catch(e){ console.warn('load banned failed', e); }
+}
+
+/* ---------- UI: render chat page ---------- */
+function renderChat(){
+  content.innerHTML = `<div class="chat-shell" id="chatShell"><div class="chat-column"><div class="chat-header"><div><strong>#global</strong><div class="small-note">Global chat</div></div><div class="right" style="position:relative"></div></div><div class="chat-body chat-body-padding" id="chatMessages" aria-live="polite"></div></div></div>`;
+  const fixedBar = document.getElementById('fixedInputBar'); fixedBar.style.display='flex'; fixedBar.setAttribute('aria-hidden','false');
+  attachFixedInputHandlers();
+  startFirestoreListener();
+  cancelReply();
+}
+
+/* ---------- Fixed input handlers ---------- */
+let _fixedHandlers = null;
+function attachFixedInputHandlers(){
+  detachFixedInputHandlers();
+  const fixedInput = document.getElementById('fixedChatInput');
+  const fixedSend = document.getElementById('fixedSendChat');
+  const gifToggle = document.getElementById('gifToggle');
+  const emojiToggle = document.getElementById('emojiToggle');
+  const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+  if(!fixedInput) return;
+  const onSendClick = async ()=>{ await sendMessageFirestore(fixedInput.value); fixedInput.value=''; };
+  const onKeyDown = (e)=>{ if(e.key==='Enter'){ sendMessageFirestore(fixedInput.value); fixedInput.value=''; } };
+  const onGifToggle = ()=> toggleGifPanel();
+  const onEmojiToggle = ()=> toggleEmojiPanel();
+  const onCancelReply = ()=> cancelReply();
+  fixedSend.addEventListener('click', onSendClick);
+  fixedInput.addEventListener('keydown', onKeyDown);
+  gifToggle.addEventListener('click', onGifToggle);
+  emojiToggle.addEventListener('click', onEmojiToggle);
+  cancelReplyBtn.addEventListener('click', onCancelReply);
+  _fixedHandlers = { onSendClick, onKeyDown, onGifToggle, onEmojiToggle, onCancelReply };
+}
+function detachFixedInputHandlers(){
+  if(!_fixedHandlers) return;
+  const fixedInput = document.getElementById('fixedChatInput');
+  const fixedSend = document.getElementById('fixedSendChat');
+  const gifToggle = document.getElementById('gifToggle');
+  const emojiToggle = document.getElementById('emojiToggle');
+  const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+  try{
+    if(fixedSend && _fixedHandlers.onSendClick) fixedSend.removeEventListener('click', _fixedHandlers.onSendClick);
+    if(fixedInput && _fixedHandlers.onKeyDown) fixedInput.removeEventListener('keydown', _fixedHandlers.onKeyDown);
+    if(gifToggle && _fixedHandlers.onGifToggle) gifToggle.removeEventListener('click', _fixedHandlers.onGifToggle);
+    if(emojiToggle && _fixedHandlers.onEmojiToggle) emojiToggle.removeEventListener('click', _fixedHandlers.onEmojiToggle);
+    if(cancelReplyBtn && _fixedHandlers.onCancelReply) cancelReplyBtn.removeEventListener('click', _fixedHandlers.onCancelReply);
+  }catch(e){}
+  _fixedHandlers = null;
+}
+
+/* ---------- GIF & Emoji panels ---------- */
 const TENOR_API_KEY = 'LIVDSRZULELA';
 async function searchTenorGifs(query, limit = 16){
   if(!query || !query.trim()) return [];
   const q = encodeURIComponent(query.trim());
   const url = `https://g.tenor.com/v1/search?q=${q}&key=${TENOR_API_KEY}&limit=${limit}&media_filter=minimal`;
-  try{
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('Tenor search failed');
-    const data = await res.json();
-    return (data.results || []).map(r => {
-      const media = r.media && r.media[0];
-      const gif = media && (media.gif && media.gif.url) || (media && media.mediumgif && media.mediumgif.url) || null;
-      const thumb = media && (media.tinygif && media.tinygif.url) || gif;
-      return { id: r.id, gif, thumb, title: r.title || '' };
-    }).filter(x => x.gif);
-  }catch(e){
-    console.error('Tenor search error', e);
-    return [];
-  }
+  try{ const res = await fetch(url); if(!res.ok) throw new Error('Tenor failed'); const data = await res.json(); return (data.results||[]).map(r=>{ const media = r.media && r.media[0]; const gif = media && (media.gif && media.gif.url) || (media && media.mediumgif && media.mediumgif.url) || null; const thumb = media && (media.tinygif && media.tinygif.url) || gif; return { id: r.id, gif, thumb, title: r.title||'' }; }).filter(x=>x.gif); }catch(e){ console.error(e); return []; }
 }
-
-/* render gif panel */
 function renderGifPanel(items){
-  const panel = document.getElementById('gifPanel');
-  panel.innerHTML = '';
-  const searchRow = document.createElement('div');
-  searchRow.style.display = 'flex';
-  searchRow.style.gap = '8px';
-  const input = document.createElement('input');
-  input.placeholder = 'Search GIFs';
-  input.style.flex = '1';
-  input.style.padding = '8px';
-  input.style.borderRadius = '8px';
-  input.style.border = '1px solid var(--border)';
-  const btn = document.createElement('button');
-  btn.className = 'btn small';
-  btn.textContent = 'Search';
-  searchRow.appendChild(input);
-  searchRow.appendChild(btn);
-  panel.appendChild(searchRow);
-
-  const grid = document.createElement('div');
-  grid.className = 'gif-grid';
-  grid.style.marginTop = '10px';
-  panel.appendChild(grid);
-
-  btn.addEventListener('click', async () => {
+  const panel = document.getElementById('gifPanel'); panel.innerHTML='';
+  const searchRow = document.createElement('div'); searchRow.style.display='flex'; searchRow.style.gap='8px';
+  const input = document.createElement('input'); input.placeholder='Search GIFs'; input.style.flex='1'; input.style.padding='8px'; input.style.borderRadius='8px'; input.style.border='1px solid var(--border)';
+  const btn = document.createElement('button'); btn.className='btn small'; btn.textContent='Search';
+  searchRow.appendChild(input); searchRow.appendChild(btn); panel.appendChild(searchRow);
+  const grid = document.createElement('div'); grid.className='gif-grid'; grid.style.marginTop='10px'; panel.appendChild(grid);
+  btn.addEventListener('click', async ()=>{
     grid.innerHTML = '<div class="small-note">Searching...</div>';
     const items = await searchTenorGifs(input.value, 24);
     grid.innerHTML = '';
-    items.forEach(it => {
-      const img = document.createElement('img');
-      img.src = it.thumb || it.gif;
-      img.title = 'Click to send GIF';
-      img.addEventListener('click', async () => {
-        try{
-          await sendMessageFirestore('', it.gif);
-          toggleGifPanel(false);
-          showToast('GIF sent','success');
-        }catch(e){ showToast('Failed to send GIF','warn'); }
-      });
+    items.forEach(it=>{
+      const img = document.createElement('img'); img.src = it.thumb || it.gif; img.title = 'Click to send GIF';
+      img.addEventListener('click', async ()=>{ try{ await sendMessageFirestore('', it.gif); toggleGifPanel(false); showToast('GIF sent'); }catch(e){ showToast('Failed'); } });
       grid.appendChild(img);
     });
   });
-
   input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') btn.click(); });
 }
-
-/* ---------- Emoji panel (searchable) ---------- */
-const EMOJI_LIST = [
-"😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","😗","😙","😚","🙂","🤗","🤩","🤔","🤨","😐","😑","😶","🙄","😏","😣","😥","😮","🤐","😯","😪","😫","😴","😌","😛","😜","😝","🤤","😒","😓","😔","😕","🙃","🤑","😲","☹️","🙁","😖","😞","😟","😤","😢","😭","😦","😧","😨","😩","🤯","😬","😰","😱","🥵","🥶","😳","🤪","😵","😡","😠","🤬","😷","🤒","🤕","🤢","🤮","🤧","😇","🤠","🤡","🤥","🤫","🤭","🧐","🤓",
-"👋","🤚","🖐️","✋","🖖","👌","🤌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","✋","👏","🙌","👐","🤝","🙏",
-"💪","🦾","🦵","🦿","🦶","👂","👃","🧠","🫀","🫁","👀","👁️","👅","👄","🧑","👨","👩","👶","🧒","👦","👧","🧑‍🦱","🧑‍🦰","🧑‍🦳","🧑‍🦲","👱‍♂️","👱‍♀️","🧔","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🤦","🤷","🧏","🙇",
-"🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐽","🐸","🐵","🐔","🐧","🐦","🐤","🐣","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🐛","🦋","🐌","🐞","🐜","🪲","🪳","🕷️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐠","🐟","🐬","🐳","🐋","🦈","🐊","🐅","🐆","🦓","🦍","🦧","🦣","🦛","🦏","🐘",
-"🌱","🌲","🌳","🌴","🌵","🌾","🌿","☘️","🍀","🍁","🍂","🍃","🌸","🌼","🌻","🌺","🌹","🥀","🌷","🌱","🌞","🌝","🌛","🌜","🌚","🌕","🌖","🌗","🌘","🌑","🌒","🌓","🌔","🌈","☀️","⛅","☁️","⚡","⛈️","🌩️","🌨️","❄️","☃️","🔥","💧","🌊",
-"🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🌽","🥕","🧄","🧅","🥔","🍠","🥐","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🥪","🥙","🌮","🌯","🥗","🍝","🍜","🍲","🍛","🍣","🍱","🍤","🍙","🍚","🍘","🍥","🥮","🍰","🎂","🍮","🍦","🍨","🍧","🍩","🍪","🍫","🍬","🍭","☕","🍵","🧃","🥤","🍺","🍻","🍷","🥂","🥃","🍸","🍹","🧉","🍾",
-"⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱","🏓","🏸","🥅","🏒","🏑","🏏","⛳","🏹","🎣","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🎿","🏂","🏋️","🏋️‍♀️","🏋️‍♂️","🚴","🚴‍♀️","🚴‍♂️","🚵","🚵‍♀️","🚵‍♂️","🏇","🏆","🥇","🥈","🥉",
-"💡","🔦","🏮","📱","💻","🖥️","🖨️","⌨️","🖱️","🕹️","🧭","📷","📹","🎥","📺","📻","🎙️","🎚️","🎛️","💿","📀","🧾","📁","📂","🗂️","🗃️","🗄️","🗑️","🔒","🔓","🔑","🧰","🧲","🧪","🔬","🔭","⚖️","🧮","🔋","🔌","💳","💸","💰","🧾","📦","📫","📮","✉️","📧","📨","📩","📤","📥","📬","📭",
-"❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⚛️","🔱","🔰","♻️","⚠️","🚫","✅","❌","⭕","🔺","🔻","🔸","🔹","🔶","🔷","🔔","🔕","🎵","🎶","🔊","🔉","🔈","🔇","📢","📣","📯","🔔","🛎️"
-];
-
-function renderEmojiPanel(searchTerm = ''){
-  const panel = document.getElementById('emojiPanel');
-  panel.innerHTML = '';
-  const row = document.createElement('div');
-  row.style.display = 'flex';
-  row.style.gap = '8px';
-  const input = document.createElement('input');
-  input.placeholder = 'Search emojis (char or name)';
-  input.style.flex = '1';
-  input.style.padding = '8px';
-  input.style.borderRadius = '8px';
-  input.style.border = '1px solid var(--border)';
-  input.value = searchTerm || '';
-  const clear = document.createElement('button');
-  clear.className = 'btn small';
-  clear.textContent = 'Clear';
-  row.appendChild(input);
-  row.appendChild(clear);
-  panel.appendChild(row);
-
-  const grid = document.createElement('div');
-  grid.className = 'emoji-grid';
-  grid.style.marginTop = '10px';
-  panel.appendChild(grid);
-
-  function populate(term){
-    grid.innerHTML = '';
-    const q = (term||'').trim().toLowerCase();
-    const list = q ? EMOJI_LIST.filter(e => e.includes(q) || emojiName(e).includes(q)) : EMOJI_LIST;
-    list.slice(0,400).forEach(e => {
-      const btn = document.createElement('button');
-      btn.className = 'emoji-btn';
-      btn.textContent = e;
-      btn.addEventListener('click', () => {
-        const inputEl = document.getElementById('fixedChatInput');
-        if(!inputEl) return;
-        const start = inputEl.selectionStart || inputEl.value.length;
-        const end = inputEl.selectionEnd || inputEl.value.length;
-        inputEl.value = inputEl.value.slice(0,start) + e + inputEl.value.slice(end);
-        inputEl.focus();
-      });
-      grid.appendChild(btn);
-    });
-    if(list.length === 0) grid.innerHTML = '<div class="small-note">No emojis found.</div>';
-  }
-
-  input.addEventListener('input', () => populate(input.value));
-  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') populate(input.value); });
-  clear.addEventListener('click', () => { input.value=''; populate(''); });
-
+const EMOJI_LIST = ["😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","😗","😙","😚","🙂","🤗","🤩","🤔","🤨","😐","😑","😶","🙄","😏","😣","😥","😮","🤐","😯","😪","😫","😴","😌","😛","😜","😝","🤤","😒","😓","😔","😕","🙃","🤑","😲","☹️","🙁","😖","😞","😟","😤","😢","😭","😦","😧","😨","😩","🤯","😬","😰","😱","🥵","🥶","😳","🤪","😵","😡","😠","🤬","😷","🤒","🤕","🤢","🤮","🤧","😇","🤠","🤡","🤥","🤫","🤭","🧐","🤓"];
+function renderEmojiPanel(searchTerm=''){
+  const panel = document.getElementById('emojiPanel'); panel.innerHTML='';
+  const row = document.createElement('div'); row.style.display='flex'; row.style.gap='8px';
+  const input = document.createElement('input'); input.placeholder='Search emojis (char)'; input.style.flex='1'; input.style.padding='8px'; input.style.borderRadius='8px'; input.style.border='1px solid var(--border)'; input.value = searchTerm || '';
+  const clear = document.createElement('button'); clear.className='btn small'; clear.textContent='Clear';
+  row.appendChild(input); row.appendChild(clear); panel.appendChild(row);
+  const grid = document.createElement('div'); grid.className='emoji-grid'; grid.style.marginTop='10px'; panel.appendChild(grid);
+  function populate(term){ grid.innerHTML=''; const q = (term||'').trim().toLowerCase(); const list = q ? EMOJI_LIST.filter(e=>e.includes(q)) : EMOJI_LIST; list.slice(0,400).forEach(e=>{ const btn = document.createElement('button'); btn.className='emoji-btn'; btn.textContent = e; btn.addEventListener('click', ()=>{ const inputEl = document.getElementById('fixedChatInput'); if(!inputEl) return; const start = inputEl.selectionStart || inputEl.value.length; const end = inputEl.selectionEnd || inputEl.value.length; inputEl.value = inputEl.value.slice(0,start) + e + inputEl.value.slice(end); inputEl.focus(); }); grid.appendChild(btn); }); if(list.length===0) grid.innerHTML = '<div class="small-note">No emojis found.</div>'; }
+  input.addEventListener('input', ()=>populate(input.value)); input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') populate(input.value); }); clear.addEventListener('click', ()=>{ input.value=''; populate(''); });
   populate(searchTerm);
 }
-
-/* helper: small mapping for searchable names */
-function emojiName(ch){
-  const map = {
-    "😀":"grinning","😁":"grin","😂":"joy","🤣":"rofl","😊":"smile","😍":"heart","😢":"cry","😭":"sob","😡":"angry",
-    "👍":"thumbs up","👎":"thumbs down","❤️":"heart","🔥":"fire","✨":"sparkles","🎉":"party","🎮":"game","📚":"books",
-    "😴":"sleep","🤔":"think","🤖":"robot","🤩":"starstruck","😎":"cool","🤗":"hug","🤝":"handshake","🙏":"pray"
-  };
-  return map[ch] || ch;
-}
-
-/* toggle gif panel (exclusive) */
 function toggleGifPanel(force){
-  const gif = document.getElementById('gifPanel');
-  const emoji = document.getElementById('emojiPanel');
+  const gif = document.getElementById('gifPanel'); const emoji = document.getElementById('emojiPanel');
   if(force === false){ gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true'); return; }
-  if(!gif.classList.contains('hidden')){
-    gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true');
-  } else {
-    // close emoji first
-    emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true');
-    gif.classList.remove('hidden'); gif.setAttribute('aria-hidden','false');
-    renderGifPanel([]);
-  }
+  if(!gif.classList.contains('hidden')){ gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true'); } else { emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true'); gif.classList.remove('hidden'); gif.setAttribute('aria-hidden','false'); renderGifPanel([]); }
 }
-
-/* toggle emoji panel (exclusive) */
 function toggleEmojiPanel(force){
-  const gif = document.getElementById('gifPanel');
-  const emoji = document.getElementById('emojiPanel');
+  const gif = document.getElementById('gifPanel'); const emoji = document.getElementById('emojiPanel');
   if(force === false){ emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true'); return; }
-  if(!emoji.classList.contains('hidden')){
-    emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true');
-  } else {
-    gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true');
-    emoji.classList.remove('hidden'); emoji.setAttribute('aria-hidden','false');
-    renderEmojiPanel('');
-  }
+  if(!emoji.classList.contains('hidden')){ emoji.classList.add('hidden'); emoji.setAttribute('aria-hidden','true'); } else { gif.classList.add('hidden'); gif.setAttribute('aria-hidden','true'); emoji.classList.remove('hidden'); emoji.setAttribute('aria-hidden','false'); renderEmojiPanel(''); }
 }
 
-/* ---------- Image preload ---------- */
-function preloadImage(url, timeoutMs=6000){ return new Promise((resolve,reject)=>{ const img = new Image(); let done=false; const t = setTimeout(()=>{ if(done) return; done=true; img.src=''; reject(new Error('timeout')); }, timeoutMs); img.onload = ()=>{ if(done) return; done=true; clearTimeout(t); resolve(); }; img.onerror = ()=>{ if(done) return; done=true; clearTimeout(t); reject(new Error('error')); }; img.src = url; }); }
-
-/* ---------- Auth UI ---------- */
-const authBackdrop = document.getElementById('authBackdrop');
-const authEmail = document.getElementById('authEmail');
-const authPass = document.getElementById('authPass');
-const authStatus = document.getElementById('authStatus');
-
-function openAuthModal(message){
-  authStatus.textContent = message || '';
-  authBackdrop.style.display = 'flex';
-  authBackdrop.setAttribute('aria-hidden','false');
-}
-function closeAuthModal(){
-  authBackdrop.style.display = 'none';
-  authBackdrop.setAttribute('aria-hidden','true');
-  authStatus.textContent = '';
-  authEmail.value = '';
-  authPass.value = '';
-}
-
-/* ---------- Profile menu wiring ---------- */
+/* ---------- Profile menu wiring (profile settings opens modal) ---------- */
 (function(){
   const profileButton = document.getElementById('profileButton');
   const profileMenu = document.getElementById('profileMenu');
   const menuAccount = document.getElementById('menuAccount');
   const menuSettings = document.getElementById('menuSettings');
-  const menuAdminOpen = document.getElementById('menuAdminOpen');
   const menuSignIn = document.getElementById('menuSignIn');
   const menuSignOut = document.getElementById('menuSignOut');
-  const accountBackdrop = document.getElementById('accountBackdrop');
-  const settingsBackdrop = document.getElementById('settingsBackdrop');
 
-  function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileMenu.style.display = 'flex'; profileButton.setAttribute('aria-expanded','true'); }
-  function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileMenu.style.display = 'none'; profileButton.setAttribute('aria-expanded','false'); }
+  function openProfileMenu(){ profileMenu.setAttribute('aria-hidden','false'); profileMenu.style.display='flex'; profileButton.setAttribute('aria-expanded','true'); }
+  function closeProfileMenu(){ profileMenu.setAttribute('aria-hidden','true'); profileMenu.style.display='none'; profileButton.setAttribute('aria-expanded','false'); }
 
-  profileButton.addEventListener('click', (e) => { e.stopPropagation(); const hidden = profileMenu.getAttribute('aria-hidden') === 'true' || profileMenu.style.display === 'none'; if(hidden) openProfileMenu(); else closeProfileMenu(); });
-  document.addEventListener('click', (e) => { if(!profileMenu.contains(e.target) && !profileButton.contains(e.target)) closeProfileMenu(); });
+  profileButton.addEventListener('click', (e)=>{ e.stopPropagation(); const hidden = profileMenu.getAttribute('aria-hidden') === 'true' || profileMenu.style.display === 'none'; if(hidden) openProfileMenu(); else closeProfileMenu(); });
+  document.addEventListener('click', (e)=>{ if(!profileMenu.contains(e.target) && !profileButton.contains(e.target)) closeProfileMenu(); });
 
-  if(menuAccount){
-    menuAccount.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeProfileMenu();
-      if(typeof auth !== 'undefined' && !auth.currentUser){ if(authBackdrop){ authBackdrop.style.display = 'flex'; authBackdrop.setAttribute('aria-hidden','false'); } return; }
-      if(accountBackdrop){ accountBackdrop.style.display = 'flex'; accountBackdrop.setAttribute('aria-hidden','false'); }
-    });
-  }
+  menuAccount.addEventListener('click', (e)=>{ e.stopPropagation(); closeProfileMenu(); if(!auth.currentUser){ openAuthModal(); return; } document.getElementById('accountBackdrop').style.display='flex'; document.getElementById('accountBackdrop').setAttribute('aria-hidden','false'); populateAccountModal(); });
 
-  if(menuSettings){
-    menuSettings.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeProfileMenu();
-      if(settingsBackdrop){ settingsBackdrop.style.display = 'flex'; settingsBackdrop.setAttribute('aria-hidden','false'); }
-      try{ if(typeof loadSettings === 'function'){ const s = loadSettings(); const accent = document.getElementById('settingsAccent'); if(accent) accent.value = s.accent || '#5865f2'; } }catch(err){}
-    });
-  }
+  // Make profile menu Settings open the categorized settings modal
+  menuSettings.addEventListener('click', (e)=>{ e.stopPropagation(); closeProfileMenu(); openSettingsModal(); });
 
-  if(menuAdminOpen){
-    menuAdminOpen.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeProfileMenu();
-      // open admin auth modal
-      document.getElementById('adminAuthBackdrop').style.display = 'flex';
-      document.getElementById('adminAuthBackdrop').setAttribute('aria-hidden','false');
-      document.getElementById('adminPasswordInput').value = '';
-      document.getElementById('adminAuthStatus').textContent = '';
-    });
-  }
-
-  if(menuSignIn){
-    menuSignIn.addEventListener('click', (e) => { e.stopPropagation(); closeProfileMenu(); if(authBackdrop){ authBackdrop.style.display = 'flex'; authBackdrop.setAttribute('aria-hidden','false'); } });
-  }
-
-  if(menuSignOut){
-    menuSignOut.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      closeProfileMenu();
-      try{ if(typeof auth !== 'undefined' && auth.signOut){ await auth.signOut(); showToast('Signed out','success'); } }catch(err){ console.error('Sign out failed', err); showToast('Sign out failed','warn'); }
-    });
-  }
-
-  if(typeof auth !== 'undefined' && auth.onAuthStateChanged){
-    auth.onAuthStateChanged(user => {
-      try{
-        if(menuSignIn) menuSignIn.style.display = user ? 'none' : 'block';
-        if(menuSignOut) menuSignOut.style.display = user ? 'block' : 'none';
-        if(typeof updateMiniProfile === 'function') updateMiniProfile();
-      }catch(e){ console.error(e); }
-    });
-  }
-
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ closeProfileMenu(); } });
-  closeProfileMenu();
+  menuSignIn.addEventListener('click', (e)=>{ e.stopPropagation(); closeProfileMenu(); openAuthModal(); });
+  menuSignOut.addEventListener('click', async (e)=>{ e.stopPropagation(); closeProfileMenu(); try{ await auth.signOut(); showToast('Signed out'); }catch(e){ showToast('Sign out failed'); } });
 })();
 
-/* ---------- Settings wiring (presets, apply, save behavior) ---------- */
-const settingsAccent = document.getElementById('settingsAccent');
-const settingsSave = document.getElementById('settingsSave');
-const settingsCancel = document.getElementById('settingsCancel');
-const resetAccentBtn = document.getElementById('resetAccentBtn');
-const disguiseTitle = document.getElementById('disguiseTitle');
-const disguiseFavicon = document.getElementById('disguiseFavicon');
-const disguiseApplyTitle = document.getElementById('disguiseApplyTitle');
-const disguiseApplyIcon = document.getElementById('disguiseApplyIcon');
-const disguisePreviewIcon = document.getElementById('disguisePreviewIcon');
-const disguisePreviewTitle = document.getElementById('disguisePreviewTitle');
-const disguiseResetBtn = document.getElementById('disguiseResetBtn');
-const disguiseClearBtn = document.getElementById('disguiseClearBtn');
+/* ---------- Account modal wiring ---------- */
+function populateAccountModal(){ const user = auth.currentUser; if(!user) return; document.getElementById('accountDisplayName').value = user.displayName || ''; document.getElementById('accountPhotoUrl').value = user.photoURL || ''; document.getElementById('accountStatus').textContent = ''; }
+document.getElementById('accountCancel').addEventListener('click', ()=>{ document.getElementById('accountBackdrop').style.display='none'; document.getElementById('accountBackdrop').setAttribute('aria-hidden','true'); });
+document.getElementById('accountSave').addEventListener('click', async ()=>{
+  const name = (document.getElementById('accountDisplayName').value||'').trim();
+  const photo = (document.getElementById('accountPhotoUrl').value||'').trim() || null;
+  if(!auth.currentUser){ document.getElementById('accountStatus').textContent = 'Not signed in.'; return; }
+  document.getElementById('accountStatus').textContent = 'Saving...';
+  try{
+    await auth.currentUser.updateProfile({ displayName: name || null, photoURL: photo || null });
+    const uref = db.collection('users').doc(auth.currentUser.uid);
+    await uref.set({ displayName: name || (auth.currentUser.email?auth.currentUser.email.split('@')[0]:'User'), email: auth.currentUser.email || '', photoURL: photo || null, lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    document.getElementById('accountStatus').textContent = 'Saved.'; document.getElementById('accountBackdrop').style.display='none'; document.getElementById('accountBackdrop').setAttribute('aria-hidden','true'); updateMiniProfile(); showToast('Profile updated');
+  }catch(e){ console.error(e); document.getElementById('accountStatus').textContent = 'Save failed.'; showToast('Save failed'); }
+});
 
-function updateDisguisePreview(){
-  const d = loadTabDisguise();
-  const title = d && d.title ? d.title : (disguiseTitle.value || 'Preview title');
-  const icon = d && d.icon ? d.icon : (disguiseFavicon.value || '');
-  disguisePreviewTitle.textContent = title;
-  if(icon) disguisePreviewIcon.innerHTML = `<img src="${icon}" alt="icon" style="width:100%;height:100%;object-fit:cover">`; else disguisePreviewIcon.innerHTML = '';
+/* ---------- Auth modal wiring ---------- */
+function openAuthModal(msg){ document.getElementById('authStatus').textContent = msg || ''; document.getElementById('authBackdrop').style.display = 'flex'; document.getElementById('authBackdrop').setAttribute('aria-hidden','false'); }
+function closeAuthModal(){ document.getElementById('authBackdrop').style.display = 'none'; document.getElementById('authBackdrop').setAttribute('aria-hidden','true'); document.getElementById('authStatus').textContent = ''; document.getElementById('authEmail').value = ''; document.getElementById('authPass').value = ''; }
+document.getElementById('closeAuthBtn').addEventListener('click', closeAuthModal);
+document.getElementById('emailSignInBtn').addEventListener('click', async ()=>{
+  const email = (document.getElementById('authEmail').value||'').trim(); const pass = document.getElementById('authPass').value||'';
+  if(!email || !pass){ document.getElementById('authStatus').textContent = 'Enter email and password.'; return; }
+  document.getElementById('authStatus').textContent = 'Signing in...';
+  try{ await auth.signInWithEmailAndPassword(email, pass); document.getElementById('authStatus').textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in'); }catch(e){ console.error(e); document.getElementById('authStatus').textContent = e.message || 'Sign in failed'; }
+});
+document.getElementById('emailSignUpBtn').addEventListener('click', async ()=>{
+  const email = (document.getElementById('authEmail').value||'').trim(); const pass = document.getElementById('authPass').value||'';
+  if(!email || !pass){ document.getElementById('authStatus').textContent = 'Enter email and password.'; return; }
+  document.getElementById('authStatus').textContent = 'Creating account...';
+  try{ const cred = await auth.createUserWithEmailAndPassword(email, pass); try{ await cred.user.sendEmailVerification(); }catch(e){} document.getElementById('authStatus').textContent = 'Account created.'; closeAuthModal(); showToast('Account created'); }catch(e){ console.error(e); document.getElementById('authStatus').textContent = e.message || 'Sign up failed'; }
+});
+document.getElementById('googleSignInBtn').addEventListener('click', async ()=>{
+  const provider = new firebase.auth.GoogleAuthProvider();
+  document.getElementById('authStatus').textContent = 'Signing in with Google...';
+  try{ await auth.signInWithPopup(provider); document.getElementById('authStatus').textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in with Google'); }catch(e){ console.error(e); document.getElementById('authStatus').textContent = e.message || 'Google sign-in failed'; }
+});
+
+/* ---------- Settings modal helpers ---------- */
+function openSettingsModal(){
+  applySettingsToUI();
+  // show General panel by default
+  const sidebarBtns = document.querySelectorAll('.settings-sidebar button');
+  sidebarBtns.forEach(b => b.classList.remove('active'));
+  const first = document.querySelector('.settings-sidebar button[data-cat="general"]');
+  if(first) first.classList.add('active');
+  switchSettingsPanel('general');
+  document.getElementById('settingsBackdrop').style.display = 'flex';
+  document.getElementById('settingsBackdrop').setAttribute('aria-hidden','false');
 }
-disguiseApplyTitle.addEventListener('click', () => { const t = (disguiseTitle.value||'').trim(); setTabDisguise(t || '', undefined); updateDisguisePreview(); showToast('Tab title applied','success'); });
-disguiseApplyIcon.addEventListener('click', async () => {
-  const url = (disguiseFavicon.value||'').trim();
-  if(!url){ setTabDisguise(undefined, ''); updateDisguisePreview(); showToast('Favicon removed','success'); return; }
-  try{ await preloadImage(url, 5000); setTabDisguise(undefined, url); updateDisguisePreview(); showToast('Favicon applied','success'); }catch(e){ showToast('Favicon failed to load','warn'); }
-});
-disguiseResetBtn.addEventListener('click', () => { saveTabDisguise(null); disguiseTitle.value = ''; disguiseFavicon.value = ''; updateDisguisePreview(); applyTabDisguise(); showToast('Tab disguise reset','success'); });
-disguiseClearBtn.addEventListener('click', () => { saveTabDisguise(null); updateDisguisePreview(); applyTabDisguise(); showToast('Tab disguise cleared','success'); });
-
-resetAccentBtn.addEventListener('click', () => { const s = loadSettings(); s.accent = defaultSettings.accent; saveSettings(s); settingsAccent.value = defaultSettings.accent; applyThemeFromSettings(); showToast('Accent reset to default','success'); });
-
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('.theme-select');
-  if(!t) return;
-  document.querySelectorAll('.theme-select').forEach(b => b.classList.remove('active'));
-  t.classList.add('active');
-  const theme = t.getAttribute('data-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', theme);
-});
-
-/* preset buttons wiring */
-document.addEventListener('click', (e) => {
-  const p = e.target.closest('.preset-btn');
-  if(!p) return;
-  const title = p.dataset.title || '';
-  const icon = p.dataset.icon || '';
-  disguiseTitle.value = title;
-  disguiseFavicon.value = icon;
-  updateDisguisePreview();
-  showToast('Preset applied to preview','success');
-});
-
-/* settings save: apply, persist, close, notify */
-settingsCancel.addEventListener('click', () => {
+function closeSettingsModal(){
   document.getElementById('settingsBackdrop').style.display = 'none';
   document.getElementById('settingsBackdrop').setAttribute('aria-hidden','true');
+}
+function switchSettingsPanel(cat){
+  const panels = document.querySelectorAll('[data-panel]');
+  panels.forEach(p => p.style.display = (p.getAttribute('data-panel') === cat) ? '' : 'none');
+  const title = { general:'General', appearance:'Appearance', chat:'Chat', advanced:'Advanced' }[cat] || 'Settings';
+  document.getElementById('settingsTitle').textContent = title;
+}
+
+/* sidebar category clicks */
+document.querySelectorAll('.settings-sidebar button').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    document.querySelectorAll('.settings-sidebar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    switchSettingsPanel(btn.dataset.cat);
+  });
 });
-settingsSave.addEventListener('click', () => {
-  const s = loadSettings();
-  s.accent = settingsAccent.value || s.accent;
-  s.theme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+/* cancel/save wiring */
+document.getElementById('settingsCancel').addEventListener('click', ()=>{
+  closeSettingsModal();
+  applySettingsToUI();
+});
+document.getElementById('settingsSave').addEventListener('click', ()=>{
+  const theme = document.getElementById('settingsTheme').value;
+  const accent = document.getElementById('settingsAccent').value || '#5865f2';
+  const fontSize = document.getElementById('settingsFontSize').value || 'medium';
+  const compact = !!document.getElementById('settingsCompact').checked;
+  const showAvatars = !!document.getElementById('settingsAvatars').checked;
+  const showTimestamps = !!document.getElementById('settingsTimestamps').checked;
+  const welcomeMessage = !!document.getElementById('settingsWelcome').checked;
+  const autoPlayGifs = !!document.getElementById('settingsAutoGif').checked;
+  const messageLimit = Number(document.getElementById('settingsMsgLimit').value) || 300;
+  const s = { theme, accent, fontSize, compact, showAvatars, showTimestamps, welcomeMessage, autoPlayGifs, messageLimit };
   saveSettings(s);
-  applyThemeFromSettings();
-
-  const key = (document.getElementById('panicKeyInput').value || "'").slice(0,1);
-  const action = document.getElementById('panicAction').value || 'close';
-  const redirect = (document.getElementById('panicRedirectUrl').value || '').trim() || 'https://www.google.com';
-  localStorage.setItem(PANIC_KEY, JSON.stringify({ key, action, redirect }));
-
-  // apply tab disguise inputs to storage
-  const t = (disguiseTitle.value||'').trim();
-  const i = (disguiseFavicon.value||'').trim();
-  if(!t && !i) saveTabDisguise(null);
-  else saveTabDisguise({ title: t, icon: i });
-
-  applyTabDisguise();
-
-  // close settings and notify
-  document.getElementById('settingsBackdrop').style.display = 'none';
-  document.getElementById('settingsBackdrop').setAttribute('aria-hidden','true');
-  showToast('Changes applied','success');
+  applySettingsToUI();
+  closeSettingsModal();
+  showToast('Settings saved');
 });
 
-/* ---------- Admin auth & panel wiring ---------- */
-/*
-  The admin password is "anotheryear123".
-  It's stored obfuscated in the client code as char codes to avoid plain text in the DOM.
-  Unlocking sets a local admin flag in localStorage (homewrk.admin.v1).
-  NOTE: Client-side admin is for development/testing only. For production, use server-side admin checks.
-*/
-(function wireAdmin(){
-  const adminAuthBackdrop = document.getElementById('adminAuthBackdrop');
-  const adminAuthInput = document.getElementById('adminPasswordInput');
-  const adminAuthUnlock = document.getElementById('adminAuthUnlock');
-  const adminAuthCancel = document.getElementById('adminAuthCancel');
-  const adminAuthStatus = document.getElementById('adminAuthStatus');
+/* ---------- Init & wiring ---------- */
+const content = document.getElementById('content');
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadFavs(); applySettingsToUI();
 
-  const adminPanelBackdrop = document.getElementById('adminPanelBackdrop');
-  const adminCloseBtn = document.getElementById('adminCloseBtn');
-  const adminClearLocalMessages = document.getElementById('adminClearLocalMessages');
-  const adminClearLocalData = document.getElementById('adminClearLocalData');
-  const adminActionStatus = document.getElementById('adminActionStatus');
+  // tab wiring
+  Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', ()=>{
+    Array.from(document.querySelectorAll('.tab')).forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    renderActive(t.dataset.target);
+  }));
 
-  const modSearchBtn = document.getElementById('modSearchBtn');
-  const modUserSearch = document.getElementById('modUserSearch');
-  const modUserList = document.getElementById('modUserList');
-  const modRefreshUsers = document.getElementById('modRefreshUsers');
-  const modSelectedInfo = document.getElementById('modSelectedInfo');
-  const modSelected = document.getElementById('modSelected');
-  const modNewName = document.getElementById('modNewName');
-  const modNewPhoto = document.getElementById('modNewPhoto');
-  const modApplyName = document.getElementById('modApplyName');
-  const modApplyPhoto = document.getElementById('modApplyPhoto');
-  const modDeleteMessages = document.getElementById('modDeleteMessages');
-  const modBulkRename = document.getElementById('modBulkRename');
-  const modBanUser = document.getElementById('modBanUser');
-  const modLog = document.getElementById('modLog');
+  // content open button
+  content.addEventListener('click', e=>{ const openBtn = e.target.closest('.open-btn'); if(openBtn){ const file = openBtn.dataset.file; if(file) window.location.href = file; } });
 
-  const bannedBackdrop = document.getElementById('bannedBackdrop');
-  const bannedList = document.getElementById('bannedList');
-  const bannedClose = document.getElementById('bannedClose');
-  const adminViewBanned = document.getElementById('adminViewBanned');
+  // search wiring
+  if(searchInput) searchInput.addEventListener('input', ()=>applySearchToActive());
+  if(searchClearBtn) searchClearBtn.addEventListener('click', ()=>{ searchInput.value=''; applySearchToActive(); searchInput.focus(); });
 
-  // obfuscated password char codes for "anotheryear123"
-  const _adminCharCodes = [97,110,111,116,104,101,114,121,101,97,114,49,50,51];
-  function getExpectedAdminCode(){ return String.fromCharCode(..._adminCharCodes); }
+  // initial render
+  renderActive('games');
 
-  // moderation helpers
-  let lastUserResults = []; // { uid, name, email, sampleMsgId, photoURL }
-  let selectedUser = null; // { uid, name, email, photoURL }
+  // reply cancel
+  document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
 
-  async function searchUsersFromMessages(query){
-    const q = (query||'').toLowerCase().trim();
-    const results = new Map();
-    try{
-      const snap = await messagesCollectionRef().orderBy('ts','desc').limit(800).get();
-      snap.forEach(doc => {
-        const d = doc.data();
-        const uid = d.uid || ('anon-'+(d.name||'').slice(0,6));
-        const name = d.name || '';
-        const email = d.email || '';
-        const photoURL = d.photoURL || '';
-        const key = uid;
-        if(!results.has(key)){
-          if(!q || name.toLowerCase().includes(q) || (email && email.toLowerCase().includes(q))){
-            results.set(key, { uid, name, email, sampleMsgId: doc.id, photoURL });
-          }
-        }
-      });
-    }catch(e){
-      console.error('searchUsersFromMessages', e);
-    }
-    return Array.from(results.values()).slice(0,200);
-  }
-
-  function renderUserResults(list){
-    lastUserResults = list;
-    modUserList.innerHTML = '';
-    if(list.length === 0){ modUserList.innerHTML = '<div class="small-note">No users found.</div>'; return; }
-    list.forEach(u => {
-      const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.justifyContent = 'space-between';
-      row.style.alignItems = 'center';
-      row.style.padding = '6px';
-      row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
-      const left = document.createElement('div');
-      left.innerHTML = `<div style="font-weight:700">${escapeHtml(u.name||'(no name)')}</div><div class="small-note">${escapeHtml(u.email||u.uid)}</div>`;
-      const right = document.createElement('div');
-      const selBtn = document.createElement('button');
-      selBtn.className = 'btn small';
-      selBtn.textContent = 'Select';
-      selBtn.addEventListener('click', () => {
-        selectedUser = { uid: u.uid, name: u.name, email: u.email, sampleMsgId: u.sampleMsgId, photoURL: u.photoURL };
-        showSelectedUserDetails(selectedUser);
-      });
-      right.appendChild(selBtn);
-      row.appendChild(left);
-      row.appendChild(right);
-      modUserList.appendChild(row);
-    });
-  }
-
-  async function applyNameToMessages(uid, newName){
-    if(!uid) return;
-    if(!confirm(`Apply new display name "${newName}" to all messages from this user?`)) return;
-    adminActionStatus.textContent = 'Applying name to messages...';
-    try{
-      const snap = await messagesCollectionRef().where('uid','==',uid).get();
-      const batch = db.batch();
-      snap.forEach(doc => {
-        batch.update(doc.ref, { name: newName });
-      });
-      await batch.commit();
-      adminActionStatus.textContent = 'Name applied to messages.';
-      logModAction(`Renamed uid ${uid} -> "${newName}" (${snap.size} messages)`);
-      showToast('Name applied to messages','success');
-    }catch(e){
-      console.error(e);
-      adminActionStatus.textContent = 'Failed to apply name.';
-      showToast('Failed to apply name','warn');
-    }
-  }
-
-  async function applyPhotoToMessages(uid, photoUrl){
-    if(!uid) return;
-    if(!confirm(`Apply new profile photo to all messages from this user?`)) return;
-    adminActionStatus.textContent = 'Applying photo to messages...';
-    try{
-      await preloadImage(photoUrl, 5000);
-    }catch(e){
-      adminActionStatus.textContent = 'Photo failed to load.';
-      showToast('Photo failed to load','warn');
-      return;
-    }
-    try{
-      const snap = await messagesCollectionRef().where('uid','==',uid).get();
-      const batch = db.batch();
-      snap.forEach(doc => {
-        batch.update(doc.ref, { photoURL: photoUrl });
-      });
-      await batch.commit();
-      adminActionStatus.textContent = 'Photo applied to messages.';
-      logModAction(`Changed photo for uid ${uid} (${snap.size} messages)`);
-      showToast('Photo applied to messages','success');
-    }catch(e){
-      console.error(e);
-      adminActionStatus.textContent = 'Failed to apply photo.';
-      showToast('Failed to apply photo','warn');
-    }
-  }
-
-  async function deleteMessagesByUser(uid){
-    if(!uid) return;
-    if(!confirm('Delete all messages from this user? This is permanent.')) return;
-    adminActionStatus.textContent = 'Deleting messages...';
-    try{
-      const snap = await messagesCollectionRef().where('uid','==',uid).get();
-      const docs = snap.docs;
-      const batchSize = 500;
-      for(let i=0;i<docs.length;i+=batchSize){
-        const batch = db.batch();
-        docs.slice(i,i+batchSize).forEach(d => batch.delete(d.ref));
-        await batch.commit();
-      }
-      adminActionStatus.textContent = 'Messages deleted.';
-      logModAction(`Deleted ${docs.length} messages for uid ${uid}`);
-      showToast('Messages deleted','success');
-    }catch(e){
-      console.error(e);
-      adminActionStatus.textContent = 'Failed to delete messages.';
-      showToast('Failed to delete messages','warn');
-    }
-  }
-
-  async function banUser(uid){
-    if(!uid) return;
-    if(!confirm('Ban this user? They will be prevented from sending messages.')) return;
-    adminActionStatus.textContent = 'Banning user...';
-    try{
-      await db.collection('moderation_banned').doc(uid).set({ ts: firebase.firestore.FieldValue.serverTimestamp() });
-      bannedCache.add(uid);
-      adminActionStatus.textContent = 'User banned.';
-      logModAction(`Banned uid ${uid}`);
-      showToast('User banned','success');
-    }catch(e){
-      console.error(e);
-      adminActionStatus.textContent = 'Failed to ban user.';
-      showToast('Failed to ban user','warn');
-    }
-  }
-
-  async function unbanUser(uid){
-    if(!uid) return;
-    if(!confirm('Unban this user?')) return;
-    adminActionStatus.textContent = 'Unbanning user...';
-    try{
-      await db.collection('moderation_banned').doc(uid).delete();
-      bannedCache.delete(uid);
-      adminActionStatus.textContent = 'User unbanned.';
-      logModAction(`Unbanned uid ${uid}`);
-      showToast('User unbanned','success');
-    }catch(e){
-      console.error(e);
-      adminActionStatus.textContent = 'Failed to unban user.';
-      showToast('Failed to unban user','warn');
-    }
-  }
-
-  function logModAction(text){
-    const row = document.createElement('div');
-    row.style.padding = '6px';
-    row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
-    row.textContent = `${new Date().toLocaleString()}: ${text}`;
-    modLog.insertBefore(row, modLog.firstChild);
-    // Optionally write to Firestore moderation log (commented out; enable if you want server-side audit)
-    // db.collection('moderation_logs').add({ text, ts: firebase.firestore.FieldValue.serverTimestamp(), actor: auth.currentUser ? auth.currentUser.uid : null }).catch(()=>{});
-  }
-
-  async function renderBannedList(){
-    bannedList.innerHTML = '';
-    try{
-      const snap = await db.collection('moderation_banned').get();
-      if(snap.empty){ bannedList.innerHTML = '<div class="small-note">No banned users.</div>'; return; }
-      snap.forEach(doc => {
-        const uid = doc.id;
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.alignItems = 'center';
-        row.style.padding = '6px';
-        row.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
-        row.innerHTML = `<div class="small-note">${escapeHtml(uid)}</div>`;
-        const btn = document.createElement('button');
-        btn.className = 'btn small';
-        btn.textContent = 'Unban';
-        btn.addEventListener('click', () => unbanUser(uid));
-        row.appendChild(btn);
-        bannedList.appendChild(row);
-      });
-    }catch(e){
-      console.error(e);
-      bannedList.innerHTML = '<div class="small-note">Failed to load banned list.</div>';
-    }
-  }
-
-  // show selected user details and wire quick actions
-  function showSelectedUserDetails(user){
-    const infoEl = document.getElementById('modSelectedInfo');
-    infoEl.innerHTML = `
-      <div style="display:flex;gap:12px;align-items:center">
-        <div style="width:72px;height:72px;border-radius:8px;overflow:hidden;background:#071427;flex-shrink:0" id="modPfpWrap">
-          ${user.photoURL ? `<img src="${escapeHtml(user.photoURL)}" alt="pfp" style="width:100%;height:100%;object-fit:cover">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800">${(user.name||'U').charAt(0).toUpperCase()}</div>`}
-        </div>
-        <div style="flex:1">
-          <div style="font-weight:800">${escapeHtml(user.name || '(no name)')}</div>
-          <div class="small-note">${escapeHtml(user.email || user.uid)}</div>
-          <div class="small-note" id="modLastMsg">Loading last message...</div>
-        </div>
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button id="adminSendReset" class="btn small">Send password reset</button>
-        <button id="adminRequestTemp" class="btn ghost small">Request temp password (server)</button>
-        <button id="adminShowUid" class="btn ghost small">Copy UID</button>
-      </div>
-    `;
-    modNewName.value = user.name || '';
-    modNewPhoto.value = user.photoURL || '';
-
-    // load last message text (optional)
-    if(user.sampleMsgId){
-      db.collection('chat').doc('main').collection('messages').doc(user.sampleMsgId).get().then(d => {
-        if(d.exists){
-          const data = d.data();
-          const el = document.getElementById('modLastMsg');
-          el.textContent = (data && data.text) ? `Sample: ${data.text.slice(0,120)}` : 'No sample message text';
-        }
-      }).catch(()=>{});
-    }
-
-    // wire buttons
-    const sendResetBtn = document.getElementById('adminSendReset');
-    const requestTempBtn = document.getElementById('adminRequestTemp');
-    const copyUidBtn = document.getElementById('adminShowUid');
-
-    sendResetBtn.addEventListener('click', async () => {
-      if(!user.email){ alert('No email available for this user.'); return; }
-      try{
-        await firebase.auth().sendPasswordResetEmail(user.email);
-        showToast('Password reset email sent to ' + user.email, 'success', 4000);
-        logModAction(`Sent password reset to ${user.email}`);
-      }catch(err){
-        console.error(err);
-        showToast('Failed to send reset email: ' + (err.message||''), 'warn', 5000);
-      }
-    });
-
-    requestTempBtn.addEventListener('click', async () => {
-      if(!confirm('Request a temporary password for this user (server-side action)?')) return;
-      try{
-        // Placeholder: call your server endpoint that uses Admin SDK to set a temp password.
-        // You must implement /admin/set-temp-password on your server and protect it.
-        const resp = await fetch('/admin/set-temp-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: user.uid })
-        });
-        const json = await resp.json();
-        if(resp.ok){
-          showToast('Temporary password set on server. Deliver it securely to the user.', 'success', 6000);
-          logModAction(`Requested temp password for uid ${user.uid}`);
-        } else {
-          showToast('Server failed: ' + (json.error || resp.statusText), 'warn', 6000);
-        }
-      }catch(e){
-        console.error(e);
-        showToast('Request failed', 'warn', 4000);
-      }
-    });
-
-    copyUidBtn.addEventListener('click', () => {
-      navigator.clipboard?.writeText(user.uid || '')?.then(()=> showToast('UID copied','success'))?.catch(()=>{});
-    });
-  }
-
-  adminAuthUnlock.addEventListener('click', async () => {
-    const entered = (adminAuthInput.value || '').trim();
-    if(!entered){ adminAuthStatus.textContent = 'Enter password.'; return; }
-    if(entered === getExpectedAdminCode()){
-      setLocalAdmin(true);
-      adminAuthStatus.textContent = 'Unlocked.';
-      adminAuthBackdrop.style.display = 'none';
-      adminAuthBackdrop.setAttribute('aria-hidden','true');
-      // open admin panel
-      adminPanelBackdrop.style.display = 'flex';
-      adminPanelBackdrop.setAttribute('aria-hidden','false');
-      adminAuthInput.value = '';
-      showToast('Admin unlocked','success');
-      // load banned cache
-      await loadBannedCache();
-    } else {
-      adminAuthStatus.textContent = 'Incorrect password.';
-      showToast('Incorrect admin password','warn');
-    }
-  });
-
-  adminAuthCancel.addEventListener('click', () => {
-    adminAuthBackdrop.style.display = 'none';
-    adminAuthBackdrop.setAttribute('aria-hidden','true');
-    adminAuthStatus.textContent = '';
-    adminAuthInput.value = '';
-  });
-
-  adminCloseBtn.addEventListener('click', () => {
-    adminPanelBackdrop.style.display = 'none';
-    adminPanelBackdrop.setAttribute('aria-hidden','true');
-  });
-
-  adminClearLocalMessages.addEventListener('click', () => {
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(chatMessagesEl){ chatMessagesEl.innerHTML = ''; messageElements.clear(); adminActionStatus.textContent = 'Chat DOM cleared (local only).'; showToast('Chat DOM cleared','success'); } else { adminActionStatus.textContent = 'No chat DOM found.'; }
-  });
-
-  adminClearLocalData.addEventListener('click', () => {
-    try{
-      localStorage.removeItem(FAVS_KEY);
-      localStorage.removeItem(SETTINGS_KEY);
-      localStorage.removeItem(TAB_DISGUISE_KEY);
-      localStorage.removeItem(PANIC_KEY);
-      localStorage.removeItem(ADMIN_LOCAL_KEY);
-      favorites = [];
-      saveFavs();
-      adminActionStatus.textContent = 'Local data cleared.';
-      showToast('Local app data cleared','success');
-      renderAdminBadge();
-    }catch(e){ adminActionStatus.textContent = 'Failed to clear local data.'; }
-  });
-
-  // user search
-  modSearchBtn.addEventListener('click', async () => {
-    const q = (modUserSearch.value||'').trim();
-    modUserList.innerHTML = '<div class="small-note">Searching...</div>';
-    const users = await searchUsersFromMessages(q);
-    renderUserResults(users);
-  });
-  modRefreshUsers.addEventListener('click', async () => {
-    modUserList.innerHTML = '<div class="small-note">Refreshing...</div>';
-    const users = await searchUsersFromMessages('');
-    renderUserResults(users);
-  });
-
-  modApplyName.addEventListener('click', async () => {
-    if(!selectedUser){ alert('Select a user first'); return; }
-    const newName = (modNewName.value||'').trim();
-    if(!newName){ alert('Enter a new name'); return; }
-    await applyNameToMessages(selectedUser.uid, newName);
-  });
-
-  modApplyPhoto.addEventListener('click', async () => {
-    if(!selectedUser){ alert('Select a user first'); return; }
-    const newPhoto = (modNewPhoto.value||'').trim();
-    if(!newPhoto){ alert('Enter a photo URL'); return; }
-    await applyPhotoToMessages(selectedUser.uid, newPhoto);
-  });
-
-  modDeleteMessages.addEventListener('click', async () => {
-    if(!selectedUser){ alert('Select a user first'); return; }
-    await deleteMessagesByUser(selectedUser.uid);
-  });
-
-  modBulkRename.addEventListener('click', async () => {
-    if(!selectedUser){ alert('Select a user first'); return; }
-    const newName = (modNewName.value||'').trim();
-    if(!newName){ alert('Enter a new name'); return; }
-    await applyNameToMessages(selectedUser.uid, newName);
-  });
-
-  modBanUser.addEventListener('click', async () => {
-    if(!selectedUser){ alert('Select a user first'); return; }
-    await banUser(selectedUser.uid);
-  });
-
-  adminViewBanned.addEventListener('click', async () => {
-    await renderBannedList();
-    bannedBackdrop.style.display = 'flex';
-    bannedBackdrop.setAttribute('aria-hidden','false');
-  });
-
-  bannedClose.addEventListener('click', () => {
-    bannedBackdrop.style.display = 'none';
-    bannedBackdrop.setAttribute('aria-hidden','true');
-  });
-
-  // expose a small helper to open admin panel if already unlocked
-  window.__openAdminPanelIfUnlocked = function(){
-    if(isLocalAdmin()){
-      adminPanelBackdrop.style.display = 'flex';
-      adminPanelBackdrop.setAttribute('aria-hidden','false');
-      loadBannedCache();
-    } else {
-      adminAuthBackdrop.style.display = 'flex';
-      adminAuthBackdrop.setAttribute('aria-hidden','false');
-    }
-  };
-})();
-
-/* ---------- Search & helpers ---------- */
-const searchInput = document.getElementById('global-search');
-const searchClearBtn = document.getElementById('searchClear');
-
-function normalize(s){ return String(s||'').toLowerCase().trim(); }
-function filterGridByQuery(query){
-  const grid = document.getElementById('grid');
-  if(!grid) return;
-  const q = normalize(query);
-  if(!q){ Array.from(grid.children).forEach(child => child.style.display = ''); return; }
-  Array.from(grid.children).forEach(tile => {
-    const title = normalize(tile.querySelector('.tile-title')?.textContent || tile.querySelector('.tile-title')?.innerText);
-    const file = normalize(tile.querySelector('.meta-file')?.textContent || '');
-    const matches = title.includes(q) || file.includes(q);
-    tile.style.display = matches ? '' : 'none';
-  });
-}
-function filterChatByQuery(query){
-  const chatMessagesEl = document.getElementById('chatMessages');
-  if(!chatMessagesEl) return;
-  const q = normalize(query);
-  const rows = Array.from(chatMessagesEl.querySelectorAll('.msg-group'));
-  if(!q){ rows.forEach(r => r.style.display = ''); return; }
-  rows.forEach(row => {
-    const name = normalize(row.querySelector('.msg-name')?.textContent || '');
-    const text = normalize(row.querySelector('.msg-bubble')?.textContent || '');
-    const matches = name.includes(q) || text.includes(q);
-    row.style.display = matches ? '' : 'none';
-  });
-}
-function debounce(fn, wait=250){ let t = null; return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this, args), wait); }; }
-const applySearchToActive = debounce(() => {
-  const q = searchInput.value || '';
-  const active = document.querySelector('.tab.active')?.dataset.target || 'games';
-  if(active === 'chat'){
-    const chatMessagesEl = document.getElementById('chatMessages');
-    if(!chatMessagesEl) renderChat();
-    setTimeout(()=> filterChatByQuery(q), 50);
-  } else {
-    const grid = document.getElementById('grid');
-    if(!grid) renderActive(active);
-    setTimeout(()=> filterGridByQuery(q), 50);
-  }
-}, 200);
+  // auth state
+  auth.onAuthStateChanged(u => { updateMiniProfile(); loadBannedCache().catch(()=>{}); });
+});
 
 /* ---------- Render active tab ---------- */
 function renderActive(target){
   if(!target) target = document.querySelector('.tab.active')?.dataset.target || 'games';
-  const fixedBar = document.getElementById('fixedInputBar');
-  if(fixedBar) fixedBar.style.display = 'none';
-  if(target !== 'chat'){
-    detachFixedInputHandlers();
-    stopFirestoreListener();
-    clearChatState();
-    toggleGifPanel(false);
-    toggleEmojiPanel(false);
-  }
+  const fixedBar = document.getElementById('fixedInputBar'); if(fixedBar) fixedBar.style.display='none';
+  if(target !== 'chat'){ detachFixedInputHandlers(); stopFirestoreListener(); const chatMessagesEl = document.getElementById('chatMessages'); if(chatMessagesEl) chatMessagesEl.innerHTML=''; messageElements.clear(); cancelReply(); toggleGifPanel(false); toggleEmojiPanel(false); }
   if(target === 'games') renderGames();
   if(target === 'tools') renderTools();
   if(target === 'favorites') renderFavorites();
   if(target === 'chat') renderChat();
 }
 
-/* ---------- Chat renderer ---------- */
-function renderChat(){
-  clearChatState();
-  content.innerHTML = `
-    <div class="chat-shell" id="chatShell">
-      <div class="chat-column">
-        <div class="chat-header">
-          <div><strong>#global</strong><div class="small-note">Global chat</div></div>
-          <div class="small-note"></div>
-        </div>
-        <div class="chat-body chat-body-padding" id="chatMessages" aria-live="polite"></div>
-      </div>
-    </div>
-    <div id="gifResults" style="display:none"></div>
-  `;
-
-  // show fixed input bar
-  const fixedBar = document.getElementById('fixedInputBar');
-  fixedBar.style.display = 'flex';
-  fixedBar.setAttribute('aria-hidden','false');
-
-  // attach handlers
-  attachFixedInputHandlers();
-
-  // start listener and scroll to bottom on load
-  startFirestoreListener();
-
-  // ensure panels hidden initially
-  toggleGifPanel(false);
-  toggleEmojiPanel(false);
-}
-
-/* ---------- Panic key ---------- */
-function loadPanicSettings(){ try{ const raw = localStorage.getItem(PANIC_KEY); return raw ? JSON.parse(raw) : { key: "'", action: 'close', redirect: 'https://www.google.com' }; }catch(e){ return { key: "'", action: 'close', redirect: 'https://www.google.com' }; } }
-function handlePanic(){
-  const p = loadPanicSettings();
-  if(!p || !p.key) return;
-  if(p.action === 'redirect'){
-    // redirect explicitly when user chose redirect
-    window.location.href = p.redirect || 'https://www.google.com';
-    return;
-  }
-  // action === 'close' - attempt to close the tab/window
-  try{
-    try { window.open('', '_self'); } catch(e){}
-    window.close();
-    setTimeout(() => {
-      if(!window.closed){
-        showToast('Unable to close tab (browser blocked).', 'warn', 4000);
-      }
-    }, 300);
-  }catch(e){
-    showToast('Unable to close tab (browser blocked).', 'warn', 4000);
-  }
-}
-document.addEventListener('keydown', (e) => {
-  const p = loadPanicSettings();
-  const tag = (document.activeElement && document.activeElement.tagName) || '';
-  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement?.isContentEditable) return;
-  if(!p || !p.key) return;
-  if(e.key === p.key) handlePanic();
-});
-
-/* ---------- Admin badge render ---------- */
-function renderAdminBadge(){
-  const wrap = document.getElementById('adminStatusWrap');
-  wrap.innerHTML = '';
-  if(isLocalAdmin()){
-    const b = document.createElement('div');
-    b.className = 'admin-badge';
-    b.textContent = 'Admin';
-    b.style.cursor = 'pointer';
-    b.title = 'Open admin panel';
-    b.addEventListener('click', () => { window.__openAdminPanelIfUnlocked(); });
-    wrap.appendChild(b);
-  }
-}
-
-/* ---------- Init & wiring ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-  // load favorites before rendering anything
-  loadFavs();
-
-  applyThemeFromSettings();
-  applyTabDisguise();
-
-  Array.from(document.querySelectorAll('.tab')).forEach(t => t.addEventListener('click', () => {
-    Array.from(document.querySelectorAll('.tab')).forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    renderActive(t.dataset.target);
-  }));
-
-  // content click handlers (open)
-  content.addEventListener('click', e=> {
-    const openBtn = e.target.closest('.open-btn');
-    if(openBtn){
-      const file = openBtn.getAttribute('data-file');
-      window.location.href = file;
-    }
-  });
-
-  if(searchInput) searchInput.addEventListener('input', () => applySearchToActive());
-  if(searchClearBtn) searchClearBtn.addEventListener('click', () => { searchInput.value = ''; applySearchToActive(); searchInput.focus(); });
-
-  document.getElementById('menuSignIn').addEventListener('click', () => { document.getElementById('profileMenu').style.display = 'none'; openAuthModal(); });
-  document.getElementById('closeAuthBtn').addEventListener('click', closeAuthModal);
-
-  document.getElementById('emailSignInBtn').addEventListener('click', async () => {
-    const email = (authEmail.value||'').trim();
-    const pass = authPass.value||'';
-    if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
-    authStatus.textContent = 'Signing in...';
-    try{ await auth.signInWithEmailAndPassword(email, pass); authStatus.textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Sign in failed'; }
-  });
-
-  document.getElementById('emailSignUpBtn').addEventListener('click', async () => {
-    const email = (authEmail.value||'').trim();
-    const pass = authPass.value||'';
-    if(!email || !pass){ authStatus.textContent = 'Enter email and password.'; return; }
-    authStatus.textContent = 'Creating account...';
-    try{ const cred = await auth.createUserWithEmailAndPassword(email, pass); try{ await cred.user.sendEmailVerification(); }catch(e){} authStatus.textContent = 'Account created.'; closeAuthModal(); showToast('Account created','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Sign up failed'; }
-  });
-
-  document.getElementById('googleSignInBtn').addEventListener('click', async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    authStatus.textContent = 'Signing in with Google...';
-    try{ await auth.signInWithPopup(provider); authStatus.textContent = 'Signed in.'; closeAuthModal(); showToast('Signed in with Google','success'); }catch(e){ console.error(e); authStatus.textContent = e.message || 'Google sign-in failed'; }
-  });
-
-  renderActive('games');
-
-  auth.onAuthStateChanged(async user => { updateMiniProfile(); await loadBannedCache(); });
-
-  if(!localStorage.getItem(PANIC_KEY)) localStorage.setItem(PANIC_KEY, JSON.stringify({ key: "'", action: 'close', redirect: 'https://www.google.com' }));
-
-  updateDisguisePreview();
-  renderAdminBadge();
-});
-
-/* ---------- Mini profile ---------- */
+/* ---------- Profile mini ---------- */
 function updateMiniProfile(){
   const user = auth.currentUser;
   const avatarEl = document.getElementById('miniAvatar');
@@ -1851,18 +983,10 @@ function updateMiniProfile(){
     document.getElementById('menuSignIn').style.display = 'block';
     if(menuGuestInfo) menuGuestInfo.textContent = 'Guest — Not signed in';
   }
-  renderAdminBadge();
 }
 
-/* ---------- Helpers ---------- */
-function setTabDisguise(title, iconUrl){
-  const obj = {};
-  if(title !== undefined) obj.title = title || '';
-  if(iconUrl !== undefined) obj.icon = iconUrl || '';
-  if((!obj.title || obj.title === '') && (!obj.icon || obj.icon === '')) saveTabDisguise(null);
-  else saveTabDisguise(obj);
-  applyTabDisguise();
-}
+/* ---------- Apply settings on load ---------- */
+applySettingsToUI();
   </script>
 </body>
 </html>
