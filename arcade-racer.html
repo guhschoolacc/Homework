@@ -3,241 +3,181 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Arcade Racer — Moto X3M Style</title>
+<title>Arcade Racer — Topdown (Menu & Levels)</title>
 <style>
   :root{
-    --bg1:#071026; --bg2:#0b1220; --neon:#00f0ff; --accent:#ff3d81;
-    --panel: rgba(10,18,30,0.7);
+    --bg:#071026; --road:#0b1220; --neon:#00f0ff; --accent:#ff3d81;
   }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),#020617);font-family:Inter,system-ui,Arial;color:#cfe9ff}
-  #container{max-width:1000px;margin:18px auto;padding:12px}
-  canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
-  .ui{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
-  .panel{background:var(--panel);padding:8px 12px;border-radius:10px;backdrop-filter:blur(6px)}
-  button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-  .menu{display:flex;gap:12px;align-items:center}
-  .levels{display:flex;gap:8px;flex-wrap:wrap}
-  .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020317 0%,#071026 100%);font-family:Inter,system-ui,Arial;color:#cfe9ff}
+  .wrap{max-width:900px;margin:18px auto;padding:12px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  h1{color:var(--neon);margin:0;font-size:20px}
+  .panel{background:rgba(10,18,30,0.6);padding:8px 12px;border-radius:10px}
+  canvas{display:block;width:100%;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
   .hud{display:flex;gap:12px;align-items:center}
-  .big{font-size:18px;font-weight:800;color:var(--neon)}
+  button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+  .menuOverlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
+  .menuCard{width:520px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .levels{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
   .small{font-size:13px;color:#9fb8d9}
-  #touchControls{display:none;position:fixed;left:0;right:0;bottom:18px;pointer-events:none}
-  .touchBtn{pointer-events:auto;display:inline-block;background:rgba(255,255,255,0.06);padding:14px;border-radius:50%;margin:6px}
-  @media (max-width:700px){ #touchControls{display:flex;justify-content:center} }
+  .center{display:flex;justify-content:center;gap:8px;margin-top:12px}
 </style>
 </head>
 <body>
-<div id="container">
-  <div class="ui">
-    <div class="panel">
-      <div class="big">Arcade Racer — Moto X3M Style</div>
-      <div class="small">Physics, levels, neon visuals</div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Arcade Racer</h1>
+      <div class="small">Top‑down neon racer — avoid cars, collect pickups</div>
     </div>
     <div class="panel hud">
-      <div>Score: <span id="score">0</span></div>
-      <div>Level: <span id="levelName">1</span></div>
-      <div>Speed: <span id="speed">0</span> px/s</div>
-      <div><button id="menuBtn">Menu</button></div>
+      <div>Score: <strong id="score">0</strong></div>
+      <div>Level: <strong id="levelLabel">1</strong></div>
+      <div>Speed: <strong id="speed">1.00</strong>x</div>
+      <div><button id="menuToggle">Menu</button></div>
+    </div>
+  </header>
+
+  <div style="position:relative">
+    <canvas id="game" width="800" height="520"></canvas>
+
+    <!-- Menu overlay -->
+    <div id="menu" class="menuOverlay" style="display:flex">
+      <div class="menuCard">
+        <h2 style="margin:0;color:var(--neon)">Start Menu</h2>
+        <p class="small" style="margin-top:8px">Choose a level, then press Start. Controls: ← → or A/D to steer.</p>
+
+        <div style="margin-top:12px">
+          <label class="small">Select Level</label>
+          <div class="levels" id="levelsList"></div>
+        </div>
+
+        <div class="center">
+          <button id="startBtn">Start</button>
+          <button id="resumeBtn" style="display:none">Resume</button>
+          <button id="restartBtn">Restart</button>
+        </div>
+
+        <div style="margin-top:12px" class="small">Tips: Collect green pickups for bonus points. Avoid collisions.</div>
+      </div>
     </div>
   </div>
-
-  <canvas id="game" width="1000" height="520"></canvas>
-
-  <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-    <div class="panel menu" id="mainMenu">
-      <button id="startBtn">Start</button>
-      <div class="levels" id="levelsList"></div>
-      <button id="muteBtn">Mute</button>
-    </div>
-    <div class="panel small">Controls: ←/→ or A/D to lean, ↑/W to throttle, ↓/S to brake. Tap on mobile.</div>
-  </div>
-</div>
-
-<div id="touchControls">
-  <div class="touchBtn" id="leftTouch">◀</div>
-  <div class="touchBtn" id="throttleTouch">▲</div>
-  <div class="touchBtn" id="rightTouch">▶</div>
 </div>
 
 <script>
-/* =========================
-   Arcade Racer — Core
-   ========================= */
+/* ---------- Canvas setup ---------- */
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let W = canvas.width, H = canvas.height;
+function setDPR(){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+setDPR();
 
-window.addEventListener('resize', ()=>{ /* keep canvas fixed pixel size for physics */ });
+/* ---------- UI elements ---------- */
+const menuEl = document.getElementById('menu');
+const startBtn = document.getElementById('startBtn');
+const resumeBtn = document.getElementById('resumeBtn');
+const restartBtn = document.getElementById('restartBtn');
+const menuToggle = document.getElementById('menuToggle');
+const levelsList = document.getElementById('levelsList');
+const scoreEl = document.getElementById('score');
+const levelLabel = document.getElementById('levelLabel');
+const speedEl = document.getElementById('speed');
 
-/* ---------- Game State ---------- */
-let state = 'menu'; // menu, playing, paused, levelComplete, gameOver
+/* ---------- Game state ---------- */
+let state = 'menu'; // menu, playing, paused, gameover
 let currentLevel = 0;
 let score = 0;
-let mute = false;
+let baseSpeed = 2.2;
+let speedMultiplier = 1.0;
 
-/* ---------- Level Definitions ----------
-   Each level: width, goalX, terrain points (x,y)
-   Terrain is a height map; y measured from top.
-*/
-const levels = [
-  {
-    name: 'Training Hill',
-    width: 3000,
-    goalX: 2600,
-    startX: 80,
-    terrain: generateTerrain(3000, [
-      {x:0,y:380},{x:200,y:360},{x:400,y:380},{x:600,y:320},{x:800,y:380},
-      {x:1100,y:420},{x:1300,y:360},{x:1500,y:420},{x:1800,y:360},{x:2200,y:380},
-      {x:2600,y:300},{x:3000,y:380}
-    ])
-  },
-  {
-    name: 'Ramp Rush',
-    width: 4200,
-    goalX: 4000,
-    startX: 60,
-    terrain: generateTerrain(4200, [
-      {x:0,y:380},{x:300,y:360},{x:600,y:300},{x:800,y:420},{x:1100,y:320},
-      {x:1400,y:380},{x:1700,y:300},{x:2000,y:420},{x:2400,y:360},{x:2800,y:300},
-      {x:3200,y:420},{x:3600,y:360},{x:4200,y:380}
-    ])
-  },
-  {
-    name: 'Gap Gauntlet',
-    width: 5000,
-    goalX: 4800,
-    startX: 80,
-    terrain: generateTerrain(5000, [
-      {x:0,y:380},{x:200,y:380},{x:400,y:380},{x:600,y:420},{x:700,y:520}, // gap (deep)
-      {x:900,y:380},{x:1200,y:320},{x:1500,y:420},{x:1700,y:520},{x:1900,y:380},
-      {x:2300,y:360},{x:2600,y:300},{x:3000,y:420},{x:3400,y:360},{x:3800,y:300},
-      {x:4200,y:420},{x:4600,y:360},{x:5000,y:380}
-    ])
-  }
-];
-
-/* ---------- Utility: generateTerrain ----------
-   Smoothly interpolate given control points into a height map array for every x.
-*/
-function generateTerrain(width, points){
-  // points: array of {x,y} sorted by x
-  const map = new Float32Array(width+1);
-  for(let i=0;i<points.length-1;i++){
-    const a=points[i], b=points[i+1];
-    const dx = b.x - a.x;
-    for(let x=a.x; x<=b.x; x++){
-      const t = (x - a.x) / dx;
-      // smoothstep interpolation
-      const s = t*t*(3-2*t);
-      map[x] = a.y*(1-s) + b.y*s;
-    }
-  }
-  // fill any gaps
-  for(let x=0;x<=width;x++) if(!map[x]) map[x]=H-140;
-  return map;
-}
-
-/* ---------- Camera & Parallax ---------- */
-const camera = {x:0,y:0,shake:0};
-function worldToScreen(wx, wy){ return {x: wx - camera.x + 200, y: wy - camera.y}; }
-
-/* ---------- Player / Bike Physics ---------- */
-const bike = {
-  x: 100, y: 0, vx: 0, vy: 0,
-  angle: 0, angVel: 0,
-  width: 80, height: 36,
-  wheelBase: 48,
-  onGround: false,
-  fuel: 100
-};
-
-const physics = {
-  gravity: 0.9,
-  mass: 1.0,
-  throttlePower: 0.18,
-  brakePower: 0.28,
-  airDrag: 0.995,
-  angularDrag: 0.98,
-  suspension: 0.18,
-  maxLean: 0.9
-};
-
-/* ---------- Particles ---------- */
-const particles = [];
-function spawnParticle(x,y,dx,dy,color,life=40){
-  particles.push({x,y,dx,dy,color,life,age:0});
-}
-
-/* ---------- Input ---------- */
+/* ---------- Controls ---------- */
 const keys = {};
 addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-document.getElementById('leftTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowleft']=true});
-document.getElementById('leftTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowleft']=false});
-document.getElementById('rightTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowright']=true});
-document.getElementById('rightTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowright']=false});
-document.getElementById('throttleTouch').addEventListener('touchstart',e=>{e.preventDefault(); keys['arrowup']=true});
-document.getElementById('throttleTouch').addEventListener('touchend',e=>{e.preventDefault(); keys['arrowup']=false});
 
-/* ---------- Menu & UI ---------- */
-const startBtn = document.getElementById('startBtn');
-const menuBtn = document.getElementById('menuBtn');
-const levelsList = document.getElementById('levelsList');
-const scoreEl = document.getElementById('score');
-const levelNameEl = document.getElementById('levelName');
-const speedEl = document.getElementById('speed');
-const muteBtn = document.getElementById('muteBtn');
-
-startBtn.onclick = ()=>{ startLevel(currentLevel); };
-menuBtn.onclick = ()=>{ openMenu(); };
-muteBtn.onclick = ()=>{ mute = !mute; muteBtn.textContent = mute ? 'Unmute' : 'Mute'; };
+/* ---------- Levels (old top-down style) ----------
+   Each level defines lane count, enemy frequency, pickup frequency, background color accents.
+*/
+const levels = [
+  { name: 'Easy Streets', lanes: 3, enemyRate: 0.012, pickupRate: 0.008, accent:'#00f0ff' },
+  { name: 'Neon Rush', lanes: 4, enemyRate: 0.018, pickupRate: 0.01, accent:'#ff3d81' },
+  { name: 'Nightmare Alley', lanes: 5, enemyRate: 0.028, pickupRate: 0.012, accent:'#ffd166' }
+];
 
 /* populate level buttons */
 levels.forEach((lv,i)=>{
   const b = document.createElement('button');
-  b.className='levelBtn';
+  b.className = 'levelBtn';
   b.textContent = (i+1)+'. '+lv.name;
-  b.onclick = ()=>{ currentLevel = i; startLevel(i); };
+  b.onclick = ()=>{ currentLevel = i; highlightLevel(); };
   levelsList.appendChild(b);
 });
+function highlightLevel(){
+  Array.from(levelsList.children).forEach((btn,idx)=> btn.style.outline = idx===currentLevel ? '2px solid rgba(255,255,255,0.12)' : 'none');
+  levelLabel.textContent = (currentLevel+1) + ' - ' + levels[currentLevel].name;
+}
+highlightLevel();
 
-/* ---------- Audio (simple) ---------- */
-const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
-function playBeep(freq=440, time=0.06, vol=0.08){
-  if(mute || !audioCtx) return;
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type='sine'; o.frequency.value=freq;
-  g.gain.value=vol;
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(); o.stop(audioCtx.currentTime + time);
+/* ---------- Game objects ---------- */
+const player = { w:44, h:88, x: (W/2)-22, y: H-140, lane:0, color:'#00f0ff' };
+let enemies = [];
+let pickups = [];
+let laneX = []; // x positions of lanes
+
+/* ---------- Helpers ---------- */
+function rnd(min,max){ return Math.random()*(max-min)+min; }
+function rectCollide(a,b){
+  return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
 }
 
-/* ---------- Level Control ---------- */
-let levelData = null;
-function startLevel(idx){
-  levelData = JSON.parse(JSON.stringify(levels[idx])); // clone
-  bike.x = levelData.startX || 80;
-  bike.y = levelData.terrain[Math.floor(bike.x)] - 80;
-  bike.vx = 0; bike.vy = 0; bike.angle = 0; bike.angVel = 0; bike.onGround = false;
-  camera.x = Math.max(0, bike.x - 200);
-  score = 0;
-  state = 'playing';
-  levelNameEl.textContent = (idx+1)+' - '+levelData.name;
-  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-  playBeep(880,0.08,0.06);
+/* ---------- Spawn logic ---------- */
+function spawnEnemy(lv){
+  const lane = Math.floor(rnd(0, lv.lanes));
+  const x = laneX[lane] - 22;
+  enemies.push({ x, y: -120, w:44, h:88, spd: rnd(baseSpeed*0.9, baseSpeed*1.6) * speedMultiplier, color:'#222' });
+}
+function spawnPickup(){
+  const lane = Math.floor(rnd(0, levels[currentLevel].lanes));
+  const x = laneX[lane] - 12;
+  pickups.push({ x, y: -60, r:12, spd: 2.2 * speedMultiplier });
 }
 
-/* ---------- Physics Helpers ---------- */
-function groundAt(x){
-  const xi = Math.floor(Math.max(0, Math.min(levelData.width, x)));
-  return levelData.terrain[xi];
+/* ---------- Reset / Init ---------- */
+function initLevel(){
+  enemies = []; pickups = []; score = 0; speedMultiplier = 1.0;
+  const lv = levels[currentLevel];
+  // compute lane x positions centered on canvas
+  const roadW = W - 160;
+  const laneW = roadW / lv.lanes;
+  laneX = [];
+  const startX = 80 + laneW/2;
+  for(let i=0;i<lv.lanes;i++) laneX.push(startX + i*laneW);
+  // place player in middle lane
+  player.x = laneX[Math.floor(lv.lanes/2)] - player.w/2;
+  player.y = H - 140;
+  player.color = lv.accent;
+  document.body.style.background = `linear-gradient(180deg,#020317,${lv.accent}10)`;
+  levelLabel.textContent = (currentLevel+1) + ' - ' + lv.name;
+  scoreEl.textContent = '0';
+  speedEl.textContent = speedMultiplier.toFixed(2);
 }
+
+/* ---------- Menu / Buttons ---------- */
+startBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; initLevel(); };
+restartBtn.onclick = ()=>{ initLevel(); state='playing'; menuEl.style.display='none'; };
+menuToggle.onclick = ()=>{ if(state==='playing'){ state='paused'; menuEl.style.display='flex'; resumeBtn.style.display='inline-block'; } else { state='menu'; menuEl.style.display='flex'; resumeBtn.style.display='none'; } };
+resumeBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; };
 
 /* ---------- Game Loop ---------- */
 let last = performance.now();
 function loop(now){
-  const dt = Math.min(40, now - last) / 16.666; // normalized to ~60fps
+  const dt = Math.min(40, now - last) / 16.666;
   last = now;
   update(dt);
   render();
@@ -248,95 +188,74 @@ requestAnimationFrame(loop);
 /* ---------- Update ---------- */
 function update(dt){
   if(state !== 'playing') return;
+  const lv = levels[currentLevel];
 
-  // Input
+  // steering: left/right or a/d
   const left = keys['arrowleft'] || keys['a'];
   const right = keys['arrowright'] || keys['d'];
-  const throttle = keys['arrowup'] || keys['w'];
-  const brake = keys['arrowdown'] || keys['s'];
+  if(left) movePlayer(-1, dt);
+  if(right) movePlayer(1, dt);
 
-  // Apply torque for lean
-  const leanInput = (right ? 1 : 0) - (left ? 1 : 0);
-  bike.angVel += leanInput * 0.02 * dt;
-  bike.angVel *= physics.angularDrag;
+  // spawn enemies/pickups based on rates
+  if(Math.random() < lv.enemyRate * dt) spawnEnemy(lv);
+  if(Math.random() < lv.pickupRate * dt) spawnPickup();
 
-  // Throttle / brake affect forward velocity
-  const forward = throttle ? physics.throttlePower : 0;
-  const braking = brake ? physics.brakePower : 0;
-  bike.vx += forward * dt;
-  bike.vx *= physics.airDrag;
-
-  // Gravity
-  bike.vy += physics.gravity * dt;
-
-  // Integrate
-  bike.x += bike.vx * dt * 1.2;
-  bike.y += bike.vy * dt;
-  bike.angle += bike.angVel * dt;
-  bike.angle = Math.max(-physics.maxLean, Math.min(physics.maxLean, bike.angle));
-
-  // Ground collision & suspension
-  const groundY = groundAt(bike.x + bike.width*0.5);
-  const bikeBottom = bike.y + bike.height;
-  if(bikeBottom > groundY){
-    // on ground
-    bike.onGround = true;
-    // simple spring: push up
-    const penetration = bikeBottom - groundY;
-    bike.y -= penetration * physics.suspension * dt * 1.5;
-    // damp vertical velocity
-    bike.vy *= 0.4;
-    // friction slows vx
-    bike.vx *= 0.995;
-    // align angle to slope
-    const slope = (groundAt(bike.x+20) - groundAt(bike.x-20)) / 40;
-    const targetAngle = Math.atan2(-slope, 1);
-    bike.angle += (targetAngle - bike.angle) * 0.08 * dt;
-    // spawn dust when landing or moving fast
-    if(Math.abs(bike.vy) > 3 && Math.random() < 0.3) spawnParticle(bike.x+20, groundY-6, (Math.random()-0.5)*1.5, -1.2, 'rgba(200,255,200,0.9)', 30);
-  } else {
-    bike.onGround = false;
-    // air control: small torque from throttle/brake
-    bike.angVel += (throttle ? -0.01 : 0) * dt;
-    bike.angVel += (brake ? 0.01 : 0) * dt;
+  // update enemies
+  for(let i=enemies.length-1;i>=0;i--){
+    const e = enemies[i];
+    e.y += e.spd * dt * 12;
+    // if off screen, remove and reward small score
+    if(e.y > H + 200){ enemies.splice(i,1); score += 5; }
+    // collision with player
+    if(rectCollide({x:player.x,y:player.y,w:player.w,h:player.h}, e)){
+      // crash: go to gameover
+      state = 'gameover';
+      menuEl.style.display = 'flex';
+      resumeBtn.style.display = 'none';
+      startBtn.style.display = 'none';
+      playCrashEffect();
+    }
   }
 
-  // Camera follows
-  camera.x += (bike.x - camera.x - 200) * 0.06 * dt;
-  camera.y = 0;
-
-  // Particles update
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.dx * dt;
-    p.y += p.dy * dt;
-    p.dy += 0.06 * dt;
-    p.age += dt;
-    if(p.age > p.life) particles.splice(i,1);
+  // update pickups
+  for(let i=pickups.length-1;i>=0;i--){
+    const p = pickups[i];
+    p.y += p.spd * dt * 12;
+    if(p.y > H + 50){ pickups.splice(i,1); continue; }
+    // pickup collision (circle vs rect)
+    const px = p.x + p.r, py = p.y + p.r;
+    const closestX = Math.max(player.x, Math.min(px, player.x + player.w));
+    const closestY = Math.max(player.y, Math.min(py, player.y + player.h));
+    const dist = Math.hypot(px - closestX, py - closestY);
+    if(dist < p.r + 2){
+      pickups.splice(i,1);
+      score += 20;
+      speedMultiplier = Math.min(2.2, speedMultiplier + 0.06);
+      playPickupEffect();
+    }
   }
 
-  // Score & goal
-  score += Math.max(0, bike.vx * 0.02) * dt;
+  // gradually increase difficulty
+  speedMultiplier += 0.0006 * dt;
+  score += 0.02 * dt * Math.max(1, speedMultiplier);
   scoreEl.textContent = Math.floor(score);
-  speedEl.textContent = Math.abs(bike.vx).toFixed(1);
+  speedEl.textContent = speedMultiplier.toFixed(2);
+}
 
-  if(bike.x >= levelData.goalX){
-    state = 'levelComplete';
-    playBeep(1200,0.12,0.08);
-    setTimeout(()=>{ currentLevel = Math.min(levels.length-1, currentLevel+1); openMenu(); }, 800);
+/* move player between lanes smoothly */
+function movePlayer(dir, dt){
+  const lv = levels[currentLevel];
+  // find nearest lane index
+  let nearest = 0, best = Infinity;
+  for(let i=0;i<lv.lanes;i++){
+    const dx = (player.x + player.w/2) - laneX[i];
+    if(Math.abs(dx) < best){ best = Math.abs(dx); nearest = i; }
   }
-
-  // Crash detection: flip too far or fall into deep gap
-  if(Math.abs(bike.angle) > 1.6 || bike.y > H + 200){
-    state = 'gameOver';
-    playBeep(120,0.4,0.12);
-    setTimeout(()=> openMenu(), 900);
-  }
-
-  // spawn small sparks when hitting obstacles at speed
-  if(Math.random() < 0.02 && bike.onGround && Math.abs(bike.vx) > 6){
-    spawnParticle(bike.x + Math.random()*40, groundAt(bike.x) - 6, (Math.random()-0.5)*2, -Math.random()*1.5, 'rgba(255,200,120,0.95)', 30);
-  }
+  let targetIdx = nearest + dir;
+  targetIdx = Math.max(0, Math.min(lv.lanes-1, targetIdx));
+  const targetX = laneX[targetIdx] - player.w/2;
+  // smooth move
+  player.x += (targetX - player.x) * Math.min(1, 0.18 * dt);
 }
 
 /* ---------- Render ---------- */
@@ -344,162 +263,100 @@ function render(){
   // clear
   ctx.clearRect(0,0,W,H);
 
-  // background gradient
+  // background
   const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#071026'); g.addColorStop(1,'#020617');
+  g.addColorStop(0,'#071026'); g.addColorStop(1,'#020317');
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // parallax mountains
-  drawParallax();
+  // draw road
+  drawRoad();
 
-  // draw terrain
-  drawTerrain();
+  // draw lane markers
+  drawLanes();
 
-  // draw goal flag
-  const goalScreen = worldToScreen(levelData.goalX, groundAt(levelData.goalX));
-  ctx.save();
-  ctx.translate(goalScreen.x, goalScreen.y);
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fillRect(-6,-80,12,80);
-  ctx.fillStyle = 'linear-gradient(#ff3d81,#00f0ff)';
-  ctx.beginPath();
-  ctx.moveTo(6,-70); ctx.lineTo(36,-50); ctx.lineTo(6,-30); ctx.closePath();
-  ctx.fillStyle = '#ff3d81'; ctx.fill();
-  ctx.restore();
-
-  // draw particles
-  particles.forEach(p=>{
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = 1 - (p.age / p.life);
-    ctx.beginPath(); ctx.arc(p.x - camera.x + 200, p.y, 3,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
+  // draw pickups
+  pickups.forEach(p=>{
+    ctx.fillStyle = '#00ff88';
+    ctx.beginPath(); ctx.arc(p.x + p.r, p.y + p.r, p.r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fillRect(p.x + p.r - 6, p.y + p.r - 6, 12, 12);
   });
 
-  // draw bike shadow
-  const bikeScreen = worldToScreen(bike.x, bike.y);
-  ctx.save();
-  ctx.translate(bikeScreen.x + bike.width*0.5, bikeScreen.y + bike.height*0.9);
-  ctx.rotate(bike.angle);
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fillRect(-bike.width*0.5, 6, bike.width, 8);
-  ctx.restore();
+  // draw enemies
+  enemies.forEach(e=>{
+    drawCar(e.x, e.y, e.w, e.h, '#222', true);
+  });
 
-  // draw bike (stylized)
-  drawBike(bikeScreen.x, bikeScreen.y, bike.angle);
+  // draw player
+  drawCar(player.x, player.y, player.w, player.h, player.color, false);
 
-  // HUD overlays
-  if(state === 'menu' || state === 'paused'){
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(120,60,760,380);
-    ctx.fillStyle = '#fff';
-    ctx.font = '28px Inter';
-    ctx.fillText(state === 'menu' ? 'Main Menu' : 'Paused', 160, 110);
+  // HUD overlay when paused or gameover
+  if(state === 'paused'){
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#fff'; ctx.font = '28px Inter'; ctx.fillText('Paused', W/2 - 50, H/2);
   }
-  if(state === 'levelComplete'){
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = '#00ffcc';
-    ctx.font = '36px Inter';
-    ctx.fillText('Level Complete!', W/2 - 140, H/2 - 10);
-    ctx.font = '20px Inter';
-    ctx.fillStyle = '#cfe9ff';
-    ctx.fillText('Score: '+Math.floor(score), W/2 - 60, H/2 + 30);
-  }
-  if(state === 'gameOver'){
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = '#ff6b6b';
-    ctx.font = '36px Inter';
-    ctx.fillText('Crashed!', W/2 - 70, H/2 - 10);
-    ctx.font = '20px Inter';
-    ctx.fillStyle = '#cfe9ff';
-    ctx.fillText('Score: '+Math.floor(score), W/2 - 60, H/2 + 30);
+  if(state === 'gameover'){
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#ff6b6b'; ctx.font = '36px Inter'; ctx.fillText('Crashed!', W/2 - 70, H/2 - 10);
+    ctx.fillStyle = '#cfe9ff'; ctx.font = '18px Inter'; ctx.fillText('Score: ' + Math.floor(score), W/2 - 50, H/2 + 20);
   }
 }
 
-/* ---------- Draw Helpers ---------- */
-function drawParallax(){
-  // distant mountains
-  for(let layer=0; layer<3; layer++){
-    const speed = 0.1 + layer*0.06;
+/* draw road and side glow */
+function drawRoad(){
+  // side background
+  ctx.fillStyle = '#071026'; ctx.fillRect(0,0,W,H);
+  // road
+  ctx.fillStyle = '#0b1220'; ctx.fillRect(80,0,W-160,H);
+  // side glow
+  ctx.fillStyle = 'rgba(0,240,255,0.04)'; ctx.fillRect(70,0,10,H); ctx.fillRect(W-80,0,10,H);
+  // center dashed
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 6; ctx.setLineDash([30,20]);
+  ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
+}
+
+/* draw lanes based on laneX */
+function drawLanes(){
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 2;
+  for(let i=0;i<laneX.length;i++){
+    const x = laneX[i];
     ctx.beginPath();
-    const baseY = 120 + layer*40;
-    ctx.moveTo(0, H);
-    for(let x=0; x<=W; x+=40){
-      const wx = camera.x * speed + x;
-      const h = 40 + Math.sin((wx*0.002)+layer) * (20 + layer*10);
-      ctx.lineTo(x, baseY + h);
-    }
-    ctx.lineTo(W,H);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(${20+layer*20},${30+layer*30},${60+layer*40},${0.08 + layer*0.04})`;
-    ctx.fill();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
   }
-}
-
-function drawTerrain(){
-  ctx.save();
-  ctx.translate(200 - camera.x, 0);
-  // ground fill
-  ctx.beginPath();
-  ctx.moveTo(-200, H);
-  for(let x=0; x<=levelData.width; x+=4){
-    const y = groundAt(x);
-    ctx.lineTo(x, y);
-  }
-  ctx.lineTo(levelData.width+200, H);
-  ctx.closePath();
-  const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#0b1220'); g.addColorStop(1,'#071026');
-  ctx.fillStyle = g;
-  ctx.fill();
-
-  // road edge glow
-  ctx.strokeStyle = 'rgba(0,240,255,0.06)';
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  for(let x=0; x<=levelData.width; x+=8){
-    const y = groundAt(x);
-    if(x===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-
-  // small obstacles (rocks)
-  for(let x=200; x<levelData.width; x+=400){
-    const y = groundAt(x);
-    ctx.fillStyle = '#2b2b2b';
-    ctx.beginPath(); ctx.ellipse(x, y-8, 12,8,0,0,Math.PI*2); ctx.fill();
-  }
-
   ctx.restore();
 }
 
-function drawBike(sx, sy, angle){
-  ctx.save();
-  ctx.translate(sx + bike.width*0.5, sy + bike.height*0.5);
-  ctx.rotate(angle);
+/* draw a stylized car */
+function drawCar(x,y,w,h,color,isEnemy){
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(x+6, y+h-6, w-12, 8);
   // body
-  ctx.fillStyle = '#ff3d81';
-  roundRect(ctx, -bike.width*0.5, -bike.height*0.5, bike.width, bike.height, 8);
-  ctx.fillStyle = '#001';
-  roundRect(ctx, -bike.width*0.5 + 8, -bike.height*0.5 + 8, bike.width-16, bike.height-16, 6);
+  ctx.fillStyle = color;
+  roundRect(ctx, x, y, w, h, 8);
+  // windshield
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillRect(x+8, y+8, w-16, 10);
   // wheels
   ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.arc(-bike.width*0.25, bike.height*0.35, 14,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(bike.width*0.25, bike.height*0.35, 14,0,Math.PI*2); ctx.fill();
-  // wheel rims
-  ctx.fillStyle = '#9fb8d9';
-  ctx.beginPath(); ctx.arc(-bike.width*0.25, bike.height*0.35, 6,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(bike.width*0.25, bike.height*0.35, 6,0,Math.PI*2); ctx.fill();
-  // neon accent
-  ctx.strokeStyle = 'rgba(0,240,255,0.9)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(-bike.width*0.5+2, -bike.height*0.5+2, bike.width-4, bike.height-4);
-  ctx.restore();
+  ctx.fillRect(x+6, y+h-14, 12, 8);
+  ctx.fillRect(x+w-18, y+h-14, 12, 8);
+  // enemy accent
+  if(isEnemy){
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x+4, y+4, w-8, 6);
+  } else {
+    // neon outline for player
+    ctx.strokeStyle = 'rgba(0,240,255,0.9)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x+1, y+1, w-2, h-2);
+  }
 }
 
-/* ---------- Helpers ---------- */
+/* rounded rect helper */
 function roundRect(ctx,x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);
@@ -511,43 +368,36 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.fill();
 }
 
-/* ---------- Menu functions ---------- */
-function openMenu(){
-  state = 'menu';
-  // show menu panel
-  document.getElementById('mainMenu').style.display = 'flex';
+/* ---------- Simple sound effects (tiny beeps) ---------- */
+const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+function playTone(freq, dur=0.06, vol=0.06){
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine'; o.frequency.value = freq;
+  g.gain.value = vol;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + dur);
 }
-function hideMenu(){
-  document.getElementById('mainMenu').style.display = 'none';
-}
+function playPickupEffect(){ playTone(880,0.06,0.06); }
+function playCrashEffect(){ playTone(120,0.3,0.12); }
 
-/* ---------- Start with menu ---------- */
-openMenu();
+/* ---------- Start with menu visible ---------- */
+menuEl.style.display = 'flex';
+startBtn.style.display = 'inline-block';
+resumeBtn.style.display = 'none';
 
-/* ---------- Optional: keyboard shortcuts ---------- */
+/* ---------- Keyboard shortcuts ---------- */
 addEventListener('keydown', e=>{
-  if(e.key === 'Escape'){ if(state === 'playing') { state='paused'; openMenu(); } else if(state==='paused'){ state='playing'; hideMenu(); } }
-  if(e.key === 'r'){ if(state==='playing' || state==='gameOver') startLevel(currentLevel); }
+  if(e.key === 'Escape'){
+    if(state === 'playing'){ state='paused'; menuEl.style.display='flex'; resumeBtn.style.display='inline-block'; }
+    else if(state === 'paused'){ state='playing'; menuEl.style.display='none'; }
+  }
+  if(e.key === 'r'){ initLevel(); state='playing'; menuEl.style.display='none'; }
 });
 
-/* ---------- Touch: hide menu on start ---------- */
-startBtn.addEventListener('click', ()=>{ hideMenu(); });
-
-/* ---------- Initialize canvas size to device pixel ratio ---------- */
-(function setCanvasDPR(){
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-})();
-
-/* ---------- Small polish: spawn ambient particles occasionally ---------- */
-setInterval(()=>{ if(state==='playing' && Math.random()<0.6) spawnParticle(camera.x + Math.random()*800, 60 + Math.random()*40, (Math.random()-0.5)*0.2, 0.2, 'rgba(0,240,255,0.06)', 120); }, 200);
-
-/* ---------- Expose for debugging ---------- */
-window._game = { bike, levels, startLevel, state };
+/* ---------- Ensure audio context resumes on first interaction (mobile) ---------- */
+document.addEventListener('click', ()=>{ if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, {once:true});
 </script>
 </body>
 </html>
