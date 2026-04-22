@@ -3,17 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Arcade Stunt Run</title>
+<title>MotoX Rally</title>
 <style>
   :root{
-    --bg-dark:#071026;
-    --road:#0b1220;
-    --neon:#00f0ff;
-    --accent:#ff3d81;
-    --glass: rgba(10,18,30,0.6);
+    --bg:#071026; --road:#0b1220; --neon:#00f0ff; --accent:#ff3d81;
+    --glass: rgba(8,12,20,0.6);
   }
   html,body{height:100%;margin:0;background:linear-gradient(180deg,#020317 0%,#071026 100%);font-family:Inter,system-ui,Arial;color:#dff6ff}
-  .wrap{max-width:1100px;margin:18px auto;padding:12px}
+  .wrap{max-width:1200px;margin:18px auto;padding:12px}
   header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   h1{color:var(--neon);margin:0;font-size:20px}
   .panel{background:var(--glass);padding:8px 12px;border-radius:10px}
@@ -21,68 +18,77 @@
   .hud{display:flex;gap:12px;align-items:center}
   button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
   .menuOverlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
-  .menuCard{width:640px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .menuCard{width:720px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
   .levels{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
   .small{font-size:13px;color:#9fb8d9}
   .center{display:flex;justify-content:center;gap:8px;margin-top:12px}
-  .stat{font-weight:700;color:var(--neon)}
   .hudRight{display:flex;gap:10px;align-items:center}
-  .best{font-size:12px;color:#9fb8d9}
+  .stat{font-weight:700;color:var(--neon)}
+  .controls{font-size:13px;color:#9fb8d9;margin-top:8px}
+  @media (max-width:800px){ .menuCard{width:92%} canvas{height:360px} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div>
-      <h1>Arcade Stunt Run</h1>
-      <div class="small">Perform flips, collect coins, hit checkpoints, beat the clock</div>
+      <h1>MotoX Rally</h1>
+      <div class="small">Race AI opponents, perform stunts, beat checkpoints — Moto X3M inspired physics</div>
     </div>
     <div class="panel hud">
-      <div>Score: <span id="score">0</span></div>
-      <div>Time: <span id="timer">60</span>s</div>
-      <div>Level: <span id="levelLabel">1</span></div>
+      <div>Position: <span id="pos">1/4</span></div>
+      <div>Lap: <span id="lap">1</span>/<span id="lapsTotal">2</span></div>
+      <div>Time: <span id="time">0.00</span>s</div>
       <div class="hudRight"><button id="menuToggle">Menu</button></div>
     </div>
   </header>
 
   <div style="position:relative">
-    <canvas id="game" width="1000" height="540"></canvas>
+    <canvas id="game" width="1100" height="560"></canvas>
 
     <div id="menu" class="menuOverlay" style="display:flex">
       <div class="menuCard">
-        <h2 style="margin:0;color:var(--neon)">Main Menu</h2>
-        <p class="small" style="margin-top:8px">Choose a level and game mode. Stunt Run rewards airtime and rotations. Best times are saved locally.</p>
+        <h2 style="margin:0;color:var(--neon)">MotoX Rally — Main Menu</h2>
+        <p class="small" style="margin-top:8px">Select a map, choose laps, then press Start. Race AI opponents or practice stunts.</p>
 
         <div style="margin-top:12px">
-          <label class="small">Select Level</label>
+          <label class="small">Select Map</label>
           <div class="levels" id="levelsList"></div>
         </div>
 
         <div style="margin-top:12px">
-          <label class="small">Mode</label>
+          <label class="small">Laps</label>
           <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="modeStunt" class="levelBtn">Stunt Run</button>
-            <button id="modeTime" class="levelBtn">Time Trial</button>
-            <button id="modeCollect" class="levelBtn">Coin Rush</button>
+            <button class="levelBtn" data-laps="1">1</button>
+            <button class="levelBtn" data-laps="2">2</button>
+            <button class="levelBtn" data-laps="3">3</button>
           </div>
         </div>
 
         <div class="center">
-          <button id="startBtn">Start</button>
+          <button id="startBtn">Start Race</button>
+          <button id="aiToggle">AI: On</button>
           <button id="restartBtn">Restart</button>
         </div>
 
-        <div style="margin-top:12px" class="small">Best times: <span id="bestTime" class="best">—</span></div>
+        <div class="controls">Controls: ←/→ or A/D to lean; ↑/W to accelerate; ↓/S to brake; Space to flip in air; R to restart; Esc for menu.</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ---------- Canvas and DPR ---------- */
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+/* =========================
+   MotoX Rally - Single File
+   Features:
+   - AI opponents with path following
+   - Moto X3M-like bike physics (gravity, torque, flips, suspension)
+   - Multiple themed maps with "real-life" scenery (city bridge, desert highway, mountain pass)
+   - Main menu, level select, laps, checkpoints
+   ========================= */
+
+const canvas = document.getElementById('game'), ctx = canvas.getContext('2d');
 let W = canvas.width, H = canvas.height;
 (function setDPR(){
   const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -97,146 +103,273 @@ const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
 const menuToggle = document.getElementById('menuToggle');
 const levelsList = document.getElementById('levelsList');
-const scoreEl = document.getElementById('score');
-const timerEl = document.getElementById('timer');
-const levelLabel = document.getElementById('levelLabel');
-const bestTimeEl = document.getElementById('bestTime');
+const aiToggle = document.getElementById('aiToggle');
+const posEl = document.getElementById('pos');
+const lapEl = document.getElementById('lap');
+const lapsTotalEl = document.getElementById('lapsTotal');
+const timeEl = document.getElementById('time');
 
-/* ---------- State ---------- */
-let state = 'menu';
-let currentLevel = 0;
-let mode = 'stunt';
-let score = 0;
-let timer = 60;
-let bestTimes = JSON.parse(localStorage.getItem('stunt_best') || '{}');
+let showAI = true;
+aiToggle.onclick = ()=>{ showAI = !showAI; aiToggle.textContent = 'AI: ' + (showAI ? 'On' : 'Off'); };
 
 /* ---------- Controls ---------- */
 const keys = {};
 addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
-/* ---------- Levels with scenery and ramp layouts ---------- */
-const levels = [
+/* ---------- Game state ---------- */
+let state = 'menu'; // menu, racing, paused, finished
+let currentMap = 0;
+let lapsToDo = 2;
+let raceTime = 0;
+let players = []; // includes player and AI
+let checkpoints = [];
+let lapsTotal = 2;
+
+/* ---------- Maps (real-life inspired scenes) ----------
+   Each map has:
+   - name, length, path (array of points), scenery function, start positions
+*/
+const maps = [
   {
-    name: 'Neon City',
-    bg: 'city',
-    time: 60,
-    ramps: [
-      {x: 400, w: 120, h: -80},
-      {x: 900, w: 160, h: -120},
-      {x: 1500, w: 140, h: -100},
-      {x: 2100, w: 180, h: -140}
-    ],
-    coins: [500, 950, 1600, 2200],
-    checkpoints: [1200, 2400],
-    accent: '#00f0ff'
+    name: 'Bay Bridge Circuit',
+    length: 3600,
+    laps: 2,
+    accent: '#00f0ff',
+    // path: array of {x,y} world coordinates forming a closed loop
+    path: generateOvalPath(3600, 220, 160, 0.5),
+    scenery: drawCityBridge,
+    startOffsets: [0, -40, -80, -120]
   },
   {
-    name: 'Desert Dunes',
-    bg: 'desert',
-    time: 70,
-    ramps: [
-      {x: 300, w: 140, h: -90},
-      {x: 700, w: 100, h: -70},
-      {x: 1200, w: 200, h: -150},
-      {x: 1900, w: 160, h: -110}
-    ],
-    coins: [350, 760, 1250, 1950],
-    checkpoints: [1000, 2000],
-    accent: '#ffd166'
+    name: 'Desert Highway',
+    length: 4200,
+    laps: 2,
+    accent: '#ffd166',
+    path: generateSinePath(4200, 220, 0.006, 60),
+    scenery: drawDesert,
+    startOffsets: [0, -40, -80, -120]
   },
   {
-    name: 'Forest Run',
-    bg: 'forest',
-    time: 65,
-    ramps: [
-      {x: 420, w: 110, h: -70},
-      {x: 820, w: 150, h: -110},
-      {x: 1400, w: 130, h: -90},
-      {x: 2000, w: 170, h: -130}
-    ],
-    coins: [480, 860, 1450, 2050],
-    checkpoints: [1100, 2300],
-    accent: '#7be495'
+    name: 'Mountain Pass',
+    length: 4800,
+    laps: 2,
+    accent: '#7be495',
+    path: generateWindingPath(4800, 220, 0.008, 120),
+    scenery: drawMountain,
+    startOffsets: [0, -40, -80, -120]
   }
 ];
 
 /* populate level buttons */
-levels.forEach((lv,i)=>{
+maps.forEach((m,i)=>{
   const b = document.createElement('button');
   b.className = 'levelBtn';
-  b.textContent = (i+1)+'. '+lv.name;
-  b.onclick = ()=>{ currentLevel = i; updateMenuPreview(); };
+  b.textContent = (i+1)+'. '+m.name;
+  b.onclick = ()=>{ currentMap = i; highlightMap(); };
   levelsList.appendChild(b);
 });
-function updateMenuPreview(){
-  levelLabel.textContent = (currentLevel+1) + ' - ' + levels[currentLevel].name;
-  const key = currentLevel + '_' + mode;
-  bestTimeEl.textContent = bestTimes[key] ? bestTimes[key].toFixed(2) + 's' : '—';
+function highlightMap(){
+  Array.from(levelsList.children).forEach((btn,idx)=> btn.style.outline = idx===currentMap ? '2px solid rgba(255,255,255,0.12)' : 'none');
 }
-updateMenuPreview();
+highlightMap();
 
-/* mode buttons */
-document.getElementById('modeStunt').onclick = ()=>{ mode='stunt'; updateMenuPreview(); };
-document.getElementById('modeTime').onclick = ()=>{ mode='time'; updateMenuPreview(); };
-document.getElementById('modeCollect').onclick = ()=>{ mode='collect'; updateMenuPreview(); };
+/* lap buttons */
+Array.from(document.querySelectorAll('[data-laps]')).forEach(btn=>{
+  btn.onclick = ()=>{ lapsToDo = parseInt(btn.dataset.laps); lapsTotalEl.textContent = lapsToDo; };
+});
+lapsTotalEl.textContent = lapsToDo;
 
-/* ---------- Player and world ---------- */
-const world = { width: 2800, scroll: 0, speed: 0 };
-const bike = {
-  x: 160, y: 0, w: 64, h: 28,
-  vx: 0, vy: 0, angle: 0, angVel: 0,
-  onGround: true, airtime: 0, rotationAccum: 0
+/* ---------- Utility path generators ---------- */
+function generateOvalPath(length, centerY, radiusX, curvature){
+  // returns array of points along an oval-like loop
+  const pts = [];
+  const segments = Math.floor(length / 8);
+  for(let i=0;i<segments;i++){
+    const t = i / segments;
+    const angle = t * Math.PI * 2;
+    const x = i * (length / segments);
+    const y = centerY + Math.sin(angle * curvature) * radiusX;
+    pts.push({x, y});
+  }
+  // ensure closed loop by mapping x modulo length
+  return pts;
+}
+function generateSinePath(length, centerY, freq, amp){
+  const pts = [];
+  const segments = Math.floor(length / 6);
+  for(let i=0;i<segments;i++){
+    const x = i * (length / segments);
+    const y = centerY + Math.sin(x * freq) * amp;
+    pts.push({x,y});
+  }
+  return pts;
+}
+function generateWindingPath(length, centerY, freq, amp){
+  const pts = [];
+  const segments = Math.floor(length / 6);
+  for(let i=0;i<segments;i++){
+    const x = i * (length / segments);
+    const y = centerY + Math.sin(x * freq) * amp + Math.cos(x * freq * 0.6) * (amp*0.4);
+    pts.push({x,y});
+  }
+  return pts;
+}
+
+/* ---------- Player & AI template ---------- */
+function createRider(isPlayer, startOffset, color){
+  return {
+    isPlayer,
+    color,
+    worldX: startOffset, // distance along path
+    speed: 0,
+    vx: 0,
+    vy: 0,
+    angle: 0,
+    angVel: 0,
+    onGround: true,
+    airtime: 0,
+    rotationAccum: 0,
+    lap: 1,
+    checkpointIndex: 0,
+    finished: false,
+    name: isPlayer ? 'You' : 'AI'
+  };
+}
+
+/* ---------- Race initialization ---------- */
+function initRace(){
+  const map = maps[currentMap];
+  players = [];
+  const startOffsets = map.startOffsets;
+  for(let i=0;i<4;i++){
+    const rider = createRider(i===0, startOffsets[i] || 0, i===0 ? map.accent : (i===1? '#ff6b6b' : (i===2? '#ffd166' : '#9fb8d9')));
+    // offset them slightly along path
+    rider.worldX = (startOffsets[i] || 0) + (i*20);
+    players.push(rider);
+  }
+  // checkpoints: divide path into segments
+  checkpoints = [];
+  const cpCount = 6;
+  for(let i=1;i<=cpCount;i++){
+    checkpoints.push(Math.floor((i/cpCount) * map.length));
+  }
+  lapsTotal = lapsToDo;
+  raceTime = 0;
+  document.getElementById('pos').textContent = '1/' + players.length;
+  document.getElementById('lap').textContent = '1';
+  document.getElementById('lapsTotal').textContent = lapsTotal;
+}
+
+/* ---------- Physics parameters (Moto X3M-like) ---------- */
+const phys = {
+  gravity: 0.9,
+  throttle: 0.18,
+  brake: 0.28,
+  airControl: 0.02,
+  angularDrag: 0.985,
+  airDrag: 0.995,
+  maxLean: 1.2,
+  suspension: 0.18
 };
-let ramps = [], coins = [], checkpoints = [];
 
-/* ---------- Particles ---------- */
-const particles = [];
-function spawnParticle(x,y,dx,dy,color,life=40){ particles.push({x,y,dx,dy,color,life,age:0}); }
+/* ---------- AI behavior ----------
+   Simple path-following with speed profile and jump handling.
+*/
+function updateAI(ai, map, dt){
+  if(ai.finished) return;
+  // target speed depends on upcoming ramp and curvature
+  const lookAhead = 60;
+  const nextX = (ai.worldX + lookAhead) % map.length;
+  // simple speed target
+  let target = 6 + Math.sin(ai.worldX*0.002)*1.5;
+  // if approaching ramp, increase speed
+  for(const r of map.ramps || []){ if(nextX > r.x - 40 && nextX < r.x + r.w + 40) target += 2.5; }
+  // accelerate/decelerate
+  if(ai.speed < target) ai.speed += phys.throttle * dt * 0.8;
+  else ai.speed -= phys.brake * dt * 0.6;
+  ai.speed = Math.max(0, Math.min(12, ai.speed));
+  // handle jumps: if ramp ahead and on ground, launch
+  const ramp = rampAt(map, ai.worldX);
+  if(ramp && ai.onGround){
+    ai.vy = -6 - Math.min(6, ai.speed * 0.35);
+    ai.onGround = false;
+  }
+  // air rotation: small automatic correction to land upright
+  if(!ai.onGround){
+    ai.angVel += (Math.random()-0.5)*0.002 * dt;
+    ai.angle += ai.angVel * dt;
+    ai.vy += phys.gravity * dt;
+    ai.worldX += ai.speed * dt * 1.2;
+    // landing detection
+    const groundY = groundYAt(map, ai.worldX);
+    if(ai.vy > 0 && ai.worldY + 24 >= groundY){
+      ai.onGround = true;
+      ai.vy = 0;
+      ai.angle = 0;
+    }
+  } else {
+    ai.worldX += ai.speed * dt * 1.2;
+  }
+  // lap handling
+  if(ai.worldX >= map.length){
+    ai.worldX -= map.length;
+    ai.lap++;
+    if(ai.lap > lapsTotal) ai.finished = true;
+  }
+}
+
+/* ---------- Helper: ramp detection ---------- */
+function rampAt(map, worldX){
+  if(!map.ramps) return null;
+  for(const r of map.ramps){
+    if(worldX >= r.x && worldX <= r.x + r.w) return r;
+  }
+  return null;
+}
+
+/* ---------- Ground Y sampling ---------- */
+function groundYAt(map, worldX){
+  // sample path point nearest to worldX
+  const pts = map.path;
+  const idx = Math.floor((worldX / map.length) * pts.length) % pts.length;
+  const p = pts[idx];
+  // base road Y near bottom
+  const base = H - 140;
+  // combine path y with base
+  return base + (p ? p.y : 0);
+}
+
+/* ---------- Map ramp definitions (realistic ramps placed on maps) ---------- */
+maps[0].ramps = [
+  {x: 420, w: 120, h: -90},
+  {x: 980, w: 160, h: -120},
+  {x: 1700, w: 140, h: -100},
+  {x: 2600, w: 180, h: -140}
+];
+maps[1].ramps = [
+  {x: 300, w: 140, h: -90},
+  {x: 760, w: 100, h: -70},
+  {x: 1400, w: 200, h: -150},
+  {x: 2200, w: 160, h: -110}
+];
+maps[2].ramps = [
+  {x: 420, w: 110, h: -70},
+  {x: 920, w: 150, h: -110},
+  {x: 1600, w: 130, h: -90},
+  {x: 2400, w: 170, h: -130}
+];
+
+/* ---------- Start / Menu handlers ---------- */
+startBtn.onclick = ()=>{ menuEl.style.display='none'; state='racing'; initRace(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); };
+restartBtn.onclick = ()=>{ initRace(); state='racing'; menuEl.style.display='none'; };
+menuToggle.onclick = ()=>{ menuEl.style.display = (menuEl.style.display === 'none') ? 'flex' : 'none'; state = (menuEl.style.display === 'none') ? 'racing' : 'menu'; };
 
 /* ---------- Audio helper ---------- */
 const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
 function beep(freq=440, t=0.06, vol=0.06){ if(!audioCtx) return; const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+t); }
 
-/* ---------- Init level ---------- */
-function initLevel(){
-  const lv = levels[currentLevel];
-  ramps = lv.ramps.map(r=>Object.assign({}, r));
-  coins = lv.coins.map(x=>({x,y: groundYAt(x)-40, collected:false}));
-  checkpoints = lv.checkpoints.map(x=>({x,passed:false}));
-  world.width = Math.max(2600, ramps[ramps.length-1].x + 600);
-  bike.x = 160; bike.y = groundYAt(0) - 40; bike.vx = 0; bike.vy = 0; bike.angle = 0; bike.angVel = 0; bike.onGround = true; bike.airtime = 0; bike.rotationAccum = 0;
-  world.scroll = 0; world.speed = 0;
-  score = 0; timer = lv.time;
-  scoreEl.textContent = Math.floor(score); timerEl.textContent = Math.ceil(timer);
-  levelLabel.textContent = (currentLevel+1) + ' - ' + lv.name;
-}
-
-/* ground profile simple function */
-function groundYAt(x){
-  // base road y
-  const base = H - 120;
-  // small sine bumps for variety
-  return base + Math.sin(x*0.004)*18 + Math.cos(x*0.002)*10;
-}
-
-/* ramp surface function returns ramp top y for x inside ramp */
-function rampTopAt(x){
-  for(const r of ramps){
-    if(x >= r.x && x <= r.x + r.w){
-      const t = (x - r.x) / r.w;
-      return groundYAt(r.x) + r.h * (1 - (t)); // simple incline
-    }
-  }
-  return null;
-}
-
-/* ---------- Menu and controls ---------- */
-startBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; initLevel(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); };
-restartBtn.onclick = ()=>{ initLevel(); state='playing'; menuEl.style.display='none'; };
-menuToggle.onclick = ()=>{ menuEl.style.display = (menuEl.style.display === 'none') ? 'flex' : 'none'; state = (menuEl.style.display === 'none') ? 'playing' : 'menu'; };
-
-/* ---------- Game loop ---------- */
+/* ---------- Main loop ---------- */
 let last = performance.now();
 function loop(now){
   const dt = Math.min(40, now - last) / 16.666;
@@ -249,279 +382,250 @@ requestAnimationFrame(loop);
 
 /* ---------- Update ---------- */
 function update(dt){
-  if(state !== 'playing') return;
-  const lv = levels[currentLevel];
+  if(state !== 'racing') return;
+  const map = maps[currentMap];
+  raceTime += dt * (1/60) * 16.666;
+  // ensure players exist
+  if(players.length === 0) initRace();
 
-  // input
-  const left = keys['arrowleft'] || keys['a'];
-  const right = keys['arrowright'] || keys['d'];
-  const up = keys['arrowup'] || keys['w'];
-  const down = keys['arrowdown'] || keys['s'];
-  const flip = keys[' '] || keys['space'];
+  // update player (players[0])
+  const rider = players[0];
+  if(!rider.finished){
+    // input
+    const left = keys['arrowleft'] || keys['a'];
+    const right = keys['arrowright'] || keys['d'];
+    const up = keys['arrowup'] || keys['w'];
+    const down = keys['arrowdown'] || keys['s'];
+    const flip = keys[' '] || keys['space'];
 
-  // throttle and braking
-  const accel = up ? 0.18 : 0.06;
-  const brake = down ? 0.3 : 0;
-  bike.vx += (accel - brake) * dt;
-  bike.vx = Math.max(0, Math.min(12, bike.vx));
+    // throttle/brake
+    const accel = up ? phys.throttle : phys.throttle * 0.2;
+    const braking = down ? phys.brake : 0;
+    rider.speed += (accel - braking) * dt;
+    rider.speed = Math.max(0, Math.min(12, rider.speed));
 
-  // world scroll follows bike
-  world.scroll += bike.vx * dt * 6;
-  world.scroll = Math.max(0, Math.min(world.width - 800, world.scroll));
-
-  // horizontal position relative to world
-  const worldX = world.scroll + bike.x;
-
-  // ramp interaction
-  const rampTop = rampTopAt(worldX);
-  if(rampTop !== null){
-    // if approaching ramp, set bike y to ramp top when on ground
-    if(bike.onGround && bike.y + bike.h >= rampTop - 2){
+    // world movement
+    // check ramp
+    const r = rampAt(map, rider.worldX);
+    if(r && rider.onGround && rider.speed > 3){
       // launch
-      bike.vy = -6 - Math.min(6, bike.vx * 0.4);
-      bike.onGround = false;
-      spawnParticle(bike.x + 10, rampTop, -1, -1.2, 'rgba(255,200,120,0.9)', 30);
+      rider.vy = -6 - Math.min(6, rider.speed * 0.35);
+      rider.onGround = false;
       beep(880,0.04,0.04);
     }
-  }
 
-  // gravity
-  bike.vy += 0.35 * dt;
-  bike.y += bike.vy * dt * 12;
-
-  // rotation in air
-  if(!bike.onGround){
-    // player can add rotation
-    const rotInput = (right ? 0.02 : 0) - (left ? 0.02 : 0);
-    bike.angVel += rotInput * dt;
-    if(flip){
-      bike.angVel += 0.06 * dt;
+    // air physics
+    if(!rider.onGround){
+      // air control
+      const rotInput = (right ? 0.02 : 0) - (left ? 0.02 : 0);
+      rider.angVel += rotInput * dt;
+      if(flip) rider.angVel += 0.06 * dt;
+      rider.angle += rider.angVel * dt;
+      rider.vy += phys.gravity * dt;
+      rider.worldY = (rider.worldY || 0) + rider.vy * dt * 12;
+      rider.worldX += rider.speed * dt * 1.2;
+      rider.rotationAccum = (rider.rotationAccum || 0) + Math.abs(rider.angVel * dt);
+    } else {
+      rider.worldX += rider.speed * dt * 1.2;
     }
-    bike.angle += bike.angVel * dt;
-    bike.rotationAccum += Math.abs(bike.angVel * dt);
-    bike.airtime += dt;
-  }
 
-  // landing detection
-  const groundY = rampTopAt(worldX) ?? groundYAt(worldX);
-  if(bike.y + bike.h >= groundY){
-    if(!bike.onGround){
-      // landing event
-      const landingSpeed = Math.abs(bike.vy);
-      const rotationScore = Math.floor(bike.rotationAccum * 40);
-      const airtimeScore = Math.floor(bike.airtime * 30);
-      // reward for clean landing angle
-      const anglePenalty = Math.max(0, Math.abs(bike.angle) - 0.6);
+    // landing detection
+    const groundY = groundYAt(map, rider.worldX);
+    if(!rider.onGround && rider.worldY + 24 >= groundY){
+      // landing
+      const landingSpeed = Math.abs(rider.vy);
+      const rotationScore = Math.floor((rider.rotationAccum || 0) * 40);
+      const airtimeScore = Math.floor((rider.airtime || 0) * 30);
+      const anglePenalty = Math.max(0, Math.abs(rider.angle) - 0.6);
       const landingBonus = Math.max(0, rotationScore + airtimeScore - Math.floor(anglePenalty * 100));
-      score += landingBonus;
-      if(landingBonus > 0) spawnParticle(bike.x + 20, groundY - 6, (Math.random()-0.5)*2, -1.2, 'rgba(0,240,255,0.9)', 40);
-      // reset air values
-      bike.airtime = 0; bike.rotationAccum = 0;
-      // heavy crash if landing too steep or too fast
-      if(landingSpeed > 10 || Math.abs(bike.angle) > 1.6){
+      // reward
+      if(landingBonus > 0) { beep(1200,0.06,0.06); }
+      rider.airtime = 0; rider.rotationAccum = 0;
+      if(landingSpeed > 10 || Math.abs(rider.angle) > 1.6){
         // crash
-        state = 'gameover';
+        rider.finished = true;
+        state = 'finished';
         menuEl.style.display = 'flex';
         startBtn.style.display = 'none';
         beep(120,0.4,0.12);
       } else {
-        // successful landing dampen velocities
-        bike.vy *= 0.2;
-        bike.angVel *= 0.2;
-        bike.angle *= 0.4;
-        bike.onGround = true;
+        rider.vy *= 0.2; rider.angVel *= 0.2; rider.angle *= 0.4; rider.onGround = true;
       }
+      rider.worldY = groundY - 24;
     }
-    // snap to ground
-    bike.y = groundY - bike.h;
-  } else {
-    bike.onGround = false;
+
+    // lap handling
+    if(rider.worldX >= map.length){
+      rider.worldX -= map.length;
+      rider.lap++;
+      if(rider.lap > lapsTotal) rider.finished = true;
+    }
   }
 
-  // coins collection
-  for(let i=0;i<coins.length;i++){
-    const c = coins[i];
-    if(!c.collected && Math.abs((c.x - world.scroll) - bike.x) < 40 && Math.abs(c.y - (bike.y + bike.h/2)) < 40){
-      c.collected = true;
-      score += 50;
-      spawnParticle(c.x - world.scroll, c.y, (Math.random()-0.5)*2, -1.2, 'rgba(0,255,120,0.95)', 40);
-      beep(1200,0.06,0.06);
+  // update AI
+  for(let i=1;i<players.length;i++){
+    if(showAI) updateAI(players[i], map, dt);
+    else {
+      // if AI disabled, freeze them
+      players[i].speed = 0;
     }
+  }
+
+  // update positions (ranking)
+  const ranking = players.slice().sort((a,b)=> {
+    const aScore = a.lap * map.length + a.worldX;
+    const bScore = b.lap * map.length + b.worldX;
+    return bScore - aScore;
+  });
+  const pos = ranking.indexOf(players[0]) + 1;
+  posEl.textContent = pos + '/' + players.length;
+  lapEl.textContent = players[0].lap;
+  timeEl.textContent = raceTime.toFixed(2);
+}
+
+/* ---------- Rendering ---------- */
+function render(){
+  ctx.clearRect(0,0,W,H);
+  const map = maps[currentMap];
+
+  // background gradient
+  const g = ctx.createLinearGradient(0,0,0,H);
+  if(map.name.includes('City')){ g.addColorStop(0,'#071026'); g.addColorStop(1,'#020317'); }
+  if(map.name.includes('Desert')){ g.addColorStop(0,'#0b1a1a'); g.addColorStop(1,'#2b1a00'); }
+  if(map.name.includes('Mountain')){ g.addColorStop(0,'#052018'); g.addColorStop(1,'#071a10'); }
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  // parallax scenery
+  map.scenery(map, raceTime);
+
+  // road band
+  ctx.fillStyle = '#0b1220'; ctx.fillRect(0, H-160, W, 160);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 6; ctx.setLineDash([30,20]);
+  ctx.beginPath(); ctx.moveTo(W/2, H-160); ctx.lineTo(W/2, H); ctx.stroke(); ctx.setLineDash([]);
+
+  // draw ramps and checkpoints in world space (translate by camera)
+  // camera centers on player worldX
+  const camX = players[0] ? players[0].worldX : 0;
+  const camOffset = camX - 200;
+
+  ctx.save();
+  ctx.translate(-camOffset, 0);
+
+  // draw path guide (for debugging / visual)
+  ctx.globalAlpha = 0.06;
+  ctx.beginPath();
+  for(let i=0;i<map.path.length;i++){
+    const p = map.path[i];
+    const sx = p.x;
+    const sy = H - 140 + p.y;
+    if(i===0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+  }
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // ramps
+  for(const r of map.ramps){
+    ctx.fillStyle = '#2b2b2b';
+    ctx.beginPath();
+    ctx.moveTo(r.x, groundYAt(map, r.x));
+    ctx.lineTo(r.x + r.w, groundYAt(map, r.x + r.w));
+    ctx.lineTo(r.x + r.w, groundYAt(map, r.x + r.w) + 40);
+    ctx.lineTo(r.x, groundYAt(map, r.x) + 40);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(r.x, groundYAt(map, r.x) - 6, r.w, 6);
   }
 
   // checkpoints
   for(const cp of checkpoints){
-    if(!cp.passed && worldX > cp.x){
-      cp.passed = true;
-      timer += 12;
-      score += 100;
-      beep(1000,0.08,0.08);
-    }
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(cp - 6, groundYAt(map, cp) - 120, 12, 120);
   }
 
-  // timer
-  timer -= 0.016 * dt * 60;
-  if(timer <= 0){
-    state = 'gameover';
-    menuEl.style.display = 'flex';
-    startBtn.style.display = 'none';
-  }
-
-  // update particles
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.dx * dt * 6;
-    p.y += p.dy * dt * 6;
-    p.dy += 0.06 * dt;
-    p.age += dt;
-    if(p.age > p.life) particles.splice(i,1);
-  }
-
-  // update UI
-  scoreEl.textContent = Math.floor(score);
-  timerEl.textContent = Math.max(0, Math.ceil(timer));
-}
-
-/* ---------- Render ---------- */
-function render(){
-  ctx.clearRect(0,0,W,H);
-  const lv = levels[currentLevel];
-
-  // background gradient
-  const g = ctx.createLinearGradient(0,0,0,H);
-  if(lv.bg === 'city'){ g.addColorStop(0,'#071026'); g.addColorStop(1,'#020317'); }
-  if(lv.bg === 'desert'){ g.addColorStop(0,'#0b1a1a'); g.addColorStop(1,'#2b1a00'); }
-  if(lv.bg === 'forest'){ g.addColorStop(0,'#052018'); g.addColorStop(1,'#071a10'); }
-  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-
-  // parallax scenery
-  drawParallax(lv);
-
-  // road
-  ctx.fillStyle = '#0b1220'; ctx.fillRect(0, H-160, W, 160);
-  // road center glow
-  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 6; ctx.setLineDash([30,20]);
-  ctx.beginPath(); ctx.moveTo(W/2, H-160); ctx.lineTo(W/2, H); ctx.stroke(); ctx.setLineDash([]);
-
-  // draw ramps
-  ctx.save();
-  ctx.translate(-world.scroll,0);
-  for(const r of ramps){
-    // ramp polygon
-    ctx.fillStyle = 'linear-gradient(#333,#111)';
-    ctx.beginPath();
-    ctx.moveTo(r.x, groundYAt(r.x));
-    ctx.lineTo(r.x + r.w, groundYAt(r.x + r.w));
-    ctx.lineTo(r.x + r.w, groundYAt(r.x + r.w) + 40);
-    ctx.lineTo(r.x, groundYAt(r.x) + 40);
-    ctx.closePath();
-    ctx.fillStyle = '#2b2b2b';
-    ctx.fill();
-    // ramp top highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.04)';
-    ctx.fillRect(r.x, groundYAt(r.x) - 6, r.w, 6);
-  }
-
-  // draw coins
-  for(const c of coins){
-    if(c.collected) continue;
-    ctx.fillStyle = '#ffd700';
-    ctx.beginPath(); ctx.arc(c.x, c.y, 10, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fillRect(c.x-6, c.y-6, 12, 6);
-  }
-
-  // draw checkpoints
-  for(const cp of checkpoints){
-    ctx.fillStyle = cp.passed ? 'rgba(0,255,120,0.6)' : 'rgba(255,255,255,0.08)';
-    ctx.fillRect(cp.x - 6, groundYAt(cp.x) - 120, 12, 120);
-    ctx.fillStyle = lv.accent;
-    ctx.fillRect(cp.x + 12, groundYAt(cp.x) - 100, 40, 24);
+  // draw riders
+  for(const r of players){
+    const sx = r.worldX;
+    const sy = (r.worldY !== undefined ? r.worldY : groundYAt(map, r.worldX) - 24);
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(sx - 12, sy + 18, 48, 8);
+    // bike body
+    ctx.save();
+    ctx.translate(sx + 10, sy + 10);
+    ctx.rotate(r.angle || 0);
+    ctx.fillStyle = r.color;
+    roundRect(ctx, -10, -8, 80, 20, 6);
+    ctx.fillStyle = '#001';
+    roundRect(ctx, 6, -6, 36, 12, 4);
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(6, 14, 10, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(56, 14, 10, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    // name
+    ctx.fillStyle = '#cfe9ff';
+    ctx.font = '12px Inter';
+    ctx.fillText(r.isPlayer ? 'You' : r.name, sx - 6, sy - 12);
   }
 
   ctx.restore();
-
-  // draw bike shadow
-  const bikeScreenX = bike.x;
-  const bikeScreenY = bike.y;
-  ctx.save();
-  ctx.translate(bikeScreenX + 10, bikeScreenY + bike.h + 6);
-  ctx.rotate(bike.angle);
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fillRect(-20, 0, 60, 10);
-  ctx.restore();
-
-  // draw bike
-  ctx.save();
-  ctx.translate(bikeScreenX + 10, bikeScreenY + 10);
-  ctx.rotate(bike.angle);
-  // body
-  ctx.fillStyle = lv.accent;
-  roundRect(ctx, -10, -8, 80, 20, 6);
-  // seat
-  ctx.fillStyle = '#001';
-  roundRect(ctx, 6, -6, 36, 12, 4);
-  // wheels
-  ctx.fillStyle = '#111';
-  ctx.beginPath(); ctx.arc(6, 14, 10, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(56, 14, 10, 0, Math.PI*2); ctx.fill();
-  // neon outline
-  ctx.strokeStyle = 'rgba(0,240,255,0.9)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(-10, -8, 80, 20);
-  ctx.restore();
-
-  // particles
-  for(const p of particles){
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = 1 - (p.age / p.life);
-    ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-  }
 
   // HUD overlays
   if(state === 'menu'){
     ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0,0,W,H);
   }
-  if(state === 'gameover'){
+  if(state === 'finished'){
     ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = '#ff6b6b'; ctx.font = '36px Inter'; ctx.fillText('Game Over', W/2 - 100, H/2 - 10);
-    ctx.fillStyle = '#cfe9ff'; ctx.font = '18px Inter'; ctx.fillText('Score: ' + Math.floor(score), W/2 - 60, H/2 + 20);
-    // save best time for time mode
-    if(mode === 'time'){
-      const key = currentLevel + '_' + mode;
-      const t = levels[currentLevel].time - timer;
-      if(!bestTimes[key] || t < bestTimes[key]){ bestTimes[key] = t; localStorage.setItem('stunt_best', JSON.stringify(bestTimes)); }
-    }
+    ctx.fillStyle = '#00ffcc'; ctx.font = '36px Inter'; ctx.fillText('Race Finished', W/2 - 140, H/2 - 10);
+    ctx.fillStyle = '#cfe9ff'; ctx.font = '18px Inter'; ctx.fillText('Time: ' + raceTime.toFixed(2) + 's', W/2 - 60, H/2 + 20);
   }
 }
 
-/* ---------- Parallax scenery drawing ---------- */
-let tick = 0;
-function drawParallax(lv){
-  tick += 1;
-  if(lv.bg === 'city'){
-    // skyline
-    for(let i=0;i<8;i++){
-      const bx = (i*160 - (tick*0.3 % 160));
-      const h = 60 + (i%3)*30;
-      ctx.fillStyle = 'rgba(10,20,30,0.6)';
-      ctx.fillRect(bx, 40, 120, h);
-      ctx.fillStyle = 'rgba(255,230,120,0.06)';
-      for(let y=50;y<40+h;y+=12) for(let x=bx+8;x<bx+112;x+=14) ctx.fillRect(x,y,8,8);
-    }
-  } else if(lv.bg === 'desert'){
-    for(let i=0;i<6;i++){
-      const bx = i*220 - (tick*0.4 % 220);
-      const by = 140 + Math.sin((tick*0.02)+i)*8;
-      ctx.fillStyle = 'rgba(80,50,20,0.35)';
-      ctx.beginPath(); ctx.ellipse(bx, by, 220, 60, 0, 0, Math.PI*2); ctx.fill();
-    }
-  } else if(lv.bg === 'forest'){
-    for(let i=0;i<12;i++){
-      const bx = i*90 - (tick*0.5 % 90);
-      const by = 120 + (i%3)*10;
-      drawTree(bx, by, 1.0 + (i%2)*0.2);
-    }
+/* ---------- Scenery drawing functions (real-life inspired) ---------- */
+function drawCityBridge(map, t){
+  // skyline
+  for(let i=0;i<10;i++){
+    const bx = (i*160 - (t*0.3 % 160));
+    const h = 60 + (i%3)*30;
+    ctx.fillStyle = 'rgba(10,20,30,0.6)';
+    ctx.fillRect(bx, 40, 120, h);
+    ctx.fillStyle = 'rgba(255,230,120,0.06)';
+    for(let y=50;y<40+h;y+=12) for(let x=bx+8;x<bx+112;x+=14) ctx.fillRect(x,y,8,8);
+  }
+  // bridge silhouette
+  ctx.fillStyle = 'rgba(20,30,40,0.6)';
+  ctx.fillRect(0, H-260, W, 20);
+  // cables
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  for(let i=0;i<20;i++){
+    ctx.beginPath();
+    ctx.moveTo(i*60, H-260);
+    ctx.lineTo(i*60 + 40, H-360);
+    ctx.stroke();
+  }
+}
+function drawDesert(map, t){
+  for(let i=0;i<6;i++){
+    const bx = i*220 - (t*0.4 % 220);
+    const by = 140 + Math.sin((t*0.02)+i)*8;
+    ctx.fillStyle = 'rgba(80,50,20,0.35)';
+    ctx.beginPath(); ctx.ellipse(bx, by, 220, 60, 0, 0, Math.PI*2); ctx.fill();
+  }
+  // sun
+  ctx.fillStyle = 'rgba(255,200,80,0.08)';
+  ctx.beginPath(); ctx.arc(W-120, 80, 60, 0, Math.PI*2); ctx.fill();
+}
+function drawMountain(map, t){
+  for(let i=0;i<6;i++){
+    const bx = i*220 - (t*0.3 % 220);
+    const by = 120;
+    ctx.fillStyle = 'rgba(20,30,40,0.6)';
+    ctx.beginPath();
+    ctx.moveTo(bx, by+120);
+    ctx.lineTo(bx+80, by-40);
+    ctx.lineTo(bx+160, by+120);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 
@@ -536,31 +640,20 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.closePath();
   ctx.fill();
 }
-function drawTree(x,y,scale=1){
-  ctx.fillStyle = '#1f5f2f';
-  ctx.beginPath();
-  ctx.moveTo(x, y-40*scale);
-  ctx.lineTo(x-18*scale, y+6*scale);
-  ctx.lineTo(x+18*scale, y+6*scale);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#6b4b2a';
-  ctx.fillRect(x-4*scale, y+6*scale, 8*scale, 12*scale);
-}
 
 /* ---------- Keyboard shortcuts ---------- */
 addEventListener('keydown', e=>{
   if(e.key === 'Escape'){ menuEl.style.display = 'flex'; state='menu'; }
-  if(e.key === 'r'){ initLevel(); state='playing'; menuEl.style.display='none'; }
+  if(e.key === 'r'){ initRace(); state='racing'; menuEl.style.display='none'; }
 });
 
 /* ---------- Ensure audio resumes on first interaction ---------- */
 document.addEventListener('click', ()=>{ if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, {once:true});
 
-/* ---------- Start with menu ---------- */
+/* ---------- Initialize menu visible ---------- */
 menuEl.style.display = 'flex';
 startBtn.style.display = 'inline-block';
-updateMenuPreview();
+highlightMap();
 </script>
 </body>
 </html>
