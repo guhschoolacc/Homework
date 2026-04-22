@@ -3,25 +3,27 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Arcade Racer — Topdown (Menu & Levels)</title>
+<title>Arcade Racer — Distinct Level Scenery</title>
 <style>
   :root{
-    --bg:#071026; --road:#0b1220; --neon:#00f0ff; --accent:#ff3d81;
+    --panel: rgba(10,18,30,0.6);
+    --neon:#00f0ff; --accent:#ff3d81;
   }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020317 0%,#071026 100%);font-family:Inter,system-ui,Arial;color:#cfe9ff}
-  .wrap{max-width:900px;margin:18px auto;padding:12px}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020317 0%,#071026 100%);font-family:Inter,system-ui,Arial;color:#dff6ff}
+  .wrap{max-width:980px;margin:18px auto;padding:12px}
   header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   h1{color:var(--neon);margin:0;font-size:20px}
-  .panel{background:rgba(10,18,30,0.6);padding:8px 12px;border-radius:10px}
+  .panel{background:var(--panel);padding:8px 12px;border-radius:10px}
   canvas{display:block;width:100%;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
   .hud{display:flex;gap:12px;align-items:center}
   button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
   .menuOverlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
-  .menuCard{width:520px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .menuCard{width:560px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
   .levels{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
   .small{font-size:13px;color:#9fb8d9}
   .center{display:flex;justify-content:center;gap:8px;margin-top:12px}
+  .muted{opacity:0.6}
 </style>
 </head>
 <body>
@@ -29,7 +31,7 @@
   <header>
     <div>
       <h1>Arcade Racer</h1>
-      <div class="small">Top‑down neon racer — avoid cars, collect pickups</div>
+      <div class="small">Top‑down neon racer — now with unique scenery per level</div>
     </div>
     <div class="panel hud">
       <div>Score: <strong id="score">0</strong></div>
@@ -40,13 +42,12 @@
   </header>
 
   <div style="position:relative">
-    <canvas id="game" width="800" height="520"></canvas>
+    <canvas id="game" width="900" height="520"></canvas>
 
-    <!-- Menu overlay -->
     <div id="menu" class="menuOverlay" style="display:flex">
       <div class="menuCard">
         <h2 style="margin:0;color:var(--neon)">Start Menu</h2>
-        <p class="small" style="margin-top:8px">Choose a level, then press Start. Controls: ← → or A/D to steer.</p>
+        <p class="small" style="margin-top:8px">Choose a level to play. Each level has different scenery, obstacles, and ambience.</p>
 
         <div style="margin-top:12px">
           <label class="small">Select Level</label>
@@ -59,7 +60,7 @@
           <button id="restartBtn">Restart</button>
         </div>
 
-        <div style="margin-top:12px" class="small">Tips: Collect green pickups for bonus points. Avoid collisions.</div>
+        <div style="margin-top:12px" class="small">Tips: Different levels have different hazards — watch the scenery for cues.</div>
       </div>
     </div>
   </div>
@@ -78,7 +79,7 @@ function setDPR(){
 }
 setDPR();
 
-/* ---------- UI elements ---------- */
+/* ---------- UI ---------- */
 const menuEl = document.getElementById('menu');
 const startBtn = document.getElementById('startBtn');
 const resumeBtn = document.getElementById('resumeBtn');
@@ -89,7 +90,7 @@ const scoreEl = document.getElementById('score');
 const levelLabel = document.getElementById('levelLabel');
 const speedEl = document.getElementById('speed');
 
-/* ---------- Game state ---------- */
+/* ---------- State ---------- */
 let state = 'menu'; // menu, playing, paused, gameover
 let currentLevel = 0;
 let score = 0;
@@ -101,13 +102,44 @@ const keys = {};
 addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
-/* ---------- Levels (old top-down style) ----------
-   Each level defines lane count, enemy frequency, pickup frequency, background color accents.
-*/
+/* ---------- Levels with distinct scenery ---------- */
 const levels = [
-  { name: 'Easy Streets', lanes: 3, enemyRate: 0.012, pickupRate: 0.008, accent:'#00f0ff' },
-  { name: 'Neon Rush', lanes: 4, enemyRate: 0.018, pickupRate: 0.01, accent:'#ff3d81' },
-  { name: 'Nightmare Alley', lanes: 5, enemyRate: 0.028, pickupRate: 0.012, accent:'#ffd166' }
+  {
+    name: 'City Lights',
+    lanes: 4,
+    enemyRate: 0.018,
+    pickupRate: 0.01,
+    accent: '#00f0ff',
+    bg: 'city',
+    props: { billboards: true, neonSigns: true, trafficLights: true }
+  },
+  {
+    name: 'Desert Run',
+    lanes: 3,
+    enemyRate: 0.014,
+    pickupRate: 0.009,
+    accent: '#ffd166',
+    bg: 'desert',
+    props: { cacti: true, dunes: true, tumbleweeds: true }
+  },
+  {
+    name: 'Forest Trail',
+    lanes: 3,
+    enemyRate: 0.02,
+    pickupRate: 0.011,
+    accent: '#7be495',
+    bg: 'forest',
+    props: { trees: true, fog: true, logs: true }
+  },
+  {
+    name: 'Industrial Night',
+    lanes: 5,
+    enemyRate: 0.028,
+    pickupRate: 0.012,
+    accent: '#ff3d81',
+    bg: 'industrial',
+    props: { cranes: true, sparks: true, pipes: true }
+  }
 ];
 
 /* populate level buttons */
@@ -125,10 +157,10 @@ function highlightLevel(){
 highlightLevel();
 
 /* ---------- Game objects ---------- */
-const player = { w:44, h:88, x: (W/2)-22, y: H-140, lane:0, color:'#00f0ff' };
+const player = { w:44, h:88, x: (W/2)-22, y: H-140, color:'#00f0ff' };
 let enemies = [];
 let pickups = [];
-let laneX = []; // x positions of lanes
+let laneX = [];
 
 /* ---------- Helpers ---------- */
 function rnd(min,max){ return Math.random()*(max-min)+min; }
@@ -140,7 +172,8 @@ function rectCollide(a,b){
 function spawnEnemy(lv){
   const lane = Math.floor(rnd(0, lv.lanes));
   const x = laneX[lane] - 22;
-  enemies.push({ x, y: -120, w:44, h:88, spd: rnd(baseSpeed*0.9, baseSpeed*1.6) * speedMultiplier, color:'#222' });
+  const color = lv.bg === 'desert' ? '#6b4b2a' : (lv.bg === 'forest' ? '#2b6b2b' : '#222');
+  enemies.push({ x, y: -120, w:44, h:88, spd: rnd(baseSpeed*0.9, baseSpeed*1.6) * speedMultiplier, color });
 }
 function spawnPickup(){
   const lane = Math.floor(rnd(0, levels[currentLevel].lanes));
@@ -152,13 +185,11 @@ function spawnPickup(){
 function initLevel(){
   enemies = []; pickups = []; score = 0; speedMultiplier = 1.0;
   const lv = levels[currentLevel];
-  // compute lane x positions centered on canvas
   const roadW = W - 160;
   const laneW = roadW / lv.lanes;
   laneX = [];
   const startX = 80 + laneW/2;
   for(let i=0;i<lv.lanes;i++) laneX.push(startX + i*laneW);
-  // place player in middle lane
   player.x = laneX[Math.floor(lv.lanes/2)] - player.w/2;
   player.y = H - 140;
   player.color = lv.accent;
@@ -169,8 +200,8 @@ function initLevel(){
 }
 
 /* ---------- Menu / Buttons ---------- */
-startBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; initLevel(); };
-restartBtn.onclick = ()=>{ initLevel(); state='playing'; menuEl.style.display='none'; };
+startBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; initLevel(); startBtn.style.display='inline-block'; };
+restartBtn.onclick = ()=>{ initLevel(); state='playing'; menuEl.style.display='none'; startBtn.style.display='inline-block'; };
 menuToggle.onclick = ()=>{ if(state==='playing'){ state='paused'; menuEl.style.display='flex'; resumeBtn.style.display='inline-block'; } else { state='menu'; menuEl.style.display='flex'; resumeBtn.style.display='none'; } };
 resumeBtn.onclick = ()=>{ menuEl.style.display='none'; state='playing'; };
 
@@ -190,25 +221,19 @@ function update(dt){
   if(state !== 'playing') return;
   const lv = levels[currentLevel];
 
-  // steering: left/right or a/d
   const left = keys['arrowleft'] || keys['a'];
   const right = keys['arrowright'] || keys['d'];
   if(left) movePlayer(-1, dt);
   if(right) movePlayer(1, dt);
 
-  // spawn enemies/pickups based on rates
   if(Math.random() < lv.enemyRate * dt) spawnEnemy(lv);
   if(Math.random() < lv.pickupRate * dt) spawnPickup();
 
-  // update enemies
   for(let i=enemies.length-1;i>=0;i--){
     const e = enemies[i];
     e.y += e.spd * dt * 12;
-    // if off screen, remove and reward small score
     if(e.y > H + 200){ enemies.splice(i,1); score += 5; }
-    // collision with player
     if(rectCollide({x:player.x,y:player.y,w:player.w,h:player.h}, e)){
-      // crash: go to gameover
       state = 'gameover';
       menuEl.style.display = 'flex';
       resumeBtn.style.display = 'none';
@@ -217,12 +242,10 @@ function update(dt){
     }
   }
 
-  // update pickups
   for(let i=pickups.length-1;i>=0;i--){
     const p = pickups[i];
     p.y += p.spd * dt * 12;
     if(p.y > H + 50){ pickups.splice(i,1); continue; }
-    // pickup collision (circle vs rect)
     const px = p.x + p.r, py = p.y + p.r;
     const closestX = Math.max(player.x, Math.min(px, player.x + player.w));
     const closestY = Math.max(player.y, Math.min(py, player.y + player.h));
@@ -235,7 +258,6 @@ function update(dt){
     }
   }
 
-  // gradually increase difficulty
   speedMultiplier += 0.0006 * dt;
   score += 0.02 * dt * Math.max(1, speedMultiplier);
   scoreEl.textContent = Math.floor(score);
@@ -245,7 +267,6 @@ function update(dt){
 /* move player between lanes smoothly */
 function movePlayer(dir, dt){
   const lv = levels[currentLevel];
-  // find nearest lane index
   let nearest = 0, best = Infinity;
   for(let i=0;i<lv.lanes;i++){
     const dx = (player.x + player.w/2) - laneX[i];
@@ -254,42 +275,24 @@ function movePlayer(dir, dt){
   let targetIdx = nearest + dir;
   targetIdx = Math.max(0, Math.min(lv.lanes-1, targetIdx));
   const targetX = laneX[targetIdx] - player.w/2;
-  // smooth move
   player.x += (targetX - player.x) * Math.min(1, 0.18 * dt);
 }
 
 /* ---------- Render ---------- */
 function render(){
-  // clear
   ctx.clearRect(0,0,W,H);
-
-  // background
-  const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#071026'); g.addColorStop(1,'#020317');
-  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-
-  // draw road
+  drawBackground(levels[currentLevel]);
   drawRoad();
-
-  // draw lane markers
   drawLanes();
-
-  // draw pickups
+  drawScenery(levels[currentLevel]);
   pickups.forEach(p=>{
     ctx.fillStyle = '#00ff88';
     ctx.beginPath(); ctx.arc(p.x + p.r, p.y + p.r, p.r, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fillRect(p.x + p.r - 6, p.y + p.r - 6, 12, 12);
   });
-
-  // draw enemies
-  enemies.forEach(e=>{
-    drawCar(e.x, e.y, e.w, e.h, '#222', true);
-  });
-
-  // draw player
+  enemies.forEach(e=> drawCar(e.x, e.y, e.w, e.h, e.color, true));
   drawCar(player.x, player.y, player.w, player.h, player.color, false);
 
-  // HUD overlay when paused or gameover
   if(state === 'paused'){
     ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0,0,W,H);
     ctx.fillStyle = '#fff'; ctx.font = '28px Inter'; ctx.fillText('Paused', W/2 - 50, H/2);
@@ -301,20 +304,28 @@ function render(){
   }
 }
 
+/* draw background gradient and subtle parallax elements */
+function drawBackground(lv){
+  ctx.save();
+  let top = '#071026', bot = '#020317';
+  if(lv.bg === 'desert'){ top = '#0b1a1a'; bot = '#2b1a00'; }
+  if(lv.bg === 'forest'){ top = '#052018'; bot = '#071a10'; }
+  if(lv.bg === 'industrial'){ top = '#0b0710'; bot = '#1a0710'; }
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, top); g.addColorStop(1, bot);
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.restore();
+}
+
 /* draw road and side glow */
 function drawRoad(){
-  // side background
-  ctx.fillStyle = '#071026'; ctx.fillRect(0,0,W,H);
-  // road
   ctx.fillStyle = '#0b1220'; ctx.fillRect(80,0,W-160,H);
-  // side glow
   ctx.fillStyle = 'rgba(0,240,255,0.04)'; ctx.fillRect(70,0,10,H); ctx.fillRect(W-80,0,10,H);
-  // center dashed
   ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 6; ctx.setLineDash([30,20]);
   ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
 }
 
-/* draw lanes based on laneX */
+/* draw lane separators */
 function drawLanes(){
   ctx.save();
   ctx.strokeStyle = 'rgba(255,255,255,0.06)';
@@ -329,30 +340,179 @@ function drawLanes(){
   ctx.restore();
 }
 
-/* draw a stylized car */
+/* draw scenery per level (parallax props, animated elements) */
+let tick = 0;
+function drawScenery(lv){
+  tick += 1;
+  ctx.save();
+  // parallax skyline / mountains / trees
+  if(lv.bg === 'city'){
+    // skyline
+    for(let i=0;i<8;i++){
+      const bx = (i*140 - (tick*0.3 % 140));
+      const h = 80 + (i%3)*30;
+      ctx.fillStyle = 'rgba(10,20,30,0.6)';
+      ctx.fillRect(bx, 40, 120, h);
+      // windows
+      ctx.fillStyle = 'rgba(255,230,120,0.06)';
+      for(let y=50;y<40+h;y+=12) for(let x=bx+8;x<bx+112;x+=14) ctx.fillRect(x,y,8,8);
+    }
+    // billboards
+    for(let i=0;i<5;i++){
+      const bx = 40 + i*180 - (tick*0.6 % 180);
+      const by = 120 + (i%2)*20;
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(bx, by, 80, 40);
+      ctx.fillStyle = i%2 ? lv.accent : '#00f0ff';
+      ctx.fillRect(bx+6, by+6, 68, 28);
+    }
+  } else if(lv.bg === 'desert'){
+    // dunes
+    for(let i=0;i<6;i++){
+      const bx = i*220 - (tick*0.4 % 220);
+      const by = 140 + Math.sin((tick*0.02)+i)*8;
+      ctx.fillStyle = 'rgba(80,50,20,0.35)';
+      ctx.beginPath(); ctx.ellipse(bx, by, 220, 60, 0, 0, Math.PI*2); ctx.fill();
+    }
+    // cacti
+    for(let i=0;i<8;i++){
+      const bx = 30 + i*120 - (tick*0.2 % 120);
+      const by = 220 + (i%3)*10;
+      drawCactus(bx, by);
+    }
+    // tumbleweeds
+    if(Math.random() < 0.02) spawnTumble();
+  } else if(lv.bg === 'forest'){
+    // distant trees
+    for(let i=0;i<12;i++){
+      const bx = i*90 - (tick*0.5 % 90);
+      const by = 120 + (i%3)*10;
+      drawTree(bx, by, 1.0 + (i%2)*0.2);
+    }
+    // logs occasionally cross the roadside
+    if(Math.random() < 0.01) spawnLog();
+  } else if(lv.bg === 'industrial'){
+    // cranes and pipes
+    for(let i=0;i<6;i++){
+      const bx = i*160 - (tick*0.3 % 160);
+      ctx.fillStyle = 'rgba(80,40,60,0.25)';
+      ctx.fillRect(bx, 80, 120, 40);
+      // crane arm
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(bx+20,80); ctx.lineTo(bx+80,40); ctx.stroke();
+    }
+    // sparks
+    if(Math.random() < 0.02) spawnSpark();
+  }
+
+  // roadside props near lanes
+  for(let i=0;i<laneX.length;i++){
+    const lx = laneX[i];
+    // left side
+    drawRoadsideProp(lv, 60, 80 + (i*40) + (tick%40));
+    // right side
+    drawRoadsideProp(lv, W-100, 100 + (i*40) - (tick%40));
+  }
+
+  // moving tumbleweeds and logs (global arrays)
+  updateAndDrawExtras();
+
+  ctx.restore();
+}
+
+/* ---------- Extras: tumbleweeds, logs, sparks ---------- */
+const extras = { tumble:[], logs:[], sparks:[] };
+function spawnTumble(){ extras.tumble.push({x:-40, y: 260 + Math.random()*80, dx: 1 + Math.random()*1.2, r:8 + Math.random()*6}); }
+function spawnLog(){ extras.logs.push({x: W + 40, y: H - 160 - Math.random()*40, dx: -2 - Math.random()*1.2, w: 40 + Math.random()*30}); }
+function spawnSpark(){ extras.sparks.push({x: 120 + Math.random()*660, y: 120 + Math.random()*200, life: 30 + Math.random()*30}); }
+
+function updateAndDrawExtras(){
+  // tumble
+  for(let i=extras.tumble.length-1;i>=0;i--){
+    const t = extras.tumble[i];
+    t.x += t.dx;
+    ctx.fillStyle = 'rgba(180,140,80,0.9)';
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.fill();
+    if(t.x > W + 40) extras.tumble.splice(i,1);
+  }
+  // logs
+  for(let i=extras.logs.length-1;i>=0;i--){
+    const l = extras.logs[i];
+    l.x += l.dx;
+    ctx.fillStyle = '#6b4b2a';
+    ctx.fillRect(l.x, l.y, l.w, 12);
+    if(l.x < -80) extras.logs.splice(i,1);
+  }
+  // sparks
+  for(let i=extras.sparks.length-1;i>=0;i--){
+    const s = extras.sparks[i];
+    s.life -= 1;
+    ctx.fillStyle = 'rgba(255,200,120,' + (s.life/60) + ')';
+    ctx.fillRect(s.x, s.y, 3, 3);
+    if(s.life <= 0) extras.sparks.splice(i,1);
+  }
+}
+
+/* roadside prop drawer */
+function drawRoadsideProp(lv, x, y){
+  if(lv.bg === 'city'){
+    // neon sign
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x-18, y-40, 36, 28);
+    ctx.fillStyle = lv.accent;
+    ctx.fillRect(x-14, y-36, 28, 20);
+  } else if(lv.bg === 'desert'){
+    drawCactus(x, y);
+  } else if(lv.bg === 'forest'){
+    drawTree(x, y, 0.9);
+  } else if(lv.bg === 'industrial'){
+    ctx.fillStyle = 'rgba(120,120,120,0.6)';
+    ctx.fillRect(x-10, y-30, 20, 40);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x-6, y-26, 12, 8);
+  }
+}
+
+/* cactus */
+function drawCactus(x,y){
+  ctx.fillStyle = '#2f8b4a';
+  ctx.fillRect(x-6, y-24, 12, 24);
+  ctx.fillRect(x-14, y-12, 8, 8);
+  ctx.fillRect(x+6, y-12, 8, 8);
+}
+
+/* tree */
+function drawTree(x,y,scale=1){
+  ctx.fillStyle = '#1f5f2f';
+  ctx.beginPath();
+  ctx.moveTo(x, y-40*scale);
+  ctx.lineTo(x-18*scale, y+6*scale);
+  ctx.lineTo(x+18*scale, y+6*scale);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#6b4b2a';
+  ctx.fillRect(x-4*scale, y+6*scale, 8*scale, 12*scale);
+}
+
+/* draw car */
 function drawCar(x,y,w,h,color,isEnemy){
-  // shadow
   ctx.fillStyle = 'rgba(0,0,0,0.35)';
   ctx.fillRect(x+6, y+h-6, w-12, 8);
-  // body
   ctx.fillStyle = color;
   roundRect(ctx, x, y, w, h, 8);
-  // windshield
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.fillRect(x+8, y+8, w-16, 10);
-  // wheels
   ctx.fillStyle = '#111';
   ctx.fillRect(x+6, y+h-14, 12, 8);
   ctx.fillRect(x+w-18, y+h-14, 12, 8);
-  // enemy accent
-  if(isEnemy){
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    ctx.fillRect(x+4, y+4, w-8, 6);
-  } else {
-    // neon outline for player
+  if(!isEnemy){
     ctx.strokeStyle = 'rgba(0,240,255,0.9)';
     ctx.lineWidth = 2;
     ctx.strokeRect(x+1, y+1, w-2, h-2);
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(x+4, y+4, w-8, 6);
   }
 }
 
@@ -368,7 +528,7 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.fill();
 }
 
-/* ---------- Simple sound effects (tiny beeps) ---------- */
+/* ---------- Sound ---------- */
 const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
 function playTone(freq, dur=0.06, vol=0.06){
   if(!audioCtx) return;
@@ -382,7 +542,7 @@ function playTone(freq, dur=0.06, vol=0.06){
 function playPickupEffect(){ playTone(880,0.06,0.06); }
 function playCrashEffect(){ playTone(120,0.3,0.12); }
 
-/* ---------- Start with menu visible ---------- */
+/* ---------- Start state ---------- */
 menuEl.style.display = 'flex';
 startBtn.style.display = 'inline-block';
 resumeBtn.style.display = 'none';
@@ -396,7 +556,7 @@ addEventListener('keydown', e=>{
   if(e.key === 'r'){ initLevel(); state='playing'; menuEl.style.display='none'; }
 });
 
-/* ---------- Ensure audio context resumes on first interaction (mobile) ---------- */
+/* ---------- Ensure audio context resumes on first interaction ---------- */
 document.addEventListener('click', ()=>{ if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, {once:true});
 </script>
 </body>
