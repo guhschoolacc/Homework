@@ -3,396 +3,1099 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MotoX Rally (Fixed)</title>
+<title>Moto X3M Inspired — Canvas Game</title>
 <style>
-  :root{--bg:#071026;--road:#0b1220;--neon:#00f0ff;--accent:#ff3d81;--glass: rgba(8,12,20,0.6);}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020317 0%,#071026 100%);font-family:Inter,system-ui,Arial;color:#dff6ff}
-  .wrap{max-width:1200px;margin:18px auto;padding:12px}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  h1{color:var(--neon);margin:0;font-size:20px}
-  .panel{background:var(--glass);padding:8px 12px;border-radius:10px}
-  canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
-  .hud{display:flex;gap:12px;align-items:center}
-  button{background:linear-gradient(90deg,var(--neon),var(--accent));border:none;color:#001;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-  .menuOverlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
-  .menuCard{width:720px;background:linear-gradient(180deg,rgba(2,6,16,0.95),rgba(6,10,20,0.9));border-radius:12px;padding:18px;color:#dff6ff;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-  .levels{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-  .levelBtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;cursor:pointer;color:#cfe9ff}
-  .small{font-size:13px;color:#9fb8d9}
-  .center{display:flex;justify-content:center;gap:8px;margin-top:12px}
-  .hudRight{display:flex;gap:10px;align-items:center}
-  .stat{font-weight:700;color:var(--neon)}
-  .controls{font-size:13px;color:#9fb8d9;margin-top:8px}
-  @media (max-width:800px){ .menuCard{width:92%} canvas{height:360px} }
+  :root{
+    --bg:#87CEEB;
+    --ground:#6b4f2b;
+    --panel: rgba(0,0,0,0.6);
+    --accent:#ffcc00;
+    --hud:#ffffff;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;}
+  #gameWrap{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:linear-gradient(#87CEEB,#bfe9ff 60%);}
+  header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:linear-gradient(rgba(255,255,255,0.06),rgba(255,255,255,0));backdrop-filter: blur(2px);}
+  header .title{font-weight:700;color:#05386b}
+  header .controls{display:flex;gap:8px;align-items:center}
+  button{background:var(--panel);color:var(--hud);border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
+  button:hover{opacity:0.95}
+  #canvasContainer{flex:1;position:relative;display:flex;align-items:center;justify-content:center}
+  canvas{background:transparent;display:block;max-width:100%;height:auto}
+  #hud{position:absolute;left:12px;top:12px;color:var(--hud);z-index:10}
+  #hud .row{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+  .panel{background:var(--panel);padding:8px 10px;border-radius:8px;color:var(--hud);font-weight:600}
+  #results{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;min-width:320px;max-width:90%;display:none}
+  #results .card{background:linear-gradient(180deg,#fff,#f3f3f3);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.25);text-align:center}
+  #results h2{margin:0 0 8px;color:#222}
+  .stars{font-size:28px;color:#ffb400;margin:8px 0}
+  .small{font-size:13px;color:#444}
+  footer{padding:8px 12px;background:linear-gradient(rgba(255,255,255,0),rgba(0,0,0,0.02));display:flex;justify-content:space-between;align-items:center}
+  @media (max-width:700px){
+    header .title{font-size:14px}
+    button{padding:6px 8px}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="gameWrap">
   <header>
-    <div>
-      <h1>MotoX Rally</h1>
-      <div class="small">Race AI opponents, perform stunts, beat checkpoints — Moto X3M inspired physics</div>
-    </div>
-    <div class="panel hud">
-      <div>Position: <span id="pos">1/4</span></div>
-      <div>Lap: <span id="lap">1</span>/<span id="lapsTotal">2</span></div>
-      <div>Time: <span id="time">0.00</span>s</div>
-      <div class="hudRight"><button id="menuToggle">Menu</button></div>
+    <div class="title">Moto X3M — Canvas Edition</div>
+    <div class="controls">
+      <div class="panel small">Level: <span id="levelName">1</span></div>
+      <div class="panel small">Time: <span id="time">0.00</span>s</div>
+      <button id="restartBtn">Restart (R)</button>
     </div>
   </header>
 
-  <div style="position:relative">
-    <canvas id="game" width="1100" height="560"></canvas>
+  <div id="canvasContainer">
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
 
-    <div id="menu" class="menuOverlay" style="display:flex">
-      <div class="menuCard">
-        <h2 style="margin:0;color:var(--neon)">MotoX Rally — Main Menu</h2>
-        <p class="small" style="margin-top:8px">Select a map, choose laps, then press Start. Race AI opponents or practice stunts.</p>
+    <div id="hud">
+      <div class="row">
+        <div class="panel">Speed: <span id="speed">0</span> km/h</div>
+        <div class="panel">Flips: <span id="flips">0</span></div>
+        <div class="panel">Score: <span id="score">0</span></div>
+      </div>
+      <div class="row">
+        <div class="panel small">Controls: W/A/S/D or Arrows — R restart</div>
+      </div>
+    </div>
 
+    <div id="results">
+      <div class="card">
+        <h2 id="resultTitle">Level Complete</h2>
+        <div class="small" id="resultTime">Time: 0.00s</div>
+        <div class="stars" id="resultStars">★★★</div>
         <div style="margin-top:12px">
-          <label class="small">Select Map</label>
-          <div class="levels" id="levelsList"></div>
+          <button id="nextBtn">Next Level</button>
+          <button id="retryBtn">Retry</button>
         </div>
-
-        <div style="margin-top:12px">
-          <label class="small">Laps</label>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="levelBtn" data-laps="1">1</button>
-            <button class="levelBtn" data-laps="2">2</button>
-            <button class="levelBtn" data-laps="3">3</button>
-          </div>
-        </div>
-
-        <div class="center">
-          <button id="startBtn">Start Race</button>
-          <button id="aiToggle">AI: On</button>
-          <button id="restartBtn">Restart</button>
-        </div>
-
-        <div class="controls">Controls: ←/→ or A/D to lean; ↑/W to accelerate; ↓/S to brake; Space to flip in air; R to restart; Esc for menu.</div>
       </div>
     </div>
   </div>
+
+  <footer>
+    <div class="small">Built with Canvas API — Physics simplified for fun</div>
+    <div class="small">Tip: Lean in air to control rotation; land flat to avoid crash</div>
+  </footer>
 </div>
 
 <script>
-/* MotoX Rally - Fixed worldX wrapping so riders don't vanish */
+/*
+Moto X3M Inspired Canvas Game
+- Single-file implementation
+- Controls: W/Up = accelerate, S/Down = brake, A/Left = lean back, D/Right = lean forward, R = restart
+- Levels defined in `LEVELS` array. Add new levels by adding objects to that array.
+- Modular classes: Player, Wheel, Level, Obstacle
+- Physics: simple rigid-body-like system with two wheels, chassis, springs for suspension
+- Collision: terrain represented as line segments; wheel-ground collision via circle-segment intersection
+- Flips detection: track rotation while airborne
+- Camera: smooth follow with lag
+- Sounds: simple WebAudio engine for engine pitch and crash beep
+*/
 
-/* Canvas setup */
-const canvas = document.getElementById('game'), ctx = canvas.getContext('2d');
-let W = canvas.width, H = canvas.height;
-(function setDPR(){ const dpr = Math.min(2, window.devicePixelRatio || 1); canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; ctx.setTransform(dpr,0,0,dpr,0,0); })();
+(() => {
+  // ---------- Config ----------
+  const CONFIG = {
+    gravity: 1600,            // px/s^2
+    wheelRadius: 18,
+    wheelMass: 3,
+    chassisMass: 8,
+    suspensionStiffness: 2200,
+    suspensionDamping: 180,
+    maxEngineForce: 2200,
+    brakeForce: 3000,
+    airControlTorque: 1200,  // torque applied when leaning
+    maxTilt: Math.PI * 0.9,
+    timeScale: 1,
+    pixelsPerMeter: 1,
+    cameraLag: 0.08,
+    groundFriction: 0.9,
+    flipBonusTime: 0.8,      // seconds reduced per flip
+    flipScore: 150,
+    targetFPS: 60
+  };
 
-/* UI */
-const menuEl = document.getElementById('menu');
-const startBtn = document.getElementById('startBtn');
-const restartBtn = document.getElementById('restartBtn');
-const menuToggle = document.getElementById('menuToggle');
-const levelsList = document.getElementById('levelsList');
-const aiToggle = document.getElementById('aiToggle');
-const posEl = document.getElementById('pos');
-const lapEl = document.getElementById('lap');
-const lapsTotalEl = document.getElementById('lapsTotal');
-const timeEl = document.getElementById('time');
+  // ---------- Utility ----------
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function now(){ return performance.now()/1000; }
+  function rand(min,max){ return min + Math.random()*(max-min); }
 
-let showAI = true;
-aiToggle.onclick = ()=>{ showAI = !showAI; aiToggle.textContent = 'AI: ' + (showAI ? 'On' : 'Off'); };
-
-/* Controls */
-const keys = {};
-addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
-addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-
-/* Game state */
-let state = 'menu'; // menu, racing, paused, finished
-let currentMap = 0;
-let lapsToDo = 2;
-let raceTime = 0;
-let players = []; // player + AI
-let checkpoints = [];
-
-/* Maps */
-const maps = [
-  { name: 'Bay Bridge Circuit', length: 3600, laps: 2, accent: '#00f0ff', path: generateOvalPath(3600, 220, 160, 0.5), scenery: drawCityBridge, startOffsets: [0, -40, -80, -120] },
-  { name: 'Desert Highway', length: 4200, laps: 2, accent: '#ffd166', path: generateSinePath(4200, 220, 0.006, 60), scenery: drawDesert, startOffsets: [0, -40, -80, -120] },
-  { name: 'Mountain Pass', length: 4800, laps: 2, accent: '#7be495', path: generateWindingPath(4800, 220, 0.008, 120), scenery: drawMountain, startOffsets: [0, -40, -80, -120] }
-];
-
-/* Populate level buttons */
-maps.forEach((m,i)=>{ const b=document.createElement('button'); b.className='levelBtn'; b.textContent=(i+1)+'. '+m.name; b.onclick=()=>{ currentMap=i; highlightMap(); }; levelsList.appendChild(b); });
-function highlightMap(){ Array.from(levelsList.children).forEach((btn,idx)=> btn.style.outline = idx===currentMap ? '2px solid rgba(255,255,255,0.12)' : 'none'); }
-highlightMap();
-
-/* Lap buttons */
-Array.from(document.querySelectorAll('[data-laps]')).forEach(btn=>{ btn.onclick = ()=>{ lapsToDo = parseInt(btn.dataset.laps); lapsTotalEl.textContent = lapsToDo; }; });
-lapsTotalEl.textContent = lapsToDo;
-
-/* Path generators */
-function generateOvalPath(length, centerY, radiusX, curvature){
-  const pts=[]; const segments=Math.floor(length/8);
-  for(let i=0;i<segments;i++){ const t=i/segments; const angle=t*Math.PI*2; const x=i*(length/segments); const y=centerY + Math.sin(angle*curvature)*radiusX; pts.push({x,y}); }
-  return pts;
-}
-function generateSinePath(length, centerY, freq, amp){
-  const pts=[]; const segments=Math.floor(length/6);
-  for(let i=0;i<segments;i++){ const x=i*(length/segments); const y=centerY + Math.sin(x*freq)*amp; pts.push({x,y}); }
-  return pts;
-}
-function generateWindingPath(length, centerY, freq, amp){
-  const pts=[]; const segments=Math.floor(length/6);
-  for(let i=0;i<segments;i++){ const x=i*(length/segments); const y=centerY + Math.sin(x*freq)*amp + Math.cos(x*freq*0.6)*(amp*0.4); pts.push({x,y}); }
-  return pts;
-}
-
-/* Rider factory */
-function createRider(isPlayer, startOffset, color){
-  return { isPlayer, color, worldX: startOffset, speed:0, vx:0, vy:0, angle:0, angVel:0, onGround:true, airtime:0, rotationAccum:0, lap:1, checkpointIndex:0, finished:false, name:isPlayer?'You':'AI' };
-}
-
-/* Wrap worldX into [0, map.length) for sampling */
-function wrapX(x, map){
-  if(!map || !map.length) return 0;
-  let v = x % map.length;
-  if(v < 0) v += map.length;
-  return v;
-}
-
-/* Ground sampling uses wrapped X */
-function groundYAt(map, worldX){
-  const pts = map.path || [];
-  if(pts.length === 0) return H - 140;
-  const wrapped = wrapX(worldX, map);
-  const idx = Math.floor((wrapped / map.length) * pts.length);
-  const safeIdx = ((idx % pts.length) + pts.length) % pts.length;
-  const p = pts[safeIdx] || {y:0};
-  const base = H - 140;
-  return base + (p.y || 0);
-}
-
-/* Ramp detection uses wrapped X */
-function rampAt(map, worldX){
-  if(!map.ramps) return null;
-  const wrapped = wrapX(worldX, map);
-  for(const r of map.ramps){ if(wrapped >= r.x && wrapped <= r.x + r.w) return r; }
-  return null;
-}
-
-/* Map ramp definitions */
-maps[0].ramps = [{x:420,w:120,h:-90},{x:980,w:160,h:-120},{x:1700,w:140,h:-100},{x:2600,w:180,h:-140}];
-maps[1].ramps = [{x:300,w:140,h:-90},{x:760,w:100,h:-70},{x:1400,w:200,h:-150},{x:2200,w:160,h:-110}];
-maps[2].ramps = [{x:420,w:110,h:-70},{x:920,w:150,h:-110},{x:1600,w:130,h:-90},{x:2400,w:170,h:-130}];
-
-/* Init race */
-function initRace(){
-  const map = maps[currentMap];
-  players = [];
-  const startOffsets = map.startOffsets;
-  for(let i=0;i<4;i++){
-    const rider = createRider(i===0, (startOffsets[i] || 0) + (i*20), i===0 ? map.accent : (i===1? '#ff6b6b' : (i===2? '#ffd166' : '#9fb8d9')));
-    // ensure worldX is non-negative and within range for sampling
-    rider.worldX = wrapX(rider.worldX, map);
-    players.push(rider);
+  // ---------- Canvas & Scaling ----------
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d', { alpha: true });
+  let W = canvas.width, H = canvas.height;
+  function resizeCanvas(){
+    const container = document.getElementById('canvasContainer');
+    const rect = container.getBoundingClientRect();
+    // Keep 16:9 ratio based on canvas base size
+    const scale = Math.min(rect.width / 1280, rect.height / 720);
+    canvas.style.width = Math.round(1280 * scale) + 'px';
+    canvas.style.height = Math.round(720 * scale) + 'px';
   }
-  checkpoints = [];
-  const cpCount = 6;
-  for(let i=1;i<=cpCount;i++) checkpoints.push(Math.floor((i/cpCount) * map.length));
-  raceTime = 0;
-  document.getElementById('pos').textContent = '1/' + players.length;
-  document.getElementById('lap').textContent = '1';
-  document.getElementById('lapsTotal').textContent = lapsToDo;
-}
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-/* Physics */
-const phys = { gravity:0.9, throttle:0.18, brake:0.28, airControl:0.02, angularDrag:0.985, airDrag:0.995, maxLean:1.2, suspension:0.18 };
+  // ---------- Input ----------
+  const input = { left:false, right:false, up:false, down:false, restart:false, boost:false };
+  window.addEventListener('keydown', e => {
+    if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = true;
+    if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = true;
+    if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = true;
+    if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = true;
+    if(e.key === 'r' || e.key === 'R') input.restart = true;
+    if(e.code === 'Space') input.boost = true;
+  });
+  window.addEventListener('keyup', e => {
+    if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') input.left = false;
+    if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') input.right = false;
+    if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') input.up = false;
+    if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') input.down = false;
+    if(e.key === 'r' || e.key === 'R') input.restart = false;
+    if(e.code === 'Space') input.boost = false;
+  });
 
-/* AI update (uses wrapX for sampling) */
-function updateAI(ai, map, dt){
-  if(ai.finished) return;
-  const lookAhead = 60;
-  const nextX = wrapX(ai.worldX + lookAhead, map);
-  let target = 6 + Math.sin(ai.worldX*0.002)*1.5;
-  for(const r of map.ramps || []){ if(nextX > r.x - 40 && nextX < r.x + r.w + 40) target += 2.5; }
-  if(ai.speed < target) ai.speed += phys.throttle * dt * 0.8; else ai.speed -= phys.brake * dt * 0.6;
-  ai.speed = Math.max(0, Math.min(12, ai.speed));
-  const ramp = rampAt(map, ai.worldX);
-  if(ramp && ai.onGround){
-    ai.vy = -6 - Math.min(6, ai.speed * 0.35);
-    ai.onGround = false;
+  // ---------- Simple Sound Engine (WebAudio) ----------
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = AudioCtx ? new AudioCtx() : null;
+  function playBeep(freq=440, time=0.08, type='sine', gain=0.12){
+    if(!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = gain;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time);
+    o.stop(audioCtx.currentTime + time + 0.02);
   }
-  if(!ai.onGround){
-    ai.angVel += (Math.random()-0.5)*0.002 * dt;
-    ai.angle += ai.angVel * dt;
-    ai.vy += phys.gravity * dt;
-    ai.worldY = (ai.worldY || 0) + ai.vy * dt * 12;
-    ai.worldX += ai.speed * dt * 1.2;
-    const groundY = groundYAt(map, ai.worldX);
-    if(ai.vy > 0 && (ai.worldY + 24) >= groundY){ ai.onGround = true; ai.vy = 0; ai.angle = 0; ai.worldY = groundY - 24; }
-  } else {
-    ai.worldX += ai.speed * dt * 1.2;
+  // engine sound: create oscillator and control frequency
+  let engineOsc = null, engineGain = null;
+  function startEngineSound(){
+    if(!audioCtx) return;
+    if(engineOsc) return;
+    engineOsc = audioCtx.createOscillator();
+    engineGain = audioCtx.createGain();
+    engineOsc.type = 'sawtooth';
+    engineOsc.frequency.value = 80;
+    engineGain.gain.value = 0.02;
+    engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination);
+    engineOsc.start();
   }
-  if(ai.worldX >= map.length){ ai.worldX -= map.length; ai.lap++; if(ai.lap > lapsToDo) ai.finished = true; }
-}
+  function stopEngineSound(){
+    if(!engineOsc) return;
+    engineOsc.stop(); engineOsc.disconnect();
+    engineGain.disconnect();
+    engineOsc = null; engineGain = null;
+  }
+  function setEnginePitch(p){
+    if(!engineOsc) return;
+    engineOsc.frequency.value = 60 + p * 160;
+    engineGain.gain.value = 0.01 + p * 0.03;
+  }
 
-/* Start / menu handlers */
-startBtn.onclick = ()=>{ menuEl.style.display='none'; state='racing'; initRace(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); };
-restartBtn.onclick = ()=>{ initRace(); state='racing'; menuEl.style.display='none'; };
-menuToggle.onclick = ()=>{ menuEl.style.display = (menuEl.style.display === 'none') ? 'flex' : 'none'; state = (menuEl.style.display === 'none') ? 'racing' : 'menu'; };
-
-/* Audio helper */
-const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
-function beep(freq=440, t=0.06, vol=0.06){ if(!audioCtx) return; const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+t); }
-
-/* Main loop */
-let last = performance.now();
-function loop(now){
-  const dt = Math.min(40, now - last) / 16.666;
-  last = now;
-  update(dt);
-  render();
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-/* Update */
-function update(dt){
-  if(state !== 'racing') return;
-  const map = maps[currentMap];
-  raceTime += dt * (1/60) * 16.666;
-  if(players.length === 0) initRace();
-
-  const rider = players[0];
-  if(!rider.finished){
-    const left = keys['arrowleft'] || keys['a'];
-    const right = keys['arrowright'] || keys['d'];
-    const up = keys['arrowup'] || keys['w'];
-    const down = keys['arrowdown'] || keys['s'];
-    const flip = keys[' '] || keys['space'];
-    const accel = up ? phys.throttle : phys.throttle * 0.2;
-    const braking = down ? phys.brake : 0;
-    rider.speed += (accel - braking) * dt;
-    rider.speed = Math.max(0, Math.min(12, rider.speed));
-    const r = rampAt(map, rider.worldX);
-    if(r && rider.onGround && rider.speed > 3){
-      rider.vy = -6 - Math.min(6, rider.speed * 0.35);
-      rider.onGround = false;
-      beep(880,0.04,0.04);
+  // ---------- Level Data ----------
+  // Each level: startX, finishX, terrain segments, obstacles array
+  // Terrain segments: array of points [x,y] forming polyline
+  // Obstacles: type, x, y, params
+  const LEVELS = [
+    // Level 1: gentle ramps
+    {
+      name: "Beginner's Hill",
+      startX: 0,
+      finishX: 2200,
+      startPos: { x: 60, y: 420 },
+      terrain: [
+        [ -200, 520 ], [0,520], [120,520], [220,480], [360,480], [520,520], [700,520],
+        [820,460], [920,420], [1040,420], [1160,480], [1300,520], [1500,520],
+        [1620,460], [1740,420], [1860,420], [1980,480], [2120,520], [2400,520]
+      ],
+      obstacles: [
+        { type:'spikes', x: 540, y: 520 },
+        { type:'saw', x: 900, y: 420, radius:28, speed:2.2 },
+        { type:'barrel', x: 1700, y: 520 },
+        { type:'movingPlatform', x: 1280, y: 460, w:120, h:12, range:120, speed:1.2 },
+      ],
+      timeThresholds: [18, 28] // 3 stars if <18, 2 stars if <28 else 1
+    },
+    // Level 2: jumps and gap
+    {
+      name: "Big Air",
+      startX: 0,
+      finishX: 3000,
+      startPos: { x: 60, y: 420 },
+      terrain: [
+        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[900,520],
+        [980,520],[1040,420],[1160,420],[1280,420],[1400,520],[1520,520],[1640,480],
+        [1760,420],[1880,420],[2000,520],[2200,520],[2360,420],[2480,420],[2600,520],[3200,520]
+      ],
+      obstacles: [
+        { type:'spikes', x: 1060, y: 420 },
+        { type:'saw', x: 1500, y: 520, radius:30, speed:2.6 },
+        { type:'falling', x: 2360, y: 420, w:120, h:12, delay:0.6 },
+        { type:'loop', x: 2440, y: 420, radius:60 }
+      ],
+      timeThresholds: [22, 36]
+    },
+    // Level 3: moving hazards and narrow landings
+    {
+      name: "Hazard Course",
+      startX: 0,
+      finishX: 2600,
+      startPos: { x: 60, y: 420 },
+      terrain: [
+        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[860,520],[980,480],
+        [1100,420],[1220,420],[1340,480],[1460,520],[1580,520],[1700,480],[1820,420],[1940,420],[2060,520],[2600,520]
+      ],
+      obstacles: [
+        { type:'movingSaw', x: 920, y: 480, radius:26, range:160, speed:2.2 },
+        { type:'barrel', x: 1320, y: 420 },
+        { type:'movingPlatform', x: 1560, y: 520, w:140, h:12, range:180, speed:1.6 },
+        { type:'spikes', x: 2000, y: 520 }
+      ],
+      timeThresholds: [20, 34]
+    },
+    // Level 4: loop and tricky landings
+    {
+      name: "Loop the Loop",
+      startX: 0,
+      finishX: 3200,
+      startPos: { x: 60, y: 420 },
+      terrain: [
+        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[900,520],[1100,480],[1220,420],[1340,420],[1460,480],[1580,520],[1800,520],[2000,520],[2200,420],[2320,420],[2440,520],[3200,520]
+      ],
+      obstacles: [
+        { type:'loop', x: 1200, y: 420, radius:80 },
+        { type:'saw', x: 2100, y: 520, radius:32, speed:3.0 },
+        { type:'barrel', x: 2500, y: 520 }
+      ],
+      timeThresholds: [24, 40]
+    },
+    // Level 5: gauntlet
+    {
+      name: "Gauntlet",
+      startX: 0,
+      finishX: 3600,
+      startPos: { x: 60, y: 420 },
+      terrain: [
+        [-200,520],[0,520],[200,520],[360,480],[520,480],[700,520],[820,520],[940,480],[1060,420],[1180,420],[1300,480],[1420,520],[1540,520],[1660,480],[1780,420],[1900,420],[2020,480],[2140,520],[2260,520],[2380,480],[2500,420],[2620,420],[2740,480],[2860,520],[3600,520]
+      ],
+      obstacles: [
+        { type:'saw', x: 900, y: 480, radius:28, speed:2.4 },
+        { type:'movingSaw', x: 1500, y: 520, radius:26, range:200, speed:2.6 },
+        { type:'falling', x: 2100, y: 420, w:120, h:12, delay:0.5 },
+        { type:'barrel', x: 2700, y: 520 },
+        { type:'spikes', x: 3200, y: 520 }
+      ],
+      timeThresholds: [28, 46]
     }
-    if(!rider.onGround){
-      const rotInput = (right ? 0.02 : 0) - (left ? 0.02 : 0);
-      rider.angVel += rotInput * dt;
-      if(flip) rider.angVel += 0.06 * dt;
-      rider.angle += rider.angVel * dt;
-      rider.vy += phys.gravity * dt;
-      rider.worldY = (rider.worldY || 0) + rider.vy * dt * 12;
-      rider.worldX += rider.speed * dt * 1.2;
-      rider.rotationAccum = (rider.rotationAccum || 0) + Math.abs(rider.angVel * dt);
-      rider.airtime = (rider.airtime || 0) + dt;
-    } else {
-      rider.worldX += rider.speed * dt * 1.2;
+  ];
+
+  // ---------- Physics Primitives ----------
+  class Vec {
+    constructor(x=0,y=0){ this.x=x; this.y=y; }
+    add(v){ return new Vec(this.x+v.x, this.y+v.y); }
+    sub(v){ return new Vec(this.x-v.x, this.y-v.y); }
+    mul(s){ return new Vec(this.x*s, this.y*s); }
+    dot(v){ return this.x*v.x + this.y*v.y; }
+    len(){ return Math.hypot(this.x,this.y); }
+    norm(){ const l=this.len()||1; return new Vec(this.x/l,this.y/l); }
+  }
+
+  // ---------- Terrain collision helpers ----------
+  function pointToSegmentDistance(px,py,x1,y1,x2,y2){
+    const vx = x2-x1, vy = y2-y1;
+    const wx = px-x1, wy = py-y1;
+    const c1 = vx*wx + vy*wy;
+    if(c1 <= 0) return Math.hypot(px-x1,py-y1);
+    const c2 = vx*vx + vy*vy;
+    if(c2 <= c1) return Math.hypot(px-x2,py-y2);
+    const t = c1 / c2;
+    const projx = x1 + t*vx, projy = y1 + t*vy;
+    return Math.hypot(px-projx,py-projy);
+  }
+
+  // ---------- Player & Wheels ----------
+  class Wheel {
+    constructor(x,y,r){
+      this.pos = new Vec(x,y);
+      this.prevPos = new Vec(x,y);
+      this.vel = new Vec(0,0);
+      this.r = r;
+      this.onGround = false;
+      this.groundNormal = new Vec(0,-1);
+      this.angular = 0;
+      this.angularVel = 0;
     }
-    const groundY = groundYAt(map, rider.worldX);
-    if(!rider.onGround && (rider.worldY + 24) >= groundY){
-      const landingSpeed = Math.abs(rider.vy);
-      const rotationScore = Math.floor((rider.rotationAccum || 0) * 40);
-      const airtimeScore = Math.floor((rider.airtime || 0) * 30);
-      const anglePenalty = Math.max(0, Math.abs(rider.angle) - 0.6);
-      const landingBonus = Math.max(0, rotationScore + airtimeScore - Math.floor(anglePenalty * 100));
-      if(landingBonus > 0) { beep(1200,0.06,0.06); }
-      rider.airtime = 0; rider.rotationAccum = 0;
-      if(landingSpeed > 10 || Math.abs(rider.angle) > 1.6){
-        rider.finished = true; state = 'finished'; menuEl.style.display = 'flex'; startBtn.style.display = 'none'; beep(120,0.4,0.12);
-      } else {
-        rider.vy *= 0.2; rider.angVel *= 0.2; rider.angle *= 0.4; rider.onGround = true;
+    applyImpulse(ix,iy){
+      this.vel.x += ix; this.vel.y += iy;
+    }
+    integrate(dt){
+      // Verlet-like integration for stability
+      const nx = this.pos.x + (this.pos.x - this.prevPos.x) + this.vel.x * dt * dt;
+      const ny = this.pos.y + (this.pos.y - this.prevPos.y) + this.vel.y * dt * dt;
+      this.prevPos.x = this.pos.x; this.prevPos.y = this.pos.y;
+      this.pos.x = nx; this.pos.y = ny;
+      // reset vel (we store separately)
+      this.vel.x = 0; this.vel.y = 0;
+    }
+  }
+
+  class Player {
+    constructor(x,y){
+      // wheels positions relative to chassis
+      this.front = new Wheel(x+60,y,CONFIG.wheelRadius);
+      this.rear = new Wheel(x-60,y,CONFIG.wheelRadius);
+      this.chassisPos = new Vec(x,y-40);
+      this.chassisVel = new Vec(0,0);
+      this.chassisAngle = 0;
+      this.chassisAngularVel = 0;
+      this.score = 0;
+      this.flips = 0;
+      this.bestFlipAngle = 0;
+      this.onGround = false;
+      this.crashed = false;
+      this.finished = false;
+      this.boost = 0;
+      this.timeSinceStart = 0;
+      this.reset(x,y);
+    }
+    reset(x,y){
+      this.front.pos = new Vec(x+60,y);
+      this.front.prevPos = new Vec(x+60,y);
+      this.rear.pos = new Vec(x-60,y);
+      this.rear.prevPos = new Vec(x-60,y);
+      this.chassisPos = new Vec(x,y-40);
+      this.chassisVel = new Vec(0,0);
+      this.chassisAngle = 0;
+      this.chassisAngularVel = 0;
+      this.score = 0;
+      this.flips = 0;
+      this.bestFlipAngle = 0;
+      this.onGround = false;
+      this.crashed = false;
+      this.finished = false;
+      this.boost = 0;
+      this.timeSinceStart = 0;
+      this.airRotationAccum = 0;
+      this.wasAirborne = false;
+      this.lastGroundContact = now();
+    }
+
+    applyControls(dt, input){
+      if(this.crashed || this.finished) return;
+      // engine force applied to rear wheel (simple)
+      let engine = 0;
+      if(input.up) engine += 1;
+      if(input.down) engine -= 0.8;
+      // boost
+      if(input.boost && this.boost > 0){
+        engine += 1.6;
+        this.boost -= dt*0.8;
       }
-      rider.worldY = groundY - 24;
+      // torque for lean
+      let torque = 0;
+      if(input.left) torque -= 1;
+      if(input.right) torque += 1;
+      // apply torque to chassis angular velocity
+      this.chassisAngularVel += torque * CONFIG.airControlTorque * dt / CONFIG.chassisMass;
+      // apply forward force to rear wheel along chassis direction
+      const dir = new Vec(Math.cos(this.chassisAngle), Math.sin(this.chassisAngle));
+      const force = engine * CONFIG.maxEngineForce;
+      // convert to impulse for wheel
+      const impulse = force * dt / CONFIG.wheelMass;
+      this.rear.applyImpulse(dir.x * impulse, dir.y * impulse);
+      // braking
+      if(input.down){
+        // apply opposite impulse to wheels to slow
+        const brakeImpulse = CONFIG.brakeForce * dt / CONFIG.wheelMass;
+        this.rear.applyImpulse(-dir.x * brakeImpulse, -dir.y * brakeImpulse);
+        this.front.applyImpulse(-dir.x * brakeImpulse*0.6, -dir.y * brakeImpulse*0.6);
+      }
     }
-    if(rider.worldX >= map.length){ rider.worldX -= map.length; rider.lap++; if(rider.lap > lapsToDo) rider.finished = true; }
+
+    physicsUpdate(dt, level){
+      if(this.crashed || this.finished) return;
+      // gravity to wheels and chassis
+      const g = CONFIG.gravity;
+      this.front.vel.y += g * dt;
+      this.rear.vel.y += g * dt;
+      this.chassisVel.y += g * dt * 0.6; // chassis lighter gravity effect
+
+      // suspension: spring between chassis and each wheel
+      const applySuspension = (wheel, offsetX) => {
+        const worldAnchor = new Vec(this.chassisPos.x + Math.cos(this.chassisAngle)*offsetX - Math.sin(this.chassisAngle)*0,
+                                  this.chassisPos.y + Math.sin(this.chassisAngle)*offsetX + Math.cos(this.chassisAngle)*0);
+        const dx = wheel.pos.x - worldAnchor.x;
+        const dy = wheel.pos.y - worldAnchor.y;
+        const dist = Math.hypot(dx,dy);
+        const rest = 60;
+        const dirx = dx / (dist || 1), diry = dy / (dist || 1);
+        const stretch = dist - rest;
+        const springForce = -CONFIG.suspensionStiffness * stretch;
+        // damping based on relative velocity (approx)
+        const relVelX = (wheel.pos.x - wheel.prevPos.x) - (this.chassisPos.x - (this.chassisPos.x - this.chassisVel.x*dt));
+        const relVelY = (wheel.pos.y - wheel.prevPos.y) - (this.chassisPos.y - (this.chassisPos.y - this.chassisVel.y*dt));
+        const damping = -CONFIG.suspensionDamping * (relVelX*dirx + relVelY*diry);
+        const fx = (springForce + damping) * dirx;
+        const fy = (springForce + damping) * diry;
+        // apply to wheel and chassis
+        wheel.applyImpulse(fx * dt / CONFIG.wheelMass, fy * dt / CONFIG.wheelMass);
+        this.chassisVel.x -= fx * dt / CONFIG.chassisMass;
+        this.chassisVel.y -= fy * dt / CONFIG.chassisMass;
+      };
+      applySuspension(this.front, +60);
+      applySuspension(this.rear, -60);
+
+      // integrate wheels (simple verlet)
+      this.front.integrate(dt);
+      this.rear.integrate(dt);
+
+      // integrate chassis
+      this.chassisPos.x += this.chassisVel.x * dt;
+      this.chassisPos.y += this.chassisVel.y * dt;
+      this.chassisAngle += this.chassisAngularVel * dt;
+
+      // ground collisions for wheels
+      const segments = level.segments;
+      const handleWheelCollision = (wheel) => {
+        wheel.onGround = false;
+        for(let i=0;i<segments.length-1;i++){
+          const a = segments[i], b = segments[i+1];
+          // project wheel center onto segment
+          const vx = b[0]-a[0], vy = b[1]-a[1];
+          const wx = wheel.pos.x - a[0], wy = wheel.pos.y - a[1];
+          const c1 = vx*wx + vy*wy;
+          const c2 = vx*vx + vy*vy;
+          let closestX, closestY;
+          if(c1 <= 0){ closestX = a[0]; closestY = a[1]; }
+          else if(c1 >= c2){ closestX = b[0]; closestY = b[1]; }
+          else {
+            const t = c1 / c2;
+            closestX = a[0] + vx*t; closestY = a[1] + vy*t;
+          }
+          const dx = wheel.pos.x - closestX, dy = wheel.pos.y - closestY;
+          const dist = Math.hypot(dx,dy);
+          if(dist < wheel.r + 0.001){
+            // push wheel out
+            const nx = dx / (dist || 1), ny = dy / (dist || 1);
+            const penetration = wheel.r - dist;
+            wheel.pos.x += nx * penetration;
+            wheel.pos.y += ny * penetration;
+            // simple bounce: set prevPos to simulate velocity change
+            const velx = wheel.pos.x - wheel.prevPos.x;
+            const vely = wheel.pos.y - wheel.prevPos.y;
+            // reflect velocity along normal with friction
+            const vn = velx*nx + vely*ny;
+            const vt_x = velx - vn*nx;
+            const vt_y = vely - vn*ny;
+            const bounce = -0.1;
+            const friction = 0.85;
+            const newVx = vt_x * friction + nx * vn * bounce;
+            const newVy = vt_y * friction + ny * vn * bounce;
+            wheel.prevPos.x = wheel.pos.x - newVx;
+            wheel.prevPos.y = wheel.pos.y - newVy;
+            wheel.onGround = true;
+            wheel.groundNormal = new Vec(nx,ny);
+            this.lastGroundContact = now();
+          }
+        }
+      };
+      handleWheelCollision(this.front);
+      handleWheelCollision(this.rear);
+
+      // if either wheel on ground, consider player on ground
+      this.onGround = this.front.onGround || this.rear.onGround;
+
+      // simple chassis-ground collision (head hits)
+      // check if chassis point intersects terrain (approx)
+      for(let i=0;i<segments.length-1;i++){
+        const a = segments[i], b = segments[i+1];
+        // distance from chassis to segment
+        const d = pointToSegmentDistance(this.chassisPos.x, this.chassisPos.y, a[0],a[1],b[0],b[1]);
+        if(d < 18){
+          // crash if angle too steep or high speed
+          const angle = this.chassisAngle;
+          const deg = Math.abs(angle) * 180/Math.PI;
+          const speed = Math.hypot(this.chassisVel.x, this.chassisVel.y);
+          if(deg > 70 || speed > 420){
+            this.triggerCrash();
+          } else {
+            // push chassis up slightly
+            // simple correction
+            this.chassisPos.y -= (18 - d);
+            this.chassisVel.y *= -0.2;
+          }
+        }
+      }
+
+      // update chassis angular damping
+      this.chassisAngularVel *= 0.995;
+
+      // flips detection: if airborne, accumulate rotation
+      if(!this.onGround){
+        if(!this.wasAirborne){
+          this.airRotationAccum = 0;
+          this.wasAirborne = true;
+        }
+        this.airRotationAccum += this.chassisAngularVel * dt;
+      } else {
+        if(this.wasAirborne){
+          // landed: check flips
+          const rot = Math.abs(this.airRotationAccum) / (2*Math.PI);
+          const fullFlips = Math.floor(rot + 0.25); // require near full rotations
+          if(fullFlips > 0){
+            this.flips += fullFlips;
+            this.score += fullFlips * CONFIG.flipScore;
+            // reduce time as reward
+            gameState.time -= fullFlips * CONFIG.flipBonusTime;
+            // small sound
+            playBeep(900,0.06,'square',0.08);
+          }
+        }
+        this.wasAirborne = false;
+      }
+
+      // update chassis orientation to follow wheels (soft)
+      const desiredAngle = Math.atan2(this.front.pos.y - this.rear.pos.y, this.front.pos.x - this.rear.pos.x);
+      this.chassisAngle = lerp(this.chassisAngle, desiredAngle, 0.06);
+
+      // update chassis velocity from wheel average
+      const avgWheelVelX = ((this.front.pos.x - this.front.prevPos.x) + (this.rear.pos.x - this.rear.prevPos.x)) / (dt || 1);
+      const avgWheelVelY = ((this.front.pos.y - this.front.prevPos.y) + (this.rear.pos.y - this.rear.prevPos.y)) / (dt || 1);
+      this.chassisVel.x = lerp(this.chassisVel.x, avgWheelVelX, 0.06);
+      this.chassisVel.y = lerp(this.chassisVel.y, avgWheelVelY, 0.06);
+
+      // check finish line
+      if(this.chassisPos.x >= level.finishX){
+        this.finished = true;
+        // stop engine sound
+        stopEngineSound();
+      }
+    }
+
+    triggerCrash(){
+      if(this.crashed) return;
+      this.crashed = true;
+      // explosion particles
+      spawnParticles(this.chassisPos.x, this.chassisPos.y, 18, '#ff6b6b');
+      playBeep(120,0.18,'sawtooth',0.18);
+      stopEngineSound();
+      // small camera shake
+      camera.shake(0.18, 6);
+    }
+
+    draw(ctx){
+      // draw wheels
+      ctx.save();
+      // wheels
+      const drawWheel = (wheel) => {
+        ctx.beginPath();
+        ctx.fillStyle = '#222';
+        ctx.arc(wheel.pos.x, wheel.pos.y, wheel.r, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        // rim
+        ctx.beginPath();
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 2;
+        ctx.moveTo(wheel.pos.x, wheel.pos.y);
+        ctx.lineTo(wheel.pos.x + Math.cos(now()*wheel.r)*wheel.r*0.5, wheel.pos.y + Math.sin(now()*wheel.r)*wheel.r*0.5);
+        ctx.stroke();
+      };
+      drawWheel(this.rear);
+      drawWheel(this.front);
+
+      // chassis
+      ctx.translate(this.chassisPos.x, this.chassisPos.y);
+      ctx.rotate(this.chassisAngle);
+      // body
+      ctx.fillStyle = this.crashed ? '#aa2222' : '#ff6f00';
+      ctx.beginPath();
+      ctx.moveTo(-70, -10);
+      ctx.quadraticCurveTo(-20, -40, 40, -20);
+      ctx.quadraticCurveTo(70, -10, 60, 10);
+      ctx.quadraticCurveTo(20, 30, -40, 20);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // rider
+      ctx.save();
+      ctx.translate(0, -18);
+      ctx.rotate(-0.15);
+      ctx.fillStyle = '#222';
+      ctx.fillRect(-8, -28, 16, 28); // torso
+      ctx.beginPath(); ctx.fillStyle = '#ffd166'; ctx.arc(0, -36, 10, 0, Math.PI*2); ctx.fill(); // head
+      ctx.restore();
+
+      ctx.restore();
+    }
   }
 
-  for(let i=1;i<players.length;i++){ if(showAI) updateAI(players[i], map, dt); else players[i].speed = 0; }
-
-  const ranking = players.slice().sort((a,b)=> { const aScore = a.lap * map.length + a.worldX; const bScore = b.lap * map.length + b.worldX; return bScore - aScore; });
-  const pos = ranking.indexOf(players[0]) + 1;
-  posEl.textContent = pos + '/' + players.length;
-  lapEl.textContent = players[0].lap;
-  timeEl.textContent = raceTime.toFixed(2);
-}
-
-/* Render */
-function render(){
-  ctx.clearRect(0,0,W,H);
-  const map = maps[currentMap];
-  const g = ctx.createLinearGradient(0,0,0,H);
-  if(map.name.includes('Bay')){ g.addColorStop(0,'#071026'); g.addColorStop(1,'#020317'); }
-  if(map.name.includes('Desert')){ g.addColorStop(0,'#0b1a1a'); g.addColorStop(1,'#2b1a00'); }
-  if(map.name.includes('Mountain')){ g.addColorStop(0,'#052018'); g.addColorStop(1,'#071a10'); }
-  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-  map.scenery(map, raceTime);
-  ctx.fillStyle = '#0b1220'; ctx.fillRect(0, H-160, W, 160);
-  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 6; ctx.setLineDash([30,20]);
-  ctx.beginPath(); ctx.moveTo(W/2, H-160); ctx.lineTo(W/2, H); ctx.stroke(); ctx.setLineDash([]);
-
-  const camX = players[0] ? players[0].worldX : 0;
-  const camOffset = camX - 200;
-  ctx.save(); ctx.translate(-camOffset, 0);
-
-  ctx.globalAlpha = 0.06;
-  ctx.beginPath();
-  for(let i=0;i<map.path.length;i++){ const p = map.path[i]; const sx = p.x; const sy = H - 140 + p.y; if(i===0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy); }
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  for(const r of map.ramps){
-    ctx.fillStyle = '#2b2b2b';
-    ctx.beginPath();
-    ctx.moveTo(r.x, groundYAt(map, r.x));
-    ctx.lineTo(r.x + r.w, groundYAt(map, r.x + r.w));
-    ctx.lineTo(r.x + r.w, groundYAt(map, r.x + r.w) + 40);
-    ctx.lineTo(r.x, groundYAt(map, r.x) + 40);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(r.x, groundYAt(map, r.x) - 6, r.w, 6);
+  // ---------- Particles ----------
+  const particles = [];
+  function spawnParticles(x,y,count,color){
+    for(let i=0;i<count;i++){
+      particles.push({
+        x:x + rand(-8,8),
+        y:y + rand(-8,8),
+        vx: rand(-200,200),
+        vy: rand(-200, -40),
+        life: rand(0.4,1.2),
+        color: color || '#fff'
+      });
+    }
+  }
+  function updateParticles(dt){
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.vy += CONFIG.gravity * dt * 0.2;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life -= dt;
+      if(p.life <= 0) particles.splice(i,1);
+    }
+  }
+  function drawParticles(ctx){
+    for(const p of particles){
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x-2, p.y-2, 4, 4);
+    }
+    ctx.globalAlpha = 1;
   }
 
-  for(const cp of checkpoints){ ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(cp - 6, groundYAt(map, cp) - 120, 12, 120); }
-
-  for(const r of players){
-    const wrappedX = wrapX(r.worldX, map);
-    const sx = r.worldX; // use raw worldX for camera continuity
-    const sy = (r.worldY !== undefined ? r.worldY : groundYAt(map, r.worldX) - 24);
-    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(sx - 12, sy + 18, 48, 8);
-    ctx.save(); ctx.translate(sx + 10, sy + 10); ctx.rotate(r.angle || 0);
-    ctx.fillStyle = r.color; roundRect(ctx, -10, -8, 80, 20, 6);
-    ctx.fillStyle = '#001'; roundRect(ctx, 6, -6, 36, 12, 4);
-    ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(6, 14, 10, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(56, 14, 10, 0, Math.PI*2); ctx.fill();
-    ctx.restore();
-    ctx.fillStyle = '#cfe9ff'; ctx.font = '12px Inter'; ctx.fillText(r.isPlayer ? 'You' : r.name, sx - 6, sy - 12);
+  // ---------- Obstacles ----------
+  class Obstacle {
+    constructor(data){
+      Object.assign(this, data);
+      this.active = true;
+      // dynamic properties
+      if(this.type === 'movingPlatform'){
+        this.baseX = this.x;
+        this.t = 0;
+      }
+      if(this.type === 'movingSaw'){
+        this.baseX = this.x;
+        this.t = 0;
+      }
+      if(this.type === 'falling'){
+        this.fallen = false;
+        this.timer = 0;
+      }
+    }
+    update(dt){
+      if(this.type === 'movingPlatform'){
+        this.t += dt * this.speed;
+        this.x = this.baseX + Math.sin(this.t) * this.range;
+      }
+      if(this.type === 'movingSaw'){
+        this.t += dt * this.speed;
+        this.x = this.baseX + Math.sin(this.t) * this.range;
+      }
+      if(this.type === 'falling'){
+        // check if player near to trigger
+        if(!this.fallen){
+          // nothing here; level will trigger when player steps on it
+        } else {
+          this.y += 600 * dt;
+        }
+      }
+    }
+    draw(ctx){
+      if(this.type === 'spikes'){
+        // draw small spikes on ground
+        const spikeW = 18;
+        ctx.fillStyle = '#333';
+        for(let i=0;i<6;i++){
+          const sx = this.x + i*spikeW - 3*spikeW;
+          ctx.beginPath();
+          ctx.moveTo(sx, this.y);
+          ctx.lineTo(sx + spikeW/2, this.y - spikeW);
+          ctx.lineTo(sx + spikeW, this.y);
+          ctx.closePath();
+          ctx.fill();
+        }
+      } else if(this.type === 'saw' || this.type === 'movingSaw'){
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(now() * (this.speed || 2));
+        ctx.fillStyle = '#bbb';
+        ctx.beginPath();
+        ctx.arc(0,0,this.radius,0,Math.PI*2);
+        ctx.fill();
+        // teeth
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 3;
+        for(let i=0;i<12;i++){
+          const a = i/12*Math.PI*2;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a)*(this.radius-2), Math.sin(a)*(this.radius-2));
+          ctx.lineTo(Math.cos(a)*(this.radius+8), Math.sin(a)*(this.radius+8));
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if(this.type === 'barrel'){
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.fillStyle = '#8b3e2f';
+        ctx.fillRect(-16,-24,32,32);
+        ctx.strokeStyle = '#000';
+        ctx.strokeRect(-16,-24,32,32);
+        ctx.restore();
+      } else if(this.type === 'movingPlatform' || this.type === 'falling'){
+        ctx.fillStyle = '#444';
+        ctx.fillRect(this.x - (this.w||120)/2, this.y - (this.h||12)/2, this.w||120, this.h||12);
+      } else if(this.type === 'loop'){
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.strokeStyle = '#ff6f00';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(0,0,this.radius,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    checkCollision(player, level){
+      if(!this.active) return;
+      // simple collision checks
+      if(this.type === 'spikes'){
+        // if either wheel touches spike area
+        const dx1 = Math.abs(player.rear.pos.x - this.x);
+        const dx2 = Math.abs(player.front.pos.x - this.x);
+        if((dx1 < 80 && Math.abs(player.rear.pos.y - this.y) < 30) || (dx2 < 80 && Math.abs(player.front.pos.y - this.y) < 30)){
+          player.triggerCrash();
+        }
+      } else if(this.type === 'saw' || this.type === 'movingSaw'){
+        const sawX = this.x, sawY = this.y, r = this.radius;
+        const check = (x,y) => {
+          const d = Math.hypot(x - sawX, y - sawY);
+          if(d < r + CONFIG.wheelRadius*0.6){
+            // wheel hit saw -> crash
+            player.triggerCrash();
+          }
+        };
+        check(player.front.pos.x, player.front.pos.y);
+        check(player.rear.pos.x, player.rear.pos.y);
+        // chassis hit
+        if(Math.hypot(player.chassisPos.x - sawX, player.chassisPos.y - sawY) < r + 12){
+          player.triggerCrash();
+        }
+      } else if(this.type === 'barrel'){
+        // barrel explosion if hit
+        const bx = this.x, by = this.y - 12;
+        const d = Math.hypot(player.chassisPos.x - bx, player.chassisPos.y - by);
+        if(d < 48){
+          // explode
+          spawnParticles(bx, by, 28, '#ffb400');
+          player.triggerCrash();
+          this.active = false;
+        }
+      } else if(this.type === 'movingPlatform'){
+        // if player lands on platform, adjust wheel positions
+        const px = player.chassisPos.x;
+        const py = player.chassisPos.y;
+        const left = this.x - (this.w||120)/2, right = this.x + (this.w||120)/2;
+        const top = this.y - (this.h||12)/2;
+        // if wheel near top
+        if(player.rear.pos.x > left && player.rear.pos.x < right && Math.abs(player.rear.pos.y - top) < 30){
+          // snap wheel to platform
+          player.rear.pos.y = top - player.rear.r;
+          player.rear.prevPos.y = player.rear.pos.y;
+        }
+        if(player.front.pos.x > left && player.front.pos.x < right && Math.abs(player.front.pos.y - top) < 30){
+          player.front.pos.y = top - player.front.r;
+          player.front.prevPos.y = player.front.pos.y;
+        }
+      } else if(this.type === 'falling'){
+        // if player steps on it, start timer
+        const left = this.x - (this.w||120)/2, right = this.x + (this.w||120)/2;
+        const top = this.y - (this.h||12)/2;
+        if(!this.fallen && ((player.rear.pos.x > left && player.rear.pos.x < right && Math.abs(player.rear.pos.y - top) < 20) || (player.front.pos.x > left && player.front.pos.x < right && Math.abs(player.front.pos.y - top) < 20))){
+          this.timer += 0.016;
+          if(this.timer > (this.delay || 0.6)){
+            this.fallen = true;
+            spawnParticles(this.x, this.y, 12, '#c2c2c2');
+          }
+        }
+      } else if(this.type === 'loop'){
+        // if player enters loop area, allow passing through without crash if speed sufficient
+        const dx = player.chassisPos.x - this.x, dy = player.chassisPos.y - this.y;
+        const d = Math.hypot(dx,dy);
+        if(d < this.radius + 40){
+          // if player speed low and angle wrong, crash
+          const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
+          if(speed < 200){
+            player.triggerCrash();
+          } else {
+            // reward: small boost
+            player.boost = 1.2;
+            spawnParticles(player.chassisPos.x, player.chassisPos.y, 8, '#ffd166');
+          }
+        }
+      }
+    }
   }
 
-  ctx.restore();
+  // ---------- Level Class ----------
+  class Level {
+    constructor(data){
+      this.name = data.name;
+      this.startX = data.startX;
+      this.finishX = data.finishX;
+      this.startPos = data.startPos;
+      this.points = data.terrain;
+      this.segments = data.terrain;
+      this.obstacles = data.obstacles.map(o => new Obstacle(o));
+      this.timeThresholds = data.timeThresholds || [20,40];
+    }
+    update(dt){
+      for(const o of this.obstacles) o.update(dt);
+    }
+    draw(ctx){
+      // background parallax layers
+      // sky gradient already in CSS; draw distant hills
+      ctx.save();
+      // distant hills
+      ctx.fillStyle = '#cfe8d8';
+      ctx.beginPath();
+      ctx.moveTo(-1000, 520);
+      for(let i=0;i<40;i++){
+        const x = i*200 - camera.x*0.2;
+        const y = 420 + Math.sin(i*0.6 + camera.x*0.002)*40;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(camera.x + 4000, 720);
+      ctx.lineTo(-2000,720);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
 
-  if(state === 'menu'){ ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0,0,W,H); }
-  if(state === 'finished'){ ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H); ctx.fillStyle = '#00ffcc'; ctx.font = '36px Inter'; ctx.fillText('Race Finished', W/2 - 140, H/2 - 10); ctx.fillStyle = '#cfe9ff'; ctx.font = '18px Inter'; ctx.fillText('Time: ' + raceTime.toFixed(2) + 's', W/2 - 60, H/2 + 20); }
-}
+      // terrain
+      ctx.save();
+      ctx.fillStyle = '#6b4f2b';
+      ctx.beginPath();
+      ctx.moveTo(this.points[0][0], this.points[0][1]);
+      for(let i=1;i<this.points.length;i++){
+        ctx.lineTo(this.points[i][0], this.points[i][1]);
+      }
+      ctx.lineTo(this.points[this.points.length-1][0], 900);
+      ctx.lineTo(this.points[0][0], 900);
+      ctx.closePath();
+      ctx.fill();
 
-/* Scenery */
-function drawCityBridge(map, t){
-  for(let i=0;i<10;i++){ const bx = (i*160 - (t*0.3 % 160)); const h = 60 + (i%3)*30; ctx.fillStyle = 'rgba(10,20,30,0.6)'; ctx.fillRect(bx, 40, 120, h); ctx.fillStyle = 'rgba(255,230,120,0.06)'; for(let y=50;y<40+h;y+=12) for(let x=bx+8;x<bx+112;x+=14) ctx.fillRect(x,y,8,8); }
-  ctx.fillStyle = 'rgba(20,30,40,0.6)'; ctx.fillRect(0, H-260, W, 20);
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; for(let i=0;i<20;i++){ ctx.beginPath(); ctx.moveTo(i*60, H-260); ctx.lineTo(i*60 + 40, H-360); ctx.stroke(); }
-}
-function drawDesert(map, t){ for(let i=0;i<6;i++){ const bx = i*220 - (t*0.4 % 220); const by = 140 + Math.sin((t*0.02)+i)*8; ctx.fillStyle = 'rgba(80,50,20,0.35)'; ctx.beginPath(); ctx.ellipse(bx, by, 220, 60, 0, 0, Math.PI*2); ctx.fill(); } ctx.fillStyle = 'rgba(255,200,80,0.08)'; ctx.beginPath(); ctx.arc(W-120, 80, 60, 0, Math.PI*2); ctx.fill(); }
-function drawMountain(map, t){ for(let i=0;i<6;i++){ const bx = i*220 - (t*0.3 % 220); const by = 120; ctx.fillStyle = 'rgba(20,30,40,0.6)'; ctx.beginPath(); ctx.moveTo(bx, by+120); ctx.lineTo(bx+80, by-40); ctx.lineTo(bx+160, by+120); ctx.closePath(); ctx.fill(); } }
+      // terrain outline
+      ctx.strokeStyle = '#3f2f1f';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(this.points[0][0], this.points[0][1]);
+      for(let i=1;i<this.points.length;i++){
+        ctx.lineTo(this.points[i][0], this.points[i][1]);
+      }
+      ctx.stroke();
+      ctx.restore();
 
-/* Helpers */
-function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.fill(); }
+      // finish line
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(this.finishX - 6, 360, 12, 160);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(this.finishX - 6, 360, 12, 20);
+      ctx.restore();
 
-/* Shortcuts */
-addEventListener('keydown', e=>{ if(e.key === 'Escape'){ menuEl.style.display = 'flex'; state='menu'; } if(e.key === 'r'){ initRace(); state='racing'; menuEl.style.display='none'; } });
-document.addEventListener('click', ()=>{ if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, {once:true});
+      // obstacles
+      for(const o of this.obstacles) o.draw(ctx);
+    }
+  }
 
-/* Init */
-menuEl.style.display = 'flex';
-startBtn.style.display = 'inline-block';
+  // ---------- Camera ----------
+  const camera = {
+    x: 0, y: 0, shakeTime:0, shakeMag:0,
+    update(targetX, targetY, dt){
+      const desiredX = targetX - 420; // keep player slightly left for forward visibility
+      this.x = lerp(this.x, desiredX, CONFIG.cameraLag);
+      this.y = lerp(this.y, targetY - 360, CONFIG.cameraLag);
+      if(this.shakeTime > 0){
+        this.shakeTime -= dt;
+      }
+    },
+    apply(ctx){
+      ctx.setTransform(1,0,0,1,0,0);
+      // center camera
+      const tx = -this.x + 160 + (this.shakeTime>0 ? rand(-this.shakeMag,this.shakeMag) : 0);
+      const ty = -this.y + (this.shakeTime>0 ? rand(-this.shakeMag,this.shakeMag) : 0);
+      ctx.translate(tx, ty);
+    },
+    shake(time, mag){
+      this.shakeTime = time; this.shakeMag = mag;
+    }
+  };
+
+  // ---------- Game State ----------
+  let currentLevelIndex = 0;
+  let level = new Level(LEVELS[currentLevelIndex]);
+  let player = new Player(level.startPos.x, level.startPos.y);
+  let lastTime = now();
+  let accumulator = 0;
+  let gameState = {
+    running: true,
+    time: 0,
+    bestTimes: JSON.parse(localStorage.getItem('moto_bestTimes') || '{}'),
+    score: 0
+  };
+
+  // UI elements
+  const levelNameEl = document.getElementById('levelName');
+  const timeEl = document.getElementById('time');
+  const speedEl = document.getElementById('speed');
+  const flipsEl = document.getElementById('flips');
+  const scoreEl = document.getElementById('score');
+  const restartBtn = document.getElementById('restartBtn');
+  const resultsEl = document.getElementById('results');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultTime = document.getElementById('resultTime');
+  const resultStars = document.getElementById('resultStars');
+  const nextBtn = document.getElementById('nextBtn');
+  const retryBtn = document.getElementById('retryBtn');
+
+  restartBtn.addEventListener('click', ()=> resetLevel());
+  nextBtn.addEventListener('click', ()=> {
+    currentLevelIndex = Math.min(LEVELS.length-1, currentLevelIndex+1);
+    loadLevel(currentLevelIndex);
+    hideResults();
+  });
+  retryBtn.addEventListener('click', ()=> {
+    loadLevel(currentLevelIndex);
+    hideResults();
+  });
+
+  function loadLevel(idx){
+    level = new Level(LEVELS[idx]);
+    player = new Player(level.startPos.x, level.startPos.y);
+    currentLevelIndex = idx;
+    gameState.time = 0;
+    gameState.running = true;
+    lastTime = now();
+    startEngineSound();
+    levelNameEl.textContent = level.name;
+    // center camera
+    camera.x = player.chassisPos.x - 420;
+    camera.y = player.chassisPos.y - 360;
+  }
+
+  function resetLevel(){
+    loadLevel(currentLevelIndex);
+    hideResults();
+  }
+
+  function showResults(){
+    gameState.running = false;
+    resultsEl.style.display = 'block';
+    resultTitle.textContent = 'Level Complete';
+    resultTime.textContent = `Time: ${gameState.time.toFixed(2)}s`;
+    // compute stars
+    const thresholds = level.timeThresholds;
+    let stars = 1;
+    if(gameState.time <= thresholds[0]) stars = 3;
+    else if(gameState.time <= thresholds[1]) stars = 2;
+    resultStars.textContent = '★'.repeat(stars) + '☆'.repeat(3-stars);
+    // save best time
+    const key = 'level_' + currentLevelIndex;
+    const prev = gameState.bestTimes[key];
+    if(!prev || gameState.time < prev){
+      gameState.bestTimes[key] = gameState.time;
+      localStorage.setItem('moto_bestTimes', JSON.stringify(gameState.bestTimes));
+    }
+  }
+  function hideResults(){ resultsEl.style.display = 'none'; }
+
+  // ---------- Main Loop ----------
+  function update(dt){
+    if(!gameState.running) return;
+    // handle restart input
+    if(input.restart){
+      resetLevel();
+      input.restart = false;
+      return;
+    }
+    // apply controls
+    player.applyControls(dt, input);
+    // update level obstacles
+    level.update(dt);
+    // physics update
+    player.physicsUpdate(dt, level);
+    // obstacle collisions
+    for(const o of level.obstacles) o.checkCollision(player, level);
+    // update particles
+    updateParticles(dt);
+    // update engine sound pitch based on speed
+    const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
+    setEnginePitch(Math.min(1, speed / 600));
+    // update time
+    gameState.time += dt;
+    // if finished, show results
+    if(player.finished){
+      showResults();
+    }
+  }
+
+  function render(){
+    // clear
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // apply camera transform
+    camera.apply(ctx);
+    // draw background sky (simple)
+    // draw level
+    level.draw(ctx);
+    // draw player
+    player.draw(ctx);
+    // draw particles
+    drawParticles(ctx);
+    // HUD elements are DOM-based; update values
+    const speed = Math.hypot(player.chassisVel.x, player.chassisVel.y);
+    speedEl.textContent = Math.round(speed*0.06);
+    flipsEl.textContent = player.flips;
+    scoreEl.textContent = player.score;
+    timeEl.textContent = gameState.time.toFixed(2);
+  }
+
+  function gameLoop(){
+    const t = now();
+    let dt = (t - lastTime) * CONFIG.timeScale;
+    lastTime = t;
+    // clamp dt
+    dt = Math.min(0.05, dt);
+    // update camera target
+    camera.update(player.chassisPos.x, player.chassisPos.y, dt);
+    // update
+    update(dt);
+    // render
+    render();
+    requestAnimationFrame(gameLoop);
+  }
+
+  // ---------- Initialization ----------
+  loadLevel(0);
+  startEngineSound();
+  requestAnimationFrame(gameLoop);
+
+  // ---------- Expose for debugging (optional) ----------
+  window._game = { player, level, loadLevel, resetLevel };
+
+  // ---------- Additional polish: small UI interactions ----------
+  // show/hide results when finished
+  const observer = new MutationObserver(()=>{});
+  // ensure canvas resizes initially
+  setTimeout(resizeCanvas, 50);
+
+})();
 </script>
 </body>
 </html>
