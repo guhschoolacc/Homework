@@ -1,0 +1,413 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Arena Tower Defense Collapsible UI and Cheat Money</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{--bg:#071014;--panel:#0f1a1a;--accent:#2b7f66;--muted:#9fbfb0}
+  html,body{height:100%;margin:0;background:var(--bg);color:#e6eef6;font-family:Inter,Arial,Helvetica,sans-serif}
+  /* Collapsible UI panel */
+  #uiPanel{
+    position:fixed; left:12px; top:12px; z-index:40;
+    width:300px; max-width:calc(100vw - 24px);
+    background:rgba(0,0,0,0.55); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    transition: transform 0.22s ease, opacity 0.22s ease;
+  }
+  #uiPanel.hidden{ transform: translateX(-110%); opacity:0.02; pointer-events:none; }
+  #uiHeader{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  #uiHeader h3{ margin:0; font-size:16px; }
+  .row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  button{ background:var(--accent); color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; }
+  button.secondary{ background:#444; }
+  .small{ font-size:13px; color:var(--muted); }
+  #upgradePanel{ margin-top:8px; background:rgba(255,255,255,0.02); padding:8px; border-radius:6px; }
+  #game{ display:block; width:100vw; height:100vh; cursor:crosshair; }
+  /* Floating toggle button visible when UI hidden or shown */
+  #toggleBtn{
+    position:fixed; left:12px; top:12px; z-index:50; width:44px; height:44px; border-radius:10px;
+    background:rgba(0,0,0,0.6); color:#fff; border:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,0.6); cursor:pointer;
+  }
+  #toggleBtn.hidden{ left:12px; top:12px; } /* same place, kept for clarity */
+  input[type=number]{ width:100px; padding:6px; border-radius:6px; border:1px solid #333; background:#0b1412; color:#fff; }
+  .muted{ color:var(--muted); }
+  .hud{ position:fixed; right:12px; bottom:12px; z-index:30; background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); }
+</style>
+</head>
+<body>
+  <!-- Toggle button always visible so user can show/hide UI -->
+  <div id="toggleBtn" title="Show or hide UI">☰</div>
+
+  <!-- Collapsible UI panel -->
+  <div id="uiPanel">
+    <div id="uiHeader">
+      <h3>Arena Tower Defense</h3>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button id="reset" class="secondary">Reset</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div><strong>Money:</strong> <span id="money">150</span></div>
+      <div style="width:12px"></div>
+      <div><strong>Lives:</strong> <span id="lives">10</span></div>
+      <div style="width:12px"></div>
+      <div><strong>Wave:</strong> <span id="wave">0</span></div>
+    </div>
+
+    <div class="row">
+      <button id="startWave">Start Wave</button>
+      <button id="sellToggle" class="secondary">Sell Mode Off</button>
+    </div>
+
+    <div class="small muted">Click anywhere to place a tower cost <strong>50</strong>. Click a tower to select. Sell returns half cost.</div>
+
+    <div id="upgradePanel" class="small">
+      <div><strong>Selected Tower</strong></div>
+      <div id="noSelect" class="muted">No tower selected</div>
+      <div id="selectedInfo" style="display:none;margin-top:6px">
+        <div>Damage: <span id="sDamage"></span></div>
+        <div>Range: <span id="sRange"></span></div>
+        <div>Fire Rate: <span id="sRate"></span> s</div>
+        <div>Level: <span id="sLevel"></span></div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          <button id="upgradeDamage" class="secondary">Upgrade Damage</button>
+          <button id="upgradeRange" class="secondary">Upgrade Range</button>
+          <button id="upgradeRate" class="secondary">Upgrade Fire Rate</button>
+          <button id="sellSelected" class="secondary">Sell Selected</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <div class="small muted">Cheat Money</div>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+        <input id="cheatInput" type="number" min="0" step="1" value="999" />
+        <button id="setMoney" class="secondary">Set Money</button>
+      </div>
+      <div class="small muted" style="margin-top:6px">Tip: hide the UI to play without obstruction.</div>
+    </div>
+  </div>
+
+  <canvas id="game"></canvas>
+
+  <div class="hud small muted">Click toggle to show UI</div>
+
+<script>
+/* ====== Canvas and UI elements ====== */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = canvas.width = innerWidth;
+let H = canvas.height = innerHeight;
+window.addEventListener('resize', ()=>{ W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+
+const uiPanel = document.getElementById('uiPanel');
+const toggleBtn = document.getElementById('toggleBtn');
+const uiMoney = document.getElementById('money');
+const uiLives = document.getElementById('lives');
+const uiWave = document.getElementById('wave');
+const startWaveBtn = document.getElementById('startWave');
+const sellToggleBtn = document.getElementById('sellToggle');
+const resetBtn = document.getElementById('reset');
+const cheatInput = document.getElementById('cheatInput');
+const setMoneyBtn = document.getElementById('setMoney');
+
+let money = 150, lives = 10, wave = 0;
+uiMoney.textContent = money; uiLives.textContent = lives; uiWave.textContent = wave;
+
+let sellMode = false;
+sellToggleBtn.addEventListener('click', ()=>{
+  sellMode = !sellMode;
+  sellToggleBtn.textContent = sellMode ? 'Sell Mode On' : 'Sell Mode Off';
+  sellToggleBtn.style.background = sellMode ? '#a33' : '';
+});
+
+/* Toggle UI visibility */
+let uiHidden = false;
+toggleBtn.addEventListener('click', ()=>{
+  uiHidden = !uiHidden;
+  if(uiHidden){
+    uiPanel.classList.add('hidden');
+    toggleBtn.textContent = '☰';
+    toggleBtn.title = 'Show UI';
+  } else {
+    uiPanel.classList.remove('hidden');
+    toggleBtn.textContent = '✕';
+    toggleBtn.title = 'Hide UI';
+  }
+});
+
+/* Cheat money control */
+setMoneyBtn.addEventListener('click', ()=>{
+  const v = parseInt(cheatInput.value, 10);
+  if(!isNaN(v) && v >= 0){
+    money = v;
+    uiMoney.textContent = money;
+    flashMoney();
+  }
+});
+
+/* ====== Game constants and entities ====== */
+const TOWER_COST = 50;
+const BASE_RADIUS = 28;
+
+class Enemy {
+  constructor(hp, speed, reward){
+    const angle = Math.random() * Math.PI * 2;
+    const spawnRadius = Math.max(W,H) * 0.6;
+    this.x = W/2 + Math.cos(angle) * spawnRadius;
+    this.y = H/2 + Math.sin(angle) * spawnRadius;
+    this.hp = hp; this.maxHp = hp;
+    this.speed = speed; // pixels per second
+    this.reward = reward;
+    this.dead = false; this.reached = false;
+  }
+  update(dt){
+    const cx = W/2, cy = H/2;
+    const dx = cx - this.x, dy = cy - this.y;
+    const dist = Math.hypot(dx,dy);
+    if(dist <= BASE_RADIUS + 6){
+      this.dead = true; this.reached = true; return;
+    }
+    const nx = dx / dist, ny = dy / dist;
+    this.x += nx * this.speed * dt;
+    this.y += ny * this.speed * dt;
+  }
+  draw(){
+    ctx.fillStyle = '#e04b4b';
+    ctx.beginPath(); ctx.arc(this.x,this.y,10,0,Math.PI*2); ctx.fill();
+    const w = 28;
+    ctx.fillStyle = '#000'; ctx.fillRect(this.x - w/2, this.y - 18, w, 5);
+    ctx.fillStyle = '#6ee36e'; ctx.fillRect(this.x - w/2, this.y - 18, w * Math.max(0, this.hp/this.maxHp), 5);
+  }
+}
+
+class Tower {
+  constructor(x,y){
+    this.x = x; this.y = y;
+    this.range = 120; this.fireRate = 0.6; this.damage = 20; this.timer = 0;
+    this.cost = TOWER_COST; this.level = 1;
+  }
+  update(dt, enemies){
+    this.timer -= dt;
+    if(this.timer <= 0){
+      let target = null, best = Infinity;
+      for(const e of enemies){
+        const d = Math.hypot(e.x - this.x, e.y - this.y);
+        if(d <= this.range && d < best){ best = d; target = e; }
+      }
+      if(target){
+        target.hp -= this.damage;
+        projectiles.push({sx:this.x, sy:this.y, tx:target.x, ty:target.y, t:0, ttl:0.18, color:'#fff'});
+        this.timer = this.fireRate;
+      }
+    }
+  }
+  draw(selected){
+    ctx.fillStyle = selected ? '#ffd' : '#cfcfcf';
+    ctx.beginPath(); ctx.rect(this.x-12,this.y-12,24,24); ctx.fill();
+    if(selected){
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.range,0,Math.PI*2); ctx.stroke();
+    }
+  }
+}
+
+/* ====== State ====== */
+let enemies = [], towers = [], projectiles = [], spawnQueue = [], spawning = false, spawnTimer = 0;
+let selectedTower = null;
+
+/* ====== Wave logic ====== */
+function startWave(){
+  if(spawning) return;
+  wave++; uiWave.textContent = wave;
+  const count = 5 + wave * 2;
+  spawnQueue = [];
+  for(let i=0;i<count;i++){
+    const hp = 20 + wave * 8 + Math.floor(Math.random()*6);
+    const speed = 30 + wave * 4 + Math.random()*20;
+    const reward = 8 + Math.floor(wave * 1.2);
+    spawnQueue.push({hp, speed, reward});
+  }
+  spawning = true; spawnTimer = 0.6;
+}
+startWaveBtn.addEventListener('click', startWave);
+
+/* ====== Input handling ====== */
+canvas.addEventListener('click', (ev)=>{
+  // If UI is visible and click is inside UI panel, ignore placement
+  if(!uiHidden){
+    const rect = uiPanel.getBoundingClientRect();
+    if(ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom){
+      return; // clicked UI, do not place tower
+    }
+  }
+  const rect = canvas.getBoundingClientRect();
+  const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+  const clicked = towers.find(t => Math.hypot(t.x-x,t.y-y) < 16);
+  if(sellMode){
+    if(clicked){
+      money += Math.floor(clicked.cost / 2);
+      towers = towers.filter(t => t !== clicked);
+      if(selectedTower === clicked) selectedTower = null;
+      updateUI();
+    }
+    return;
+  }
+  if(clicked){
+    selectedTower = clicked; updateSelectedPanel(); return;
+  }
+  if(money >= TOWER_COST){
+    money -= TOWER_COST; uiMoney.textContent = money;
+    const t = new Tower(x,y); towers.push(t); selectedTower = t; updateSelectedPanel();
+  } else {
+    flashMoney();
+  }
+});
+
+/* Sell selected button */
+document.getElementById('sellSelected').addEventListener('click', ()=>{
+  if(!selectedTower) return;
+  money += Math.floor(selectedTower.cost / 2);
+  towers = towers.filter(t => t !== selectedTower);
+  selectedTower = null; updateUI(); updateSelectedPanel();
+});
+
+/* Upgrades */
+function upgradeCost(base, level){ return Math.floor(base * Math.pow(1.6, level-1)); }
+document.getElementById('upgradeDamage').addEventListener('click', ()=>{
+  if(!selectedTower) return;
+  const cost = upgradeCost(40, selectedTower.level);
+  if(money < cost){ flashMoney(); return; }
+  money -= cost; selectedTower.damage = Math.round(selectedTower.damage * 1.35); selectedTower.level++;
+  updateUI(); updateSelectedPanel();
+});
+document.getElementById('upgradeRange').addEventListener('click', ()=>{
+  if(!selectedTower) return;
+  const cost = upgradeCost(30, selectedTower.level);
+  if(money < cost){ flashMoney(); return; }
+  money -= cost; selectedTower.range = Math.round(selectedTower.range * 1.25); selectedTower.level++;
+  updateUI(); updateSelectedPanel();
+});
+document.getElementById('upgradeRate').addEventListener('click', ()=>{
+  if(!selectedTower) return;
+  const cost = upgradeCost(50, selectedTower.level);
+  if(money < cost){ flashMoney(); return; }
+  money -= cost; selectedTower.fireRate = Math.max(0.12, selectedTower.fireRate * 0.78); selectedTower.level++;
+  updateUI(); updateSelectedPanel();
+});
+
+/* Helpers */
+function updateUI(){ uiMoney.textContent = money; uiLives.textContent = lives; uiWave.textContent = wave; }
+function updateSelectedPanel(){
+  const noSel = document.getElementById('noSelect');
+  const info = document.getElementById('selectedInfo');
+  if(!selectedTower){ noSel.style.display = 'block'; info.style.display = 'none'; return; }
+  noSel.style.display = 'none'; info.style.display = 'block';
+  document.getElementById('sDamage').textContent = selectedTower.damage;
+  document.getElementById('sRange').textContent = selectedTower.range;
+  document.getElementById('sRate').textContent = selectedTower.fireRate.toFixed(2);
+  document.getElementById('sLevel').textContent = selectedTower.level;
+}
+function flashMoney(){
+  uiMoney.style.transition = 'none'; uiMoney.style.color = '#ff8080';
+  setTimeout(()=>{ uiMoney.style.transition = ''; uiMoney.style.color = ''; }, 220);
+}
+
+/* Reset */
+resetBtn.addEventListener('click', resetGame);
+function resetGame(){
+  money = 150; lives = 10; wave = 0;
+  enemies = []; towers = []; projectiles = []; spawnQueue = []; spawning = false; spawnTimer = 0;
+  selectedTower = null; updateUI(); updateSelectedPanel();
+}
+
+/* Main loop */
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  update(dt); draw(); requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* Update */
+function update(dt){
+  if(spawning && spawnQueue.length){
+    spawnTimer -= dt;
+    if(spawnTimer <= 0){
+      const s = spawnQueue.shift();
+      enemies.push(new Enemy(s.hp, s.speed, s.reward));
+      spawnTimer = 0.6;
+    }
+  } else if(spawning && spawnQueue.length === 0){
+    spawning = false;
+  }
+
+  for(const e of enemies) e.update(dt);
+  for(const e of enemies){
+    if(e.dead){
+      if(e.reached){ lives = Math.max(0, lives - 1); }
+      else if(e.hp <= 0){ money += e.reward; }
+    }
+  }
+  enemies = enemies.filter(e => !e.dead);
+
+  for(const t of towers) t.update(dt, enemies);
+
+  for(const p of projectiles) p.t += dt;
+  projectiles = projectiles.filter(p => p.t < p.ttl);
+
+  if(lives <= 0){
+    setTimeout(()=>{ alert('Game Over. You reached wave ' + wave + '.'); resetGame(); }, 50);
+  }
+  updateUI();
+}
+
+/* Draw */
+function draw(){
+  ctx.fillStyle = '#071014'; ctx.fillRect(0,0,W,H);
+  const cx = W/2, cy = H/2;
+  ctx.fillStyle = '#2b7f66'; ctx.beginPath(); ctx.arc(cx,cy,BASE_RADIUS,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#042a20'; ctx.beginPath(); ctx.arc(cx,cy,BASE_RADIUS-10,0,Math.PI*2); ctx.fill();
+
+  for(const t of towers) t.draw(t === selectedTower);
+  for(const e of enemies) e.draw();
+
+  for(const p of projectiles){
+    const t = Math.min(1, p.t / p.ttl);
+    const x = p.sx + (p.tx - p.sx) * t;
+    const y = p.sy + (p.ty - p.sy) * t;
+    ctx.strokeStyle = p.color; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(p.sx,p.sy); ctx.lineTo(x,y); ctx.stroke();
+  }
+}
+
+/* Keep hover selection updated */
+canvas.addEventListener('mousemove', (ev)=>{
+  // if UI visible and mouse over UI, do not change hover selection
+  if(!uiHidden){
+    const rect = uiPanel.getBoundingClientRect();
+    if(ev.clientX >= rect.left && ev.clientX <= rect.right && ev.clientY >= rect.top && ev.clientY <= rect.bottom){
+      return;
+    }
+  }
+  const rect = canvas.getBoundingClientRect();
+  const mx = ev.clientX - rect.left, my = ev.clientY - rect.top;
+  // highlight tower under cursor
+  const hover = towers.find(t => Math.hypot(t.x-mx,t.y-my) < 16) || null;
+  // do not auto-select on hover; just show range ring when hovered
+  // we use hovered to draw ring for visual feedback
+  hovered = hover;
+});
+let hovered = null;
+
+/* Draw hover ring separately so it appears even when no tower is selected */
+(function hoverLoop(){
+  requestAnimationFrame(hoverLoop);
+  // nothing heavy here; main draw handles ring for selected tower
+})();
+
+</script>
+</body>
+</html>
