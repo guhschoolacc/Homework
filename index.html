@@ -112,6 +112,9 @@
     .search{ display:flex;align-items:center;gap:10px;background:#0d1a2a;padding:8px 12px;border-radius:10px; min-width:300px;border:1px solid rgba(255,255,255,0.02); }
     .search input{background:transparent;border:0;color:var(--text);outline:none;width:100%;font-size:14px}
 
+    .notif-btn{ background:transparent;border:0;color:var(--muted);padding:8px;border-radius:8px;cursor:pointer;font-size:18px; display:flex;align-items:center;gap:8px }
+    .notif-btn[aria-pressed="true"]{ color:var(--accent) }
+
     .content{ position:relative; background:var(--panel); border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow); border:1px solid rgba(255,255,255,0.03);flex:1;overflow:auto;display:flex;flex-direction:column; min-height:0; }
     .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
     .title{font-size:20px;font-weight:700}
@@ -134,12 +137,15 @@
     .profile-menu .guest-avatar{width:36px;height:36px;border-radius:50%;background:#1b2430;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700;border:1px solid rgba(255,255,255,0.03)}
     .profile-menu .guest-meta{font-size:13px;color:var(--muted)}
 
-    .settings-dropdown{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0b1220; border-radius:10px; padding:12px; border:1px solid rgba(255,255,255,0.03); display:none; z-index:95; min-width:420px; max-width:92%; max-height:80vh; overflow:auto; box-shadow:var(--card-shadow); color:var(--text); }
+    .settings-dropdown{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0b1220; border-radius:10px; padding:12px; border:1px solid rgba(255,255,255,0.03); display:none; z-index:95; min-width:520px; max-width:96%; max-height:86vh; overflow:auto; box-shadow:var(--card-shadow); color:var(--text); }
     .settings-dropdown h4{margin:0 0 8px 0;font-size:15px}
     .settings-dropdown .section{ border-top:1px solid rgba(255,255,255,0.03); padding-top:10px; margin-top:10px; }
     .settings-dropdown .row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-    .settings-dropdown label{font-size:13px;color:var(--muted);min-width:120px}
+    .settings-dropdown label{font-size:13px;color:var(--muted);min-width:140px}
     .settings-dropdown .small{font-size:12px;color:var(--muted);margin-left:4px}
+
+    .mask-presets{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px }
+    .mask-presets button{ padding:6px 8px; font-size:13px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:#0f1724; color:var(--muted); cursor:pointer }
 
     .viewer-overlay {
       position:fixed;
@@ -164,6 +170,25 @@
     .field input, .field select, .field textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#0f1724;color:var(--text)}
     .field textarea{min-height:200px;font-family:var(--mono);resize:vertical}
     .small{font-size:13px;color:var(--muted)}
+
+    /* toast notification */
+    .toast {
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:11000;
+      background:linear-gradient(180deg, rgba(10,18,28,0.98), rgba(6,10,16,0.98));
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:10px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6);
+      display:none;
+      min-width:260px;
+      border:1px solid rgba(255,255,255,0.03);
+      font-size:14px;
+    }
+    .toast .t-title{ font-weight:700; margin-bottom:6px; }
+    .toast .t-body{ color:var(--muted); font-size:13px; }
 
     @media (max-width:1100px){ .sidebar{display:none} .topbar{border-radius:10px} .search{min-width:180px} .viewer{height:calc(100vh - 140px)} }
     @media (max-width:520px){ .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .search{min-width:120px} .categories{gap:6px} }
@@ -222,6 +247,11 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></circle></svg>
               <input id="search" type="search" placeholder="Search games or files" aria-label="Search games or files" />
             </div>
+
+            <!-- notification / mute button -->
+            <button id="notifBtn" class="notif-btn" aria-pressed="false" title="Notifications (click to mute/unmute)">
+              🔔 <span id="notifLabel" style="font-size:13px;color:var(--muted)">On</span>
+            </button>
           </div>
         </header>
 
@@ -249,7 +279,7 @@
                   <button id="viewerClose" class="viewer-close" title="Close (Esc)">✕</button>
                 </div>
               </div>
-              <iframe id="viewerIframe" class="viewer-iframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+              <iframe id="viewerIframe" class="viewer-iframe" sandbox="allow-scripts allow-same-origin allow-forms" allow="fullscreen; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             </div>
           </div>
         </section>
@@ -422,6 +452,12 @@
     </div>
   </div>
 
+  <!-- toast notification element -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <div class="t-title" id="toastTitle">New message</div>
+    <div class="t-body" id="toastBody">Someone said something in chat</div>
+  </div>
+
   <script>
     /************************************************************************
      * Firebase config - keep as in your project
@@ -457,6 +493,7 @@
 
     /************************************************************************
      * Master cards and routeMap (relative paths)
+     * Added: James Clicker, James Simulator (games) and Visual Studio Recreation (tools)
      ************************************************************************/
     const masterCards = [
       { id: 'card-sandbox', category: 'games', title: 'Sandbox', file: 'sandbox.html' },
@@ -476,6 +513,10 @@
       { id: 'card-block', category: 'games', title: 'Block Breaker', file: 'block-breaker.html' },
       { id: 'card-arcade', category: 'games', title: 'Arcade Racer', file: 'arcade-racer.html' },
 
+      // new games
+      { id: 'card-james-clicker', category: 'games', title: 'James Clicker', file: 'james-clicker.html' },
+      { id: 'card-james-sim', category: 'games', title: 'James Simulator', file: 'james-simulator.html' },
+
       { id: 'card-base64', category: 'tools', title: 'Base64 Encoder/Decoder', file: 'base64-tool.html' },
       { id: 'card-calculator', category: 'tools', title: 'Calculator', file: 'calculator.html' },
       { id: 'card-clock', category: 'tools', title: 'Clock', file: 'clock.html' },
@@ -492,6 +533,9 @@
       { id: 'card-regex-tester', category: 'tools', title: 'Regex Tester', file: 'regex-tester.html' },
       { id: 'card-soundboard', category: 'tools', title: 'Soundboard', file: 'soundboard.html' },
       { id: 'card-text-to-speech', category: 'tools', title: 'Text To Speech', file: 'text-to-speech.html' },
+
+      // new tool: Visual Studio recreation
+      { id: 'card-vs-recreation', category: 'tools', title: 'Visual Studio Recreation', file: 'vs-recreation.html' },
 
       { id: 'card-chat', category: 'social', title: 'Chat Room', file: 'chat.html' }
     ];
@@ -515,6 +559,11 @@
       "card-hangman": "games/hangman.html",
       "card-block": "games/block-breaker.html",
       "card-arcade": "games/arcade-racer.html",
+
+      // new routes
+      "card-james-clicker": "games/james-clicker.html",
+      "card-james-sim": "games/james-simulator.html",
+
       "card-base64": "tools/base64-tool.html",
       "card-calculator": "tools/calculator.html",
       "card-clock": "tools/clock.html",
@@ -531,6 +580,10 @@
       "card-regex-tester": "tools/regex-tester.html",
       "card-soundboard": "tools/soundboard.html",
       "card-text-to-speech": "tools/text-to-speech.html",
+
+      // new tool route
+      "card-vs-recreation": "tools/vs-recreation.html",
+
       "card-chat": "social/chat.html"
     };
 
@@ -600,6 +653,7 @@
     let panicAction = 'redirect';
     let panicRedirect = 'https://www.google.com';
     let panicModifier = 'none';
+    let panicEnabled = true;
 
     function getActiveFilter(){
       const active = document.querySelector('.categories [aria-selected="true"]');
@@ -825,7 +879,7 @@
     });
 
     /************************************************************************
-     * Viewer helpers
+     * Viewer helpers (fullscreen request on open, exit on close)
      ************************************************************************/
     let originalTitle = document.title;
     let originalUrl = location.href;
@@ -846,6 +900,8 @@
       const viewerOverlay = document.getElementById('viewerOverlay');
       const viewerIframe = document.getElementById('viewerIframe');
       const viewerTitle = document.getElementById('viewerTitle');
+      const viewer = viewerOverlay.querySelector('.viewer') || viewerOverlay;
+
       viewerTitle.textContent = title;
       viewerIframe.src = filePath;
       viewerOverlay.style.display = 'flex';
@@ -855,9 +911,31 @@
       originalUrl = location.href;
       applyMaskIfNeeded();
       document.getElementById('viewerClose').focus({preventScroll:true});
+
+      // Try to enter fullscreen for a consistent full-viewport experience.
+      try {
+        if (viewer.requestFullscreen) {
+          viewer.requestFullscreen().catch(()=>{ /* ignore fullscreen failure */ });
+        } else if (viewer.webkitRequestFullscreen) {
+          viewer.webkitRequestFullscreen();
+        } else if (viewer.msRequestFullscreen) {
+          viewer.msRequestFullscreen();
+        }
+      } catch (err) {
+        // ignore; fallback is still the overlay covering the viewport
+      }
     }
 
     function closeOverlayAndRestore(){
+      // exit fullscreen if active
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+      } catch(e){ /* ignore */ }
+
       const viewerOverlay = document.getElementById('viewerOverlay');
       const viewerIframe = document.getElementById('viewerIframe');
       viewerIframe.src = 'about:blank';
@@ -1324,6 +1402,7 @@
     document.addEventListener('keydown', (e)=>{
       const tag = (document.activeElement && document.activeElement.tagName) || '';
       if(tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+      if(!panicEnabled) return;
       if(e.key === panicKey && checkPanicModifiers(e)){ e.preventDefault(); triggerPanic(); return; }
       if(e.key === 'Escape'){
         const viewerOverlay = document.getElementById('viewerOverlay');
@@ -1578,6 +1657,93 @@
     adminReloadUser.addEventListener('click', ()=> { if(selectedUserId) selectUser(selectedUserId); });
 
     /************************************************************************
+     * Chat notifications
+     * - Listens to Firestore 'chat' collection for new messages
+     * - Shows a toast unless muted or message is from current user
+     * - Stores lastSeen timestamp to avoid notifying on initial load
+     ************************************************************************/
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastBody = document.getElementById('toastBody');
+    const notifBtn = document.getElementById('notifBtn');
+    const notifLabel = document.getElementById('notifLabel');
+
+    // load mute state from localStorage
+    function loadNotificationState(){
+      const s = JSON.parse(localStorage.getItem('hw_notif_state') || '{}');
+      const muted = !!s.muted;
+      notifBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      notifLabel.textContent = muted ? 'Muted' : 'On';
+      return { muted };
+    }
+    let notifState = loadNotificationState();
+
+    // toggle mute on button click
+    notifBtn.addEventListener('click', ()=>{
+      notifState.muted = !notifState.muted;
+      notifBtn.setAttribute('aria-pressed', notifState.muted ? 'true' : 'false');
+      notifLabel.textContent = notifState.muted ? 'Muted' : 'On';
+      localStorage.setItem('hw_notif_state', JSON.stringify({ muted: notifState.muted }));
+    });
+
+    // show toast
+    let toastTimer = null;
+    function showNotification(title, body){
+      if(notifState.muted) return;
+      toastTitle.textContent = title || 'New message';
+      toastBody.textContent = body || '';
+      toast.style.display = 'block';
+      toast.style.opacity = '1';
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>{ toast.style.opacity = '0'; setTimeout(()=>{ toast.style.display = 'none'; }, 220); }, 6000);
+    }
+
+    // helper to parse Firestore timestamp safely
+    function toMillis(ts){
+      if(!ts) return 0;
+      if(typeof ts.toMillis === 'function') return ts.toMillis();
+      if(ts.seconds) return ts.seconds * 1000;
+      return Number(ts) || 0;
+    }
+
+    // initialize chat listener
+    (function initChatNotifications(){
+      const fs = getFs();
+      if(!fs) return;
+      try{
+        // lastSeen stored in localStorage to avoid notifying on initial load
+        let lastSeen = Number(localStorage.getItem('hw_chat_last_seen') || '0');
+        // subscribe to new messages (ordered by createdAt)
+        fs.collection('chat').orderBy('createdAt', 'desc').limit(1).onSnapshot(snapshot=>{
+          snapshot.docChanges().forEach(change=>{
+            if(change.type !== 'added') return;
+            const doc = change.doc;
+            const data = doc.data() || {};
+            const createdAt = toMillis(data.createdAt);
+            // ignore if createdAt is older or equal to lastSeen
+            if(createdAt <= lastSeen) return;
+            // update lastSeen
+            lastSeen = Math.max(lastSeen, createdAt);
+            localStorage.setItem('hw_chat_last_seen', String(lastSeen));
+            // don't notify if message from current user
+            const auth = getAuthIfReady();
+            const currentUid = auth && auth.currentUser ? auth.currentUser.uid : null;
+            if(data.uid && currentUid && data.uid === currentUid) return;
+            // show notification
+            const who = data.displayName || data.name || (data.uid ? data.uid.substring(0,6) : 'Someone');
+            const text = (data.text || '').slice(0,200);
+            showNotification(`${who} in chat`, text || 'sent a message');
+          });
+        }, err=>{
+          // ignore listener errors silently
+          console.warn('chat notif listener error', err);
+        });
+      }catch(e){
+        console.warn('initChatNotifications error', e);
+      }
+    })();
+
+    /************************************************************************
      * Utility: render snippet content into page (example)
      ************************************************************************/
     async function renderSnippetToElement(snippetId, element){
@@ -1600,6 +1766,8 @@
     (function ensureGalaxyOn(){
       document.body.classList.add('galaxy');
       document.querySelectorAll('.stars, .stars2, .shooting').forEach(el => { el.style.display = 'block'; });
+      // ensure notification state is reflected
+      notifState = loadNotificationState();
     })();
   </script>
 </body>
