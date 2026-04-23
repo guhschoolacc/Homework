@@ -3,40 +3,43 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>James Clicker — Phases</title>
+<title>James Clicker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-1:#071226; --bg-2:#071a2a; --card:#0f1724; --muted:#9aa4b2;
     --accent:#7c5cff; --accent-2:#16a34a; --glass: rgba(255,255,255,0.03);
-    --glass-2: rgba(255,255,255,0.02);
+    --glass-2: rgba(255,255,255,0.02); --danger:#ff6b6b;
   }
   *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:#e6eef8;}
-  .container{max-width:1100px;margin:28px auto;padding:20px;display:grid;grid-template-columns:420px 1fr;gap:18px;}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,23,0.6);}
+  .container{max-width:1200px;margin:28px auto;padding:20px;display:grid;grid-template-columns:460px 1fr;gap:18px;}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 40px rgba(2,6,23,0.6);}
   /* Left column */
   .left{display:flex;flex-direction:column;gap:12px;align-items:center;}
-  #clickTarget{width:360px;height:360px;border-radius:12px;overflow:hidden;background:var(--glass);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:transform .12s ease, box-shadow .12s;}
-  #clickTarget:active{transform:scale(.98);}
-  #phaseImage{width:100%;height:100%;object-fit:cover;display:block;}
+  #clickTarget{width:420px;height:420px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;user-select:none;will-change:transform;}
+  /* two-layer image to avoid flicker when swapping */
+  .phaseLayer{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;transition:opacity .6s ease, transform .35s ease;backface-visibility:hidden;}
+  .phaseLayer.top{z-index:2;opacity:1;}
+  .phaseLayer.bottom{z-index:1;opacity:0;}
+  .phaseBadge{position:absolute;left:14px;top:14px;background:linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));padding:8px 12px;border-radius:10px;font-weight:800;color:#fff;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(4px);}
+  .phaseGlow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .6s;}
   .hud{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;}
-  .score{font-weight:800;font-size:20px;}
+  .score{font-weight:800;font-size:20px;letter-spacing:0.2px;}
   .sub{color:var(--muted);font-size:13px;}
   .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
-  .stat{background:var(--glass-2);padding:8px 10px;border-radius:10px;font-size:13px;color:var(--muted);min-width:110px;text-align:center;}
+  .stat{background:var(--glass-2);padding:10px 12px;border-radius:12px;font-size:13px;color:var(--muted);min-width:120px;text-align:center;}
   .controls{display:flex;gap:8px;}
   .btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer;}
-  .primary{background:linear-gradient(90deg,var(--accent),#5b8bff);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(124,92,255,0.12);}
+  .primary{background:linear-gradient(90deg,var(--accent),#5b8bff);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;box-shadow:0 8px 24px rgba(124,92,255,0.12);}
   .small{font-size:13px;padding:6px 8px;}
-  .phaseBadge{position:absolute;left:12px;top:12px;background:rgba(0,0,0,0.45);padding:8px 10px;border-radius:10px;font-weight:700;color:#fff;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.03);}
-  .phaseGlow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .6s;}
   /* Right column */
   .right{display:flex;flex-direction:column;gap:12px;}
-  .shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
-  .shopItem{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:8px;min-height:110px;}
+  .shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+  .shopItem{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:8px;min-height:120px;transition:transform .12s;}
+  .shopItem:hover{transform:translateY(-6px)}
   .shopTop{display:flex;justify-content:space-between;align-items:center;}
-  .shopName{font-weight:700;}
+  .shopName{font-weight:800;}
   .shopDesc{color:var(--muted);font-size:13px;}
   .shopBuy{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
   .cost{font-weight:800;}
@@ -44,9 +47,11 @@
   .progressWrap{display:flex;flex-direction:column;gap:8px;}
   .progressBar{height:14px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;}
   .progressFill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .6s ease;}
-  .log{background:var(--glass-2);padding:10px;border-radius:10px;height:120px;overflow:auto;color:var(--muted);font-size:13px;}
+  .log{background:var(--glass-2);padding:10px;border-radius:10px;height:140px;overflow:auto;color:var(--muted);font-size:13px;}
+  .achievements{display:flex;gap:8px;flex-wrap:wrap;}
+  .ach{background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:10px;color:var(--muted);font-size:13px;}
   .footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:13px;}
-  /* responsive */
+  .danger{color:var(--danger)}
   @media (max-width:980px){.container{grid-template-columns:1fr;}.left{align-items:stretch}.right{order:2}}
 </style>
 </head>
@@ -64,9 +69,10 @@
       </div>
     </div>
 
-    <div id="clickTarget" title="Click James">
+    <div id="clickTarget" title="Click James" aria-label="Click target">
       <div class="phaseBadge" id="phaseBadge">Calm</div>
-      <img id="phaseImage" alt="Phase image" />
+      <img id="phaseTop" class="phaseLayer top" alt="phase top" draggable="false" />
+      <img id="phaseBottom" class="phaseLayer bottom" alt="phase bottom" draggable="false" />
       <div id="phaseGlow" class="phaseGlow"></div>
     </div>
 
@@ -97,8 +103,8 @@
   <div class="card right" aria-label="Shop and settings">
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div>
-        <h3 style="margin:0 0 6px 0;">Shop & Progression</h3>
-        <div class="sub">Buy upgrades to speed up progress — but costs scale aggressively.</div>
+        <h3 style="margin:0 0 6px 0;">Shop, Prestige & Achievements</h3>
+        <div class="sub">Aggressive scaling keeps the endgame challenging. Prestige gives permanent bonuses.</div>
       </div>
       <div style="text-align:right;">
         <div class="sub">Prestige</div>
@@ -106,13 +112,14 @@
       </div>
     </div>
 
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+      <label class="sub" style="min-width:120px;">Image base path</label>
+      <input id="imageBase" type="text" value="images/" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;" />
+      <button class="primary small" id="applyPath">Apply</button>
+    </div>
+
     <div style="margin-top:12px;">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <label class="sub" style="min-width:120px;">Image base path</label>
-        <input id="imageBase" type="text" value="images/" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;" />
-        <button class="primary small" id="applyPath">Apply</button>
-      </div>
-      <div class="sub" style="margin-bottom:8px;">Phase files (loaded automatically from your site)</div>
+      <div class="sub" style="margin-bottom:8px;">Phase files (loaded automatically)</div>
       <div class="sub" id="fileList" style="color:var(--muted);font-size:13px;margin-bottom:12px;"></div>
     </div>
 
@@ -122,6 +129,11 @@
       <button class="primary" id="clickBig">Click</button>
       <button class="btn" id="buyMax">Buy Max</button>
       <button class="btn" id="exportSave">Export Save</button>
+    </div>
+
+    <div style="margin-top:12px;">
+      <div class="sub" style="margin-bottom:6px;">Achievements</div>
+      <div class="achievements" id="achievements"></div>
     </div>
 
     <div class="footer">
@@ -134,33 +146,36 @@
 <canvas id="particles" width="800" height="600" style="position:fixed;left:0;top:0;pointer-events:none;"></canvas>
 
 <script>
-/* James Clicker — improved UI, no upload UI, site-hosted images
-   Configure IMAGE_BASE_PATH and PHASE_FILE_NAMES to match your site.
+/* James Clicker — Polished
+   - Configure IMAGE_BASE_PATH and PHASE_FILE_NAMES to match your site.
+   - Autosave triggers on nearly every meaningful action.
+   - Two-layer image rendering prevents flicker when swapping phase images.
+   - Prestige, achievements, buy-max, export save included.
 */
 
-/* ---------- Config: change these to match your site ---------- */
-let IMAGE_BASE_PATH = 'images/'; // folder on your site where phase images live
+/* ---------- Config ---------- */
+let IMAGE_BASE_PATH = 'images/'; // change to your folder
 const PHASE_FILE_NAMES = [
-  'jamescalm.jpg', // phase 0 (calm)
-  'phase1.png',    // phase 1
-  'phase2.png',    // phase 2
-  'phase3.png',    // phase 3
-  'phase4.png',    // phase 4
-  'phase5.png',    // phase 5
-  'phase6.png'     // phase 6 (final)
+  'jamescalm.jpg',
+  'phase1.png',
+  'phase2.png',
+  'phase3.png',
+  'phase4.png',
+  'phase5.png',
+  'phase6.png'
 ];
-/* ------------------------------------------------------------ */
-
 const MAX_PHASE = PHASE_FILE_NAMES.length - 1;
 
-/* Difficulty tuning: exponential thresholds */
-const PHASE_BASE = 250;   // starting coins for phase 1
-const PHASE_FACTOR = 10;  // growth factor between phases (large to force long grind)
+/* Difficulty tuning */
+const PHASE_BASE = 300;   // coins required for phase 1
+const PHASE_FACTOR = 12;  // growth factor (large -> long grind)
+const SHOP_GROWTH = 1.55; // shop cost growth per level
 
-/* Shop scaling */
-const SHOP_GROWTH = 1.5;
+/* Prestige tuning */
+const PRESTIGE_REQUIRE_PHASE = MAX_PHASE; // must reach final phase to prestige
+const PRESTIGE_REWARD_MULT = 0.05; // each prestige gives +5% permanent multiplier
 
-/* ---------- Game state ---------- */
+/* ---------- State ---------- */
 const state = {
   coins: 0,
   totalClicks: 0,
@@ -170,52 +185,76 @@ const state = {
   prestige: 0,
   phaseIndex: 0,
   shop: [
-    { id:'cpc1', name:'Better Mouse', desc:'+1 CPC', baseCost:40, level:0, type:'cpc', value:1 },
-    { id:'cpc2', name:'Golden Cursor', desc:'+5 CPC', baseCost:450, level:0, type:'cpc', value:5 },
-    { id:'auto1', name:'Auto Clicker', desc:'+1 auto/sec', baseCost:220, level:0, type:'auto', value:1 },
-    { id:'multi1', name:'Multiplier', desc:'+0.5x mult', baseCost:1200, level:0, type:'mult', value:0.5 },
-    { id:'auto2', name:'Auto Farm', desc:'+10 auto', baseCost:9000, level:0, type:'auto', value:10 }
-  ]
+    { id:'cpc1', name:'Better Mouse', desc:'+1 CPC', baseCost:50, level:0, type:'cpc', value:1 },
+    { id:'cpc2', name:'Golden Cursor', desc:'+5 CPC', baseCost:600, level:0, type:'cpc', value:5 },
+    { id:'auto1', name:'Auto Clicker', desc:'+1 auto/sec', baseCost:300, level:0, type:'auto', value:1 },
+    { id:'multi1', name:'Multiplier', desc:'+0.5x mult', baseCost:1800, level:0, type:'mult', value:0.5 },
+    { id:'auto2', name:'Auto Farm', desc:'+15 auto', baseCost:14000, level:0, type:'auto', value:15 }
+  ],
+  achievements: {} // id -> unlocked boolean
 };
+
+/* Achievement definitions */
+const ACHIEVEMENTS = [
+  { id:'first_click', title:'First Click', desc:'Click James once', check: s => s.totalClicks >= 1 },
+  { id:'click_100', title:'Century', desc:'100 total clicks', check: s => s.totalClicks >= 100 },
+  { id:'coins_1k', title:'Starter Rich', desc:'Earn 1,000 coins', check: s => s.coins >= 1000 || s.totalCoinsEver >= 1000 },
+  { id:'phase_1', title:'Phase 1', desc:'Reach Phase 1', check: s => s.phaseIndex >= 1 },
+  { id:'phase_final', title:'Endgame', desc:'Reach final phase', check: s => s.phaseIndex >= MAX_PHASE }
+];
+
+/* track total coins ever for achievements */
+state.totalCoinsEver = 0;
 
 /* ---------- DOM refs ---------- */
 const $ = id => document.getElementById(id);
 const coinsEl = $('coins'), cpcEl = $('cpc'), multEl = $('mult'), totalClicksEl = $('totalClicks'),
       autoCountEl = $('autoCount'), phaseLabelEl = $('phaseLabel'), progressFill = $('progressFill'),
       nextThresholdEl = $('nextThreshold'), progressPercentEl = $('progressPercent'),
-      shopEl = $('shop'), logEl = $('log'), phaseBadge = $('phaseBadge'), phaseImage = $('phaseImage'),
-      fileListEl = $('fileList'), imageBaseInput = $('imageBase'), applyPathBtn = $('applyPath'),
-      saveStatusEl = $('saveStatus'), prestigeEl = $('prestige'), phaseGlow = $('phaseGlow');
+      shopEl = $('shop'), logEl = $('log'), phaseBadge = $('phaseBadge'),
+      phaseTop = $('phaseTop'), phaseBottom = $('phaseBottom'), fileListEl = $('fileList'),
+      imageBaseInput = $('imageBase'), applyPathBtn = $('applyPath'), saveStatusEl = $('saveStatus'),
+      prestigeEl = $('prestige'), achievementsEl = $('achievements'), phaseGlow = $('phaseGlow');
 
 /* ---------- Utilities ---------- */
 function format(n){ return Math.floor(n).toLocaleString(); }
+function now(){ return new Date().toLocaleTimeString(); }
 function log(msg){
-  const t = new Date().toLocaleTimeString();
-  logEl.innerHTML = `<div style="margin-bottom:6px;"><strong style="color:#cbd5e1">${t}</strong> — <span style="color:var(--muted)">${msg}</span></div>` + logEl.innerHTML;
+  logEl.innerHTML = `<div style="margin-bottom:6px;"><strong style="color:#cbd5e1">${now()}</strong> — <span style="color:var(--muted)">${msg}</span></div>` + logEl.innerHTML;
   if(logEl.scrollHeight > logEl.clientHeight) logEl.scrollTop = 0;
 }
 function phaseThreshold(idx){ return Math.ceil(PHASE_BASE * Math.pow(PHASE_FACTOR, idx)); }
+
+/* ---------- Autosave helpers ---------- */
+let autosaveTimer = null;
+function scheduleAutosave(){
+  // Save immediately but debounce rapid calls to avoid blocking UI
+  if(autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=>{ saveGame(false); autosaveTimer = null; }, 120);
+}
+
+/* Save on nearly every meaningful action */
+function markAndSave(actionDesc){
+  // small internal tracking
+  scheduleAutosave();
+  if(actionDesc) log(actionDesc);
+}
 
 /* ---------- UI rendering ---------- */
 function updateUI(){
   coinsEl.textContent = `${format(state.coins)}`;
   cpcEl.textContent = `${(state.cpc * state.multiplier).toFixed(2)}`;
-  multEl.textContent = `${state.multiplier}x`;
+  multEl.textContent = `${state.multiplier.toFixed(2)}x`;
   totalClicksEl.textContent = format(state.totalClicks);
   autoCountEl.textContent = format(state.autoCount);
   phaseBadge.textContent = state.phaseIndex === 0 ? 'Calm' : `Phase ${state.phaseIndex}`;
-  $('phaseLabel').textContent = state.phaseIndex === 0 ? 'Calm' : `Phase ${state.phaseIndex}`;
   prestigeEl.textContent = format(state.prestige);
   $('saveStatus').textContent = localStorage.getItem('jc_save') ? 'Saved' : 'Not saved';
   renderShop();
   renderPhaseProgress();
   renderPhaseImage();
   renderFileList();
-}
-
-function renderFileList(){
-  const list = PHASE_FILE_NAMES.map((f,i)=> `${i===0?'Calm':('Phase '+i)}: ${IMAGE_BASE_PATH + f}`).join(' • ');
-  fileListEl.textContent = list;
+  renderAchievements();
 }
 
 /* ---------- Shop ---------- */
@@ -245,7 +284,7 @@ function renderShop(){
       </div>
     `;
     shopEl.appendChild(div);
-    div.querySelector('.buyBtn').addEventListener('click', ()=>buyItem(item.id));
+    div.querySelector('.buyBtn').addEventListener('click', ()=>{ buyItem(item.id); });
   });
 }
 
@@ -257,17 +296,17 @@ function buyItem(id){
   item.level++;
   if(item.type === 'cpc') state.cpc += item.value;
   else if(item.type === 'auto') state.autoCount += item.value;
-  else if(item.type === 'mult') state.multiplier = +(state.multiplier + item.value).toFixed(2);
+  else if(item.type === 'mult') state.multiplier = +(state.multiplier + item.value).toFixed(3);
   // Slightly increase global difficulty on purchases
   state.shop.forEach(s => s.baseCost = Math.ceil(s.baseCost * 1.02));
-  log(`Bought ${item.name} (Level ${item.level})`);
+  markAndSave(`Bought ${item.name} (Level ${item.level})`);
   updateUI();
   playClickSound(1 + Math.random()*0.2);
 }
 
 /* Buy max helper */
 function buyMax(){
-  // Attempt to buy as many levels as possible for each item in order
+  let any = false;
   state.shop.forEach(item=>{
     let cost = shopCost(item);
     while(state.coins >= cost){
@@ -275,11 +314,12 @@ function buyMax(){
       item.level++;
       if(item.type === 'cpc') state.cpc += item.value;
       else if(item.type === 'auto') state.autoCount += item.value;
-      else if(item.type === 'mult') state.multiplier = +(state.multiplier + item.value).toFixed(2);
+      else if(item.type === 'mult') state.multiplier = +(state.multiplier + item.value).toFixed(3);
       cost = shopCost(item);
+      any = true;
     }
   });
-  log('Bought max where possible');
+  if(any) markAndSave('Bought max upgrades where possible');
   updateUI();
 }
 
@@ -288,11 +328,19 @@ function clickAction(){
   const gain = state.cpc * state.multiplier;
   state.coins += gain;
   state.totalClicks++;
+  state.totalCoinsEver = (state.totalCoinsEver || 0) + gain;
   animateClick();
   spawnParticles();
   checkPhaseProgress();
+  markAndSave('Clicked James');
   updateUI();
   playClickSound(1 + Math.random()*0.2);
+}
+
+/* Prevent flicker: use transform on container and two-layer image swapping */
+function animateClick(){
+  const el = $('clickTarget');
+  el.animate([{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'});
 }
 
 let autoTimer = null;
@@ -302,8 +350,10 @@ function startAuto(){
     if(state.autoCount <= 0) return;
     const gain = state.autoCount * state.multiplier;
     state.coins += gain;
+    state.totalCoinsEver = (state.totalCoinsEver || 0) + gain;
     log(`Auto clicked for ${format(gain)} coins`);
     checkPhaseProgress();
+    markAndSave(null);
     updateUI();
   }, 1000);
 }
@@ -327,33 +377,59 @@ function renderPhaseProgress(){
 function checkPhaseProgress(){
   while(state.phaseIndex < MAX_PHASE && state.coins >= phaseThreshold(state.phaseIndex)){
     state.phaseIndex++;
-    // On phase up, give a small visual and log
     flashPhaseGlow();
-    log(`Phase advanced to ${state.phaseIndex}`);
-    // Make shop slightly more expensive to keep grind meaningful
+    markAndSave(`Advanced to Phase ${state.phaseIndex}`);
+    // make shop slightly more expensive to keep grind meaningful
     state.shop.forEach(s => s.baseCost = Math.ceil(s.baseCost * 1.06));
+    // small log
+    log(`Phase advanced to ${state.phaseIndex}`);
   }
 }
 
-/* ---------- Phase image rendering ---------- */
+/* ---------- Phase image rendering (two-layer swap) ---------- */
+let currentTopIndex = null;
 function renderPhaseImage(){
   const idx = state.phaseIndex;
   const path = IMAGE_BASE_PATH + PHASE_FILE_NAMES[idx];
-  // set src; if file missing, browser will show broken image — we provide fallback on error
-  phaseImage.src = path;
-  phaseImage.alt = idx === 0 ? 'Calm' : `Phase ${idx}`;
+  // If top is already showing same index, do nothing
+  if(currentTopIndex === idx) return;
+  // Load bottom image first to avoid flicker, then crossfade
+  const bottom = phaseBottom;
+  const top = phaseTop;
+  bottom.style.opacity = '0';
+  bottom.src = top.src || ''; // ensure bottom exists
+  // Preload new image into an Image object
+  const img = new Image();
+  img.onload = ()=>{
+    // set bottom to current top (if any), then set top to new and fade
+    bottom.src = top.src || img.src; // keep previous visual under new top
+    top.style.transition = 'none';
+    top.src = img.src;
+    // force reflow then fade
+    requestAnimationFrame(()=>{
+      top.style.transition = 'opacity .6s ease, transform .35s ease';
+      top.style.opacity = '1';
+      bottom.style.opacity = '0';
+      currentTopIndex = idx;
+    });
+  };
+  img.onerror = ()=>{
+    // fallback svg
+    const label = idx === 0 ? 'Calm' : `Phase ${idx}`;
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><rect width='100%' height='100%' fill='#0b1220'/><text x='50%' y='50%' fill='#7c5cff' font-size='48' font-family='Inter,Arial' text-anchor='middle' dominant-baseline='middle'>${label} — missing image</text></svg>`;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    img.onload = ()=>{ renderPhaseImage(); };
+  };
+  img.src = path;
 }
 
 /* ---------- Visual effects ---------- */
-function animateClick(){
-  const el = $('clickTarget');
-  el.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:200,easing:'cubic-bezier(.2,.8,.2,1)'});
-}
 function flashPhaseGlow(){
   phaseGlow.style.opacity = '1';
   phaseGlow.style.background = `radial-gradient(circle at 50% 30%, rgba(124,92,255,0.18), transparent 30%), radial-gradient(circle at 70% 70%, rgba(22,163,74,0.12), transparent 30%)`;
   setTimeout(()=>{ phaseGlow.style.opacity = '0'; }, 900);
 }
+
 function spawnParticles(){
   const canvas = document.getElementById('particles');
   const ctx = canvas.getContext('2d');
@@ -404,11 +480,36 @@ function playClickSound(pitch=1){
   }catch(e){}
 }
 
-/* ---------- Save / Load / Reset ---------- */
+/* ---------- Achievements ---------- */
+function renderAchievements(){
+  achievementsEl.innerHTML = '';
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked = !!state.achievements[a.id];
+    const div = document.createElement('div');
+    div.className = 'ach';
+    div.style.border = unlocked ? '1px solid rgba(124,92,255,0.6)' : '1px solid rgba(255,255,255,0.02)';
+    div.innerHTML = `<strong style="display:block">${a.title}</strong><div style="font-size:12px;color:var(--muted)">${a.desc}</div>`;
+    achievementsEl.appendChild(div);
+  });
+}
+function checkAchievements(){
+  let changed = false;
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.achievements[a.id] && a.check(state)){
+      state.achievements[a.id] = true;
+      log(`Achievement unlocked: ${a.title}`);
+      changed = true;
+    }
+  });
+  if(changed) markAndSave(null);
+}
+
+/* ---------- Save / Load / Reset / Export ---------- */
 function saveGame(showLog=true){
   const save = {
     coins: state.coins, totalClicks: state.totalClicks, cpc: state.cpc, multiplier: state.multiplier,
-    autoCount: state.autoCount, prestige: state.prestige, phaseIndex: state.phaseIndex, shop: state.shop
+    autoCount: state.autoCount, prestige: state.prestige, phaseIndex: state.phaseIndex,
+    shop: state.shop, achievements: state.achievements, totalCoinsEver: state.totalCoinsEver
   };
   localStorage.setItem('jc_save', JSON.stringify(save));
   $('saveStatus').textContent = 'Saved';
@@ -427,6 +528,8 @@ function loadGame(){
     state.prestige = s.prestige || 0;
     state.phaseIndex = s.phaseIndex || 0;
     if(Array.isArray(s.shop)) state.shop = s.shop;
+    if(s.achievements) state.achievements = s.achievements;
+    state.totalCoinsEver = s.totalCoinsEver || 0;
     log('Save loaded');
   }catch(e){ console.error(e); }
 }
@@ -435,15 +538,36 @@ function resetGame(){
   localStorage.removeItem('jc_save');
   state.coins = 0; state.totalClicks = 0; state.cpc = 1; state.multiplier = 1; state.autoCount = 0; state.prestige = 0; state.phaseIndex = 0;
   state.shop.forEach(i=>i.level=0);
+  state.achievements = {};
+  state.totalCoinsEver = 0;
   updateUI();
   log('Progress reset');
+  saveGame(true);
 }
-
-/* ---------- Export save (copy JSON) ---------- */
 function exportSave(){
   const raw = localStorage.getItem('jc_save');
   if(!raw){ alert('No save to export'); return; }
   navigator.clipboard.writeText(raw).then(()=>{ log('Save exported to clipboard'); alert('Save copied to clipboard'); });
+}
+
+/* ---------- Prestige ---------- */
+function canPrestige(){
+  return state.phaseIndex >= PRESTIGE_REQUIRE_PHASE;
+}
+function doPrestige(){
+  if(!canPrestige()) { alert('You must reach the final phase to prestige.'); return; }
+  if(!confirm('Prestige will reset most progress in exchange for permanent bonuses. Proceed?')) return;
+  state.prestige++;
+  // permanent multiplier bonus
+  state.multiplier = +(state.multiplier + PRESTIGE_REWARD_MULT).toFixed(3);
+  // reset core progress but keep prestige and multiplier
+  state.coins = 0; state.totalClicks = 0; state.cpc = 1; state.autoCount = 0; state.phaseIndex = 0;
+  state.shop.forEach(i=>i.level=0);
+  state.achievements = {};
+  state.totalCoinsEver = 0;
+  log(`Prestiged! Total prestige: ${state.prestige}`);
+  markAndSave('Prestiged');
+  updateUI();
 }
 
 /* ---------- Keyboard & UI wiring ---------- */
@@ -456,14 +580,21 @@ $('saveBtn').addEventListener('click', ()=>saveGame(true));
 $('resetBtn').addEventListener('click', resetGame);
 $('buyMax').addEventListener('click', buyMax);
 $('exportSave').addEventListener('click', exportSave);
-
 applyPathBtn.addEventListener('click', ()=>{
   IMAGE_BASE_PATH = imageBase.value.trim();
   if(IMAGE_BASE_PATH.length && !IMAGE_BASE_PATH.endsWith('/')) IMAGE_BASE_PATH += '/';
   renderFileList();
   renderPhaseImage();
   log('Image base path updated');
+  scheduleAutosave();
 });
+
+/* Autosave on many interactions */
+['clickTarget','clickBig','buyMax','saveBtn','resetBtn','exportSave'].forEach(id=>{
+  const el = typeof id === 'string' ? document.getElementById(id) : id;
+  if(el) el.addEventListener('click', ()=>scheduleAutosave());
+});
+/* Also autosave when shop changes (handled in buyItem/buyMax) and when achievements change (checkAchievements calls markAndSave) */
 
 /* ---------- Canvas resize & loops ---------- */
 function resizeCanvas(){
@@ -474,20 +605,32 @@ function resizeCanvas(){
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 setInterval(()=>startAuto(), 1000);
-setInterval(()=>saveGame(false), 20000);
+setInterval(()=>saveGame(false), 30000); // periodic backup
 
 /* ---------- Init ---------- */
+function renderFileList(){
+  const list = PHASE_FILE_NAMES.map((f,i)=> `${i===0?'Calm':('Phase '+i)}: ${IMAGE_BASE_PATH + f}`).join(' • ');
+  fileListEl.textContent = list;
+}
 loadGame();
 updateUI();
 startAuto();
+checkAchievements();
+renderPhaseImage();
 
-/* Fallback if image fails to load */
-phaseImage.addEventListener('error', ()=>{
+/* Accessibility: fallback if top image fails */
+phaseTop.addEventListener('error', ()=>{
   const idx = state.phaseIndex;
   const label = idx === 0 ? 'Calm' : `Phase ${idx}`;
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><rect width='100%' height='100%' fill='#0b1220'/><text x='50%' y='50%' fill='#7c5cff' font-size='48' font-family='Inter,Arial' text-anchor='middle' dominant-baseline='middle'>${label} — missing image</text></svg>`;
-  phaseImage.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  phaseTop.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 });
+phaseBottom.addEventListener('error', ()=>{
+  phaseBottom.src = phaseTop.src;
+});
+
+/* Periodically check achievements and save on change */
+setInterval(()=>{ checkAchievements(); saveGame(false); }, 5000);
 </script>
 </body>
 </html>
