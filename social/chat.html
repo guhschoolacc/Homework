@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Global Chat — Firebase (fixed GIF + send)</title>
+<title>Global Chat</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -38,18 +38,11 @@
   .icon-btn{background:transparent;border:0;padding:8px;border-radius:8px;color:var(--muted);cursor:pointer;font-size:18px}
   .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:10px;border:none;cursor:pointer}
   .panel{position:fixed;right:20px;bottom:88px;z-index:9999;background:#071226;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.6);max-width:520px;max-height:420px;overflow:auto;display:none}
-  .tenor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .tenor-grid img{width:100%;height:100%;object-fit:cover;border-radius:8px;cursor:pointer}
-  .gif-card{position:relative}
-  .fav-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.45);border-radius:6px;padding:4px;color:#ffd166;cursor:pointer}
-  .fav-panel .fav-item{display:inline-block;width:120px;height:80px;margin:6px;border-radius:8px;overflow:hidden;cursor:pointer}
-  .reply-indicator{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);margin-right:auto}
-  .text[placeholder]:empty:before{content:attr(placeholder);color:var(--muted);pointer-events:none;display:block}
+  .attach-url-box{position:fixed;background:#071226;padding:10px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.6);z-index:60;display:none;min-width:320px}
+  .attach-url-box input{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);margin-bottom:8px}
   .profile-bottom{position:fixed;left:18px;bottom:18px;display:flex;align-items:center;gap:8px;z-index:40;cursor:pointer}
   .profile-bottom img{width:44px;height:44px;border-radius:8px;object-fit:cover}
   .profile-bottom .name{font-size:13px;color:var(--text);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .attach-url-box{position:fixed;background:#071226;padding:10px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.6);z-index:60;display:none;min-width:320px}
-  .attach-url-box input{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);margin-bottom:8px}
   .status-toast{position:fixed;right:18px;bottom:18px;background:rgba(0,0,0,0.6);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;z-index:45;display:none}
   @media (max-width:900px){ .app{grid-template-columns:1fr} .composer-wrap{left:20px;right:20px} .panel{right:20px} .messages{height:calc(100vh - 64px - 120px)} .attach-url-box{left:50%;transform:translateX(-50%);right:20px;left:20px} }
 </style>
@@ -74,13 +67,11 @@
     </div>
   </div>
 
-  <!-- bottom-left profile button with username -->
   <div class="profile-bottom" id="profileBottom" title="Open profile" style="display:none">
     <img id="profileBottomImg" src="" alt="avatar" />
     <div class="name" id="profileBottomName"></div>
   </div>
 
-  <!-- Composer -->
   <div class="composer-wrap">
     <div class="composer" role="region" aria-label="Message composer">
       <div style="display:flex;flex-direction:column;flex:1;gap:6px">
@@ -105,7 +96,6 @@
     </div>
   </div>
 
-  <!-- attach URL input box (positioned dynamically) -->
   <div class="attach-url-box" id="attachUrlBox" role="dialog" aria-hidden="true">
     <input id="attachUrlInput" placeholder="Paste image/GIF/MP4 URL here (http(s)://)"/>
     <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -114,17 +104,12 @@
     </div>
   </div>
 
-  <!-- small status toast (moved away from profile) -->
   <div id="statusToast" class="status-toast" role="status" aria-live="polite"></div>
 
-  <!-- Panels -->
   <div id="tenorPanel" class="panel" aria-hidden="true"></div>
   <div id="favPanel" class="panel fav-panel" aria-hidden="true"></div>
 
-  <!-- emoji picker -->
   <script type="module" src="https://unpkg.com/emoji-picker-element@^1/index.js"></script>
-
-  <!-- Firebase compat -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -132,7 +117,6 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // ---------- Firebase config ----------
     const firebaseConfig = {
       apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
       authDomain: "goon-7ddc3.firebaseapp.com",
@@ -147,7 +131,7 @@
     const storage = firebase.storage();
     const TENOR_API_KEY = "LIVDSRZULELA";
 
-    // ---------- UI refs ----------
+    // UI refs
     const messagesEl = document.getElementById('messages');
     const textInput = document.getElementById('textInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -171,10 +155,12 @@
     // state
     let currentUser = null;
     let unsubscribeMessages = null;
+    let unsubscribeUsers = null;
     const renderedIds = new Set();
+    const usersCache = new Map(); // uid -> { displayName, photoURL }
     let replyTo = null;
 
-    // ---------- Emoji picker ----------
+    // emoji picker
     const picker = document.createElement('emoji-picker');
     picker.style.display = 'none';
     picker.style.position = 'fixed';
@@ -219,7 +205,7 @@
       sel.addRange(range);
     }
 
-    // ---------- Tenor & favorites ----------
+    // favorites & tenor (kept minimal)
     const FAV_KEY = 'favGifs_v1';
     function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; } }
     function saveFavorites(arr){ localStorage.setItem(FAV_KEY, JSON.stringify(arr)); }
@@ -266,14 +252,11 @@
       clearBtn.addEventListener('click', () => { saveFavorites([]); renderFavoritesPanel(); });
     }
 
-    // GIF button: ensure it always toggles Tenor and closes other panels
+    // GIF button
     gifBtn.addEventListener('click', () => {
-      // close other panels
       picker.style.display = 'none';
       favPanel.style.display = 'none';
       attachUrlBox.style.display = 'none';
-
-      // toggle tenor panel
       if (tenorPanel.style.display === 'block') {
         tenorPanel.style.display = 'none';
         tenorPanel.setAttribute('aria-hidden','true');
@@ -338,16 +321,14 @@
       }
     }
 
-    // ---------- Attach URL box behavior (positioned above attach button, nudged left) ----------
+    // Attach URL box
     attachBtn.addEventListener('click', (e) => {
-      // close other panels
       picker.style.display = 'none';
       tenorPanel.style.display = 'none';
       favPanel.style.display = 'none';
 
       const rect = attachBtn.getBoundingClientRect();
       const box = attachUrlBox;
-      // compute width and left so it doesn't clip
       const boxWidth = Math.min(420, Math.max(320, window.innerWidth - 40));
       let computedLeft = rect.left + rect.width/2 - 24 - (boxWidth/2);
       if (computedLeft < 20) computedLeft = 20;
@@ -388,7 +369,7 @@
       }
     });
 
-    // file input / paste / drag & drop
+    // file/paste/drag handlers
     fileInput.addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0];
       if (!f) return;
@@ -433,7 +414,6 @@
 
     // upload helpers
     async function uploadMediaFile(file) {
-      // allow anonymous uploads if not signed in (use a short anon id)
       const uid = (currentUser && currentUser.uid) ? currentUser.uid : ('anon_' + Date.now());
       const ext = (file.name && file.name.split('.').pop()) || (file.type.split('/').pop()) || 'bin';
       const path = `chat_media/${uid}_${Date.now()}.${ext}`;
@@ -453,13 +433,42 @@
       return await res.blob();
     }
 
-    // ---------- sendMessage, appendMessage and helpers (embedding fixed) ----------
+    // ---------- USERS real-time sync ----------
+    // Keep a live cache of users so avatars update for everyone immediately.
+    function startUsersListener() {
+      if (unsubscribeUsers) unsubscribeUsers();
+      unsubscribeUsers = db.collection('users').onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const uid = change.doc.id;
+          const data = change.doc.data() || {};
+          usersCache.set(uid, { displayName: data.displayName || null, photoURL: data.photoURL || null });
+          // update any avatar elements in the DOM that reference this uid
+          const avatarEls = document.querySelectorAll(`.avatar[data-uid="${uid}"]`);
+          avatarEls.forEach(av => {
+            if (data.photoURL) {
+              av.innerHTML = `<img src="${escapeAttr(data.photoURL)}" alt="avatar">`;
+            } else {
+              const name = data.displayName || av.dataset-name || 'G';
+              av.textContent = (name || 'G')[0].toUpperCase();
+            }
+          });
+          // also update any profile-bottom if it's the current user
+          if (currentUser && currentUser.uid === uid) {
+            profileBottomImg.src = data.photoURL || '';
+            profileBottomName.textContent = data.displayName || currentUser.displayName || 'Guest';
+          }
+        });
+      }, err => {
+        console.warn('users listener error', err);
+      });
+    }
+
+    // ---------- sendMessage, appendMessage and helpers (embed + avatar using cache) ----------
     async function sendMessage(imageUrl = null) {
-      // allow sending even if not signed in (anonymous fallback)
+      if (!currentUser) { showToast('Sign in to send messages'); return; }
       const raw = textInput.innerText || '';
       const text = raw.trim();
 
-      // detect single media URL in text if imageUrl not provided
       let finalImageUrl = imageUrl || null;
       if (!finalImageUrl && text) {
         const singleUrlMatch = text.match(/^(https?:\/\/\S+)$/i);
@@ -467,9 +476,7 @@
           const url = singleUrlMatch[1];
           const imageExt = /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i;
           const videoExt = /\.(mp4|webm|ogg)(\?.*)?$/i;
-          if (imageExt.test(url) || videoExt.test(url)) {
-            finalImageUrl = url;
-          }
+          if (imageExt.test(url) || videoExt.test(url)) finalImageUrl = url;
         }
       }
 
@@ -479,14 +486,10 @@
           finalImageUrl = await uploadMediaBlob(blob, 'inline_' + Date.now());
         }
 
-        // choose uid/name: prefer signed-in user, otherwise anonymous
-        const uid = (currentUser && currentUser.uid) ? currentUser.uid : ('anon_' + Date.now());
-        const name = (currentUser && currentUser.displayName) ? currentUser.displayName : 'Guest';
-
         const payload = {
           text: (finalImageUrl && text.match(/^(https?:\/\/\S+)$/i)) ? '' : (text || ''),
-          uid: uid,
-          name: name,
+          uid: currentUser.uid,
+          name: currentUser.displayName || 'Guest',
           imageURL: finalImageUrl || null,
           ts: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -514,12 +517,16 @@
       row.className = 'message-row' + (m.uid === (currentUser && currentUser.uid) ? ' me' : '');
       row.dataset.id = m.id;
 
-      const av = document.createElement('div'); av.className = 'avatar';
-      if (m.uid) {
-        db.collection('users').doc(m.uid).get().then(snap => {
-          if (snap.exists && snap.data().photoURL) av.innerHTML = `<img src="${escapeAttr(snap.data().photoURL)}" alt="avatar">`;
-          else av.textContent = (m.name || 'G')[0].toUpperCase();
-        }).catch(()=>{ av.textContent = (m.name || 'G')[0].toUpperCase(); });
+      // avatar container with data attributes so we can update it when users change
+      const av = document.createElement('div');
+      av.className = 'avatar';
+      av.dataset.uid = m.uid || '';
+      av.dataset.name = m.name || 'G';
+
+      // use cached user info if available
+      const cached = m.uid ? usersCache.get(m.uid) : null;
+      if (cached && cached.photoURL) {
+        av.innerHTML = `<img src="${escapeAttr(cached.photoURL)}" alt="avatar">`;
       } else {
         av.textContent = (m.name || 'G')[0].toUpperCase();
       }
@@ -537,7 +544,7 @@
       const time = document.createElement('div'); time.className = 'time'; time.textContent = (m.ts instanceof Date) ? m.ts.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
       meta.appendChild(name); meta.appendChild(time); msg.appendChild(meta);
 
-      // EMBED LOGIC
+      // embed logic
       const textTrim = (m.text || '').trim();
       const singleUrl = textTrim.match(/^(https?:\/\/\S+)$/i);
       const imageExt = /\.(jpe?g|png|gif|webp|bmp|svg)(\?.*)?$/i;
@@ -618,6 +625,7 @@
       });
     }
 
+    // update message helpers (keeps avatars as data-uid so users listener can update)
     function updateMessage(m) {
       const row = messagesEl.querySelector(`[data-id="${m.id}"]`);
       if (!row) return;
@@ -626,7 +634,6 @@
       appendMessage(m);
       renderedIds.add(m.id);
     }
-
     function removeMessage(id) {
       const row = messagesEl.querySelector(`[data-id="${id}"]`);
       if (row) row.remove();
@@ -643,6 +650,71 @@
       replyTo = null;
       document.getElementById('replyBox').style.display = 'none';
     });
+
+    // messages listener
+    function startMessagesListener() {
+      if (unsubscribeMessages) unsubscribeMessages();
+      const ref = db.collection('chat').doc('main').collection('messages').orderBy('ts','asc').limit(2000);
+      unsubscribeMessages = ref.onSnapshot(snapshot => {
+        const atBottom = isScrolledToBottom(messagesEl);
+        if (renderedIds.size === 0) {
+          messagesEl.innerHTML = '';
+          snapshot.forEach(doc => {
+            const d = doc.data();
+            const msg = {
+              id: doc.id,
+              text: d.text || '',
+              uid: d.uid || null,
+              name: d.name || 'Guest',
+              imageURL: d.imageURL || d.gifUrl || null,
+              ts: d.ts && d.ts.toDate ? d.ts.toDate() : (d.ts ? new Date(d.ts) : new Date()),
+              replyTo: d.replyTo || null,
+              replyName: d.replyName || null,
+              replySnippet: d.replySnippet || null
+            };
+            appendMessage(msg);
+            renderedIds.add(msg.id);
+          });
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+          return;
+        }
+
+        snapshot.docChanges().forEach(change => {
+          const doc = change.doc;
+          const d = doc.data();
+          const msg = {
+            id: doc.id,
+            text: d.text || '',
+            uid: d.uid || null,
+            name: d.name || 'Guest',
+            imageURL: d.imageURL || d.gifUrl || null,
+            ts: d.ts && d.ts.toDate ? d.ts.toDate() : (d.ts ? new Date(d.ts) : new Date()),
+            replyTo: d.replyTo || null,
+            replyName: d.replyName || null,
+            replySnippet: d.replySnippet || null
+          };
+          if (change.type === 'added') {
+            if (!renderedIds.has(msg.id)) {
+              appendMessage(msg);
+              renderedIds.add(msg.id);
+            }
+          } else if (change.type === 'modified') {
+            updateMessage(msg);
+          } else if (change.type === 'removed') {
+            removeMessage(msg.id);
+            renderedIds.delete(msg.id);
+          }
+        });
+
+        if (atBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, err => {
+        console.error('messages listen error', err);
+        headerStatus.textContent = 'Messages error';
+      });
+    }
+
+    // users listener start
+    startUsersListener();
 
     // scrolling helpers & composer wheel forwarding
     function isScrolledToBottom(el) { return (el.scrollHeight - el.scrollTop - el.clientHeight) < 80; }
@@ -678,7 +750,7 @@
       startMessagesListener();
     });
 
-    // profile bottom quick edit (avatar upload or URL)
+    // profile bottom quick edit (upload avatar -> storage -> users doc)
     profileBottom.addEventListener('click', async () => {
       if (!currentUser) { showToast('Sign in first'); return; }
       const newName = prompt('Edit display name:', currentUser.displayName || '');
@@ -748,70 +820,7 @@
       return await snap.ref.getDownloadURL();
     }
 
-    // messages listener & rendering
-    function startMessagesListener() {
-      if (unsubscribeMessages) unsubscribeMessages();
-      const ref = db.collection('chat').doc('main').collection('messages').orderBy('ts','asc').limit(2000);
-      unsubscribeMessages = ref.onSnapshot(snapshot => {
-        const atBottom = isScrolledToBottom(messagesEl);
-        if (renderedIds.size === 0) {
-          messagesEl.innerHTML = '';
-          snapshot.forEach(doc => {
-            const d = doc.data();
-            const msg = {
-              id: doc.id,
-              text: d.text || '',
-              uid: d.uid || null,
-              name: d.name || 'Guest',
-              imageURL: d.imageURL || d.gifUrl || null,
-              ts: d.ts && d.ts.toDate ? d.ts.toDate() : (d.ts ? new Date(d.ts) : new Date()),
-              replyTo: d.replyTo || null,
-              replyName: d.replyName || null,
-              replySnippet: d.replySnippet || null
-            };
-            appendMessage(msg);
-            renderedIds.add(msg.id);
-          });
-          // always scroll to bottom on initial load
-          messagesEl.scrollTop = messagesEl.scrollHeight;
-          return;
-        }
-
-        snapshot.docChanges().forEach(change => {
-          const doc = change.doc;
-          const d = doc.data();
-          const msg = {
-            id: doc.id,
-            text: d.text || '',
-            uid: d.uid || null,
-            name: d.name || 'Guest',
-            imageURL: d.imageURL || d.gifUrl || null,
-            ts: d.ts && d.ts.toDate ? d.ts.toDate() : (d.ts ? new Date(d.ts) : new Date()),
-            replyTo: d.replyTo || null,
-            replyName: d.replyName || null,
-            replySnippet: d.replySnippet || null
-          };
-          if (change.type === 'added') {
-            if (!renderedIds.has(msg.id)) {
-              appendMessage(msg);
-              renderedIds.add(msg.id);
-            }
-          } else if (change.type === 'modified') {
-            updateMessage(msg);
-          } else if (change.type === 'removed') {
-            removeMessage(msg.id);
-            renderedIds.delete(msg.id);
-          }
-        });
-
-        if (atBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
-      }, err => {
-        console.error('messages listen error', err);
-        headerStatus.textContent = 'Messages error';
-      });
-    }
-
-    // toast for status messages
+    // toast
     let toastTimer = null;
     function showToast(text, ms = 3500) {
       statusToast.textContent = text;
@@ -820,30 +829,11 @@
       toastTimer = setTimeout(() => { statusToast.style.display = 'none'; }, ms);
     }
 
-    // small helpers
+    // helpers
     function escapeHtml(s) { return String(s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\n','<br>'); }
     function escapeAttr(s) { return String(s||'').replaceAll('"','&quot;'); }
 
-    // close panels on Escape
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        tenorPanel.style.display = 'none';
-        favPanel.style.display = 'none';
-        picker.style.display = 'none';
-        attachUrlBox.style.display = 'none';
-      }
-    });
-
-    // forward wheel from composer to messages
-    document.querySelector('.composer').addEventListener('wheel', (e) => {
-      const delta = e.deltaY;
-      if (Math.abs(delta) > 0) {
-        messagesEl.scrollTop += delta;
-        e.preventDefault();
-      }
-    }, { passive: false });
-
-    // bind send button and Enter key (ensure they work)
+    // bind send and enter
     sendBtn.addEventListener('click', () => sendMessage());
     textInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -852,9 +842,10 @@
       }
     });
 
-    // ensure initial focus and start listeners
+    // initial focus and start listeners
     textInput.focus();
     startMessagesListener();
+    startUsersListener();
   });
   </script>
 </body>
