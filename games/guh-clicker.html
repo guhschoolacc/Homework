@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GUH Clicker</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --panel:#0b1220;
+      --accent:#7ee787;
+      --muted:#9aa6b2;
+      --glass: rgba(255,255,255,0.04);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{
+      background: var(--bg);
+      color:#e6eef6;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      overflow:auto;
+      padding:28px;
+      box-sizing:border-box;
+      transition:background 1s ease, color 0.6s ease;
+    }
+
+    /* Theme classes */
+    body.theme-0 { background: radial-gradient(1200px 600px at 10% 10%, rgba(126,231,135,0.06), transparent), radial-gradient(900px 400px at 90% 90%, rgba(120,180,255,0.03), transparent), #0f1724; }
+    body.theme-1 { background: linear-gradient(180deg,#071428 0%, #0b2a3a 100%); }
+    body.theme-2 { background: linear-gradient(180deg,#0b1b2b 0%, #1b3a5a 100%); }
+    body.theme-3 { background: radial-gradient(circle at 20% 20%, #ff9a9e 0%, transparent 20%), linear-gradient(180deg,#0b1b2b,#0a0f2a); }
+    body.theme-4 { background: linear-gradient(135deg,#0f0c29 0%, #302b63 50%, #24243e 100%); }
+
+    /* Galaxy theme (enhanced) */
+    body.theme-galaxy {
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(6,4,20,0.95), rgba(6,4,20,1)),
+        radial-gradient(900px 400px at 90% 90%, rgba(20,6,40,0.85), rgba(6,4,20,1));
+      overflow:visible;
+      color: #eaf6ff;
+    }
+    /* nebula overlay */
+    .nebula {
+      position:fixed; inset:0; pointer-events:none; z-index:4; mix-blend-mode:screen; opacity:0.9;
+      background:
+        radial-gradient(30% 20% at 10% 20%, rgba(255,120,200,0.06), transparent 10%),
+        radial-gradient(40% 30% at 80% 70%, rgba(120,180,255,0.06), transparent 12%),
+        radial-gradient(50% 40% at 50% 40%, rgba(160,80,255,0.04), transparent 14%);
+      filter: blur(28px) saturate(1.2);
+    }
+
+    /* starfield layers */
+    .starfield, .starfield .layer {
+      position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:5;
+      overflow:hidden;
+    }
+    .starfield .layer { mix-blend-mode:screen; transform:translateZ(0); }
+    .star { position:absolute; background:radial-gradient(circle, #fff 0%, rgba(255,255,255,0.8) 30%, rgba(255,255,255,0.0) 60%); border-radius:50%; opacity:0.95; }
+    /* twinkle animation */
+    @keyframes twinkle {
+      0% { opacity:0.5; transform:scale(0.9); }
+      50% { opacity:1; transform:scale(1.2); }
+      100% { opacity:0.5; transform:scale(0.9); }
+    }
+    .star.twinkle { animation: twinkle 2.6s ease-in-out infinite; }
+
+    /* shooting star (meteor) */
+    .shooting {
+      position:fixed; left:0; top:0; width:4px; height:2px; background:linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0.2));
+      box-shadow: 0 0 18px rgba(255,255,255,0.95), 0 0 40px rgba(120,180,255,0.12);
+      transform-origin:left center;
+      z-index: 30;
+      pointer-events:none;
+      will-change: transform, opacity;
+      border-radius:2px;
+    }
+    @keyframes shoot {
+      0% { opacity:1; transform: translate3d(0,0,0) rotate(0deg) scaleX(1); }
+      100% { opacity:0; transform: translate3d(var(--dx), var(--dy), 0) rotate(30deg) scaleX(0.5); }
+    }
+
+    /* Top-left dashboard button */
+    .top-left { position:fixed; left:18px; top:18px; z-index:120; }
+    .dash-btn{
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      color:var(--muted); padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600;
+      border:1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      transition:transform .18s ease, color .18s ease;
+    }
+    .dash-btn:hover{transform:translateY(-3px); color:var(--accent);}
+
+    .game-wrap{
+      width:100%; max-width:1100px; min-height:72vh;
+      display:grid; grid-template-columns: 1fr 380px; gap:28px; align-items:start;
+      padding:28px; box-sizing:border-box; border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.03); box-shadow: 0 30px 80px rgba(2,6,23,0.6);
+      transition:box-shadow .6s ease, transform .6s ease;
+    }
+
+    .stage{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px; padding:40px; display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:visible; border:1px solid rgba(255,255,255,0.03); min-height:420px;
+    }
+
+    .guh{
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+      font-size:140px; color:#ffffff; cursor:pointer; user-select:none;
+      transform-origin:center; transition:transform .12s cubic-bezier(.2,.9,.3,1), filter .18s;
+      text-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02);
+      letter-spacing:2px; position:relative; z-index:12;
+    }
+    .guh:active{transform:scale(.96) rotate(-1deg);}
+    .guh::after{
+      content:''; position:absolute; width:260px;height:100px; left:50%;top:50%;
+      transform:translate(-50%,-50%) rotate(12deg) translateX(-300px);
+      background:linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.12), rgba(255,255,255,0.0));
+      opacity:0; transition:opacity .25s, transform .9s; pointer-events:none;
+    }
+    .guh.shine::after{ transform:translate(-50%,-50%) rotate(12deg) translateX(300px); opacity:1; }
+
+    .float { position:absolute; font-weight:800; color:var(--accent); text-shadow:0 2px 12px rgba(0,0,0,0.6);
+      pointer-events:none; transform:translateY(0) scale(1); opacity:1; transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms; z-index:13;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px; padding:18px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.03);
+      display:flex; flex-direction:column; gap:12px; max-height: calc(100vh - 120px); overflow:auto;
+    }
+    .stat{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:10px; background:var(--glass); color:var(--muted); font-weight:600; }
+    .stat .value{ color:var(--accent); font-weight:800; }
+
+    .upgrades{ margin-top:6px; overflow:visible; display:flex; flex-direction:column; gap:10px; padding-right:6px; }
+    .upgrade{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); border:1px solid rgba(255,255,255,0.02); transition:transform .12s, box-shadow .12s; }
+    .upgrade:hover{transform:translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.6);}
+    .upgrade .meta{ display:flex; flex-direction:column; }
+    .upgrade .meta .title{ font-weight:700; color:#eaf7ea; }
+    .upgrade .meta .desc{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .upgrade button{ background:linear-gradient(180deg, rgba(126,231,135,0.14), rgba(126,231,135,0.06)); color:#04210a; border:none; padding:8px 12px; border-radius:8px; font-weight:800; cursor:pointer; transition:transform .12s; }
+    .upgrade button:active{transform:translateY(1px);}
+    .upgrade .cost{ font-weight:800; color:var(--accent); margin-left:8px; }
+
+    .save-controls{ display:flex; gap:8px; align-items:center; margin-top:6px; }
+    .save-controls input{ flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:rgba(255,255,255,0.02); color:inherit; }
+
+    .save-list{ display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:220px; overflow:auto; padding-right:6px; }
+
+    .save-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); }
+    .save-row .meta{ display:flex; flex-direction:column; }
+    .save-row .meta .name{ font-weight:800; color:#fff; }
+    .save-row .meta .time{ font-size:12px; color:var(--muted); }
+
+    .footer{ margin-top:auto; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+
+    .particle{ position:absolute; width:10px;height:10px;border-radius:50%; background:linear-gradient(90deg,var(--accent),#b6ffb6); pointer-events:none; opacity:0.95; transform:translate(-50%,-50%) scale(1); transition:transform 900ms cubic-bezier(.2,.8,.2,1), opacity 900ms; z-index:11; }
+
+    .celebrate { box-shadow: 0 40px 120px rgba(255,215,110,0.12); transform:scale(1.02); transition:transform .6s ease, box-shadow .6s ease; }
+
+    @media (max-width:980px){
+      .game-wrap{grid-template-columns:1fr; padding:18px; min-height:0;}
+      .panel{max-height:none; overflow:visible;}
+      .stage{min-height:320px; padding:28px;}
+      .guh{font-size:96px;}
+    }
+  </style>
+</head>
+<body class="theme-0">
+  <div class="nebula" id="nebula" style="display:none;"></div>
+  <div id="starfield" class="starfield" aria-hidden="true" style="display:none;">
+    <div class="layer" id="starsLayer"></div>
+  </div>
+
+  <div class="top-left">
+  
+  </div>
+
+  <div class="game-wrap" role="application" aria-label="GUH Clicker game" id="gameWrap">
+    <div class="stage" id="stage">
+      <div id="guh" class="guh" role="button" tabindex="0" aria-label="Click GUH">guh</div>
+    </div>
+
+    <div class="panel" aria-hidden="false">
+      <div class="stat"><div>GUH Count</div><div class="value" id="count">0</div></div>
+      <div class="stat"><div>Per Click</div><div class="value" id="perClick">1</div></div>
+      <div class="stat"><div>Auto Clickers</div><div class="value" id="autoCount">0</div></div>
+      <div class="stat"><div>Prestige Points</div><div class="value" id="prestigePoints">0</div></div>
+
+      <div style="font-weight:800; color:var(--muted); margin-top:8px;">Upgrades</div>
+      <div class="upgrades" id="upgrades"></div>
+
+      <div style="font-weight:800; color:var(--muted); margin-top:8px;">Save / Load Slots</div>
+      <div class="save-controls">
+        <input id="saveName" placeholder="Save name (e.g., 'Main', 'Experiment')" />
+        <button id="saveBtn">Save Current Game</button>
+      </div>
+      <div class="save-list" id="saveList" aria-live="polite"></div>
+
+      <div class="footer">
+        <div>Saved automatically</div>
+        <div id="fps" style="color:var(--muted)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------------- Stable save key and migration ---------------- */
+    const SAVE_KEY = 'guh_save';
+    const LEGACY_KEYS = ['guh_state_v2','guh_state_v1'];
+    const CURRENT_VERSION = 6;
+    const SLOTS_KEY = 'guh_save_slots_v1'; // stores array of named saves
+
+    const defaultState = {
+      version: CURRENT_VERSION,
+      count: 0,
+      baseClickPower: 1,
+      multiplier: 1,
+      autoCount: 0,
+      autoPower: 1,
+      autoIntervalMs: 1000,
+      prestigePoints: 0,
+      prestigeMultiplier: 1,
+      totalPrestiges: 0,
+      themeIndex: 0,
+      upgrades: {
+        clickPowerLevel: 0,
+        multiplierLevel: 0,
+        autoBought: false,
+        autoSpeedLevel: 0,
+        megaClickLevel: 0,
+        autoPowerLevel: 0,
+        efficiencyLevel: 0
+      }
+    };
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(SAVE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          if(!parsed.version || parsed.version < CURRENT_VERSION) return migrateState(parsed);
+          return parsed;
+        }
+      }catch(e){ console.warn('loadState stable read failed', e); }
+      for(const k of LEGACY_KEYS){
+        try{
+          const raw = localStorage.getItem(k);
+          if(raw){
+            const parsed = JSON.parse(raw);
+            const migrated = migrateState(parsed);
+            saveState(migrated);
+            try{ localStorage.removeItem(k); }catch(e){}
+            return migrated;
+          }
+        }catch(e){}
+      }
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+
+    function migrateState(old){
+      const s = JSON.parse(JSON.stringify(defaultState));
+      if(typeof old.count === 'number') s.count = old.count;
+      if(typeof old.baseClickPower === 'number') s.baseClickPower = old.baseClickPower;
+      if(typeof old.multiplier === 'number') s.multiplier = old.multiplier;
+      if(typeof old.autoCount === 'number') s.autoCount = old.autoCount;
+      if(typeof old.autoPower === 'number') s.autoPower = old.autoPower;
+      if(typeof old.autoIntervalMs === 'number') s.autoIntervalMs = old.autoIntervalMs;
+      if(typeof old.prestigePoints === 'number') s.prestigePoints = old.prestigePoints;
+      if(typeof old.prestigeMultiplier === 'number') s.prestigeMultiplier = old.prestigeMultiplier;
+      if(typeof old.totalPrestiges === 'number') s.totalPrestiges = old.totalPrestiges;
+      if(typeof old.themeIndex === 'number') s.themeIndex = old.themeIndex;
+      if(old.upgrades && typeof old.upgrades === 'object') s.upgrades = Object.assign({}, s.upgrades, old.upgrades);
+      if(typeof old.perClick === 'number' && (!old.baseClickPower || !old.multiplier)){
+        s.baseClickPower = old.perClick;
+        s.multiplier = 1;
+      }
+      s.version = CURRENT_VERSION;
+      return s;
+    }
+
+    function saveState(stateObj){
+      try{
+        const toSave = stateObj ? stateObj : state;
+        toSave.version = CURRENT_VERSION;
+        localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+      }catch(e){ console.warn('saveState failed', e); }
+    }
+
+    /* ---------------- Slots management ---------------- */
+    function loadSlots(){
+      try{
+        const raw = localStorage.getItem(SLOTS_KEY);
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){ return []; }
+    }
+    function saveSlots(slots){
+      try{ localStorage.setItem(SLOTS_KEY, JSON.stringify(slots)); }catch(e){}
+    }
+
+    function createSlot(name, stateObj){
+      const slots = loadSlots();
+      const timestamp = Date.now();
+      const slot = { id: 'slot_' + timestamp + '_' + Math.floor(Math.random()*9999), name: name || ('Save ' + (slots.length+1)), created: timestamp, state: stateObj };
+      slots.unshift(slot); // newest first
+      saveSlots(slots);
+      return slot;
+    }
+
+    function deleteSlot(id){
+      let slots = loadSlots();
+      slots = slots.filter(s => s.id !== id);
+      saveSlots(slots);
+      renderSaveList();
+    }
+
+    function overwriteSlot(id, stateObj){
+      const slots = loadSlots();
+      const idx = slots.findIndex(s => s.id === id);
+      if(idx >= 0){
+        slots[idx].state = stateObj;
+        slots[idx].created = Date.now();
+        saveSlots(slots);
+      }
+      renderSaveList();
+    }
+
+    /* ---------------- Themes and thresholds ---------------- */
+    const THEMES = [
+      { name: 'Default', threshold: 0, class: 'theme-0' },
+      { name: 'Night Sky', threshold: 1_000, class: 'theme-1' },
+      { name: 'Deep Sea', threshold: 10_000, class: 'theme-2' },
+      { name: 'Sunset Glow', threshold: 100_000, class: 'theme-3' },
+      { name: 'Nebula', threshold: 1_000_000, class: 'theme-4' },
+      { name: 'Galaxy', threshold: 5_000_000, class: 'theme-galaxy' }
+    ];
+
+    /* ---------------- Game state ---------------- */
+    let state = loadState();
+
+    const stage = document.getElementById('stage');
+    const guhEl = document.getElementById('guh');
+    const countEl = document.getElementById('count');
+    const perClickEl = document.getElementById('perClick');
+    const autoCountEl = document.getElementById('autoCount');
+    const upgradesEl = document.getElementById('upgrades');
+    const fpsEl = document.getElementById('fps');
+    const starfield = document.getElementById('starfield');
+    const starsLayer = document.getElementById('starsLayer');
+    const nebula = document.getElementById('nebula');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveNameInput = document.getElementById('saveName');
+    const saveListEl = document.getElementById('saveList');
+    const gameWrap = document.getElementById('gameWrap');
+
+    /* ---------------- Utilities ---------------- */
+    function format(n){
+      if(n>=1e12) return (n/1e12).toFixed(2)+'T';
+      if(n>=1e9) return (n/1e9).toFixed(2)+'B';
+      if(n>=1e6) return (n/1e6).toFixed(2)+'M';
+      if(n>=1e3) return (n/1e3).toFixed(2)+'K';
+      return Math.floor(n).toString();
+    }
+
+    function effectivePerClick(){
+      return state.baseClickPower * state.multiplier * state.prestigeMultiplier;
+    }
+
+    /* ---------------- Theme handling ---------------- */
+    function updateThemeBasedOnCount(){
+      let unlockedIndex = 0;
+      for(let i=0;i<THEMES.length;i++){
+        if(state.count >= THEMES[i].threshold) unlockedIndex = i;
+      }
+      if(unlockedIndex > state.themeIndex){
+        state.themeIndex = unlockedIndex;
+        saveState();
+        triggerThemeUnlock(unlockedIndex);
+      }
+      applyTheme(state.themeIndex);
+    }
+
+    function applyTheme(index){
+      index = Math.max(0, Math.min(THEMES.length-1, index));
+      document.body.className = THEMES[index].class;
+      if(THEMES[index].class === 'theme-galaxy'){
+        enableGalaxy();
+      } else {
+        disableGalaxy();
+      }
+    }
+
+    function triggerThemeUnlock(index){
+      gameWrap.classList.add('celebrate');
+      setTimeout(()=> gameWrap.classList.remove('celebrate'), 1600);
+      const banner = document.createElement('div');
+      banner.textContent = `Theme Unlocked: ${THEMES[index].name}`;
+      banner.style.position = 'fixed';
+      banner.style.left = '50%';
+      banner.style.top = '12%';
+      banner.style.transform = 'translateX(-50%)';
+      banner.style.padding = '10px 18px';
+      banner.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))';
+      banner.style.border = '1px solid rgba(255,255,255,0.06)';
+      banner.style.borderRadius = '10px';
+      banner.style.zIndex = 220;
+      banner.style.color = '#fff';
+      banner.style.fontWeight = 800;
+      banner.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+      document.body.appendChild(banner);
+      setTimeout(()=> banner.remove(), 2600);
+    }
+
+    /* ---------------- Galaxy starfield & shooting stars ---------------- */
+    let galaxyInterval = null;
+    function enableGalaxy(){
+      starfield.style.display = '';
+      starfield.setAttribute('aria-hidden','false');
+      nebula.style.display = '';
+      nebula.setAttribute('aria-hidden','false');
+      if(!starsLayer.hasChildNodes()){
+        createStarfield(260); // more stars for cooler look
+      }
+      if(!galaxyInterval){
+        galaxyInterval = setInterval(()=> spawnShootingStar(), 1200 + Math.random()*2200);
+      }
+    }
+
+    function disableGalaxy(){
+      starfield.style.display = 'none';
+      starfield.setAttribute('aria-hidden','true');
+      nebula.style.display = 'none';
+      nebula.setAttribute('aria-hidden','true');
+      if(galaxyInterval){ clearInterval(galaxyInterval); galaxyInterval = null; }
+      document.querySelectorAll('.shooting').forEach(el => el.remove());
+    }
+
+    function createStarfield(count){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for(let i=0;i<count;i++){
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random()*3.2 + 0.6;
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        s.style.left = Math.random()*100 + 'vw';
+        s.style.top = Math.random()*100 + 'vh';
+        if(Math.random() < 0.22) s.classList.add('twinkle');
+        s.style.opacity = 0.5 + Math.random()*0.6;
+        starsLayer.appendChild(s);
+      }
+    }
+
+    function spawnShootingStar(){
+      const startX = Math.random()*80 + 5; // vw
+      const startY = Math.random()*30 + 2; // vh
+      const dx = (Math.random()*160 + 120) * (Math.random() < 0.5 ? 1 : -1); // vw
+      const dy = (Math.random()*60 + 80); // vh
+      const speed = 700 + Math.random()*900; // ms
+      const el = document.createElement('div');
+      el.className = 'shooting';
+      el.style.left = startX + 'vw';
+      el.style.top = startY + 'vh';
+      el.style.width = (8 + Math.random()*10) + 'px';
+      el.style.height = (2 + Math.random()*4) + 'px';
+      el.style.opacity = 1;
+      el.style.transform = `rotate(${Math.random()*40 - 20}deg)`;
+      el.style.setProperty('--dx', dx + 'vw');
+      el.style.setProperty('--dy', dy + 'vh');
+      el.style.animation = `shoot ${speed}ms cubic-bezier(.2,.9,.2,1) forwards`;
+      document.body.appendChild(el);
+      setTimeout(()=> { try{ el.remove(); }catch(e){} }, speed + 300);
+    }
+
+    /* ---------------- UI rendering ---------------- */
+    function render(){
+      countEl.textContent = format(state.count);
+      perClickEl.textContent = format(effectivePerClick());
+      autoCountEl.textContent = state.autoCount;
+      const prestigePointsEl = document.getElementById('prestigePoints');
+      if(prestigePointsEl) prestigePointsEl.textContent = format(state.prestigePoints);
+      updateThemeBasedOnCount();
+      renderUpgrades();
+      renderSaveList();
+    }
+
+    function renderUpgrades(){
+      upgradesEl.innerHTML = '';
+      const eff = state.upgrades.efficiencyLevel || 0;
+      const discount = Math.pow(0.95, eff);
+
+      function addUpgrade(title, desc, costRaw, onBuy, rightLabel){
+        const cost = Math.max(1, Math.floor(costRaw * discount));
+        const wrap = document.createElement('div'); wrap.className='upgrade';
+        const meta = document.createElement('div'); meta.className='meta';
+        const t = document.createElement('div'); t.className='title'; t.textContent = title;
+        const d = document.createElement('div'); d.className='desc'; d.textContent = desc;
+        meta.appendChild(t); meta.appendChild(d);
+        const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+        const label = document.createElement('div'); label.className='cost'; label.textContent = format(cost);
+        const btn = document.createElement('button'); btn.textContent = 'Buy';
+        btn.onclick = () => { if(state.count >= cost){ onBuy(cost); } else flashInsufficient(); };
+        right.appendChild(label); right.appendChild(btn);
+        if(rightLabel){
+          const small = document.createElement('div'); small.style.fontSize='12px'; small.style.color='var(--muted)'; small.style.marginLeft='8px'; small.textContent = rightLabel;
+          right.appendChild(small);
+        }
+        wrap.appendChild(meta); wrap.appendChild(right);
+        upgradesEl.appendChild(wrap);
+      }
+
+      addUpgrade('Click Power','Increase base GUH per click by +1.', 10 * Math.pow(2, state.upgrades.clickPowerLevel), (cost)=>{
+        state.count -= cost; state.upgrades.clickPowerLevel++; state.baseClickPower += 1; saveState(); render(); pulse();
+      }, `Lv ${state.upgrades.clickPowerLevel}`);
+
+      addUpgrade('Click Multiplier','Multiply your base click power by 2.', 50 * Math.pow(2, state.upgrades.multiplierLevel), (cost)=>{
+        state.count -= cost; state.upgrades.multiplierLevel++; state.multiplier *= 2; saveState(); render(); pulse();
+      }, `x${Math.pow(2,state.upgrades.multiplierLevel)}`);
+
+      addUpgrade('Mega Click','Add a big flat bonus to base click power (+5).', 200 * Math.pow(2, state.upgrades.megaClickLevel), (cost)=>{
+        state.count -= cost; state.upgrades.megaClickLevel++; state.baseClickPower += 5; saveState(); render(); pulse();
+      }, `Lv ${state.upgrades.megaClickLevel}`);
+
+      addUpgrade(state.upgrades.autoBought ? 'Upgrade Auto Speed' : 'Buy Auto Clicker', state.upgrades.autoBought ? 'Decrease auto click interval or add another auto clicker.' : 'Auto clicks for you every interval.', 200 * Math.pow(2, state.upgrades.autoSpeedLevel), (cost)=>{
+        state.count -= cost;
+        if(!state.upgrades.autoBought){ state.upgrades.autoBought = true; state.autoCount = 1; state.autoPower = 1; }
+        else { state.upgrades.autoSpeedLevel++; state.autoIntervalMs = Math.max(100, Math.round(state.autoIntervalMs * 0.85)); state.autoCount += 1; }
+        saveState(); render(); restartWorker(); pulse();
+      }, state.upgrades.autoBought ? `Speed Lv ${state.upgrades.autoSpeedLevel}` : 'Not owned');
+
+      addUpgrade('Auto Power','Increase GUH per auto click (adds +1 to autoPower).', 300 * Math.pow(2, state.upgrades.autoPowerLevel), (cost)=>{
+        if(!state.upgrades.autoBought){ alert('Buy an Auto Clicker first.'); return; }
+        state.count -= cost; state.upgrades.autoPowerLevel++; state.autoPower += 1; saveState(); render(); pulse();
+      }, `Lv ${state.upgrades.autoPowerLevel}`);
+
+      addUpgrade('Efficiency','Reduce future upgrade costs by 5% (stacking).', 500 * Math.pow(2, state.upgrades.efficiencyLevel), (cost)=>{
+        state.count -= cost; state.upgrades.efficiencyLevel++; saveState(); render(); pulse();
+      }, `Lv ${state.upgrades.efficiencyLevel}`);
+
+      // Prestige (requirement scales with totalPrestiges)
+      const prestigeWrap = document.createElement('div'); prestigeWrap.className='upgrade';
+      const meta = document.createElement('div'); meta.className='meta';
+      const title = document.createElement('div'); title.className='title'; title.textContent = 'Prestige';
+      const desc = document.createElement('div'); desc.className='desc'; desc.textContent = 'Reset most progress for Prestige Points that permanently boost gains.';
+      meta.appendChild(title); meta.appendChild(desc);
+      const right = document.createElement('div'); right.style.display='flex'; right.style.alignItems='center';
+      const gain = computePrestigeGain();
+      const requirement = computePrestigeRequirement();
+      const preview = document.createElement('div'); preview.style.fontSize='13px'; preview.style.color='var(--muted)'; preview.style.marginRight='10px';
+      preview.textContent = `Gain ${gain} pts · Req ${format(requirement)} GUH`;
+      const btn = document.createElement('button'); btn.textContent = 'Prestige';
+      btn.onclick = () => {
+        if(state.count < requirement){ alert(`You need ${format(requirement)} GUH to prestige (requirement grows each prestige).`); return; }
+        if(gain <= 0){ alert('You need more GUH to gain prestige points.'); return; }
+        if(confirm(`Prestige will reset most progress and grant ${gain} Prestige Points. Proceed?`)){
+          doPrestige(gain);
+        }
+      };
+      right.appendChild(preview); right.appendChild(btn);
+      prestigeWrap.appendChild(meta); prestigeWrap.appendChild(right);
+      upgradesEl.appendChild(prestigeWrap);
+
+      // Prestige status
+      const prestigeStat = document.createElement('div'); prestigeStat.className='upgrade';
+      const pm = document.createElement('div'); pm.className='meta';
+      const pt = document.createElement('div'); pt.className='title'; pt.textContent = 'Prestige Status';
+      const pd = document.createElement('div'); pd.className='desc'; pd.textContent = `Points: ${format(state.prestigePoints)} · Total Prestiges: ${state.totalPrestiges} · Mult x${state.prestigeMultiplier.toFixed(2)}`;
+      pm.appendChild(pt); pm.appendChild(pd);
+      prestigeStat.appendChild(pm);
+      upgradesEl.appendChild(prestigeStat);
+    }
+
+    function pulse(){ document.body.animate([{filter:'brightness(1)'},{filter:'brightness(1.03)'}], {duration:220,iterations:1}); }
+    function flashInsufficient(){ document.body.animate([{filter:'hue-rotate(0deg)'},{filter:'hue-rotate(-20deg)'},{filter:'hue-rotate(0deg)'}], {duration:420,iterations:1}); }
+
+    /* ---------------- Click handling & visuals ---------------- */
+    function doClick(n){
+      state.count += n;
+      spawnFloat('+'+format(n));
+      spawnParticles();
+      saveState();
+      render();
+      guhEl.classList.add('shine');
+      setTimeout(()=>guhEl.classList.remove('shine'), 420);
+    }
+
+    guhEl.addEventListener('click', ()=> doClick(effectivePerClick()));
+    guhEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); doClick(effectivePerClick()); }});
+
+    function spawnFloat(text){
+      const el = document.createElement('div'); el.className = 'float'; el.textContent = text;
+      const rect = guhEl.getBoundingClientRect(); const stageRect = stage.getBoundingClientRect();
+      const x = rect.left + rect.width/2 - stageRect.left; const y = rect.top + rect.height/2 - stageRect.top;
+      el.style.left = x + (Math.random()*40-20) + 'px'; el.style.top = y + (Math.random()*20-10) + 'px';
+      stage.appendChild(el);
+      requestAnimationFrame(()=> { el.style.transform = 'translateY(-120px) scale(1.1)'; el.style.opacity = '0'; });
+      setTimeout(()=> el.remove(), 900);
+    }
+
+    function spawnParticles(){
+      for(let i=0;i<10;i++){
+        const p = document.createElement('div'); p.className = 'particle';
+        const rect = guhEl.getBoundingClientRect(); const stageRect = stage.getBoundingClientRect();
+        const x = rect.left + rect.width/2 - stageRect.left + (Math.random()*80-40);
+        const y = rect.top + rect.height/2 - stageRect.top + (Math.random()*40-20);
+        p.style.left = x + 'px'; p.style.top = y + 'px'; stage.appendChild(p);
+        const dx = (Math.random()*300-150); const dy = (Math.random()*-200-40);
+        requestAnimationFrame(()=> { p.style.transform = `translate(${dx}px, ${dy}px) scale(${0.6+Math.random()*0.8})`; p.style.opacity = '0'; });
+        setTimeout(()=> p.remove(), 900);
+      }
+    }
+
+    /* ---------------- Auto clicker via Web Worker ---------------- */
+    let worker = null;
+    function createWorker(){
+      const code = `
+        let interval = 1000;
+        function tick(){ postMessage({type:'tick', time:Date.now()}); }
+        let timer = setInterval(tick, interval);
+        onmessage = function(e){
+          const d = e.data;
+          if(d.type === 'setInterval'){ interval = d.value; clearInterval(timer); timer = setInterval(tick, interval); }
+          else if(d.type === 'stop'){ clearInterval(timer); }
+          else if(d.type === 'start'){ clearInterval(timer); timer = setInterval(tick, interval); }
+        };
+      `;
+      const blob = new Blob([code], {type:'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      return new Worker(url);
+    }
+
+    function startWorker(){
+      if(worker) worker.terminate();
+      worker = createWorker();
+      worker.onmessage = (e) => {
+        if(e.data && e.data.type === 'tick'){
+          const clicks = (state.autoCount || 0) * (state.baseClickPower * (state.autoPower || 1) * state.prestigeMultiplier);
+          if(clicks > 0) {
+            state.count += clicks;
+            spawnFloat('+'+format(clicks));
+            saveState();
+            render();
+          }
+        }
+      };
+      worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
+    }
+
+    function restartWorker(){
+      if(state.upgrades.autoBought) startWorker();
+      else { if(worker){ worker.postMessage({type:'stop'}); worker.terminate(); worker = null; } }
+    }
+
+    document.addEventListener('visibilitychange', ()=>{
+      if(worker) worker.postMessage({type:'setInterval', value: state.autoIntervalMs});
+    });
+
+    /* ---------------- Prestige logic (scaling requirement) ---------------- */
+    function computePrestigeGain(){
+      const base = Math.floor(state.count / 100000);
+      const bonus = Math.floor(Math.sqrt(state.totalPrestiges));
+      return Math.max(0, base + bonus);
+    }
+
+    function computePrestigeRequirement(){
+      // requirement grows with totalPrestiges: base 100k, doubles every 2 prestiges, plus small linear bump
+      const baseReq = 100000;
+      const growth = Math.pow(2, Math.floor(state.totalPrestiges / 2)); // doubles every 2 prestiges
+      const linear = state.totalPrestiges * 25000;
+      return Math.max(100000, Math.floor(baseReq * growth + linear));
+    }
+
+    function doPrestige(gain){
+      state.prestigePoints += gain;
+      state.totalPrestiges += 1;
+      state.prestigeMultiplier = 1 + state.prestigePoints * 0.01;
+
+      const keep = {
+        prestigePoints: state.prestigePoints,
+        prestigeMultiplier: state.prestigeMultiplier,
+        totalPrestiges: state.totalPrestiges,
+        themeIndex: state.themeIndex
+      };
+
+      state = JSON.parse(JSON.stringify(defaultState));
+      state.prestigePoints = keep.prestigePoints;
+      state.prestigeMultiplier = keep.prestigeMultiplier;
+      state.totalPrestiges = keep.totalPrestiges;
+      state.themeIndex = keep.themeIndex;
+
+      saveState();
+      render();
+      restartWorker();
+
+      const banner = document.createElement('div');
+      banner.textContent = `Prestige complete — +${gain} pts · Mult x${state.prestigeMultiplier.toFixed(2)}`;
+      banner.style.position = 'fixed';
+      banner.style.left = '50%';
+      banner.style.top = '12%';
+      banner.style.transform = 'translateX(-50%)';
+      banner.style.padding = '10px 18px';
+      banner.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))';
+      banner.style.border = '1px solid rgba(255,255,255,0.06)';
+      banner.style.borderRadius = '10px';
+      banner.style.zIndex = 220;
+      banner.style.color = '#fff';
+      banner.style.fontWeight = 800;
+      banner.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+      document.body.appendChild(banner);
+      setTimeout(()=> banner.remove(), 4000);
+    }
+
+    /* ---------------- Save / Load UI ---------------- */
+    function renderSaveList(){
+      const slots = loadSlots();
+      saveListEl.innerHTML = '';
+      if(slots.length === 0){
+        const p = document.createElement('div'); p.style.color = 'var(--muted)'; p.style.fontSize='13px'; p.textContent = 'No saves yet.';
+        saveListEl.appendChild(p);
+        return;
+      }
+      slots.forEach(slot => {
+        const row = document.createElement('div'); row.className = 'save-row';
+        const meta = document.createElement('div'); meta.className = 'meta';
+        const name = document.createElement('div'); name.className = 'name'; name.textContent = slot.name;
+        const time = document.createElement('div'); time.className = 'time'; time.textContent = new Date(slot.created).toLocaleString();
+        meta.appendChild(name); meta.appendChild(time);
+        const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px';
+        const loadBtn = document.createElement('button'); loadBtn.textContent = 'Load';
+        loadBtn.onclick = () => {
+          if(confirm(`Load save "${slot.name}"? This will replace your current progress.`)){
+            state = JSON.parse(JSON.stringify(slot.state));
+            saveState();
+            render();
+            restartWorker();
+          }
+        };
+        const overwriteBtn = document.createElement('button'); overwriteBtn.textContent = 'Overwrite';
+        overwriteBtn.onclick = () => {
+          if(confirm(`Overwrite save "${slot.name}" with current game?`)){
+            overwriteSlot(slot.id, JSON.parse(JSON.stringify(state)));
+            renderSaveList();
+          }
+        };
+        const delBtn = document.createElement('button'); delBtn.textContent = 'Delete';
+        delBtn.onclick = () => {
+          if(confirm(`Delete save "${slot.name}"?`)){
+            deleteSlot(slot.id);
+          }
+        };
+        actions.appendChild(loadBtn); actions.appendChild(overwriteBtn); actions.appendChild(delBtn);
+        row.appendChild(meta); row.appendChild(actions);
+        saveListEl.appendChild(row);
+      });
+    }
+
+    saveBtn.addEventListener('click', ()=>{
+      const name = (saveNameInput.value || '').trim();
+      const slot = createSlot(name, JSON.parse(JSON.stringify(state)));
+      saveNameInput.value = '';
+      renderSaveList();
+      const banner = document.createElement('div');
+      banner.textContent = `Saved as "${slot.name}"`;
+      banner.style.position = 'fixed';
+      banner.style.left = '50%';
+      banner.style.top = '12%';
+      banner.style.transform = 'translateX(-50%)';
+      banner.style.padding = '8px 14px';
+      banner.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))';
+      banner.style.border = '1px solid rgba(255,255,255,0.06)';
+      banner.style.borderRadius = '10px';
+      banner.style.zIndex = 220;
+      banner.style.color = '#fff';
+      banner.style.fontWeight = 800;
+      banner.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+      document.body.appendChild(banner);
+      setTimeout(()=> banner.remove(), 2600);
+    });
+
+    /* ---------------- FPS indicator ---------------- */
+    let last = performance.now(), frames = 0;
+    function fpsTick(now){
+      frames++;
+      if(now - last >= 1000){
+        fpsEl.textContent = frames + ' fps';
+        frames = 0; last = now;
+      }
+      requestAnimationFrame(fpsTick);
+    }
+    requestAnimationFrame(fpsTick);
+
+    /* ---------------- Cross-tab sync ---------------- */
+    window.addEventListener('storage', (e)=>{
+      if(e.key === SAVE_KEY && e.newValue){
+        try{
+          const other = JSON.parse(e.newValue);
+          state.count = other.count;
+          state.baseClickPower = other.baseClickPower;
+          state.multiplier = other.multiplier;
+          state.autoCount = other.autoCount;
+          state.autoIntervalMs = other.autoIntervalMs;
+          state.autoPower = other.autoPower;
+          state.upgrades = other.upgrades;
+          state.prestigePoints = other.prestigePoints;
+          state.prestigeMultiplier = other.prestigeMultiplier;
+          state.totalPrestiges = other.totalPrestiges;
+          state.themeIndex = other.themeIndex;
+          render();
+        }catch(err){}
+      }
+      if(e.key === SLOTS_KEY){
+        renderSaveList();
+      }
+    });
+
+    /* ---------------- Init ---------------- */
+    applyTheme(state.themeIndex);
+    render();
+    renderSaveList();
+    if(state.upgrades.autoBought) startWorker();
+    setInterval(()=> saveState(), 2000);
+
+    /* ---------------- Debug / reset helper ---------------- */
+    window.resetGuh = function(){
+      if(confirm('Reset game to defaults?')){
+        state = JSON.parse(JSON.stringify(defaultState));
+        saveState();
+        render();
+        restartWorker();
+      }
+    };
+
+    /* ---------------- Accessibility ---------------- */
+    guhEl.addEventListener('focus', ()=> guhEl.style.outline = '3px solid rgba(126,231,135,0.12)');
+    guhEl.addEventListener('blur', ()=> guhEl.style.outline = 'none');
+  </script>
+</body>
+</html>

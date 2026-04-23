@@ -1,0 +1,1590 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>homewrk launcher — Restored</title>
+  <meta name="description" content="Launcher with games, tools, social category, full-screen viewer, add-item support, auth, improved settings, tab masking, panic key, and galaxy theme." />
+  <style>
+    :root{
+      --bg:#071226;
+      --panel:#0b1220;
+      --panel-2:#0f1724;
+      --muted:#9fb7bf;
+      --text:#eaf6f8;
+      --accent:#7be7ff;
+      --accent-2:#4fd3ff;
+      --gap:14px;
+      --sidebar-w:260px;
+      --focus: 3px solid rgba(123,231,255,0.12);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      --card-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden; /* keep app full-viewport and avoid scroll shrink */
+    }
+
+    /* Galaxy theme (default only) */
+    body.galaxy {
+      background: radial-gradient(ellipse at bottom, #071226 0%, #02040a 60%);
+      background-attachment: fixed;
+    }
+    /* stars layer */
+    .stars, .stars2, .shooting {
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+    .stars::before, .stars2::before {
+      content: "";
+      position:absolute;
+      inset:0;
+      background-image: radial-gradient(white 1px, transparent 1px);
+      background-size: 2px 2px;
+      opacity:0.06;
+      transform:translateZ(0);
+    }
+    .stars2::before {
+      background-size: 3px 3px;
+      opacity:0.03;
+      filter: blur(0.6px);
+    }
+    /* shooting stars */
+    .shooting::before {
+      content: "";
+      position:absolute;
+      width:2px;
+      height:2px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.0));
+      top:20%;
+      left:-10%;
+      transform:rotate(-20deg);
+      box-shadow: 0 0 8px 2px rgba(255,255,255,0.6);
+      animation: shoot 6s linear infinite;
+      opacity:0.9;
+    }
+    @keyframes shoot {
+      0% { left:-10%; top:10%; opacity:0; transform:translateX(0) rotate(-20deg) scaleX(0.6); }
+      5% { opacity:1; }
+      30% { left:110%; top:30%; opacity:0.6; transform:translateX(0) rotate(-20deg) scaleX(1); }
+      100% { left:110%; top:30%; opacity:0; transform:translateX(0) rotate(-20deg) scaleX(1); }
+    }
+
+    /* compact / density and shadow toggles */
+    body.compact .card{ padding:10px }
+    body.compact .card h3{ font-size:14px }
+    body.compact .card-grid{ gap:8px }
+    body.no-shadows .card{ box-shadow:none }
+
+    .app{ position:relative; width:100%; height:100vh; display:flex; gap:var(--gap); padding:18px; align-items:stretch; z-index:2; }
+    .nebula { position:fixed; inset:0; z-index:1; pointer-events:none; }
+    .shell{ position:relative; z-index:3; display:flex; width:100%; height:100%; gap:var(--gap); align-items:stretch; }
+
+    .sidebar{ width:var(--sidebar-w); min-width:200px; background:var(--panel); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; gap:12px; border:1px solid rgba(255,255,255,0.03); box-shadow: var(--card-shadow); color:var(--text); overflow:auto; }
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{ width:52px;height:52px;border-radius:10px; background:linear-gradient(135deg,var(--accent) 0%, var(--accent-2) 100%); display:flex;align-items:center;justify-content:center;color:#021;font-weight:800; letter-spacing:0.6px;font-size:16px;border:1px solid rgba(0,0,0,0.25); }
+    .brand h1{font-size:16px;margin:0}
+    .brand .tag{font-size:12px;color:var(--muted);margin-top:2px}
+
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .nav button{ display:flex;gap:12px;align-items:center;background:transparent;border:0;color:var(--muted); padding:10px;border-radius:10px;cursor:pointer;text-align:left;font-size:15px; transition:background .12s ease, color .12s ease, transform .12s ease; }
+    .nav button:hover{background:#0d1a2a;color:var(--text); transform:translateX(6px)}
+    .nav button[aria-current="true"]{ color:var(--accent); background:linear-gradient(90deg, rgba(123,231,255,0.06), transparent); box-shadow:inset 0 1px 0 rgba(255,255,255,0.01); }
+
+    .guest{ margin-top:auto;padding-top:12px;border-top:1px solid rgba(255,255,255,0.03); display:flex;gap:12px;align-items:center; }
+    .avatar{width:44px;height:44px;border-radius:50%;background:#1b2430;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.03); background-size:cover; background-position:center; }
+    .guest .meta{font-size:13px;color:var(--muted)}
+    .guest .meta .email{color:var(--text);font-weight:700}
+
+    .main{ flex:1; display:flex; flex-direction:column; gap:12px; min-width:0; align-self:stretch }
+    .topbar{ display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:var(--radius); background:var(--panel-2); border:1px solid rgba(255,255,255,0.03); box-shadow:var(--card-shadow); position:sticky; top:18px; z-index:4; }
+    .categories{display:flex;gap:8px;align-items:center;overflow:auto;-webkit-overflow-scrolling:touch}
+    .categories button{ background:transparent;border:0;color:var(--muted);padding:8px 12px;border-radius:999px;cursor:pointer;font-size:13px; transition:all .12s ease; }
+    .categories button[aria-selected="true"]{ color:#021; background:var(--accent); box-shadow:0 6px 18px rgba(0,0,0,0.45); }
+
+    .controls{display:flex;gap:10px;align-items:center}
+    .search{ display:flex;align-items:center;gap:10px;background:#0d1a2a;padding:8px 12px;border-radius:10px; min-width:300px;border:1px solid rgba(255,255,255,0.02); }
+    .search input{background:transparent;border:0;color:var(--text);outline:none;width:100%;font-size:14px}
+
+    .content{ position:relative; background:var(--panel); border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow); border:1px solid rgba(255,255,255,0.03);flex:1;overflow:auto;display:flex;flex-direction:column; min-height:0; }
+    .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .title{font-size:20px;font-weight:700}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    .card-grid{ display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;align-content:start;width:100%; min-height:0; }
+    .card{ background:#0f1724; padding:14px;border-radius:10px;box-shadow:var(--card-shadow); transition:transform .12s ease, opacity .12s ease; display:flex;flex-direction:column;gap:10px;min-height:96px;border:1px solid rgba(255,255,255,0.03); }
+    .card h3{margin:0;font-size:16px;color:var(--text)}
+    .meta{font-size:12px;color:var(--muted);font-family:var(--mono)}
+    .actions{display:flex;gap:10px;margin-top:auto}
+    .btn{padding:9px 12px;border-radius:8px;border:0;cursor:pointer;font-size:14px}
+    .btn.primary{ background:var(--accent); color:#021;font-weight:700;border:1px solid rgba(0,0,0,0.12) }
+    .btn.ghost{background:#12202b;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+    .card.is-fav{box-shadow:0 14px 36px rgba(123,231,255,0.06);border:1px solid rgba(123,231,255,0.06)}
+
+    .profile-menu{ position:fixed; background:#0b1220; border-radius:10px; padding:10px; border:1px solid rgba(255,255,255,0.03); display:none; z-index:90; min-width:220px; box-shadow:var(--card-shadow); color:var(--text); transition:opacity .12s ease, transform .12s ease; will-change:top,left; }
+    .profile-menu .menu-item{ display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer; transition:background .12s ease; }
+    .profile-menu .menu-item:hover{background:#0f1a2a}
+    .profile-menu .guest-row{display:flex;align-items:center;gap:10px;padding:10px;border-top:1px solid rgba(255,255,255,0.03);margin-top:8px}
+    .profile-menu .guest-avatar{width:36px;height:36px;border-radius:50%;background:#1b2430;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700;border:1px solid rgba(255,255,255,0.03)}
+    .profile-menu .guest-meta{font-size:13px;color:var(--muted)}
+
+    .settings-dropdown{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0b1220; border-radius:10px; padding:12px; border:1px solid rgba(255,255,255,0.03); display:none; z-index:95; min-width:420px; max-width:92%; max-height:80vh; overflow:auto; box-shadow:var(--card-shadow); color:var(--text); }
+    .settings-dropdown h4{margin:0 0 8px 0;font-size:15px}
+    .settings-dropdown .section{ border-top:1px solid rgba(255,255,255,0.03); padding-top:10px; margin-top:10px; }
+    .settings-dropdown .row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .settings-dropdown label{font-size:13px;color:var(--muted);min-width:120px}
+    .settings-dropdown .small{font-size:12px;color:var(--muted);margin-left:4px}
+
+    .mask-presets{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px }
+    .mask-presets button{ padding:6px 8px; font-size:13px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:#0f1724; color:var(--muted); cursor:pointer }
+
+    /* Full-screen viewer overlay: covers entire viewport with X top-right */
+    .viewer-overlay {
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:none;
+      align-items:stretch;
+      justify-content:center;
+      background: rgba(2,6,12,0.95);
+      padding:0;
+    }
+    .viewer {
+      position:relative;
+      width:100%;
+      height:100%;
+      border-radius:0;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      box-shadow:none;
+      pointer-events:auto;
+      background:#071226;
+      border:0;
+    }
+    .viewer-header{
+      display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(90deg, rgba(11,18,32,0.95), rgba(11,18,32,0.95));
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      z-index:12;
+    }
+    .viewer-title{font-weight:700}
+    .viewer-controls{display:flex;gap:8px;align-items:center}
+    .viewer-close{
+      background:transparent;border:0;color:var(--muted);padding:8px;border-radius:8px;cursor:pointer;font-size:20px;
+    }
+    .viewer-iframe{ flex:1;border:0;width:100%;height:100%; background:#071226; display:block; }
+
+    .modal-backdrop { position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); }
+    .modal { width:640px; max-width:92%; background:#0b1220; border-radius:12px; padding:18px; border:1px solid rgba(255,255,255,0.03); box-shadow:var(--card-shadow); color:var(--text); }
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+    .field input, .field select, .field textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#0f1724;color:var(--text)}
+    .field textarea{min-height:200px;font-family:var(--mono);resize:vertical}
+    .small{font-size:13px;color:var(--muted)}
+
+    @media (max-width:1100px){ .sidebar{display:none} .topbar{border-radius:10px} .search{min-width:180px} .viewer{height:calc(100vh - 140px)} }
+    @media (max-width:520px){ .card-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .search{min-width:120px} .categories{gap:6px} }
+    :focus{outline:none}
+    :focus-visible{box-shadow:var(--focus)}
+  </style>
+</head>
+<body class="galaxy">
+  <!-- Galaxy visual layers -->
+  <div class="stars" aria-hidden="true"></div>
+  <div class="stars2" aria-hidden="true"></div>
+  <div class="shooting" aria-hidden="true"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <div class="app" role="application" aria-label="homewrk launcher">
+    <div class="shell" role="region" aria-label="Application shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">HW</div>
+          <div>
+            <h1>homewrk</h1>
+            <div class="tag">launcher</div>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Primary">
+          <button id="nav-games" aria-current="true" data-nav="games">🎮 Games</button>
+          <button id="nav-tools" data-nav="tools">🧰 Tools</button>
+          <button id="nav-favs" data-nav="favorites">⭐ Favorites</button>
+          <button data-nav="social">💬 Social</button>
+        </nav>
+
+        <div class="guest" id="guestArea">
+          <div id="avatarBtn" class="avatar" title="Account">G</div>
+          <div>
+            <div class="meta" id="guestName">Guest</div>
+            <div class="meta small" id="guestSub">Not signed in</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main" role="main">
+        <header class="topbar" role="region" aria-label="Category bar">
+          <div class="categories" role="tablist" aria-label="Categories">
+            <button role="tab" data-filter="games" aria-selected="true">Games</button>
+            <button role="tab" data-filter="tools">Tools</button>
+            <button role="tab" data-filter="favorites">Favorites</button>
+            <button role="tab" data-filter="social">Social</button>
+          </div>
+
+          <div class="controls" role="search">
+            <div class="search" aria-hidden="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></circle></svg>
+              <input id="search" type="search" placeholder="Search games or files" aria-label="Search games or files" />
+            </div>
+          </div>
+        </header>
+
+        <section class="content" aria-live="polite" aria-atomic="true">
+          <div class="header-row">
+            <div>
+              <div class="title">Welcome</div>
+              <div class="subtitle" id="resultCount">Showing games</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button id="newBtn" class="btn ghost" title="Add new">＋ Add</button>
+            </div>
+          </div>
+
+          <div id="grid" class="card-grid" data-count="0" aria-live="polite">
+            <!-- initial cards are created by JS from master list to ensure consistent behavior -->
+          </div>
+
+          <div id="empty" class="empty" hidden>No items match your filter or search.</div>
+
+          <!-- Full-screen Viewer overlay: covers page, opens same page -->
+          <div id="viewerOverlay" class="viewer-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+            <div class="viewer" role="document" aria-label="In-page viewer">
+              <div class="viewer-header">
+                <div class="viewer-title" id="viewerTitle">Viewer</div>
+                <div class="viewer-controls">
+                  <button id="viewerOpenNew" class="viewer-close" title="Open in new tab">⤢</button>
+                  <button id="viewerClose" class="viewer-close" title="Close (Esc)">✕</button>
+                </div>
+              </div>
+              <iframe id="viewerIframe" class="viewer-iframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Settings centered (improved UI with categories) -->
+    <div id="settingsDropdown" class="settings-dropdown" aria-hidden="true">
+      <h4>Settings</h4>
+
+      <div class="section" id="settings-appearance">
+        <div style="font-weight:700;margin-bottom:8px">Appearance</div>
+        <div class="row">
+          <label>Theme</label>
+          <div class="small">Galaxy (default)</div>
+        </div>
+        <div class="row">
+          <label>Card density</label>
+          <select id="dropdownDensity">
+            <option value="normal">Normal</option>
+            <option value="compact">Compact</option>
+          </select>
+          <div class="small">Reduce card padding for more items</div>
+        </div>
+        <div class="row">
+          <label>Show shadows</label>
+          <select id="dropdownShadows">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+          <div class="small">Toggle card shadows</div>
+        </div>
+      </div>
+
+      <div class="section" id="settings-behavior">
+        <div style="font-weight:700;margin-bottom:8px">Behavior</div>
+        <div class="row">
+          <label>Open behavior</label>
+          <select id="dropdownOpenBehavior">
+            <option value="overlay">Open in overlay viewer</option>
+            <option value="redirect">Redirect to file</option>
+          </select>
+          <div class="small">How items open by default</div>
+        </div>
+        <div class="row">
+          <label>Default Add Category</label>
+          <select id="dropdownDefaultAdd">
+            <option value="games">Games</option>
+            <option value="tools">Tools</option>
+            <option value="social">Social</option>
+          </select>
+          <div class="small">Default category when adding items</div>
+        </div>
+      </div>
+
+      <div class="section" id="settings-masking">
+        <div style="font-weight:700;margin-bottom:8px">Tab Masking & Presets</div>
+        <div class="row">
+          <label>Enable masking</label>
+          <select id="dropdownMasking">
+            <option value="off">Off</option>
+            <option value="on">On</option>
+          </select>
+          <div class="small">Disguise tab title and URL</div>
+        </div>
+        <div class="row">
+          <label>Mask title</label>
+          <input id="maskTitle" placeholder="Google Drive" />
+        </div>
+        <div class="row">
+          <label>Mask URL</label>
+          <input id="maskUrl" placeholder="https://drive.google.com" />
+        </div>
+        <div class="row">
+          <label>Presets</label>
+          <div class="mask-presets" id="maskPresets">
+            <button data-title="Google Drive" data-url="https://drive.google.com">Google Drive</button>
+            <button data-title="Gmail" data-url="https://mail.google.com">Gmail</button>
+            <button data-title="Google Docs" data-url="https://docs.google.com">Google Docs</button>
+            <button data-title="YouTube" data-url="https://www.youtube.com">YouTube</button>
+            <button data-title="Google Search" data-url="https://www.google.com">Google</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="settings-panic">
+        <div style="font-weight:700;margin-bottom:8px">Panic Key</div>
+        <div class="row">
+          <label>Panic key</label>
+          <input id="panicKeyInput" placeholder="Default: ' (single quote)" style="width:120px" />
+          <div class="small">Key that triggers panic action</div>
+        </div>
+        <div class="row">
+          <label>Action</label>
+          <select id="panicAction">
+            <option value="redirect">Redirect to URL</option>
+            <option value="close">Attempt to close tab</option>
+            <option value="hide">Hide UI (blank page)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Redirect URL</label>
+          <input id="panicRedirect" placeholder="https://www.google.com" />
+        </div>
+        <div class="row">
+          <label>Require modifier</label>
+          <select id="panicModifier">
+            <option value="none">None</option>
+            <option value="ctrl">Ctrl</option>
+            <option value="alt">Alt</option>
+            <option value="shift">Shift</option>
+          </select>
+          <div class="small">Optional modifier to avoid accidental triggers</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px">
+        <button id="dropdownSave" class="btn primary">Save</button>
+        <button id="dropdownClose" class="btn ghost">Close</button>
+      </div>
+    </div>
+
+    <!-- Profile menu (positioned above avatar dynamically) -->
+    <div id="profileMenu" class="profile-menu" aria-hidden="true">
+      <div id="pmAccount" class="menu-item"><span class="label">Account</span></div>
+      <div id="pmAppSettings" class="menu-item"><span class="label">Settings</span></div>
+      <div id="pmSignAction" class="menu-item"><span class="label">Sign in</span></div>
+
+      <div class="guest-row" style="margin-top:8px">
+        <div class="guest-avatar" id="pmAvatar">G</div>
+        <div>
+          <div style="font-weight:700;color:var(--text)" id="pmGuestName">Guest</div>
+          <div class="guest-meta" id="pmGuestSub">Not signed in</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add item modal -->
+  <div id="addModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+      <h3 id="addTitle">Add New Item</h3>
+      <div class="field">
+        <label class="small">Title</label>
+        <input id="addTitleInput" placeholder="My Cool Game" />
+      </div>
+      <div class="field">
+        <label class="small">Filename (for reference)</label>
+        <input id="addFileInput" placeholder="my-game.html" />
+      </div>
+      <div class="field">
+        <label class="small">Category</label>
+        <select id="addCategory">
+          <option value="games">Games</option>
+          <option value="tools">Tools</option>
+          <option value="social">Social</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="small">HTML Code</label>
+        <textarea id="addCode" placeholder="Paste your HTML/JS/CSS here"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="addSave" class="btn primary">Add</button>
+        <button id="addCancel" class="btn ghost">Cancel</button>
+      </div>
+      <div id="addMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <!-- Account modal (restored, with avatar URL input) -->
+  <div id="accountModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+      <h3 id="accountTitle">Account Settings</h3>
+      <div class="field">
+        <label class="small">Display name</label>
+        <input id="acctDisplayName" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label class="small">Email (read-only)</label>
+        <input id="acctEmail" readonly />
+      </div>
+      <div class="field">
+        <label class="small">Avatar image URL</label>
+        <input id="acctAvatarUrl" placeholder="https://example.com/me.jpg" />
+        <div class="small">Paste an image URL (no upload required). Click Save to apply.</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="acctSave" class="btn primary">Save</button>
+        <button id="acctClose" class="btn ghost">Close</button>
+      </div>
+      <div id="acctMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <!-- App settings modal (fallback) -->
+  <div id="appSettingsModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="appSettingsTitle">
+      <h3 id="appSettingsTitle">App Settings</h3>
+      <div class="field">
+        <label class="small">Open behavior</label>
+        <select id="openBehavior">
+          <option value="redirect">Redirect to /games or /tools</option>
+          <option value="overlay">Open in overlay viewer</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="appSave" class="btn primary">Save</button>
+        <button id="appClose" class="btn ghost">Close</button>
+      </div>
+      <div id="appMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <!-- Auth modal -->
+  <div id="authModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <h3 id="authTitle">Account</h3>
+      <div class="tabs" role="tablist" aria-label="Auth tabs">
+        <button id="tabSignIn" role="tab" aria-selected="true">Sign in</button>
+        <button id="tabSignUp" role="tab" aria-selected="false">Sign up</button>
+      </div>
+      <div id="authForms">
+        <div class="field">
+          <label class="small">Email</label>
+          <input id="authEmail" type="email" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label class="small">Password</label>
+          <input id="authPassword" type="password" autocomplete="current-password" />
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:8px">
+            <button id="authPrimary" class="btn primary">Sign in</button>
+            <button id="authCancel" class="btn ghost">Cancel</button>
+          </div>
+          <button id="authClose" class="btn ghost">Close</button>
+        </div>
+        <div class="auth-social" style="margin-top:8px">
+          <button id="googleSignIn" class="btn ghost" style="flex:1">Continue with Google</button>
+        </div>
+        <div id="authMsg" class="small" style="margin-top:8px;color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /************************************************************************
+     * Firebase config (embedded so auth works). Keep this file private.
+     ************************************************************************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+      authDomain: "goon-7ddc3.firebaseapp.com",
+      projectId: "goon-7ddc3",
+      storageBucket: "goon-7ddc3.firebasestorage.app",
+      messagingSenderId: "117099331820",
+      appId: "1:117099331820:web:3af984b15a843d3d7b65c"
+    };
+
+    (function initFirebase(){
+      try {
+        if(window.firebase && firebase.initializeApp){
+          if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+          window._hw_firebase_auth = firebase.auth();
+        }
+      } catch(e){ console.warn('Firebase init error:', e && e.message); }
+    })();
+
+    /************************************************************************
+     * Master card list (source of truth). All cards are created from this.
+     ************************************************************************/
+    const masterCards = [
+      // Games
+      { id: 'card-sandbox', category: 'games', title: 'Sandbox', file: 'sandbox.html' },
+      { id: 'card-snake', category: 'games', title: 'Snake Game Ripoff', file: 'snake.html' },
+      { id: 'card-mines', category: 'games', title: 'Minesweeper', file: 'mines.html' },
+      { id: 'card-bubble', category: 'games', title: 'Bubble Shooter', file: 'bubble-shooter.html' },
+      { id: 'card-casino', category: 'games', title: 'Casino', file: 'casino.html' },
+      { id: 'card-wormscape', category: 'games', title: 'Wormscape', file: 'wormscape.html' },
+      { id: 'card-chess', category: 'games', title: 'Chess', file: 'chess.html' },
+      { id: 'card-tower', category: 'games', title: 'Tower Defense', file: 'tower-defense.html' },
+      { id: 'card-space', category: 'games', title: 'Space Shooter', file: 'space-shooter.html' },
+      { id: 'card-tictactoe', category: 'games', title: 'Tic Tac Toe', file: 'tictactoe.html' }, /* corrected path */
+      { id: 'card-2048', category: 'games', title: '2048', file: '2048.html' },
+      { id: 'card-guh', category: 'games', title: 'GUH Clicker', file: 'guh-clicker.html' },
+      { id: 'card-flappy', category: 'games', title: 'Flappy Bird', file: 'flappy-bird.html' },
+      { id: 'card-hangman', category: 'games', title: 'Hangman', file: 'hangman.html' },
+      { id: 'card-block', category: 'games', title: 'Block Breaker', file: 'block-breaker.html' },
+      { id: 'card-arcade', category: 'games', title: 'Arcade Racer', file: 'arcade-racer.html' },
+
+      // Tools
+      { id: 'card-base64', category: 'tools', title: 'Base64 Encoder/Decoder', file: 'base64-tool.html' },
+      { id: 'card-calculator', category: 'tools', title: 'Calculator', file: 'calculator.html' },
+      { id: 'card-clock', category: 'tools', title: 'Clock', file: 'clock.html' },
+      { id: 'card-converter', category: 'tools', title: 'File Converter', file: 'converter.html' },
+      { id: 'card-fl-studio', category: 'tools', title: 'FL Studio (Demo)', file: 'fl-studio.html' },
+      { id: 'card-image-cropper', category: 'tools', title: 'Image Cropper', file: 'image-cropper.html' },
+      { id: 'card-image-resizer', category: 'tools', title: 'Image Resizer', file: 'image-resizer.html' },
+      { id: 'card-ip-lookup', category: 'tools', title: 'IP Lookup', file: 'ip-lookup.html' },
+      { id: 'card-json-formatter', category: 'tools', title: 'JSON Formatter', file: 'json-formatter.html' },
+      { id: 'card-localstorage-viewer', category: 'tools', title: 'LocalStorage Viewer', file: 'localstorage-viewer.html' },
+      { id: 'card-notepad', category: 'tools', title: 'Notepad', file: 'notepad.html' },
+      { id: 'card-qr-generator', category: 'tools', title: 'QR Generator', file: 'qr-generator.html' },
+      { id: 'card-qr-scanner', category: 'tools', title: 'QR Scanner', file: 'qr-scanner.html' },
+      { id: 'card-regex-tester', category: 'tools', title: 'Regex Tester', file: 'regex-tester.html' },
+      { id: 'card-soundboard', category: 'tools', title: 'Soundboard', file: 'soundboard.html' },
+      { id: 'card-text-to-speech', category: 'tools', title: 'Text To Speech', file: 'text-to-speech.html' },
+
+      // Social (only Chat remains)
+      { id: 'card-chat', category: 'social', title: 'Chat Room', file: 'chat.html' }
+    ];
+
+    // Keep a map of templates (cloned nodes) for favorites state persistence
+    const masterMap = new Map();
+
+    // ROUTE MAP: explicit listing of each button/card and the path it opens
+    const routeMap = {
+      "card-sandbox": "/games/sandbox.html",
+      "card-snake": "/games/snake.html",
+      "card-mines": "/games/mines.html",
+      "card-bubble": "/games/bubble-shooter.html",
+      "card-casino": "/games/casino.html",
+      "card-wormscape": "/games/wormscape.html",
+      "card-chess": "/games/chess.html",
+      "card-tower": "/games/tower-defense.html",
+      "card-space": "/games/space-shooter.html",
+      "card-tictactoe": "/games/tictactoe.html",
+      "card-2048": "/games/2048.html",
+      "card-guh": "/games/guh-clicker.html",
+      "card-flappy": "/games/flappy-bird.html",
+      "card-hangman": "/games/hangman.html",
+      "card-block": "/games/block-breaker.html",
+      "card-arcade": "/games/arcade-racer.html",
+      "card-base64": "/tools/base64-tool.html",
+      "card-calculator": "/tools/calculator.html",
+      "card-clock": "/tools/clock.html",
+      "card-converter": "/tools/converter.html",
+      "card-fl-studio": "/tools/fl-studio.html",
+      "card-image-cropper": "/tools/image-cropper.html",
+      "card-image-resizer": "/tools/image-resizer.html",
+      "card-ip-lookup": "/tools/ip-lookup.html",
+      "card-json-formatter": "/tools/json-formatter.html",
+      "card-localstorage-viewer": "/tools/localstorage-viewer.html",
+      "card-notepad": "/tools/notepad.html",
+      "card-qr-generator": "/tools/qr-generator.html",
+      "card-qr-scanner": "/tools/qr-scanner.html",
+      "card-regex-tester": "/tools/regex-tester.html",
+      "card-soundboard": "/tools/soundboard.html",
+      "card-text-to-speech": "/tools/text-to-speech.html",
+      "card-chat": "/social/chat.html"
+    };
+
+    // Build a DOM node for a master card (used when rendering)
+    function buildCardNode(item){
+      const article = document.createElement('article');
+      article.className = 'card';
+      article.dataset.category = item.category;
+      article.id = item.id;
+
+      const h3 = document.createElement('h3');
+      h3.className = 'card-title';
+      h3.textContent = item.title;
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      // show the path that will be opened (explicit)
+      meta.textContent = routeMap[item.id] || item.file || '';
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const openBtn = document.createElement('button');
+      openBtn.className = 'btn primary open';
+      openBtn.dataset.file = item.file;
+      // store explicit path on the button for clarity
+      openBtn.dataset.path = routeMap[item.id] || (item.category === 'games' ? `/games/${item.file}` : item.category === 'tools' ? `/tools/${item.file}` : item.file);
+      openBtn.textContent = 'Open';
+
+      const favBtn = document.createElement('button');
+      favBtn.className = 'btn ghost fav';
+      favBtn.setAttribute('aria-pressed','false');
+      favBtn.textContent = 'Fav';
+
+      actions.appendChild(openBtn);
+      actions.appendChild(favBtn);
+
+      article.appendChild(h3);
+      article.appendChild(meta);
+      article.appendChild(actions);
+
+      return article;
+    }
+
+    // Initialize masterMap with nodes (clones will be used when rendering)
+    (function initMasterMap(){
+      masterCards.forEach(item=>{
+        const node = buildCardNode(item);
+        masterMap.set(item.id, { item, node });
+      });
+    })();
+
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const resultCount = document.getElementById('resultCount');
+    const searchInput = document.getElementById('search');
+    const tabs = document.querySelectorAll('.categories [role="tab"]');
+    const navButtons = document.querySelectorAll('.nav button');
+
+    // dynamicCategory: when set to a card id, rebuildGrid will treat that id as a category
+    let dynamicCategory = null;
+    // previousFilter remembers the filter before opening a card so we can restore it on close
+    let previousFilter = null;
+
+    // Masking state
+    let maskingEnabled = false;
+    let maskTitle = '';
+    let maskUrl = '';
+
+    // Panic key state
+    let panicKey = "'";
+    let panicAction = 'redirect';
+    let panicRedirect = 'https://www.google.com';
+    let panicModifier = 'none';
+
+    function getActiveFilter(){
+      const active = document.querySelector('.categories [aria-selected="true"]');
+      return active ? active.dataset.filter : 'games';
+    }
+
+    // Rebuild grid from masterMap (preserves master order and prevents disappearance)
+    // Now supports filter values that equal a card id (dynamic category)
+    function rebuildGrid(filter, query = ''){
+      const q = (query || '').toLowerCase().trim();
+      const fragment = document.createDocumentFragment();
+      const matches = [];
+
+      for(const m of masterCards){
+        const title = (m.title || '').toLowerCase();
+        const meta = (m.file || '').toLowerCase();
+        const masterNode = masterMap.get(m.id).node;
+        const isFav = masterNode.classList.contains('is-fav');
+
+        // Accept arbitrary categories: favorites, card id, or category name
+        const matchesCategory =
+          (filter === 'favorites' && isFav) ||
+          (filter === m.id) ||
+          (filter === m.category);
+
+        const matchesQuery = !q || title.includes(q) || meta.includes(q);
+        if(matchesCategory && matchesQuery) matches.push(m);
+      }
+
+      // preserve masterCards order
+      matches.forEach(m => {
+        // clone the stored node so event listeners are fresh
+        const clone = masterMap.get(m.id).node.cloneNode(true);
+        fragment.appendChild(clone);
+      });
+
+      while(grid.firstChild) grid.removeChild(grid.firstChild);
+      grid.appendChild(fragment);
+
+      const visible = matches.length;
+      grid.setAttribute('data-count', visible);
+      if(visible === 0){
+        empty.hidden = false;
+        resultCount.textContent = 'No items found';
+      } else {
+        empty.hidden = true;
+        // If filter is a dynamic card id, show the card title in the subtitle
+        if(filter && masterMap.has(filter)){
+          const title = masterMap.get(filter).item.title || 'Item';
+          resultCount.textContent = `Showing: ${title}`;
+        } else {
+          resultCount.textContent = visible === masterCards.length ? 'Showing items' : `${visible} item${visible>1?'s':''} shown`;
+        }
+      }
+
+      wireCardButtons(); // wire events for newly inserted nodes
+    }
+
+    // Wire open/fav/title handlers for current DOM nodes
+    function wireCardButtons(){
+      document.querySelectorAll('.open').forEach(btn=>{
+        btn.removeEventListener('click', openBtnHandler);
+        btn.addEventListener('click', openBtnHandler);
+      });
+      document.querySelectorAll('.fav').forEach(btn=>{
+        btn.removeEventListener('click', favBtnHandler);
+        btn.addEventListener('click', favBtnHandler);
+      });
+      document.querySelectorAll('.card-title').forEach(t=>{
+        t.removeEventListener('click', titleClickHandler);
+        t.addEventListener('click', titleClickHandler);
+      });
+      // apply saved favs to DOM nodes
+      applySavedFavsToDOM();
+    }
+
+    /************************************************************************
+     * OPEN HANDLER: always opens in the full-screen overlay on the same page.
+     * Uses routeMap first, then data-path, then category/file fallback.
+     * The overlay covers the page and has an X (top-right) to close.
+     *
+     * NEW: when opening a card, that card becomes a "dynamic category".
+     ************************************************************************/
+    function openBtnHandler(e){
+      e.stopPropagation();
+      const openBtn = e.currentTarget;
+      const card = openBtn.closest('.card');
+      if(!card) return;
+
+      const id = card.id;
+      // prefer explicit routeMap entry
+      const mapped = routeMap[id];
+      const custom = openBtn.dataset.path || card.dataset.path || '';
+      const file = openBtn.dataset.file || (card && card.querySelector('.meta')?.textContent) || '';
+      const category = card.dataset.category || 'other';
+      const title = card.querySelector('.card-title')?.textContent || 'Item';
+
+      // compute path: routeMap > data-path > category-based
+      let path = mapped || custom || (category === 'games' ? `/games/${file}` : category === 'tools' ? `/tools/${file}` : file);
+      // normalize for local file testing: if running file://, use relative path without leading slash
+      if(location.protocol === 'file:' && path.startsWith('/')) path = path.slice(1);
+
+      // remember current filter so we can restore it when the overlay closes
+      previousFilter = dynamicCategory || getActiveFilter();
+
+      // Set dynamicCategory so the UI treats this card as its own category
+      dynamicCategory = id;
+
+      // Update category UI: clear existing tab selections and mark none selected
+      tabs.forEach(t => t.setAttribute('aria-selected','false'));
+      navButtons.forEach(nb => nb.removeAttribute('aria-current'));
+
+      // Rebuild grid to show only this card as a category (and update subtitle)
+      rebuildGrid(dynamicCategory, '');
+
+      // open in overlay (same page, full-screen)
+      openInOverlay(title, path);
+    }
+
+    function titleClickHandler(e){
+      const titleEl = e.currentTarget;
+      const card = titleEl.closest('.card');
+      if(!card) return;
+      const id = card.id;
+      const mapped = routeMap[id];
+      const file = card.querySelector('.open')?.dataset.file || card.querySelector('.meta')?.textContent || '';
+      const category = card.dataset.category || 'other';
+      const title = titleEl.textContent;
+      let path = mapped || (category === 'games' ? `/games/${file}` : category === 'tools' ? `/tools/${file}` : file);
+      if(location.protocol === 'file:' && path.startsWith('/')) path = path.slice(1);
+
+      // remember current filter so we can restore it when the overlay closes
+      previousFilter = dynamicCategory || getActiveFilter();
+
+      // Make this card a dynamic category as well
+      dynamicCategory = id;
+      tabs.forEach(t => t.setAttribute('aria-selected','false'));
+      navButtons.forEach(nb => nb.removeAttribute('aria-current'));
+      rebuildGrid(dynamicCategory, '');
+
+      openInOverlay(title, path);
+    }
+
+    // Favorites handler: update masterMap nodes and localStorage
+    function favBtnHandler(e){
+      e.stopPropagation();
+      const favBtn = e.currentTarget;
+      const card = favBtn.closest('.card');
+      if(!card) return;
+      const id = card.id;
+      let favs = new Set(JSON.parse(localStorage.getItem('hw_favorites_overlay_v1') || '[]'));
+      if(favs.has(id)){
+        favs.delete(id);
+        favBtn.setAttribute('aria-pressed','false');
+        favBtn.textContent = 'Fav';
+      } else {
+        favs.add(id);
+        favBtn.setAttribute('aria-pressed','true');
+        favBtn.textContent = 'Unfavorite';
+      }
+      localStorage.setItem('hw_favorites_overlay_v1', JSON.stringify(Array.from(favs)));
+
+      // update masterMap node so future rebuilds reflect fav state
+      const masterNode = masterMap.get(id).node;
+      if(masterNode){
+        if(favs.has(id)) masterNode.classList.add('is-fav');
+        else masterNode.classList.remove('is-fav');
+        // also update the stored node's fav button text for future clones
+        const storedFavBtn = masterNode.querySelector('.fav');
+        if(storedFavBtn){
+          if(favs.has(id)) storedFavBtn.textContent = 'Unfavorite';
+          else storedFavBtn.textContent = 'Fav';
+        }
+      }
+
+      if(getActiveFilter() === 'favorites') rebuildGrid('favorites', searchInput.value);
+    }
+
+    // Apply saved favs to masterMap nodes (on load)
+    function applySavedFavsToMaster(){
+      const favs = new Set(JSON.parse(localStorage.getItem('hw_favorites_overlay_v1') || '[]'));
+      masterMap.forEach((v, k) => {
+        if(favs.has(k)) {
+          v.node.classList.add('is-fav');
+          const btn = v.node.querySelector('.fav');
+          if(btn) { btn.setAttribute('aria-pressed','true'); btn.textContent = 'Unfavorite'; }
+        } else {
+          v.node.classList.remove('is-fav');
+          const btn = v.node.querySelector('.fav');
+          if(btn) { btn.setAttribute('aria-pressed','false'); btn.textContent = 'Fav'; }
+        }
+      });
+    }
+
+    // Apply saved favs to DOM nodes after rendering
+    function applySavedFavsToDOM(){
+      const favs = new Set(JSON.parse(localStorage.getItem('hw_favorites_overlay_v1') || '[]'));
+      document.querySelectorAll('.card').forEach(card=>{
+        const id = card.id;
+        const btn = card.querySelector('.fav');
+        if(favs.has(id)){
+          card.classList.add('is-fav');
+          if(btn) { btn.setAttribute('aria-pressed','true'); btn.textContent = 'Unfavorite'; }
+        } else {
+          card.classList.remove('is-fav');
+          if(btn) { btn.setAttribute('aria-pressed','false'); btn.textContent = 'Fav'; }
+        }
+      });
+    }
+
+    // Initial render
+    applySavedFavsToMaster();
+    rebuildGrid('games', '');
+
+    // Tabs and nav wiring (use rebuildGrid so cards never disappear)
+    tabs.forEach(t=>{
+      t.addEventListener('click', ()=>{
+        // clear dynamicCategory when user explicitly selects a tab
+        dynamicCategory = null;
+        previousFilter = null;
+        tabs.forEach(x=>x.setAttribute('aria-selected','false'));
+        t.setAttribute('aria-selected','true');
+        const f = t.dataset.filter;
+        navButtons.forEach(nb => nb.removeAttribute('aria-current'));
+        if(f === 'games') document.getElementById('nav-games').setAttribute('aria-current','true');
+        if(f === 'tools') document.getElementById('nav-tools').setAttribute('aria-current','true');
+        if(f === 'favorites') document.getElementById('nav-favs').setAttribute('aria-current','true');
+        if(f === 'social') {
+          const socialNav = Array.from(navButtons).find(n => n.dataset.nav === 'social');
+          if(socialNav) socialNav.setAttribute('aria-current','true');
+        }
+        rebuildGrid(f, searchInput.value);
+      });
+    });
+
+    navButtons.forEach(nb=>{
+      nb.addEventListener('click', ()=>{
+        // clear dynamicCategory when user explicitly selects a nav button
+        dynamicCategory = null;
+        previousFilter = null;
+        navButtons.forEach(x=>x.removeAttribute('aria-current'));
+        nb.setAttribute('aria-current','true');
+        const target = nb.dataset.nav;
+        tabs.forEach(t=> t.setAttribute('aria-selected','false'));
+        const match = Array.from(tabs).find(t => t.dataset.filter === target);
+        if(match) match.setAttribute('aria-selected','true');
+        rebuildGrid(target, searchInput.value);
+      });
+    });
+
+    let debounceTimer = null;
+    searchInput.addEventListener('input', ()=>{
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(()=>{ rebuildGrid(dynamicCategory || getActiveFilter(), searchInput.value); }, 160);
+    });
+
+    /************************************************************************
+     * Viewer helpers (overlay open/close) with masking support
+     ************************************************************************/
+    let originalTitle = document.title;
+    let originalUrl = location.href;
+
+    function applyMaskIfNeeded(){
+      if(maskingEnabled){
+        if(maskTitle) document.title = maskTitle;
+        if(maskUrl){
+          try{
+            history.replaceState({}, maskTitle || document.title, maskUrl);
+          }catch(e){
+            // ignore cross-origin or invalid URL errors
+          }
+        }
+      }
+    }
+    function clearMask(){
+      try{
+        document.title = originalTitle;
+        history.replaceState({}, '', originalUrl);
+      }catch(e){}
+    }
+
+    function openInOverlay(title, filePath){
+      const viewerOverlay = document.getElementById('viewerOverlay');
+      const viewerIframe = document.getElementById('viewerIframe');
+      const viewerTitle = document.getElementById('viewerTitle');
+      viewerTitle.textContent = title;
+      // set iframe src to the path (same-page overlay)
+      viewerIframe.src = filePath;
+      viewerOverlay.style.display = 'flex';
+      viewerOverlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      // apply masking if enabled
+      originalTitle = document.title;
+      originalUrl = location.href;
+      applyMaskIfNeeded();
+      // focus close button for accessibility
+      document.getElementById('viewerClose').focus({preventScroll:true});
+    }
+
+    function closeOverlayAndRestore(){
+      const viewerOverlay = document.getElementById('viewerOverlay');
+      const viewerIframe = document.getElementById('viewerIframe');
+      viewerIframe.src = 'about:blank';
+      viewerOverlay.style.display = 'none';
+      viewerOverlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      // clear masking and restore view
+      clearMask();
+      if(previousFilter){
+        const restore = previousFilter;
+        previousFilter = null;
+        dynamicCategory = null;
+        rebuildGrid(restore, searchInput.value);
+      } else {
+        dynamicCategory = null;
+        rebuildGrid(getActiveFilter(), searchInput.value);
+      }
+    }
+
+    document.getElementById('viewerClose').addEventListener('click', closeOverlayAndRestore);
+
+    // clicking outside the iframe (backdrop) should close overlay and restore view
+    document.getElementById('viewerOverlay').addEventListener('click', (e)=>{
+      if(e.target === document.getElementById('viewerOverlay')){
+        closeOverlayAndRestore();
+      }
+    });
+
+    document.getElementById('viewerOpenNew').addEventListener('click', ()=>{
+      const src = document.getElementById('viewerIframe').src;
+      if(src && src !== 'about:blank') window.open(src, '_blank');
+    });
+
+    /************************************************************************
+     * Add item modal wiring: create blob URL from user code and add card
+     ************************************************************************/
+    const addModal = document.getElementById('addModal');
+    const addTitleInput = document.getElementById('addTitleInput');
+    const addFileInput = document.getElementById('addFileInput');
+    const addCategory = document.getElementById('addCategory');
+    const addCode = document.getElementById('addCode');
+    const addSave = document.getElementById('addSave');
+    const addCancel = document.getElementById('addCancel');
+    const addMsg = document.getElementById('addMsg');
+
+    // Make Add button default to current category and add into that category
+    document.getElementById('newBtn').addEventListener('click', ()=>{
+      const currentFilter = (function(){
+        if(typeof dynamicCategory === 'string' && masterMap.has(dynamicCategory)){
+          return masterMap.get(dynamicCategory).item.category || 'games';
+        }
+        const active = document.querySelector('.categories [aria-selected="true"]');
+        return active ? active.dataset.filter : (localStorage.getItem('hw_default_add') || 'games');
+      })();
+
+      addTitleInput.value = '';
+      addFileInput.value = '';
+      if(Array.from(addCategory.options).some(o => o.value === currentFilter)){
+        addCategory.value = currentFilter;
+      } else {
+        addCategory.value = (localStorage.getItem('hw_default_add') || 'games');
+      }
+      addCode.value = '<!doctype html>\\n<html>\\n<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head>\\n<body>\\n<h1>Hello from your custom item</h1>\\n</body>\\n</html>';
+      addMsg.textContent = '';
+      addModal.style.display = 'flex';
+      addModal.setAttribute('aria-hidden','false');
+      addTitleInput.focus();
+    });
+
+    addCancel.addEventListener('click', ()=>{
+      addModal.style.display = 'none';
+      addModal.setAttribute('aria-hidden','true');
+    });
+
+    addSave.addEventListener('click', ()=>{
+      const title = (addTitleInput.value || '').trim();
+      const filename = (addFileInput.value || '').trim() || `custom-${Date.now()}.html`;
+      let category = addCategory.value || null;
+      if(!category){
+        if(typeof dynamicCategory === 'string' && masterMap.has(dynamicCategory)){
+          category = masterMap.get(dynamicCategory).item.category || 'games';
+        } else {
+          const active = document.querySelector('.categories [aria-selected="true"]');
+          category = active ? active.dataset.filter : (localStorage.getItem('hw_default_add') || 'games');
+        }
+      }
+      const code = addCode.value || '';
+
+      if(!title){
+        addMsg.textContent = 'Enter a title.';
+        return;
+      }
+
+      try{
+        const blob = new Blob([code], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const id = `card-custom-${Date.now()}`;
+        const newItem = { id, category, title, file: filename };
+        masterCards.push(newItem);
+        const node = buildCardNode(newItem);
+        const openBtn = node.querySelector('.open');
+        if(openBtn) openBtn.dataset.path = url;
+        masterMap.set(id, { item: newItem, node });
+        routeMap[id] = url;
+
+        addModal.style.display = 'none';
+        addModal.setAttribute('aria-hidden','true');
+
+        rebuildGrid(dynamicCategory || getActiveFilter(), searchInput.value);
+
+        // make the newly added item the dynamic category and open it
+        previousFilter = dynamicCategory || getActiveFilter();
+        dynamicCategory = id;
+        tabs.forEach(t => t.setAttribute('aria-selected','false'));
+        navButtons.forEach(nb => nb.removeAttribute('aria-current'));
+        rebuildGrid(dynamicCategory, '');
+        openInOverlay(title, url);
+      }catch(err){
+        addMsg.textContent = 'Failed to add item: ' + (err && err.message ? err.message : 'unknown error');
+      }
+    });
+
+    /************************************************************************
+     * Profile menu positioning above avatar + centered settings behavior
+     ************************************************************************/
+    const avatarBtn = document.getElementById('avatarBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    const settingsDropdown = document.getElementById('settingsDropdown');
+    const pmAppSettings = document.getElementById('pmAppSettings');
+    const pmAccount = document.getElementById('pmAccount');
+    const pmSignAction = document.getElementById('pmSignAction');
+    const pmGuestName = document.getElementById('pmGuestName');
+    const pmGuestSub = document.getElementById('pmGuestSub');
+    const pmAvatar = document.getElementById('pmAvatar');
+
+    function show(el){ el.style.display = 'block'; el.setAttribute('aria-hidden','false'); el.style.opacity = '1'; }
+    function hide(el){ el.style.display = 'none'; el.setAttribute('aria-hidden','true'); }
+
+    function positionProfileMenu(){
+      profileMenu.style.display = 'block';
+      profileMenu.style.opacity = '0';
+      profileMenu.style.left = '-9999px';
+      profileMenu.style.top = '-9999px';
+      const avatarRect = avatarBtn.getBoundingClientRect();
+      const menuRect = profileMenu.getBoundingClientRect();
+      const gap = 8;
+      let left = avatarRect.left + (avatarRect.width / 2) - (menuRect.width / 2);
+      const minLeft = 8;
+      const maxLeft = window.innerWidth - menuRect.width - 8;
+      if(left < minLeft) left = minLeft;
+      if(left > maxLeft) left = maxLeft;
+      let top = avatarRect.top - menuRect.height - gap;
+      if(top < 8) top = avatarRect.bottom + gap;
+      profileMenu.style.left = `${Math.round(left)}px`;
+      profileMenu.style.top = `${Math.round(top)}px`;
+      profileMenu.style.opacity = '1';
+      profileMenu.setAttribute('aria-hidden','false');
+    }
+
+    avatarBtn.addEventListener('click', (e)=>{
+      hide(settingsDropdown);
+      if(profileMenu.style.display === 'block') hide(profileMenu);
+      else { positionProfileMenu(); updateProfileMenu(); }
+    });
+
+    window.addEventListener('resize', ()=> { if(profileMenu.style.display === 'block') positionProfileMenu(); });
+    window.addEventListener('scroll', ()=> {
+      const avatarRect = avatarBtn.getBoundingClientRect();
+      if(avatarRect.bottom < 0 || avatarRect.top > window.innerHeight) hide(profileMenu);
+      else if(profileMenu.style.display === 'block') positionProfileMenu();
+    }, true);
+
+    document.addEventListener('click', (e)=>{
+      if(!avatarBtn.contains(e.target) && !profileMenu.contains(e.target) && !settingsDropdown.contains(e.target) && !addModal.contains(e.target)){
+        hide(profileMenu);
+        hide(settingsDropdown);
+      }
+    });
+
+    pmAppSettings.addEventListener('click', (e)=>{
+      hide(profileMenu);
+      loadSettingsToUI();
+      show(settingsDropdown);
+      document.getElementById('dropdownDensity').focus();
+    });
+
+    document.getElementById('dropdownClose').addEventListener('click', ()=> hide(settingsDropdown));
+    document.getElementById('dropdownSave').addEventListener('click', ()=>{
+      saveSettingsFromUI();
+      hide(settingsDropdown);
+      rebuildGrid(dynamicCategory || getActiveFilter(), searchInput.value);
+    });
+
+    pmAccount.addEventListener('click', ()=>{
+      hide(profileMenu);
+      openAccountModal();
+    });
+
+    pmSignAction.addEventListener('click', async ()=>{
+      const auth = getAuthIfReady();
+      const user = auth && auth.currentUser;
+      hide(profileMenu);
+      if(user){
+        try{ await auth.signOut(); }catch(e){ alert('Sign-out failed: ' + (e && e.message ? e.message : e)); }
+      } else openAuthModal();
+    });
+
+    function updateProfileMenu(){
+      const auth = getAuthIfReady();
+      const user = auth && auth.currentUser;
+      if(user){
+        pmSignAction.querySelector('.label').textContent = 'Sign out';
+      } else {
+        pmSignAction.querySelector('.label').textContent = 'Sign in';
+      }
+    }
+
+    /************************************************************************
+     * Auth UI wiring (sign in / sign up) and account modal
+     ************************************************************************/
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabSignUp = document.getElementById('tabSignUp');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const authPrimary = document.getElementById('authPrimary');
+    const authCancel = document.getElementById('authCancel');
+    const authClose = document.getElementById('authClose');
+    const authMsg = document.getElementById('authMsg');
+    const googleSignIn = document.getElementById('googleSignIn');
+    const authModal = document.getElementById('authModal'); // ensure reference exists
+
+    function getAuthIfReady(){
+      try{ if(window.firebase && firebase.auth && firebase.apps && firebase.apps.length) return firebase.auth(); }catch(e){}
+      return null;
+    }
+
+    function openAuthModal(){ authModal.style.display = 'flex'; authModal.setAttribute('aria-hidden','false'); authEmail.focus(); setAuthMode('signin'); updateAuthUI(); }
+    function closeAuthModal(){ authModal.style.display = 'none'; authModal.setAttribute('aria-hidden','true'); authMsg.textContent = ''; authEmail.value = ''; authPassword.value = ''; }
+    function setAuthMode(mode){ if(mode === 'signin'){ tabSignIn.setAttribute('aria-selected','true'); tabSignUp.setAttribute('aria-selected','false'); authPrimary.textContent = 'Sign in'; } else { tabSignIn.setAttribute('aria-selected','false'); tabSignUp.setAttribute('aria-selected','true'); authPrimary.textContent = 'Create account'; } updateAuthUI(); }
+    tabSignIn.addEventListener('click', ()=> setAuthMode('signin'));
+    tabSignUp.addEventListener('click', ()=> setAuthMode('signup'));
+
+    function updateAuthUI(){ const auth = getAuthIfReady(); if(!auth){ authMsg.textContent = 'Authentication not available. Firebase not initialized.'; authPrimary.disabled = true; googleSignIn.disabled = true; } else { authMsg.textContent = ''; authPrimary.disabled = false; googleSignIn.disabled = false; } }
+
+    authPrimary.addEventListener('click', async ()=>{
+      const mode = tabSignIn.getAttribute('aria-selected') === 'true' ? 'signin' : 'signup';
+      const email = authEmail.value && authEmail.value.trim();
+      const pass = authPassword.value || '';
+      if(!email || !pass){ authMsg.textContent = 'Enter email and password.'; return; }
+      const auth = getAuthIfReady();
+      if(!auth){ authMsg.textContent = 'Firebase not initialized. Auth unavailable.'; return; }
+      authMsg.textContent = mode === 'signin' ? 'Signing in…' : 'Creating account…';
+      try{
+        if(mode === 'signin') await auth.signInWithEmailAndPassword(email, pass);
+        else await auth.createUserWithEmailAndPassword(email, pass);
+        authMsg.textContent = 'Success.';
+        closeAuthModal();
+      }catch(err){ authMsg.textContent = err && err.message ? err.message : 'Authentication failed.'; }
+    });
+
+    googleSignIn.addEventListener('click', async ()=>{
+      const auth = getAuthIfReady();
+      if(!auth){ authMsg.textContent = 'Firebase not initialized. Auth unavailable.'; return; }
+      authMsg.textContent = 'Opening Google sign-in…';
+      try{ const provider = new firebase.auth.GoogleAuthProvider(); await auth.signInWithPopup(provider); authMsg.textContent = 'Signed in.'; closeAuthModal(); }catch(err){ authMsg.textContent = err && err.message ? err.message : 'Google sign-in failed.'; }
+    });
+
+    authCancel.addEventListener('click', closeAuthModal);
+    authClose.addEventListener('click', closeAuthModal);
+    authModal.addEventListener('click', (e)=>{ if(e.target === authModal) closeAuthModal(); });
+
+    // Account modal wiring
+    const acctDisplayName = document.getElementById('acctDisplayName');
+    const acctEmail = document.getElementById('acctEmail');
+    const acctAvatarUrl = document.getElementById('acctAvatarUrl');
+    const acctSave = document.getElementById('acctSave');
+    const acctClose = document.getElementById('acctClose');
+    const acctMsg = document.getElementById('acctMsg');
+    const accountModal = document.getElementById('accountModal');
+
+    function setAvatarFromUrl(url){
+      if(!url) {
+        avatarBtn.style.backgroundImage = '';
+        avatarBtn.textContent = (document.getElementById('guestName').textContent || 'G')[0] || 'G';
+        pmAvatar.style.backgroundImage = '';
+        pmAvatar.textContent = avatarBtn.textContent;
+        return;
+      }
+      // set as background image; keep initials as fallback text
+      avatarBtn.style.backgroundImage = `url("${url}")`;
+      avatarBtn.textContent = '';
+      pmAvatar.style.backgroundImage = `url("${url}")`;
+      pmAvatar.textContent = '';
+    }
+
+    function openAccountModal(){
+      const auth = getAuthIfReady();
+      const savedGuestAvatar = localStorage.getItem('hw_guest_avatar') || '';
+      if(!auth || !auth.currentUser){
+        // guest: show stored values if any
+        acctDisplayName.value = localStorage.getItem('hw_guest_name') || '';
+        acctEmail.value = '';
+        acctAvatarUrl.value = savedGuestAvatar;
+        acctMsg.textContent = '';
+        accountModal.style.display = 'flex';
+        accountModal.setAttribute('aria-hidden','false');
+        acctDisplayName.focus();
+        return;
+      }
+      const user = auth.currentUser;
+      acctDisplayName.value = user.displayName || '';
+      acctEmail.value = user.email || '';
+      acctAvatarUrl.value = user.photoURL || savedGuestAvatar || '';
+      acctMsg.textContent = '';
+      accountModal.style.display = 'flex';
+      accountModal.setAttribute('aria-hidden','false');
+      acctDisplayName.focus();
+    }
+    function closeAccountModal(){ accountModal.style.display = 'none'; accountModal.setAttribute('aria-hidden','true'); acctMsg.textContent = ''; }
+
+    acctClose.addEventListener('click', closeAccountModal);
+
+    acctSave.addEventListener('click', async ()=>{
+      const auth = getAuthIfReady();
+      const name = acctDisplayName.value && acctDisplayName.value.trim();
+      const avatarUrl = acctAvatarUrl.value && acctAvatarUrl.value.trim();
+
+      acctMsg.textContent = 'Saving…';
+      // If user is signed in, update Firebase profile (displayName and photoURL)
+      if(auth && auth.currentUser){
+        try{
+          await auth.currentUser.updateProfile({ displayName: name || null, photoURL: avatarUrl || null });
+          acctMsg.textContent = 'Saved.';
+          // update UI
+          document.getElementById('guestName').textContent = name || auth.currentUser.email || 'User';
+          document.getElementById('guestSub').innerHTML = `<span class="email">${auth.currentUser.email || ''}</span>`;
+          const initial = (name || auth.currentUser.email || 'U')[0].toUpperCase();
+          if(avatarUrl){
+            setAvatarFromUrl(avatarUrl);
+          } else {
+            avatarBtn.style.backgroundImage = '';
+            avatarBtn.textContent = initial;
+            pmAvatar.style.backgroundImage = '';
+            pmAvatar.textContent = initial;
+          }
+          acctMsg.textContent = 'Saved.';
+          closeAccountModal();
+        }catch(e){
+          acctMsg.textContent = e && e.message ? e.message : 'Update failed.';
+        }
+      } else {
+        // Guest: store in localStorage and update UI
+        try{
+          localStorage.setItem('hw_guest_name', name || '');
+          localStorage.setItem('hw_guest_avatar', avatarUrl || '');
+          document.getElementById('guestName').textContent = name || 'Guest';
+          document.getElementById('guestSub').textContent = avatarUrl ? 'Custom avatar set' : 'Not signed in';
+          if(avatarUrl){
+            setAvatarFromUrl(avatarUrl);
+          } else {
+            avatarBtn.style.backgroundImage = '';
+            avatarBtn.textContent = (name || 'G')[0].toUpperCase();
+            pmAvatar.style.backgroundImage = '';
+            pmAvatar.textContent = avatarBtn.textContent;
+          }
+          acctMsg.textContent = 'Saved locally.';
+          closeAccountModal();
+        }catch(e){
+          acctMsg.textContent = 'Save failed.';
+        }
+      }
+    });
+
+    /************************************************************************
+     * Auth state watcher to update sidebar and profile menu labels
+     ************************************************************************/
+    (function watchAuthState(){
+      const auth = getAuthIfReady();
+      if(auth){
+        auth.onAuthStateChanged(user=>{
+          const guestAvatar = localStorage.getItem('hw_guest_avatar') || '';
+          const guestName = localStorage.getItem('hw_guest_name') || '';
+          if(user){
+            const name = user.displayName || user.email || 'User';
+            document.getElementById('guestName').textContent = name;
+            document.getElementById('guestSub').innerHTML = `<span class="email">${user.email || ''}</span>`;
+            if(user.photoURL){
+              setAvatarFromUrl(user.photoURL);
+            } else if(guestAvatar){
+              setAvatarFromUrl(guestAvatar);
+            } else {
+              avatarBtn.style.backgroundImage = '';
+              avatarBtn.textContent = (name[0] || 'U').toUpperCase();
+              pmAvatar.style.backgroundImage = '';
+              pmAvatar.textContent = avatarBtn.textContent;
+            }
+            avatarBtn.title = 'Account';
+            pmSignAction.querySelector('.label').textContent = 'Sign out';
+            pmGuestName.textContent = name;
+            pmGuestSub.textContent = user.email || '';
+            pmAvatar.textContent = '';
+          } else {
+            const name = guestName || 'Guest';
+            document.getElementById('guestName').textContent = name;
+            document.getElementById('guestSub').textContent = guestAvatar ? 'Custom avatar set' : 'Not signed in';
+            if(guestAvatar){
+              setAvatarFromUrl(guestAvatar);
+            } else {
+              avatarBtn.style.backgroundImage = '';
+              avatarBtn.textContent = (name[0] || 'G').toUpperCase();
+              pmAvatar.style.backgroundImage = '';
+              pmAvatar.textContent = avatarBtn.textContent;
+            }
+            avatarBtn.title = 'Sign in';
+            pmSignAction.querySelector('.label').textContent = 'Sign in';
+            pmGuestName.textContent = 'Guest';
+            pmGuestSub.textContent = 'Not signed in';
+          }
+        });
+      } else {
+        let tries = 0;
+        const poll = setInterval(()=>{
+          tries++;
+          const a = getAuthIfReady();
+          if(a){ clearInterval(poll); watchAuthState(); }
+          else if(tries > 12) clearInterval(poll);
+        }, 400);
+      }
+    })();
+
+    /************************************************************************
+     * Settings persistence and UI helpers (GALAXY only)
+     ************************************************************************/
+    function loadSettingsToUI(){
+      const prefs = JSON.parse(localStorage.getItem('hw_app_prefs') || '{}');
+      // theme removed; galaxy is default and always on
+      document.getElementById('dropdownOpenBehavior').value = prefs.openBehavior || 'overlay';
+      document.getElementById('dropdownDensity').value = prefs.density || 'normal';
+      document.getElementById('dropdownShadows').value = (prefs.shadows === false ? 'off' : 'on');
+      document.getElementById('dropdownDefaultAdd').value = prefs.defaultAdd || 'games';
+      document.getElementById('dropdownMasking').value = prefs.masking ? 'on' : 'off';
+      document.getElementById('maskTitle').value = prefs.maskTitle || '';
+      document.getElementById('maskUrl').value = prefs.maskUrl || '';
+      document.getElementById('panicKeyInput').value = prefs.panicKey || "'";
+      document.getElementById('panicAction').value = prefs.panicAction || 'redirect';
+      document.getElementById('panicRedirect').value = prefs.panicRedirect || 'https://www.google.com';
+      document.getElementById('panicModifier').value = prefs.panicModifier || 'none';
+    }
+
+    function saveSettingsFromUI(){
+      const prefs = {
+        // theme removed
+        openBehavior: document.getElementById('dropdownOpenBehavior').value || 'overlay',
+        density: document.getElementById('dropdownDensity').value || 'normal',
+        shadows: document.getElementById('dropdownShadows').value !== 'off',
+        defaultAdd: document.getElementById('dropdownDefaultAdd').value || 'games',
+        masking: document.getElementById('dropdownMasking').value === 'on',
+        maskTitle: document.getElementById('maskTitle').value || '',
+        maskUrl: document.getElementById('maskUrl').value || '',
+        panicKey: (document.getElementById('panicKeyInput').value || "'"),
+        panicAction: document.getElementById('panicAction').value || 'redirect',
+        panicRedirect: document.getElementById('panicRedirect').value || 'https://www.google.com',
+        panicModifier: document.getElementById('panicModifier').value || 'none'
+      };
+      localStorage.setItem('hw_app_prefs', JSON.stringify(prefs));
+      applyPrefs(prefs);
+    }
+
+    function applyPrefs(prefs){
+      // Galaxy is the only theme; ensure class is present
+      document.body.classList.remove('dark','light');
+      document.body.classList.add('galaxy');
+
+      // density & shadows
+      if(prefs.density === 'compact') document.body.classList.add('compact'); else document.body.classList.remove('compact');
+      if(prefs.shadows === false) document.body.classList.add('no-shadows'); else document.body.classList.remove('no-shadows');
+
+      // default add
+      localStorage.setItem('hw_default_add', prefs.defaultAdd || 'games');
+
+      // masking
+      maskingEnabled = !!prefs.masking;
+      maskTitle = prefs.maskTitle || '';
+      maskUrl = prefs.maskUrl || '';
+
+      // panic
+      panicKey = prefs.panicKey || "'";
+      panicAction = prefs.panicAction || 'redirect';
+      panicRedirect = prefs.panicRedirect || 'https://www.google.com';
+      panicModifier = prefs.panicModifier || 'none';
+    }
+
+    // wire mask preset buttons
+    document.getElementById('maskPresets').addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-title]');
+      if(!btn) return;
+      document.getElementById('maskTitle').value = btn.dataset.title || '';
+      document.getElementById('maskUrl').value = btn.dataset.url || '';
+    });
+
+    // load saved prefs on startup
+    (function initPrefs(){
+      const prefs = JSON.parse(localStorage.getItem('hw_app_prefs') || '{}');
+      applyPrefs(prefs);
+      loadSettingsToUI();
+    })();
+
+    /************************************************************************
+     * Panic key handling
+     ************************************************************************/
+    function checkPanicModifiers(e){
+      if(panicModifier === 'none') return true;
+      if(panicModifier === 'ctrl') return e.ctrlKey;
+      if(panicModifier === 'alt') return e.altKey;
+      if(panicModifier === 'shift') return e.shiftKey;
+      return true;
+    }
+
+    document.addEventListener('keydown', (e)=>{
+      // ignore when typing in inputs or textareas
+      const tag = (document.activeElement && document.activeElement.tagName) || '';
+      if(tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+
+      // Panic key
+      if(e.key === panicKey && checkPanicModifiers(e)){
+        e.preventDefault();
+        triggerPanic();
+        return;
+      }
+
+      // Escape handling (existing)
+      if(e.key === 'Escape'){
+        const viewerOverlay = document.getElementById('viewerOverlay');
+        if(viewerOverlay.style.display === 'flex'){
+          closeOverlayAndRestore();
+        }
+        if(authModal.style.display === 'flex') authModal.style.display = 'none';
+        if(accountModal.style.display === 'flex') accountModal.style.display = 'none';
+        if(addModal.style.display === 'flex') addModal.style.display = 'none';
+        if(document.getElementById('appSettingsModal').style.display === 'flex') document.getElementById('appSettingsModal').style.display = 'none';
+        hide(profileMenu);
+        hide(settingsDropdown);
+      }
+    });
+
+    function triggerPanic(){
+      // action: close, redirect, hide
+      if(panicAction === 'close'){
+        // attempt to close; if blocked, redirect to panicRedirect
+        try{
+          window.close();
+          // if still open after a short delay, redirect
+          setTimeout(()=>{ if(!document.hidden) location.href = panicRedirect; }, 250);
+        }catch(e){
+          location.href = panicRedirect;
+        }
+      } else if(panicAction === 'redirect'){
+        location.href = panicRedirect;
+      } else if(panicAction === 'hide'){
+        // replace content with blank page
+        document.documentElement.innerHTML = '<meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background:#fff;margin:0;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial,Helvetica,sans-serif;color:#222}</style><div style="text-align:center"><h2>Loading…</h2></div>';
+      }
+    }
+
+    /************************************************************************
+     * Settings UI: load/save wiring for quick access
+     ************************************************************************/
+    document.querySelectorAll('#settingsDropdown input, #settingsDropdown select').forEach(el=>{
+      el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); saveSettingsFromUI(); hide(settingsDropdown); } });
+    });
+
+    /************************************************************************
+     * Misc: keyboard handling and initial UI state
+     ************************************************************************/
+    // default tab
+    const defaultTab = Array.from(tabs).find(t => t.dataset.filter === 'games');
+    if(defaultTab){ tabs.forEach(x=>x.setAttribute('aria-selected','false')); defaultTab.setAttribute('aria-selected','true'); }
+
+    // Ensure galaxy theme is applied and layers visible
+    (function ensureGalaxyOn(){
+      document.body.classList.add('galaxy');
+      // ensure stars layers are visible (they are decorative)
+      document.querySelectorAll('.stars, .stars2, .shooting').forEach(el => { el.style.display = 'block'; });
+    })();
+  </script>
+</body>
+</html>

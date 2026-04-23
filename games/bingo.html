@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bingo</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --panel:#0f1724;
+    --accent:#ffb86b;
+    --accent-2:#7be4ff;
+    --card:#0b1220;
+    --glass: rgba(255,255,255,0.04);
+    --win: #7cffb8;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,#071026 0%, #071a2a 60%);display:flex;align-items:center;justify-content:center;}
+  .app{
+    width:1100px;max-width:96vw;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;padding:20px;box-shadow:0 10px 40px rgba(2,6,23,0.7);position:relative;overflow:hidden;
+  }
+
+  /* Back to Hub button top-left */
+  .back-hub{
+    position:absolute;left:14px;top:14px;background:linear-gradient(180deg,#0f1724,#0b1220);color:#cfe9ff;border:1px solid rgba(255,255,255,0.04);
+    padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:8px;z-index:30;
+    transition:transform .15s ease, box-shadow .15s;
+  }
+  .back-hub:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.5);}
+
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  h1{font-size:20px;margin:0;color:#eaf6ff;letter-spacing:0.6px;}
+  .controls{display:flex;gap:10px;align-items:center;}
+
+  button.btn{
+    background:linear-gradient(180deg,var(--accent),#ff9f3b);border:0;padding:10px 14px;border-radius:10px;color:#08101a;font-weight:700;cursor:pointer;
+    box-shadow:0 6px 18px rgba(255,160,80,0.12);transition:transform .12s ease;
+  }
+  button.btn.secondary{background:linear-gradient(180deg,#1b2a3a,#0f1b2a);color:#cfe9ff;border:1px solid rgba(255,255,255,0.03);box-shadow:none;}
+  button.btn:active{transform:translateY(1px);}
+
+  .layout{display:grid;grid-template-columns:420px 1fr;gap:18px;align-items:start;}
+  .left-panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
+  .right-panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);min-height:420px;}
+
+  /* Bingo card */
+  .card{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);}
+  .col-header{font-weight:800;text-align:center;padding:8px 6px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--accent-2);font-size:14px;}
+  .cell{height:72px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));color:#dff6ff;position:relative;transition:transform .18s, box-shadow .18s, background .18s;}
+  .cell.free{font-size:14px;color:#9fdff6;font-weight:700;background:linear-gradient(180deg,#0f2a3a,#07202a);}
+  .cell.marked{background:linear-gradient(180deg,var(--accent-2),#4bd6ff);color:#04202a;box-shadow:0 8px 20px rgba(11,150,180,0.12);transform:translateY(-6px) rotate(-2deg);}
+
+  .cell.win{background:linear-gradient(90deg,var(--win),#b7ffd8);color:#04202a;box-shadow:0 12px 30px rgba(124,255,184,0.12);transform:scale(1.06) rotate(-1deg);}
+
+  .controls-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .draw-area{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02);}
+
+  .ball{
+    width:86px;height:86px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;color:#04202a;background:linear-gradient(180deg,#ffd89a,#ffb86b);box-shadow:0 12px 30px rgba(255,184,107,0.18);position:relative;
+    transform-origin:center;animation:pop .6s cubic-bezier(.2,.9,.3,1);
+  }
+  @keyframes pop{0%{transform:scale(.2) rotate(-20deg);opacity:0}60%{transform:scale(1.08) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+
+  .drawn-list{display:flex;flex-wrap:wrap;gap:8px;padding:8px;max-height:160px;overflow:auto;}
+  .drawn-item{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#1b2a3a,#0f1b2a);color:#cfe9ff;border:1px solid rgba(255,255,255,0.03);font-weight:800;}
+
+  /* Confetti */
+  .confetti-piece{position:absolute;width:10px;height:18px;opacity:0;transform-origin:center;will-change:transform,opacity;}
+  .status{margin-top:10px;font-weight:700;color:#bfefff;}
+
+  /* Responsive */
+  @media (max-width:980px){
+    .layout{grid-template-columns:1fr;gap:12px;}
+    .left-panel,.right-panel{padding:12px;}
+  }
+</style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Bingo game">
+    <a class="back-hub" href="casino.html" title="Back to Hub">⬅ Back to Hub</a>
+
+    <header>
+      <h1>Animated Bingo</h1>
+      <div class="controls">
+        <button class="btn" id="newCardBtn" title="Generate a new card">New Card</button>
+        <button class="btn secondary" id="resetBtn" title="Reset game">Reset Game</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="left-panel" aria-hidden="false">
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+          <div style="display:flex;flex-direction:column;">
+            <strong style="color:#dff6ff">Your Card</strong>
+            <small style="color:#9fdff6">Click a cell to toggle mark manually</small>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800;color:#cfe9ff">B I N G O</div>
+            <div style="font-size:12px;color:#9fdff6">Numbers 1–75</div>
+          </div>
+        </div>
+
+        <div id="card" class="card" role="grid" aria-label="Bingo card" style="margin-top:12px;">
+          <!-- Column headers -->
+          <div class="col-header">B</div><div class="col-header">I</div><div class="col-header">N</div><div class="col-header">G</div><div class="col-header">O</div>
+          <!-- cells inserted by JS -->
+        </div>
+
+        <div class="controls-row">
+          <button class="btn" id="autoBtn">Auto Play</button>
+          <button class="btn secondary" id="shuffleBtn">Shuffle Numbers</button>
+          <button class="btn secondary" id="markAllBtn">Mark Called</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="status" id="status">No bingo yet</div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div style="display:flex;gap:16px;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <div style="font-weight:800;color:#dff6ff">Draw</div>
+            <small style="color:#9fdff6">Click to draw the next ball</small>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn" id="drawBtn">Call Next</button>
+            <button class="btn secondary" id="revealBtn">Reveal All</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:18px;margin-top:18px;align-items:flex-start;">
+          <div style="flex:0 0 140px;">
+            <div class="draw-area" aria-live="polite">
+              <div id="ballWrap" style="height:120px;display:flex;align-items:center;justify-content:center;"></div>
+              <div style="font-weight:800;color:#cfe9ff">Last Called</div>
+              <div id="lastCalled" style="min-height:28px;color:#9fdff6"></div>
+            </div>
+          </div>
+
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-weight:800;color:#dff6ff">Called Numbers</div>
+              <div style="color:#9fdff6;font-weight:700" id="remainingCount">75 left</div>
+            </div>
+            <div class="drawn-list" id="drawnList" aria-live="polite" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <small style="color:#9fdff6">Game tips:</small>
+            <small style="color:#cfe9ff">Auto Play draws every 1.2s; you can stop anytime. Free center is automatic.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confetti container -->
+    <div id="confettiContainer" aria-hidden="true"></div>
+  </div>
+
+<script>
+/* Bingo game logic with animations */
+(() => {
+  const cardEl = document.getElementById('card');
+  const drawBtn = document.getElementById('drawBtn');
+  const newCardBtn = document.getElementById('newCardBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const markAllBtn = document.getElementById('markAllBtn');
+  const autoBtn = document.getElementById('autoBtn');
+  const revealBtn = document.getElementById('revealBtn');
+  const drawnList = document.getElementById('drawnList');
+  const lastCalled = document.getElementById('lastCalled');
+  const ballWrap = document.getElementById('ballWrap');
+  const remainingCount = document.getElementById('remainingCount');
+  const status = document.getElementById('status');
+  const confettiContainer = document.getElementById('confettiContainer');
+
+  let card = []; // 5x5 numbers or 'FREE'
+  let marked = []; // boolean 5x5
+  let pool = []; // numbers left to draw
+  let drawn = []; // drawn numbers
+  let autoInterval = null;
+  let bingoDeclared = false;
+
+  function init(){
+    pool = Array.from({length:75},(_,i)=>i+1);
+    drawn = [];
+    bingoDeclared = false;
+    remainingCount.textContent = pool.length + ' left';
+    status.textContent = 'No bingo yet';
+    clearBall();
+    generateCard();
+    renderCard();
+    renderDrawn();
+  }
+
+  function generateCard(){
+    // Column ranges: B 1-15, I 16-30, N 31-45, G 46-60, O 61-75
+    const ranges = [[1,15],[16,30],[31,45],[46,60],[61,75]];
+    card = Array.from({length:5},()=>Array(5).fill(null));
+    marked = Array.from({length:5},()=>Array(5).fill(false));
+    for(let col=0;col<5;col++){
+      const [min,max] = ranges[col];
+      const nums = [];
+      for(let n=min;n<=max;n++) nums.push(n);
+      shuffleArray(nums);
+      for(let row=0;row<5;row++){
+        card[row][col] = nums[row];
+      }
+    }
+    // Free center
+    card[2][2] = 'FREE';
+    marked[2][2] = true;
+  }
+
+  function renderCard(){
+    // Remove existing cells (except headers)
+    // First 5 header cells already present; remove any extra cells
+    // We'll clear and re-add headers + cells for simplicity
+    cardEl.innerHTML = '';
+    const headers = ['B','I','N','G','O'];
+    headers.forEach(h=>{
+      const d = document.createElement('div');
+      d.className = 'col-header';
+      d.textContent = h;
+      cardEl.appendChild(d);
+    });
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.setAttribute('role','gridcell');
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        const val = card[r][c];
+        if(val === 'FREE'){
+          cell.classList.add('free');
+          cell.innerHTML = '<div>FREE</div>';
+        } else {
+          cell.textContent = val;
+        }
+        if(marked[r][c]) cell.classList.add('marked');
+        cell.addEventListener('click', ()=> {
+          // toggle manual mark
+          if(val === 'FREE') return;
+          marked[r][c] = !marked[r][c];
+          cell.classList.toggle('marked');
+          checkBingo();
+        });
+        cardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function drawNext(){
+    if(pool.length === 0) return;
+    // pick random from pool
+    const idx = Math.floor(Math.random()*pool.length);
+    const num = pool.splice(idx,1)[0];
+    drawn.unshift(num); // newest first
+    remainingCount.textContent = pool.length + ' left';
+    renderDrawn();
+    animateBall(num);
+    // mark on card if present
+    markNumberOnCard(num);
+    checkBingo();
+  }
+
+  function markNumberOnCard(num){
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        if(card[r][c] === num){
+          marked[r][c] = true;
+          // animate the cell
+          const selector = `.cell[data-row="${r}"][data-col="${c}"]`;
+          const el = document.querySelector(selector);
+          if(el){
+            el.classList.add('marked');
+            el.animate([{transform:'translateY(-8px) scale(1.02)'},{transform:'translateY(0) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.9,.3,1)'});
+          }
+        }
+      }
+    }
+  }
+
+  function renderDrawn(){
+    drawnList.innerHTML = '';
+    for(let i=0;i<drawn.length;i++){
+      const n = drawn[i];
+      const d = document.createElement('div');
+      d.className = 'drawn-item';
+      d.textContent = n;
+      drawnList.appendChild(d);
+    }
+  }
+
+  function animateBall(num){
+    clearBall();
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    ball.textContent = num;
+    ballWrap.appendChild(ball);
+    lastCalled.textContent = num;
+    // drop animation
+    ball.animate([
+      {transform:'translateY(-120px) scale(.6) rotate(-20deg)', opacity:0},
+      {transform:'translateY(0) scale(1.05) rotate(6deg)', opacity:1},
+      {transform:'translateY(-6px) scale(1) rotate(0)'}
+    ],{duration:700,easing:'cubic-bezier(.2,.9,.3,1)'});
+    // subtle pulse
+    ball.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:900,iterations:1});
+    // play beep
+    playBeep();
+  }
+
+  function clearBall(){
+    ballWrap.innerHTML = '';
+    lastCalled.textContent = '';
+  }
+
+  function checkBingo(){
+    if(bingoDeclared) return;
+    // check rows, cols, diagonals
+    const size = 5;
+    const winLines = [];
+
+    // rows
+    for(let r=0;r<size;r++){
+      let ok = true;
+      for(let c=0;c<size;c++){
+        if(!marked[r][c]) { ok=false; break; }
+      }
+      if(ok) winLines.push({type:'row',index:r});
+    }
+    // cols
+    for(let c=0;c<size;c++){
+      let ok = true;
+      for(let r=0;r<size;r++){
+        if(!marked[r][c]) { ok=false; break; }
+      }
+      if(ok) winLines.push({type:'col',index:c});
+    }
+    // diag TL-BR
+    let ok = true;
+    for(let i=0;i<size;i++) if(!marked[i][i]) ok=false;
+    if(ok) winLines.push({type:'diag',index:0});
+    // diag TR-BL
+    ok = true;
+    for(let i=0;i<size;i++) if(!marked[i][size-1-i]) ok=false;
+    if(ok) winLines.push({type:'diag',index:1});
+
+    if(winLines.length>0){
+      bingoDeclared = true;
+      status.textContent = 'BINGO!';
+      highlightWin(winLines);
+      launchConfetti();
+      // celebratory sound
+      playWinTone();
+    } else {
+      status.textContent = 'No bingo yet';
+    }
+  }
+
+  function highlightWin(lines){
+    // add .win to cells in winning lines
+    const size = 5;
+    const cells = document.querySelectorAll('.cell');
+    // remove previous win classes
+    cells.forEach(c=>c.classList.remove('win'));
+    lines.forEach(line=>{
+      if(line.type === 'row'){
+        const r = line.index;
+        for(let c=0;c<size;c++){
+          const el = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if(el) el.classList.add('win');
+        }
+      } else if(line.type === 'col'){
+        const c = line.index;
+        for(let r=0;r<size;r++){
+          const el = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+          if(el) el.classList.add('win');
+        }
+      } else if(line.type === 'diag'){
+        if(line.index === 0){
+          for(let i=0;i<size;i++){
+            const el = document.querySelector(`.cell[data-row="${i}"][data-col="${i}"]`);
+            if(el) el.classList.add('win');
+          }
+        } else {
+          for(let i=0;i<size;i++){
+            const el = document.querySelector(`.cell[data-row="${i}"][data-col="${size-1-i}"]`);
+            if(el) el.classList.add('win');
+          }
+        }
+      }
+    });
+  }
+
+  function shuffleArray(a){
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+  }
+
+  // Buttons
+  drawBtn.addEventListener('click', ()=> {
+    if(pool.length===0) return;
+    drawNext();
+  });
+
+  newCardBtn.addEventListener('click', ()=> {
+    generateCard();
+    renderCard();
+    status.textContent = 'New card generated';
+    bingoDeclared = false;
+  });
+
+  resetBtn.addEventListener('click', ()=> {
+    stopAuto();
+    init();
+  });
+
+  shuffleBtn.addEventListener('click', ()=> {
+    // shuffle numbers on card but keep free center
+    const flat = [];
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        if(!(r===2 && c===2)) flat.push(card[r][c]);
+      }
+    }
+    shuffleArray(flat);
+    let idx=0;
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        if(r===2 && c===2) continue;
+        card[r][c] = flat[idx++];
+        marked[r][c] = false;
+      }
+    }
+    marked[2][2] = true;
+    renderCard();
+    status.textContent = 'Card numbers shuffled';
+    bingoDeclared = false;
+  });
+
+  markAllBtn.addEventListener('click', ()=> {
+    // mark all called numbers on card
+    for(let r=0;r<5;r++){
+      for(let c=0;c<5;c++){
+        if(card[r][c] !== 'FREE' && drawn.includes(card[r][c])) marked[r][c] = true;
+      }
+    }
+    renderCard();
+    checkBingo();
+  });
+
+  autoBtn.addEventListener('click', ()=> {
+    if(autoInterval) stopAuto();
+    else startAuto();
+  });
+
+  revealBtn.addEventListener('click', ()=> {
+    // reveal all numbers (draw all)
+    while(pool.length>0){
+      drawNext();
+    }
+  });
+
+  function startAuto(){
+    if(pool.length===0) return;
+    autoBtn.textContent = 'Stop Auto';
+    autoBtn.classList.add('active');
+    autoInterval = setInterval(()=>{
+      if(pool.length===0) { stopAuto(); return; }
+      drawNext();
+      if(bingoDeclared) stopAuto();
+    }, 1200);
+  }
+  function stopAuto(){
+    if(autoInterval) clearInterval(autoInterval);
+    autoInterval = null;
+    autoBtn.textContent = 'Auto Play';
+    autoBtn.classList.remove('active');
+  }
+
+  // Confetti
+  function launchConfetti(){
+    confettiContainer.innerHTML = '';
+    const colors = ['#ffb86b','#7be4ff','#7cffb8','#ffd89a','#ff9fb8'];
+    const count = 40;
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = Math.random()*100 + '%';
+      el.style.top = '-10%';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      el.style.opacity = 1;
+      confettiContainer.appendChild(el);
+      // animate
+      const fall = el.animate([
+        {transform: `translateY(0) rotate(${Math.random()*360}deg)`, opacity:1},
+        {transform: `translateY(${200+Math.random()*400}px) rotate(${Math.random()*720}deg)`, opacity:0.9}
+      ],{duration: 1600 + Math.random()*1200, easing:'cubic-bezier(.2,.8,.2,1)'});
+      fall.onfinish = ()=> el.remove();
+    }
+  }
+
+  // Simple beep using WebAudio
+  function playBeep(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = 880;
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(ctx.destination);
+      const now = ctx.currentTime;
+      g.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+      o.start(now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      o.stop(now + 0.2);
+    }catch(e){}
+  }
+
+  function playWinTone(){
+    try{
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const notes = [660,880,990];
+      notes.forEach((f,i)=>{
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = f;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.exponentialRampToValueAtTime(0.12, now + 0.02 + i*0.08);
+        o.start(now + i*0.06);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18 + i*0.08);
+        o.stop(now + 0.22 + i*0.08);
+      });
+    }catch(e){}
+  }
+
+  // Initialize on load
+  init();
+
+  // Accessibility: keyboard draw with space
+  document.addEventListener('keydown', (e)=>{
+    if(e.code === 'Space') { e.preventDefault(); drawBtn.click(); }
+  });
+
+  // Expose for debugging (optional)
+  window._bingo = {init,drawNext,card,marked,pool,drawn};
+
+})();
+</script>
+</body>
+</html>

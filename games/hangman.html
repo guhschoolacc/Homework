@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hangman</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --accent:#60a5fa;
+    --muted:#94a3b8;
+    --danger:#fb7185;
+    --success:#34d399;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:linear-gradient(180deg,#071029 0%, #0b1220 100%);color:#e6eef8;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .container{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:22px;box-shadow:0 8px 30px rgba(2,6,23,0.7);position:relative;overflow:hidden;}
+  /* Return button fixed to very top-left of the page */
+  .return-btn{
+    position:fixed;
+    left:8px;
+    top:8px;
+    z-index:9999;
+    background:transparent;
+    border:2px solid rgba(255,255,255,0.06);
+    color:var(--accent);
+    padding:8px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    backdrop-filter: blur(4px);
+  }
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  h1{font-size:20px;margin:0;color:#dbeafe;}
+  .meta{color:var(--muted);font-size:13px;}
+  .game-area{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+  .left{padding:18px;background:rgba(255,255,255,0.02);border-radius:10px;}
+  .right{padding:18px;background:rgba(255,255,255,0.01);border-radius:10px;display:flex;flex-direction:column;gap:12px;align-items:center;}
+  canvas{background:transparent;border-radius:6px;}
+  .word{font-size:28px;letter-spacing:8px;text-transform:uppercase;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:18px 0;}
+  .letter{min-width:28px;border-bottom:3px solid rgba(255,255,255,0.06);text-align:center;padding:6px 4px;font-weight:700;}
+  /* Keyboard changed to flex with wrapping so keys create new rows instead of overflowing */
+  .keyboard{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    align-items:center;
+    padding:6px;
+  }
+  .key{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.03);
+    padding:10px 8px;
+    border-radius:6px;
+    cursor:pointer;
+    user-select:none;
+    font-weight:700;
+    color:#e6eef8;
+    min-width:40px;
+    width:44px;
+    text-align:center;
+    box-sizing:border-box;
+  }
+  .key.disabled{opacity:0.35;cursor:not-allowed;}
+  .info{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .badge{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--muted);}
+  .wrong-letters{color:var(--danger);min-height:22px;}
+  .controls{display:flex;gap:8px;justify-content:center;margin-top:8px;}
+  button.primary{background:var(--accent);border:none;color:#04263b;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer;}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:10px 14px;border-radius:8px;cursor:pointer;}
+  .message{padding:12px;border-radius:8px;text-align:center;font-weight:700;}
+  .message.win{background:linear-gradient(90deg, rgba(52,211,153,0.12), rgba(52,211,153,0.06));color:var(--success);border:1px solid rgba(52,211,153,0.12);}
+  .message.lose{background:linear-gradient(90deg, rgba(251,113,133,0.08), rgba(251,113,133,0.04));color:var(--danger);border:1px solid rgba(251,113,133,0.08);}
+  footer{margin-top:12px;color:var(--muted);font-size:13px;text-align:center;}
+  @media (max-width:880px){
+    .game-area{grid-template-columns:1fr;gap:12px;}
+    .right{align-items:stretch;}
+    .keyboard{justify-content:flex-start;}
+    .key{min-width:36px;width:40px;padding:8px 6px;}
+  }
+</style>
+</head>
+<body>
+  
+
+  <div class="container" role="main" aria-labelledby="title">
+    <div class="header">
+      <div>
+        <h1 id="title">Hangman</h1>
+        <div class="meta">Guess the word before this guy fucking dies</div>
+      </div>
+      <div class="meta">Random word generator; click letters or type on your keyboard</div>
+    </div>
+
+    <div class="game-area">
+      <div class="left" aria-live="polite">
+        <canvas id="hangmanCanvas" width="520" height="360" aria-hidden="true"></canvas>
+
+        <div class="word" id="wordContainer" aria-label="Word to guess"></div>
+
+        <div class="info" style="margin-top:12px;">
+          <div class="badge">Attempts left: <span id="attemptsLeft">6</span></div>
+          <div class="badge">Word length: <span id="wordLength">0</span></div>
+          <div class="badge">Wins: <span id="wins">0</span></div>
+        </div>
+
+        <div style="margin-top:12px;text-align:center;">
+          <div class="wrong-letters" id="wrongLetters" aria-live="polite"></div>
+          <div class="controls">
+            <button class="primary" id="newGameBtn">New Word</button>
+            <button class="ghost" id="revealBtn">Reveal Word</button>
+          </div>
+        </div>
+
+        <div id="statusMessage" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="right">
+        <div style="width:100%;max-width:320px;">
+          <div style="text-align:center;margin-bottom:8px;color:var(--muted);font-weight:700;">On-screen Keyboard</div>
+          <div class="keyboard" id="keyboard" role="application" aria-label="On-screen keyboard"></div>
+        </div>
+
+        <div style="width:100%;max-width:320px;">
+          <div style="text-align:center;color:var(--muted);margin-bottom:6px;">Wrong guesses</div>
+          <div style="min-height:40px;text-align:center;color:var(--danger);font-weight:800;" id="wrongList">—</div>
+        </div>
+
+        <div style="width:100%;max-width:320px;">
+          <div style="text-align:center;color:var(--muted);margin-bottom:6px;">Controls</div>
+          <div style="display:flex;gap:8px;justify-content:center;">
+            <button class="primary" id="hintBtn">Hint</button>
+            <button class="ghost" id="resetScoreBtn">Reset Score</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Tip: You can also type letters on your keyboard. Press New Word to start.</footer>
+  </div>
+
+<script>
+/* ======= Hangman Game Script ======= */
+/* Word list - extend as desired */
+const WORDS = [
+  "javascript","hangman","computer","programming","interface","function","variable",
+  "developer","keyboard","monitor","algorithm","network","database","application",
+  "component","element","document","stylesheet","canvas","browser","security",
+  "performance","accessibility","responsive","design","testing","deployment",
+  "iteration","version","repository","module","package","syntax","compile","execute",
+  "random","generator","puzzle","challenge","education","learning","practice"
+];
+
+/* Game state */
+let secretWord = "";
+let revealed = [];
+let wrongGuesses = [];
+let maxAttempts = 6;
+let attemptsLeft = maxAttempts;
+let wins = 0;
+let gameOver = false;
+
+/* DOM elements */
+const canvas = document.getElementById('hangmanCanvas');
+const ctx = canvas.getContext('2d');
+const wordContainer = document.getElementById('wordContainer');
+const attemptsLeftEl = document.getElementById('attemptsLeft');
+const wordLengthEl = document.getElementById('wordLength');
+const wrongLettersEl = document.getElementById('wrongLetters');
+const wrongListEl = document.getElementById('wrongList');
+const keyboardEl = document.getElementById('keyboard');
+const newGameBtn = document.getElementById('newGameBtn');
+const revealBtn = document.getElementById('revealBtn');
+const hintBtn = document.getElementById('hintBtn');
+const statusMessage = document.getElementById('statusMessage');
+const winsEl = document.getElementById('wins');
+const resetScoreBtn = document.getElementById('resetScoreBtn');
+
+/* Initialize keyboard */
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz".split('');
+function buildKeyboard(){
+  keyboardEl.innerHTML = "";
+  ALPHABET.forEach(letter=>{
+    const btn = document.createElement('button');
+    btn.className = 'key';
+    btn.textContent = letter.toUpperCase();
+    btn.dataset.letter = letter;
+    btn.setAttribute('aria-label', 'Letter ' + letter.toUpperCase());
+    btn.addEventListener('click', ()=> handleGuess(letter));
+    keyboardEl.appendChild(btn);
+  });
+}
+
+/* Random word generator */
+function pickRandomWord(){
+  const idx = Math.floor(Math.random()*WORDS.length);
+  return WORDS[idx];
+}
+
+/* Start new game */
+function startNewGame(){
+  secretWord = pickRandomWord();
+  revealed = Array.from(secretWord).map(ch => (ch === '-' || ch === ' ' ? ch : '_'));
+  wrongGuesses = [];
+  attemptsLeft = maxAttempts;
+  gameOver = false;
+  attemptsLeftEl.textContent = attemptsLeft;
+  wordLengthEl.textContent = secretWord.length;
+  wrongLettersEl.textContent = '';
+  wrongListEl.textContent = '—';
+  statusMessage.innerHTML = '';
+  updateWordDisplay();
+  resetKeyboard();
+  resetDrawing();
+}
+
+/* Update displayed word */
+function updateWordDisplay(){
+  wordContainer.innerHTML = '';
+  revealed.forEach(ch=>{
+    const span = document.createElement('div');
+    span.className = 'letter';
+    span.textContent = ch === '_' ? '' : ch;
+    wordContainer.appendChild(span);
+  });
+}
+
+/* Handle a guess */
+function handleGuess(letter){
+  if(gameOver) return;
+  letter = letter.toLowerCase();
+  // disable key
+  const keyBtn = keyboardEl.querySelector(`[data-letter="${letter}"]`);
+  if(keyBtn) keyBtn.classList.add('disabled'), keyBtn.disabled = true;
+
+  if(secretWord.includes(letter)){
+    // reveal all occurrences
+    for(let i=0;i<secretWord.length;i++){
+      if(secretWord[i] === letter) revealed[i] = letter.toUpperCase();
+    }
+    updateWordDisplay();
+    checkWin();
+  } else {
+    if(!wrongGuesses.includes(letter)){
+      wrongGuesses.push(letter);
+      attemptsLeft--;
+      attemptsLeftEl.textContent = attemptsLeft;
+      wrongLettersEl.textContent = wrongGuesses.join(', ').toUpperCase();
+      wrongListEl.textContent = wrongGuesses.join(', ').toUpperCase();
+      drawNextPart();
+      if(attemptsLeft <= 0) endGame(false);
+    }
+  }
+}
+
+/* Check for win */
+function checkWin(){
+  if(revealed.every(ch => ch !== '_' )){
+    endGame(true);
+  }
+}
+
+/* End game */
+function endGame(won){
+  gameOver = true;
+  if(won){
+    wins++;
+    winsEl.textContent = wins;
+    statusMessage.innerHTML = '<div class="message win">You win! The word was <strong>' + secretWord.toUpperCase() + '</strong></div>';
+  } else {
+    // reveal word
+    revealed = Array.from(secretWord).map(ch => ch === '-' || ch === ' ' ? ch : ch.toUpperCase());
+    updateWordDisplay();
+    statusMessage.innerHTML = '<div class="message lose">You lost. The word was <strong>' + secretWord.toUpperCase() + '</strong></div>';
+    // fully draw man
+    while(drawnParts < drawSteps.length){ drawNextPart(); }
+    attemptsLeft = 0;
+    attemptsLeftEl.textContent = 0;
+  }
+  // disable remaining keys
+  keyboardEl.querySelectorAll('.key').forEach(k=>{ k.classList.add('disabled'); k.disabled = true; });
+}
+
+/* Reset keyboard buttons */
+function resetKeyboard(){
+  keyboardEl.querySelectorAll('.key').forEach(k=>{ k.classList.remove('disabled'); k.disabled = false; });
+}
+
+/* Reveal word button */
+revealBtn.addEventListener('click', ()=>{
+  if(gameOver) return;
+  endGame(false);
+});
+
+/* New word button */
+newGameBtn.addEventListener('click', startNewGame);
+
+/* Hint button - reveals one unrevealed letter */
+hintBtn.addEventListener('click', ()=>{
+  if(gameOver) return;
+  const indices = revealed.map((v,i)=> v === '_' ? i : -1).filter(i=>i>=0);
+  if(indices.length === 0) return;
+  const idx = indices[Math.floor(Math.random()*indices.length)];
+  const letter = secretWord[idx];
+  handleGuess(letter);
+});
+
+/* Reset score */
+resetScoreBtn.addEventListener('click', ()=>{
+  wins = 0;
+  winsEl.textContent = wins;
+});
+
+/* Keyboard typing support */
+window.addEventListener('keydown', (e)=>{
+  if(e.key && /^[a-zA-Z]$/.test(e.key)){
+    handleGuess(e.key.toLowerCase());
+  }
+});
+
+/* ===== Canvas drawing for hangman ===== */
+function clearCanvas(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+
+function drawGallows(){
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 6;
+  // base
+  ctx.beginPath();
+  ctx.moveTo(40,320);
+  ctx.lineTo(200,320);
+  ctx.stroke();
+  // upright
+  ctx.beginPath();
+  ctx.moveTo(120,320);
+  ctx.lineTo(120,40);
+  ctx.lineTo(320,40);
+  ctx.lineTo(320,80);
+  ctx.stroke();
+  ctx.strokeStyle = '#e6eef8';
+  ctx.lineWidth = 4;
+}
+
+/* Parts to draw in order */
+const drawSteps = [
+  function head(){
+    ctx.beginPath();
+    ctx.arc(320,110,30,0,Math.PI*2);
+    ctx.stroke();
+  },
+  function body(){
+    ctx.beginPath();
+    ctx.moveTo(320,140);
+    ctx.lineTo(320,220);
+    ctx.stroke();
+  },
+  function leftArm(){
+    ctx.beginPath();
+    ctx.moveTo(320,160);
+    ctx.lineTo(280,190);
+    ctx.stroke();
+  },
+  function rightArm(){
+    ctx.beginPath();
+    ctx.moveTo(320,160);
+    ctx.lineTo(360,190);
+    ctx.stroke();
+  },
+  function leftLeg(){
+    ctx.beginPath();
+    ctx.moveTo(320,220);
+    ctx.lineTo(290,270);
+    ctx.stroke();
+  },
+  function rightLeg(){
+    ctx.beginPath();
+    ctx.moveTo(320,220);
+    ctx.lineTo(350,270);
+    ctx.stroke();
+  }
+];
+
+let drawnParts = 0;
+function drawNextPart(){
+  if(drawnParts < drawSteps.length){
+    drawSteps[drawnParts]();
+    drawnParts++;
+  }
+}
+
+/* Reset drawing state */
+function resetDrawing(){
+  drawnParts = 0;
+  clearCanvas();
+  drawGallows();
+}
+
+/* Initialize everything */
+function init(){
+  buildKeyboard();
+  resetDrawing();
+  startNewGame();
+}
+
+/* On load */
+init();
+</script>
+</body>
+</html>
