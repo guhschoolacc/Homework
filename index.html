@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>homewrk launcher — Restored</title>
+  <title>homewrk</title>
   <meta name="description" content="Launcher with games, tools, social category, full-screen viewer, add-item support, auth, improved settings, tab masking, panic key, and galaxy theme." />
   <style>
     :root{
@@ -595,40 +595,41 @@
 
     // ROUTE MAP: explicit listing of each button/card and the path it opens
     const routeMap = {
-      "card-sandbox": "/games/sandbox.html",
-      "card-snake": "/games/snake.html",
-      "card-mines": "/games/mines.html",
-      "card-bubble": "/games/bubble-shooter.html",
-      "card-casino": "/games/casino.html",
-      "card-wormscape": "/games/wormscape.html",
-      "card-chess": "/games/chess.html",
-      "card-tower": "/games/tower-defense.html",
-      "card-space": "/games/space-shooter.html",
-      "card-tictactoe": "/games/tictactoe.html",
-      "card-2048": "/games/2048.html",
-      "card-guh": "/games/guh-clicker.html",
-      "card-flappy": "/games/flappy-bird.html",
-      "card-hangman": "/games/hangman.html",
-      "card-block": "/games/block-breaker.html",
-      "card-arcade": "/games/arcade-racer.html",
-      "card-base64": "/tools/base64-tool.html",
-      "card-calculator": "/tools/calculator.html",
-      "card-clock": "/tools/clock.html",
-      "card-converter": "/tools/converter.html",
-      "card-fl-studio": "/tools/fl-studio.html",
-      "card-image-cropper": "/tools/image-cropper.html",
-      "card-image-resizer": "/tools/image-resizer.html",
-      "card-ip-lookup": "/tools/ip-lookup.html",
-      "card-json-formatter": "/tools/json-formatter.html",
-      "card-localstorage-viewer": "/tools/localstorage-viewer.html",
-      "card-notepad": "/tools/notepad.html",
-      "card-qr-generator": "/tools/qr-generator.html",
-      "card-qr-scanner": "/tools/qr-scanner.html",
-      "card-regex-tester": "/tools/regex-tester.html",
-      "card-soundboard": "/tools/soundboard.html",
-      "card-text-to-speech": "/tools/text-to-speech.html",
-      "card-chat": "/social/chat.html"
-    };
+  "card-sandbox": "games/sandbox.html",
+  "card-snake": "games/snake.html",
+  "card-mines": "games/mines.html",
+  "card-bubble": "games/bubble-shooter.html",
+  "card-casino": "games/casino.html",
+  "card-wormscape": "games/wormscape.html",
+  "card-chess": "games/chess.html",
+  "card-tower": "games/tower-defense.html",
+  "card-space": "games/space-shooter.html",
+  "card-tictactoe": "games/tictactoe.html",
+  "card-2048": "games/2048.html",
+  "card-guh": "games/guh-clicker.html",
+  "card-flappy": "games/flappy-bird.html",
+  "card-hangman": "games/hangman.html",
+  "card-block": "games/block-breaker.html",
+  "card-arcade": "games/arcade-racer.html",
+  "card-base64": "tools/base64-tool.html",
+  "card-calculator": "tools/calculator.html",
+  "card-clock": "tools/clock.html",
+  "card-converter": "tools/converter.html",
+  "card-fl-studio": "tools/fl-studio.html",
+  "card-image-cropper": "tools/image-cropper.html",
+  "card-image-resizer": "tools/image-resizer.html",
+  "card-ip-lookup": "tools/ip-lookup.html",
+  "card-json-formatter": "tools/json-formatter.html",
+  "card-localstorage-viewer": "tools/localstorage-viewer.html",
+  "card-notepad": "tools/notepad.html",
+  "card-qr-generator": "tools/qr-generator.html",
+  "card-qr-scanner": "tools/qr-scanner.html",
+  "card-regex-tester": "tools/regex-tester.html",
+  "card-soundboard": "tools/soundboard.html",
+  "card-text-to-speech": "tools/text-to-speech.html",
+  "card-chat": "social/chat.html"
+};
+
 
     // Build a DOM node for a master card (used when rendering)
     function buildCardNode(item){
