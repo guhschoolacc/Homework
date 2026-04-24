@@ -1004,8 +1004,6 @@ nav{
 /* =====================================================
    CONFIGURATION
 ===================================================== */
-let OPENAI_API_KEY = "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";
-const OPENAI_MODEL = "gpt-4o";
 const TENOR_KEY = "LIVDSRZULELA";
 const ADMIN_UID = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
 const AI_SYSTEM = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`;
@@ -1029,6 +1027,8 @@ const db = firebase.firestore();
    STATE
 ===================================================== */
 let currentSection = "home";
+let bannedUsersCache = new Set();
+let bannedCacheLoaded = false;
 let currentUser = null;
 let currentConvId = null;
 let attachedB64 = null;
@@ -1597,34 +1597,17 @@ async function sendChatMessage() {
 }
 
 async function callOpenAI(msgs) {
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+  const resp = await fetch("/api/chat", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + OPENAI_API_KEY
-    },
-    body: JSON.stringify({
-      model: OPENAI_MODEL,
-      max_tokens: 1024,
-      messages: [{ role: "system", content: AI_SYSTEM }, ...msgs]
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: msgs })
   });
-  if (!resp.ok) {
-    let errMsg = "HTTP " + resp.status;
-    try {
-      const eb = await resp.json();
-      if (eb.error) { errMsg = eb.error.message; }
-    } catch (_e) { /* ignore */ }
-    throw new Error(errMsg);
-  }
   const data = await resp.json();
-  return data.choices[0].message.content;
+  if (!resp.ok) {
+    throw new Error(data.error || "Request failed with status " + resp.status);
+  }
+  return data.reply;
 }
-
-document.getElementById("chat-input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
-});
-document.getElementById("chat-send-btn").addEventListener("click", sendChatMessage);
 
 /* =====================================================
    AUTH
@@ -1799,73 +1782,78 @@ function updateSocialBadge() {
   }
 }
 
-function listenSocialMessages() {
+async function listenSocialMessages() {
   if (socialUnsubscribe) { socialUnsubscribe(); }
   const container = document.getElementById("social-chat-messages");
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Loading messages...</div>';
+
+  // Pre-load banned list so messages render in correct order
+  await loadBannedCache();
   container.innerHTML = "";
 
   socialUnsubscribe = db.collection("socialMessages")
     .orderBy("timestamp", "asc")
-    .limitToLast(80)
-    .onSnapshot(
-      snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if (change.type === "added") {
-            const data = change.doc.data();
-            const msg = { id: change.doc.id, ...data };
-            isBanned(msg.userId).then(banned => {
-              if (!banned) { renderSocialMessage(msg); }
-            });
-            const isOwn = currentUser && msg.userId === currentUser.uid;
-            if (!isOwn && msg.timestamp) {
-              const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
-              if (msgTime > lastSocialMsgTime) {
-                lastSocialMsgTime = msgTime;
-                if (!socialChatOpen) {
-                  unreadSocialCount++;
-                  updateSocialBadge();
-                }
-                if (!notifMuted) {
-                  showBrowserNotif(msg.displayName || "Someone", msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image"));
-                }
+    .limitToLast(150)
+    .onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const data = change.doc.data();
+          const msg = { id: change.doc.id, ...data };
+
+          // Use sync cache — no async per-message, keeps order correct
+          if (!isBannedSync(msg.userId)) {
+            renderSocialMessage(msg);
+          }
+
+          const isOwn = currentUser && msg.userId === currentUser.uid;
+          if (!isOwn && msg.timestamp) {
+            const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
+            if (msgTime > lastSocialMsgTime) {
+              lastSocialMsgTime = msgTime;
+              if (!socialChatOpen) {
+                unreadSocialCount++;
+                updateSocialBadge();
+              }
+              if (!notifMuted) {
+                showBrowserNotif(msg.displayName || "Someone", msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image"));
               }
             }
-            const scm = document.getElementById("social-chat-messages");
-            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 50);
           }
-        });
-      },
-      err => {
-        console.warn("Ordered query failed, trying unordered:", err);
-        socialUnsubscribe = db.collection("socialMessages")
-          .limitToLast(80)
-          .onSnapshot(snapshot => {
-            container.innerHTML = "";
-            const docs = [];
-            snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-            docs.sort((a, b) => {
-              const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : a.timestamp) : 0;
-              const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : b.timestamp) : 0;
-              return ta - tb;
-            });
-            docs.forEach(msg => {
-              isBanned(msg.userId).then(banned => {
-                if (!banned) { renderSocialMessage(msg); }
-              });
-            });
-            const scm = document.getElementById("social-chat-messages");
-            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 100);
-          });
-      }
-    );
+        }
+        if (change.type === "removed") {
+          // Remove deleted messages from UI instantly
+          const el = document.querySelector(`[data-msg-id="${change.doc.id}"]`);
+          if (el) { el.remove(); }
+        }
+      });
+      const scm = document.getElementById("social-chat-messages");
+      setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 50);
+    }, err => {
+      console.error("Social chat error:", err);
+      container.innerHTML = `<div style="text-align:center;padding:20px;color:#f55;font-size:12px;">
+        Chat error: ${err.message}<br>
+        <span style="color:var(--muted);">Check your Firestore rules in Firebase Console.</span>
+      </div>`;
+    });
+}
+
+async function loadBannedCache() {
+  try {
+    const snap = await db.collection("bannedUsers").get();
+    bannedUsersCache = new Set();
+    snap.forEach(doc => bannedUsersCache.add(doc.id));
+    bannedCacheLoaded = true;
+  } catch (_e) { bannedCacheLoaded = true; }
 }
 
 async function isBanned(uid) {
   if (!uid) { return false; }
-  try {
-    const doc = await db.collection("bannedUsers").doc(uid).get();
-    return doc.exists;
-  } catch (_e) { return false; }
+  if (!bannedCacheLoaded) { await loadBannedCache(); }
+  return bannedUsersCache.has(uid);
+}
+
+function isBannedSync(uid) {
+  return bannedUsersCache.has(uid);
 }
 
 function renderSocialMessage(msg) {
@@ -2236,6 +2224,7 @@ async function refreshUserList() {
           });
           showToast("USER BANNED");
         }
+        bannedCacheLoaded = false; // force cache refresh
         await refreshUserList();
       });
 
