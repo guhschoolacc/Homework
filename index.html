@@ -459,7 +459,6 @@ nav{
   line-height:1.55;
 }
 .social-msg.own .social-msg-bubble{background:var(--social-msg-own-bg);color:var(--social-msg-own-fg);}
-/* FIX: show full GIF, not cropped */
 .social-msg-gif{width:100%;max-width:280px;height:auto;border:var(--border);margin-top:6px;display:block;}
 .social-msg-img{max-width:220px;border:var(--border);margin-top:6px;display:block;}
 .social-msg-time{font-size:10px;color:var(--muted);margin-top:3px;}
@@ -518,10 +517,8 @@ nav{
 .gif-tab.active{color:var(--fg);background:var(--bg2);}
 .gif-grid{
   flex:1;overflow-y:auto;padding:10px;
-  /* CHANGED: columns layout to show natural GIF height */
   columns:3;column-gap:6px;align-content:start;
 }
-/* CHANGED: gif-item no longer forces square aspect-ratio */
 .gif-item{
   position:relative;cursor:pointer;border:var(--border);overflow:hidden;
   break-inside:avoid;margin-bottom:6px;display:block;
@@ -710,7 +707,6 @@ nav{
         <input class="settings-input" id="s-photo-url" placeholder="Profile photo URL">
         <button class="tool-btn" id="s-update-profile-btn" style="margin-bottom:8px;">UPDATE PROFILE</button>
       </div>
-      <!-- AI API KEY SECTION REMOVED -->
       <button class="settings-save-btn" id="settings-save-btn">SAVE SETTINGS</button>
     </div>
   </div>
@@ -749,7 +745,6 @@ nav{
         <input class="social-input" id="social-input" placeholder="Say something..." autocomplete="off">
         <button class="social-send-btn" id="social-send-btn">SEND</button>
       </div>
-      <!-- ADDED: fav gif button in social tools -->
       <div class="social-tools-row">
         <button class="tool-btn" id="gif-btn">🎞 GIF</button>
         <button class="tool-btn" id="fav-gif-social-btn">★ FAVS</button>
@@ -971,7 +966,7 @@ nav{
     <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <button class="admin-action-btn" id="admin-refresh-btn">↺ REFRESH</button>
       <span style="font-size:12px;color:var(--muted);" id="admin-user-count"></span>
-      <span style="font-size:11px;color:var(--muted);margin-left:auto;">Users are stored when they sign in for the first time.</span>
+      <span style="font-size:11px;color:var(--muted);margin-left:auto;">All Firebase Auth users are listed here.</span>
     </div>
     <div style="overflow-x:auto;">
       <table class="user-table" id="users-table">
@@ -1004,49 +999,49 @@ nav{
 /* =====================================================
    CONFIGURATION
 ===================================================== */
-const TENOR_KEY = "LIVDSRZULELA";
-const ADMIN_UID = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
-const AI_SYSTEM = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`;
+const TENOR_KEY  = "LIVDSRZULELA";
+const ADMIN_UID  = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
+const AI_SYSTEM  = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`;
 
 /* =====================================================
    FIREBASE INIT
 ===================================================== */
 const firebaseConfig = {
-  apiKey: "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
-  authDomain: "goon-7ddc3.firebaseapp.com",
-  projectId: "goon-7ddc3",
-  storageBucket: "goon-7ddc3.firebasestorage.app",
+  apiKey:            "AIzaSyCR8I5eOiZbHzVZJDEQHYpyxXbcClk_rxA",
+  authDomain:        "goon-7ddc3.firebaseapp.com",
+  projectId:         "goon-7ddc3",
+  storageBucket:     "goon-7ddc3.firebasestorage.app",
   messagingSenderId: "117099331820",
-  appId: "1:117099331820:web:3af984b15a843d3d7b65c"
+  appId:             "1:117099331820:web:3af984b15a843d3d7b65c"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db   = firebase.firestore();
 
 /* =====================================================
    STATE
 ===================================================== */
-let currentSection = "home";
-let currentUser = null;
-let currentConvId = null;
-let attachedB64 = null;
-let attachedMime = null;
-let isBusy = false;
-let replyingTo = null;
+let currentSection    = "home";
+let currentUser       = null;
+let currentConvId     = null;
+let attachedB64       = null;
+let attachedMime      = null;
+let isBusy            = false;
+let replyingTo        = null;
 let socialUnsubscribe = null;
-let notifMuted = false;
-let favGifs = [];
-let pendingGifTarget = null;
-let gifActiveTab = "search";
+let notifMuted        = false;
+let favGifs           = [];
+let pendingGifTarget  = null;
+let gifActiveTab      = "search";
 let lastSocialMsgTime = 0;
 let unreadSocialCount = 0;
-let socialChatOpen = false;
+let socialChatOpen    = false;
 let settings = {
-  theme: "light",
-  panicKey: "'",
-  panicUrl: "https://google.com",
-  tabName: "",
-  tabIcon: "",
+  theme:      "light",
+  panicKey:   "'",
+  panicUrl:   "https://google.com",
+  tabName:    "",
+  tabIcon:    "",
   notifMuted: false
 };
 
@@ -1125,15 +1120,15 @@ function openSettings() {
   const s = settings;
   document.getElementById("s-panic-key").value = s.panicKey || "'";
   document.getElementById("s-panic-url").value = s.panicUrl || "https://google.com";
-  document.getElementById("s-tab-name").value = s.tabName || "";
-  document.getElementById("s-tab-icon").value = s.tabIcon || "";
+  document.getElementById("s-tab-name").value  = s.tabName  || "";
+  document.getElementById("s-tab-icon").value  = s.tabIcon  || "";
   const notifToggle = document.getElementById("notif-toggle");
   notifToggle.classList.toggle("on", s.notifMuted);
   applyTheme(s.theme || "light");
   if (currentUser) {
     document.getElementById("settings-profile-section").style.display = "block";
     document.getElementById("s-display-name").value = currentUser.displayName || "";
-    document.getElementById("s-photo-url").value = currentUser.photoURL || "";
+    document.getElementById("s-photo-url").value    = currentUser.photoURL    || "";
   } else {
     document.getElementById("settings-profile-section").style.display = "none";
   }
@@ -1141,12 +1136,12 @@ function openSettings() {
 }
 
 document.getElementById("settings-save-btn").addEventListener("click", () => {
-  settings.panicKey = document.getElementById("s-panic-key").value.trim() || "'";
-  settings.panicUrl = document.getElementById("s-panic-url").value.trim() || "https://google.com";
-  settings.tabName = document.getElementById("s-tab-name").value.trim();
-  settings.tabIcon = document.getElementById("s-tab-icon").value.trim();
+  settings.panicKey   = document.getElementById("s-panic-key").value.trim() || "'";
+  settings.panicUrl   = document.getElementById("s-panic-url").value.trim() || "https://google.com";
+  settings.tabName    = document.getElementById("s-tab-name").value.trim();
+  settings.tabIcon    = document.getElementById("s-tab-icon").value.trim();
   settings.notifMuted = document.getElementById("notif-toggle").classList.contains("on");
-  notifMuted = settings.notifMuted;
+  notifMuted          = settings.notifMuted;
   saveSettings();
   applyTabMask(settings.tabName, settings.tabIcon);
   closeModal("settings-modal");
@@ -1164,13 +1159,12 @@ document.getElementById("notif-toggle").addEventListener("click", () => {
 document.getElementById("s-update-profile-btn").addEventListener("click", async () => {
   if (!currentUser) { return; }
   const dName = document.getElementById("s-display-name").value.trim();
-  const pUrl = document.getElementById("s-photo-url").value.trim();
+  const pUrl  = document.getElementById("s-photo-url").value.trim();
   try {
     await currentUser.updateProfile({ displayName: dName || null, photoURL: pUrl || null });
-    // Update Firestore users record too
     await db.collection("users").doc(currentUser.uid).update({
       displayName: dName || "Anonymous",
-      photoURL: pUrl || null
+      photoURL:    pUrl  || null
     });
     showToast("PROFILE UPDATED");
     updateNavUser();
@@ -1182,25 +1176,19 @@ document.getElementById("s-update-profile-btn").addEventListener("click", async 
 /* =====================================================
    MODALS
 ===================================================== */
-function openModal(id) {
-  const el = document.getElementById(id);
-  if (el) { el.classList.add("open"); }
-}
-function closeModal(id) {
-  const el = document.getElementById(id);
-  if (el) { el.classList.remove("open"); }
-}
+function openModal(id)  { const el = document.getElementById(id); if (el) { el.classList.add("open"); } }
+function closeModal(id) { const el = document.getElementById(id); if (el) { el.classList.remove("open"); } }
 
-document.getElementById("settings-close").addEventListener("click", () => closeModal("settings-modal"));
-document.getElementById("auth-close").addEventListener("click", () => closeModal("auth-modal"));
-document.getElementById("social-chat-close").addEventListener("click", () => {
+document.getElementById("settings-close").addEventListener("click",       () => closeModal("settings-modal"));
+document.getElementById("auth-close").addEventListener("click",           () => closeModal("auth-modal"));
+document.getElementById("social-chat-close").addEventListener("click",    () => {
   closeModal("social-chat-modal");
   socialChatOpen = false;
   unreadSocialCount = 0;
   updateSocialBadge();
 });
-document.getElementById("gif-picker-close").addEventListener("click", () => closeModal("gif-picker-modal"));
-document.getElementById("profile-modal-close").addEventListener("click", () => closeModal("profile-modal"));
+document.getElementById("gif-picker-close").addEventListener("click",     () => closeModal("gif-picker-modal"));
+document.getElementById("profile-modal-close").addEventListener("click",  () => closeModal("profile-modal"));
 
 document.querySelectorAll(".modal-overlay").forEach(overlay => {
   overlay.addEventListener("click", (e) => {
@@ -1212,13 +1200,13 @@ document.querySelectorAll(".modal-overlay").forEach(overlay => {
    NAVIGATION
 ===================================================== */
 const NAV_MAP = {
-  "home": null,
-  "games": "nav-games",
-  "tools": "nav-tools",
-  "ai-tools": "nav-ai",
-  "social": "nav-social",
+  "home":      null,
+  "games":     "nav-games",
+  "tools":     "nav-tools",
+  "ai-tools":  "nav-ai",
+  "social":    "nav-social",
   "changelog": "nav-changelog",
-  "admin": "nav-admin"
+  "admin":     "nav-admin"
 };
 
 function showSection(name) {
@@ -1233,15 +1221,15 @@ function showSection(name) {
     if (navBtn) { navBtn.classList.add("active"); }
   }
   if (name === "ai-tools") { renderConvList(); }
-  if (name === "admin") { loadAdminData(); }
+  if (name === "admin")    { loadAdminData(); }
 }
 
-document.getElementById("nav-logo").addEventListener("click",      () => showSection("home"));
-document.getElementById("nav-games").addEventListener("click",     () => showSection("games"));
-document.getElementById("nav-tools").addEventListener("click",     () => showSection("tools"));
-document.getElementById("nav-ai").addEventListener("click",        () => showSection("ai-tools"));
-document.getElementById("nav-social").addEventListener("click",    () => showSection("social"));
-document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
+document.getElementById("nav-logo").addEventListener("click",        () => showSection("home"));
+document.getElementById("nav-games").addEventListener("click",       () => showSection("games"));
+document.getElementById("nav-tools").addEventListener("click",       () => showSection("tools"));
+document.getElementById("nav-ai").addEventListener("click",          () => showSection("ai-tools"));
+document.getElementById("nav-social").addEventListener("click",      () => showSection("social"));
+document.getElementById("nav-changelog").addEventListener("click",   () => showSection("changelog"));
 document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
 document.getElementById("nav-auth-btn").addEventListener("click", () => {
   if (currentUser) { openProfileModal(); } else { openAuthModal(); }
@@ -1308,21 +1296,30 @@ document.getElementById("shuffle-btn").addEventListener("click", () => {
 
 /* =====================================================
    STORAGE HELPERS (AI conversations)
+   FIX 1: Conversations are keyed by user UID so each
+   account has its own isolated history in localStorage.
 ===================================================== */
+function getConvStorageKey() {
+  return currentUser ? `hw3_convs_${currentUser.uid}` : "hw3_convs_guest";
+}
+
 function getConvs() {
   try {
-    const raw = localStorage.getItem("hw3_convs");
+    const raw = localStorage.getItem(getConvStorageKey());
     return raw ? JSON.parse(raw) : {};
   } catch (_e) { return {}; }
 }
+
 function setConvs(obj) {
-  try { localStorage.setItem("hw3_convs", JSON.stringify(obj)); } catch (_e) { /* ignore */ }
+  try { localStorage.setItem(getConvStorageKey(), JSON.stringify(obj)); } catch (_e) { /* ignore */ }
 }
+
 function getConvMessages() {
   if (!currentConvId) { return []; }
   const convs = getConvs();
   return (convs[currentConvId] && convs[currentConvId].messages) ? convs[currentConvId].messages : [];
 }
+
 function persistMessages(msgs) {
   if (!currentConvId) { return; }
   const convs = getConvs();
@@ -1359,7 +1356,7 @@ function newConversation() {
 
 function loadConversation(id) {
   const convs = getConvs();
-  const conv = convs[id];
+  const conv  = convs[id];
   if (!conv) { return; }
   currentConvId = id;
   const chatMessages = document.getElementById("chat-messages");
@@ -1374,7 +1371,7 @@ function loadConversation(id) {
         else if (Array.isArray(m.content)) {
           const tb = m.content.find(c => c.type === "text");
           const ib = m.content.find(c => c.type === "image_url");
-          text = tb ? tb.text : "";
+          text   = tb ? tb.text : "";
           imgUrl = ib ? ib.image_url.url : null;
         }
         appendUserMsg(text, imgUrl, m.ts, true);
@@ -1397,7 +1394,7 @@ function deleteConv(id) {
 
 function renderConvList() {
   const convs = getConvs();
-  const keys = Object.keys(convs).sort((a, b) => Number(b) - Number(a));
+  const keys  = Object.keys(convs).sort((a, b) => Number(b) - Number(a));
   const convList = document.getElementById("conv-list");
   if (keys.length === 0) {
     convList.innerHTML = '<div class="conv-empty">No saved conversations yet.</div>';
@@ -1405,11 +1402,11 @@ function renderConvList() {
   }
   convList.innerHTML = "";
   keys.forEach(id => {
-    const conv = convs[id];
+    const conv  = convs[id];
     const isAct = id === currentConvId;
-    const date = new Date(Number(id)).toLocaleDateString();
+    const date  = new Date(Number(id)).toLocaleDateString();
     const title = conv.title || "Untitled conversation";
-    const item = document.createElement("div");
+    const item  = document.createElement("div");
     item.className = "conv-item" + (isAct ? " conv-active" : "");
     item.innerHTML = `
       <span class="conv-title-text">${escHtml(title)}</span>
@@ -1437,14 +1434,14 @@ document.getElementById("new-conv-btn2").addEventListener("click", () => {
 });
 document.getElementById("clear-all-btn").addEventListener("click", () => {
   if (window.confirm("Delete all saved conversations?")) {
-    localStorage.removeItem("hw3_convs");
+    localStorage.removeItem(getConvStorageKey());
     newConversation();
     renderConvList();
     showToast("ALL CLEARED");
   }
 });
-document.getElementById("new-conv-btn").addEventListener("click", newConversation);
-document.getElementById("history-btn").addEventListener("click", () => showSection("ai-tools"));
+document.getElementById("new-conv-btn").addEventListener("click",  newConversation);
+document.getElementById("history-btn").addEventListener("click",   () => showSection("ai-tools"));
 
 /* =====================================================
    AI CHAT UI HELPERS
@@ -1524,12 +1521,12 @@ document.getElementById("image-upload-input").addEventListener("change", (e) => 
   const reader = new FileReader();
   reader.onload = (ev) => {
     const dataUrl = ev.target.result;
-    const parts = dataUrl.split(",");
-    attachedB64 = parts[1];
-    attachedMime = file.type;
+    const parts   = dataUrl.split(",");
+    attachedB64   = parts[1];
+    attachedMime  = file.type;
     const wrap = document.getElementById("img-preview-wrap");
     wrap.innerHTML = "";
-    const box = document.createElement("div");
+    const box  = document.createElement("div");
     box.className = "img-thumb-box";
     box.innerHTML = `<img src="${dataUrl}" alt="preview"><button class="img-thumb-remove">✕</button>`;
     box.querySelector(".img-thumb-remove").addEventListener("click", removeAttachedImage);
@@ -1540,7 +1537,7 @@ document.getElementById("image-upload-input").addEventListener("change", (e) => 
 });
 
 function removeAttachedImage() {
-  attachedB64 = null;
+  attachedB64  = null;
   attachedMime = null;
   document.getElementById("img-preview-wrap").innerHTML = "";
 }
@@ -1555,7 +1552,7 @@ async function sendChatMessage() {
   if (!text && !attachedB64) { return; }
   if (!currentConvId) { currentConvId = String(Date.now()); }
 
-  const ts = fmtTime();
+  const ts     = fmtTime();
   const imgUrl = attachedB64 ? ("data:" + attachedMime + ";base64," + attachedB64) : null;
   appendUserMsg(text, imgUrl, ts, false);
 
@@ -1579,7 +1576,7 @@ async function sendChatMessage() {
 
   try {
     const apiMsgs = history.map(m => ({ role: m.role, content: m.content }));
-    const reply = await callOpenAI(apiMsgs);
+    const reply   = await callOpenAI(apiMsgs);
     hideThinking();
     const replyTs = fmtTime();
     appendBotMsg(reply, replyTs, false);
@@ -1596,9 +1593,9 @@ async function sendChatMessage() {
 
 async function callOpenAI(msgs) {
   const resp = await fetch("/api/chat", {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: msgs })
+    body:    JSON.stringify({ messages: msgs })
   });
   const data = await resp.json();
   if (!resp.ok) {
@@ -1625,15 +1622,15 @@ function renderAuthForm(tab) {
     <div id="auth-error" class="auth-error" style="display:none;"></div>
     ${tab === "login" ? `
       <input class="auth-input" id="auth-email" type="email" placeholder="Email">
-      <input class="auth-input" id="auth-pass" type="password" placeholder="Password">
+      <input class="auth-input" id="auth-pass"  type="password" placeholder="Password">
       <button class="auth-btn" id="auth-signin-btn">SIGN IN</button>
       <div class="auth-divider">or</div>
       <button class="auth-google-btn" id="auth-google-btn">🟢 Continue with Google</button>
     ` : `
-      <input class="auth-input" id="auth-name" type="text" placeholder="Display name">
-      <input class="auth-input" id="auth-email" type="email" placeholder="Email">
-      <input class="auth-input" id="auth-pass" type="password" placeholder="Password">
-      <input class="auth-input" id="auth-photo" type="text" placeholder="Profile photo URL (optional)">
+      <input class="auth-input" id="auth-name"  type="text"     placeholder="Display name">
+      <input class="auth-input" id="auth-email" type="email"    placeholder="Email">
+      <input class="auth-input" id="auth-pass"  type="password" placeholder="Password">
+      <input class="auth-input" id="auth-photo" type="text"     placeholder="Profile photo URL (optional)">
       <button class="auth-btn" id="auth-reg-btn">CREATE ACCOUNT</button>
       <div class="auth-divider">or</div>
       <button class="auth-google-btn" id="auth-google-btn">🟢 Continue with Google</button>
@@ -1706,9 +1703,9 @@ function updateNavUser() {
 function openProfileModal() {
   const body = document.getElementById("profile-modal-body");
   if (!currentUser) { return; }
-  const name = currentUser.displayName || "Anonymous";
-  const photo = currentUser.photoURL || "";
-  const email = currentUser.email || "";
+  const name  = currentUser.displayName || "Anonymous";
+  const photo = currentUser.photoURL    || "";
+  const email = currentUser.email       || "";
   body.innerHTML = `
     <div class="profile-av-big">${photo ? `<img src="${photo}" alt="${escHtml(name)}">` : name[0].toUpperCase()}</div>
     <p style="text-align:center;font-family:var(--font-pixel);font-size:9px;margin-bottom:6px;">${escHtml(name)}</p>
@@ -1728,21 +1725,28 @@ function openProfileModal() {
 }
 
 /* =====================================================
-   AUTH STATE — save user to Firestore on sign-in
+   AUTH STATE
+   FIX 1 (cont): On sign-in/out, start a fresh blank
+   chat so the session always belongs to the new user.
 ===================================================== */
 auth.onAuthStateChanged(async user => {
+  const previousUid = currentUser ? currentUser.uid : null;
   currentUser = user;
   updateNavUser();
+
+  // Always start a fresh conversation on auth change so
+  // sessions are cleanly tied to whoever is logged in.
+  newConversation();
+
   if (user) {
-    // Persist user record to Firestore so admin panel can list all users
     try {
       await db.collection("users").doc(user.uid).set({
-        uid: user.uid,
+        uid:         user.uid,
         displayName: user.displayName || "Anonymous",
-        photoURL: user.photoURL || null,
-        email: user.email || null,
-        lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
-        createdAt: user.metadata.creationTime || null
+        photoURL:    user.photoURL    || null,
+        email:       user.email       || null,
+        lastSeen:    firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt:   user.metadata.creationTime || null
       }, { merge: true });
     } catch (_e) { /* non-fatal */ }
 
@@ -1750,6 +1754,7 @@ auth.onAuthStateChanged(async user => {
     const adminBtn = document.getElementById("nav-admin");
     adminBtn.style.display = user.uid === ADMIN_UID ? "inline-block" : "none";
   } else {
+    document.getElementById("settings-profile-section").style.display = "none";
     document.getElementById("nav-admin").style.display = "none";
   }
 });
@@ -1773,72 +1778,145 @@ function openSocialChat() {
 function updateSocialBadge() {
   const badge = document.getElementById("social-badge");
   if (unreadSocialCount > 0 && !socialChatOpen) {
-    badge.textContent = unreadSocialCount > 9 ? "9+" : String(unreadSocialCount);
+    badge.textContent  = unreadSocialCount > 9 ? "9+" : String(unreadSocialCount);
     badge.style.display = "inline-flex";
   } else {
     badge.style.display = "none";
   }
 }
 
+/*
+ * FIX 3 & 4 & 5: Social chat rewrite
+ * - Fetch ALL messages from Firestore (no arbitrary limit)
+ * - Sort client-side by timestamp to guarantee correct order
+ * - Only then render, so messages always appear chronologically
+ * - Auto-scroll to bottom after the initial batch loads
+ * - Real-time listener appends only genuinely new messages
+ */
 function listenSocialMessages() {
-  if (socialUnsubscribe) { socialUnsubscribe(); }
+  if (socialUnsubscribe) { socialUnsubscribe(); socialUnsubscribe = null; }
+
   const container = document.getElementById("social-chat-messages");
   container.innerHTML = "";
 
-  socialUnsubscribe = db.collection("socialMessages")
+  // Track IDs already rendered so the real-time listener
+  // doesn't duplicate messages that arrived in the initial fetch.
+  const renderedIds = new Set();
+  let initialBatchDone = false;
+
+  // Step 1 – load ALL existing messages ordered oldest → newest.
+  db.collection("socialMessages")
     .orderBy("timestamp", "asc")
-    .limitToLast(80)
-    .onSnapshot(
-      snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if (change.type === "added") {
-            const data = change.doc.data();
-            const msg = { id: change.doc.id, ...data };
-            isBanned(msg.userId).then(banned => {
-              if (!banned) { renderSocialMessage(msg); }
-            });
-            const isOwn = currentUser && msg.userId === currentUser.uid;
-            if (!isOwn && msg.timestamp) {
-              const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
-              if (msgTime > lastSocialMsgTime) {
-                lastSocialMsgTime = msgTime;
-                if (!socialChatOpen) {
-                  unreadSocialCount++;
-                  updateSocialBadge();
-                }
-                if (!notifMuted) {
-                  showBrowserNotif(msg.displayName || "Someone", msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image"));
+    .get()
+    .then(async snapshot => {
+      const docs = [];
+      snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+
+      // Extra client-side sort in case index is missing / inconsistent.
+      docs.sort((a, b) => {
+        const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : Number(a.timestamp)) : 0;
+        const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : Number(b.timestamp)) : 0;
+        return ta - tb;
+      });
+
+      for (const msg of docs) {
+        const banned = await isBanned(msg.userId);
+        if (!banned) {
+          renderSocialMessage(msg);
+          renderedIds.add(msg.id);
+        }
+      }
+
+      // FIX 5: Auto-scroll to bottom after initial load.
+      container.scrollTop = container.scrollHeight;
+      initialBatchDone = true;
+
+      // Step 2 – listen for new messages only (after now).
+      socialUnsubscribe = db.collection("socialMessages")
+        .orderBy("timestamp", "asc")
+        .startAfter(snapshot.docs[snapshot.docs.length - 1] || null)
+        .onSnapshot(
+          liveSnap => {
+            liveSnap.docChanges().forEach(async change => {
+              if (change.type !== "added") { return; }
+              const msg = { id: change.doc.id, ...change.doc.data() };
+
+              // Skip anything we already rendered from the initial fetch.
+              if (renderedIds.has(msg.id)) { return; }
+              renderedIds.add(msg.id);
+
+              const banned = await isBanned(msg.userId);
+              if (banned) { return; }
+
+              renderSocialMessage(msg);
+
+              // Scroll to bottom for new messages.
+              setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+
+              // Notifications for other people's messages.
+              const isOwn = currentUser && msg.userId === currentUser.uid;
+              if (!isOwn && msg.timestamp) {
+                const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
+                if (msgTime > lastSocialMsgTime) {
+                  lastSocialMsgTime = msgTime;
+                  if (!socialChatOpen) {
+                    unreadSocialCount++;
+                    updateSocialBadge();
+                  }
+                  if (!notifMuted) {
+                    showBrowserNotif(
+                      msg.displayName || "Someone",
+                      msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image")
+                    );
+                  }
                 }
               }
-            }
-            const scm = document.getElementById("social-chat-messages");
-            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 50);
-          }
-        });
-      },
-      err => {
-        console.warn("Ordered query failed, trying unordered:", err);
-        socialUnsubscribe = db.collection("socialMessages")
-          .limitToLast(80)
-          .onSnapshot(snapshot => {
-            container.innerHTML = "";
-            const docs = [];
-            snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-            docs.sort((a, b) => {
-              const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : a.timestamp) : 0;
-              const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : b.timestamp) : 0;
-              return ta - tb;
             });
-            docs.forEach(msg => {
-              isBanned(msg.userId).then(banned => {
-                if (!banned) { renderSocialMessage(msg); }
+          },
+          // Fallback if the startAfter cursor query fails: just listen to everything
+          // and deduplicate by rendered ID set.
+          () => {
+            socialUnsubscribe = db.collection("socialMessages")
+              .onSnapshot(snap => {
+                const allDocs = [];
+                snap.forEach(doc => allDocs.push({ id: doc.id, ...doc.data() }));
+                allDocs.sort((a, b) => {
+                  const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : 0) : 0;
+                  const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : 0) : 0;
+                  return ta - tb;
+                });
+                allDocs.forEach(async msg => {
+                  if (renderedIds.has(msg.id)) { return; }
+                  const banned = await isBanned(msg.userId);
+                  if (banned) { return; }
+                  renderedIds.add(msg.id);
+                  renderSocialMessage(msg);
+                });
+                setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
               });
-            });
-            const scm = document.getElementById("social-chat-messages");
-            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 100);
+          }
+        );
+    })
+    .catch(() => {
+      // If orderBy fails entirely (no index), fall back to unordered fetch + client sort.
+      container.innerHTML = "";
+      socialUnsubscribe = db.collection("socialMessages")
+        .onSnapshot(snap => {
+          const allDocs = [];
+          snap.forEach(doc => allDocs.push({ id: doc.id, ...doc.data() }));
+          allDocs.sort((a, b) => {
+            const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : 0) : 0;
+            const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : 0) : 0;
+            return ta - tb;
           });
-      }
-    );
+          container.innerHTML = "";
+          allDocs.forEach(async msg => {
+            const banned = await isBanned(msg.userId);
+            if (!banned) { renderSocialMessage(msg); }
+          });
+          setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+        });
+    });
 }
 
 async function isBanned(uid) {
@@ -1853,9 +1931,9 @@ function renderSocialMessage(msg) {
   const container = document.getElementById("social-chat-messages");
   if (document.querySelector(`[data-msg-id="${msg.id}"]`)) { return; }
   const isOwn = currentUser && msg.userId === currentUser.uid;
-  const row = document.createElement("div");
-  row.className = "social-msg" + (isOwn ? " own" : "");
-  row.dataset.msgId = msg.id;
+  const row   = document.createElement("div");
+  row.className      = "social-msg" + (isOwn ? " own" : "");
+  row.dataset.msgId  = msg.id;
 
   let avHTML;
   if (msg.photoURL) {
@@ -1871,8 +1949,8 @@ function renderSocialMessage(msg) {
   }
 
   let contentHTML = "";
-  if (msg.text) { contentHTML += `<div>${escHtml(msg.text)}</div>`; }
-  if (msg.gifUrl) { contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`; }
+  if (msg.text)     { contentHTML += `<div>${escHtml(msg.text)}</div>`; }
+  if (msg.gifUrl)   { contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`; }
   if (msg.imageUrl) { contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`; }
 
   const time = msg.timestamp
@@ -1897,7 +1975,7 @@ function renderSocialMessage(msg) {
 
 function setReplyingTo(msg) {
   replyingTo = msg;
-  const preview = document.getElementById("reply-preview");
+  const preview     = document.getElementById("reply-preview");
   const previewText = document.getElementById("reply-preview-text");
   previewText.textContent = `Replying to ${msg.displayName || "?"}: ${(msg.text || "GIF").substring(0, 50)}`;
   preview.classList.add("show");
@@ -1917,14 +1995,14 @@ async function sendSocialMessage(text, gifUrl, imageUrl) {
   const banned = await isBanned(currentUser.uid);
   if (banned) { showToast("YOU HAVE BEEN BANNED"); return; }
   const msgData = {
-    userId: currentUser.uid,
+    userId:      currentUser.uid,
     displayName: currentUser.displayName || "Anonymous",
-    photoURL: currentUser.photoURL || null,
-    text: text || null,
-    gifUrl: gifUrl || null,
-    imageUrl: imageUrl || null,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    replyTo: replyingTo
+    photoURL:    currentUser.photoURL    || null,
+    text:        text      || null,
+    gifUrl:      gifUrl    || null,
+    imageUrl:    imageUrl  || null,
+    timestamp:   firebase.firestore.FieldValue.serverTimestamp(),
+    replyTo:     replyingTo
       ? { id: replyingTo.id, text: replyingTo.text || "", displayName: replyingTo.displayName || "?" }
       : null
   };
@@ -1943,7 +2021,7 @@ document.getElementById("chat-send-btn").addEventListener("click", sendChatMessa
 
 document.getElementById("social-send-btn").addEventListener("click", () => {
   const input = document.getElementById("social-input");
-  const text = input.value.trim();
+  const text  = input.value.trim();
   if (text) { sendSocialMessage(text, null, null); input.value = ""; }
 });
 
@@ -1963,7 +2041,7 @@ document.getElementById("img-url-btn").addEventListener("click", () => {
 });
 
 document.getElementById("notif-mute-btn").addEventListener("click", () => {
-  notifMuted = !notifMuted;
+  notifMuted          = !notifMuted;
   settings.notifMuted = notifMuted;
   saveSettings();
   document.getElementById("notif-mute-btn").textContent = notifMuted ? "🔕 UNMUTE" : "🔔 MUTE";
@@ -1978,7 +2056,6 @@ document.getElementById("gif-btn").addEventListener("click", () => {
   openGifPicker("search");
 });
 
-// ADDED: Favorites button in social chat opens picker on favs tab
 document.getElementById("fav-gif-social-btn").addEventListener("click", () => {
   pendingGifTarget = "social";
   openGifPicker("favs");
@@ -2035,11 +2112,11 @@ function renderGifResults(results) {
   if (!results.length) { grid.innerHTML = '<div class="gif-empty">No results.</div>'; return; }
   results.forEach(r => {
     const gifMedia = r.media && r.media[0];
-    const url = gifMedia && gifMedia.gif ? gifMedia.gif.url : null;
-    const tiny = gifMedia && gifMedia.tinygif ? gifMedia.tinygif.url : url;
+    const url      = gifMedia && gifMedia.gif    ? gifMedia.gif.url    : null;
+    const tiny     = gifMedia && gifMedia.tinygif ? gifMedia.tinygif.url : url;
     if (!url) { return; }
     const isFav = favGifs.includes(url);
-    const item = document.createElement("div");
+    const item  = document.createElement("div");
     item.className = "gif-item";
     item.innerHTML = `<img src="${tiny}" alt="gif" loading="lazy"><button class="gif-fav-btn ${isFav ? "faved" : ""}">♥</button>`;
     item.querySelector("img").addEventListener("click", () => selectGif(url));
@@ -2075,7 +2152,7 @@ function renderFavGifs() {
 function toggleFavGif(url, btn) {
   const idx = favGifs.indexOf(url);
   if (idx >= 0) { favGifs.splice(idx, 1); btn.classList.remove("faved"); }
-  else { favGifs.unshift(url); btn.classList.add("faved"); }
+  else          { favGifs.unshift(url);   btn.classList.add("faved");    }
   saveFavGifs();
 }
 
@@ -2120,6 +2197,10 @@ function showBrowserNotif(title, body) {
 
 /* =====================================================
    ADMIN PANEL
+   FIX 6: Query without orderBy (avoids missing-index
+   errors), sort all users client-side, and list every
+   account that has ever signed in and been written to
+   the 'users' Firestore collection.
 ===================================================== */
 document.querySelectorAll(".admin-tab").forEach(tab => {
   tab.addEventListener("click", () => {
@@ -2129,7 +2210,7 @@ document.querySelectorAll(".admin-tab").forEach(tab => {
     const panel = document.getElementById("admin-panel-" + tab.dataset.panel);
     if (panel) { panel.classList.add("active"); }
     if (tab.dataset.panel === "whitelist") { renderWhitelist(); }
-    if (tab.dataset.panel === "banned") { renderBannedList(); }
+    if (tab.dataset.panel === "banned")    { renderBannedList(); }
   });
 });
 
@@ -2142,15 +2223,16 @@ async function loadAdminData() {
   await refreshUserList();
 }
 
-/* UPDATED: reads from the 'users' Firestore collection populated on sign-in */
 async function refreshUserList() {
-  const tbody = document.getElementById("users-table-body");
+  const tbody   = document.getElementById("users-table-body");
   const countEl = document.getElementById("admin-user-count");
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">Loading users...</td></tr>';
 
   try {
+    // FIX 6: No orderBy → no composite-index requirement.
+    // Fetch the entire 'users' collection and sort client-side.
     const [usersSnap, bannedSnap] = await Promise.all([
-      db.collection("users").orderBy("lastSeen", "desc").get(),
+      db.collection("users").get(),
       db.collection("bannedUsers").get()
     ]);
 
@@ -2159,6 +2241,13 @@ async function refreshUserList() {
 
     const users = [];
     usersSnap.forEach(doc => users.push(doc.data()));
+
+    // Sort by lastSeen descending (most recently active first).
+    users.sort((a, b) => {
+      const ta = a.lastSeen ? (a.lastSeen.toMillis ? a.lastSeen.toMillis() : 0) : 0;
+      const tb = b.lastSeen ? (b.lastSeen.toMillis ? b.lastSeen.toMillis() : 0) : 0;
+      return tb - ta;
+    });
 
     countEl.textContent = `${users.length} registered user${users.length !== 1 ? "s" : ""}`;
 
@@ -2280,7 +2369,7 @@ async function renderWhitelist() {
     }
     container.innerHTML = "";
     snap.forEach(doc => {
-      const data = doc.data();
+      const data  = doc.data();
       const entry = document.createElement("div");
       entry.className = "wl-entry";
       entry.innerHTML = `
@@ -2343,6 +2432,8 @@ document.getElementById("wl-add-btn").addEventListener("click", async () => {
 
 /* =====================================================
    INIT
+   FIX 2: Always start with a blank new conversation on
+   page load — never restore the previous session.
 ===================================================== */
 function init() {
   loadSettings();
@@ -2354,35 +2445,9 @@ function init() {
     document.getElementById("notif-mute-btn").textContent = "🔕 UNMUTE";
   }
 
-  const convs = getConvs();
-  const keys = Object.keys(convs).sort((a, b) => Number(b) - Number(a));
-  if (keys.length > 0) {
-    const lastId = keys[0];
-    currentConvId = lastId;
-    const conv = convs[lastId];
-    const chatMessages = document.getElementById("chat-messages");
-    if (conv && conv.messages) {
-      conv.messages.forEach(m => {
-        if (m.role === "assistant") {
-          appendBotMsg(typeof m.content === "string" ? m.content : "", m.ts, true);
-        } else if (m.role === "user") {
-          let text = "", imgUrl = null;
-          if (typeof m.content === "string") { text = m.content; }
-          else if (Array.isArray(m.content)) {
-            const tb = m.content.find(c => c.type === "text");
-            const ib = m.content.find(c => c.type === "image_url");
-            text = tb ? tb.text : "";
-            imgUrl = ib ? ib.image_url.url : null;
-          }
-          appendUserMsg(text, imgUrl, m.ts, true);
-        }
-      });
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-  } else {
-    currentConvId = String(Date.now());
-    appendBotMsg("Hey! What's up? I'm VEXIS — ask me anything.");
-  }
+  // FIX 2: Always start fresh — no conversation history loaded on page load.
+  currentConvId = String(Date.now());
+  appendBotMsg("Hey! What's up? I'm VEXIS — ask me anything.");
 
   requestNotifPermission();
   lastSocialMsgTime = Date.now();
