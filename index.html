@@ -1027,8 +1027,6 @@ const db = firebase.firestore();
    STATE
 ===================================================== */
 let currentSection = "home";
-let bannedUsersCache = new Set();
-let bannedCacheLoaded = false;
 let currentUser = null;
 let currentConvId = null;
 let attachedB64 = null;
@@ -1782,78 +1780,73 @@ function updateSocialBadge() {
   }
 }
 
-async function listenSocialMessages() {
+function listenSocialMessages() {
   if (socialUnsubscribe) { socialUnsubscribe(); }
   const container = document.getElementById("social-chat-messages");
-  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">Loading messages...</div>';
-
-  // Pre-load banned list so messages render in correct order
-  await loadBannedCache();
   container.innerHTML = "";
 
   socialUnsubscribe = db.collection("socialMessages")
     .orderBy("timestamp", "asc")
-    .limitToLast(150)
-    .onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-          const msg = { id: change.doc.id, ...data };
-
-          // Use sync cache — no async per-message, keeps order correct
-          if (!isBannedSync(msg.userId)) {
-            renderSocialMessage(msg);
-          }
-
-          const isOwn = currentUser && msg.userId === currentUser.uid;
-          if (!isOwn && msg.timestamp) {
-            const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
-            if (msgTime > lastSocialMsgTime) {
-              lastSocialMsgTime = msgTime;
-              if (!socialChatOpen) {
-                unreadSocialCount++;
-                updateSocialBadge();
-              }
-              if (!notifMuted) {
-                showBrowserNotif(msg.displayName || "Someone", msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image"));
+    .limitToLast(80)
+    .onSnapshot(
+      snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === "added") {
+            const data = change.doc.data();
+            const msg = { id: change.doc.id, ...data };
+            isBanned(msg.userId).then(banned => {
+              if (!banned) { renderSocialMessage(msg); }
+            });
+            const isOwn = currentUser && msg.userId === currentUser.uid;
+            if (!isOwn && msg.timestamp) {
+              const msgTime = msg.timestamp.toMillis ? msg.timestamp.toMillis() : Date.now();
+              if (msgTime > lastSocialMsgTime) {
+                lastSocialMsgTime = msgTime;
+                if (!socialChatOpen) {
+                  unreadSocialCount++;
+                  updateSocialBadge();
+                }
+                if (!notifMuted) {
+                  showBrowserNotif(msg.displayName || "Someone", msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image"));
+                }
               }
             }
+            const scm = document.getElementById("social-chat-messages");
+            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 50);
           }
-        }
-        if (change.type === "removed") {
-          // Remove deleted messages from UI instantly
-          const el = document.querySelector(`[data-msg-id="${change.doc.id}"]`);
-          if (el) { el.remove(); }
-        }
-      });
-      const scm = document.getElementById("social-chat-messages");
-      setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 50);
-    }, err => {
-      console.error("Social chat error:", err);
-      container.innerHTML = `<div style="text-align:center;padding:20px;color:#f55;font-size:12px;">
-        Chat error: ${err.message}<br>
-        <span style="color:var(--muted);">Check your Firestore rules in Firebase Console.</span>
-      </div>`;
-    });
-}
-
-async function loadBannedCache() {
-  try {
-    const snap = await db.collection("bannedUsers").get();
-    bannedUsersCache = new Set();
-    snap.forEach(doc => bannedUsersCache.add(doc.id));
-    bannedCacheLoaded = true;
-  } catch (_e) { bannedCacheLoaded = true; }
+        });
+      },
+      err => {
+        console.warn("Ordered query failed, trying unordered:", err);
+        socialUnsubscribe = db.collection("socialMessages")
+          .limitToLast(80)
+          .onSnapshot(snapshot => {
+            container.innerHTML = "";
+            const docs = [];
+            snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+            docs.sort((a, b) => {
+              const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : a.timestamp) : 0;
+              const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : b.timestamp) : 0;
+              return ta - tb;
+            });
+            docs.forEach(msg => {
+              isBanned(msg.userId).then(banned => {
+                if (!banned) { renderSocialMessage(msg); }
+              });
+            });
+            const scm = document.getElementById("social-chat-messages");
+            setTimeout(() => { scm.scrollTop = scm.scrollHeight; }, 100);
+          });
+      }
+    );
 }
 
 async function isBanned(uid) {
   if (!uid) { return false; }
-  if (!bannedCacheLoaded) { await loadBannedCache(); }
-  return bannedUsersCache.has(uid);
-}
-
-function isBannedSync(uid) {
-  return bannedUsersCache.has(uid);
+  try {
+    const doc = await db.collection("bannedUsers").doc(uid).get();
+    return doc.exists;
+  } catch (_e) { return false; }
 }
 
 function renderSocialMessage(msg) {
@@ -1942,6 +1935,11 @@ async function sendSocialMessage(text, gifUrl, imageUrl) {
     showToast("Send failed: " + err.message);
   }
 }
+
+document.getElementById("chat-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+});
+document.getElementById("chat-send-btn").addEventListener("click", sendChatMessage);
 
 document.getElementById("social-send-btn").addEventListener("click", () => {
   const input = document.getElementById("social-input");
@@ -2224,7 +2222,6 @@ async function refreshUserList() {
           });
           showToast("USER BANNED");
         }
-        bannedCacheLoaded = false; // force cache refresh
         await refreshUserList();
       });
 
