@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
 if (!process.env.OPENAI_API_KEY) {
   console.error("ERROR: OPENAI_API_KEY is not set in your .env file.");
