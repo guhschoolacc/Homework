@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname)));
 
 // ── POST /api/chat ────────────────────────────────────────────────────────────
 app.post("/api/chat", async (req, res) => {
