@@ -2532,6 +2532,10 @@
         <span>🎨 IMAGE GENERATOR</span>
         <button class="modal-close" id="imagegen-close">✕</button>
       </div>
+      <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸</span> Each image costs ~$0.04–$0.08. Please don't spam.</span>
+        <span id="imagegen-counter" style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);white-space:nowrap;">5 generations left this window</span>
+      </div>
       <div class="imagegen-output" id="imagegen-output">
         <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
       </div>
@@ -2542,11 +2546,13 @@
         </div>
         <div class="imagegen-opts">
           <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);">SIZE:</span>
-          <button class="imagegen-size-btn active" data-w="512" data-h="512">512×512</button>
-          <button class="imagegen-size-btn" data-w="768" data-h="512">768×512</button>
-          <button class="imagegen-size-btn" data-w="512" data-h="768">512×768</button>
-          <button class="imagegen-size-btn" data-w="1024" data-h="768">1024×768</button>
-          <span style="font-size:11px;color:var(--muted);margin-left:auto;">Powered by Pollinations.ai</span>
+          <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
+          <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
+          <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
+          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px;">QUALITY:</span>
+          <button class="imagegen-size-btn active" id="imagegen-quality-standard" data-quality="standard">STANDARD</button>
+          <button class="imagegen-size-btn" id="imagegen-quality-hd" data-quality="hd">HD</button>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto;">Powered by DALL-E 3</span>
         </div>
       </div>
     </div>
@@ -2626,6 +2632,16 @@
   <!-- ─── SECTIONS ─── -->
   <section class="section active" id="home-section">
     <div id="home-inner" style="max-width:660px;margin:0 auto;">
+
+      <!-- GitHub / AI cost notice -->
+      <div id="github-notice" style="border:var(--border);background:var(--bg2);padding:14px 16px;margin-bottom:18px;font-family:var(--font-mono);font-size:12px;line-height:1.8;position:relative;">
+        <button onclick="document.getElementById('github-notice').style.display='none'" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-family:var(--font-pixel);">✕</button>
+        <span style="font-family:var(--font-pixel);font-size:8px;color:var(--accent);">⚠ HEADS UP</span><br><br>
+        If you're viewing this on the <strong>GitHub Pages version</strong> of homewrk, the AI features <strong>will not work</strong> — they require the live backend server.<br><br>
+        For the full experience with working AI, visit the real site:<br>
+        <a href="https://homework-m7rr.onrender.com/" target="_blank" style="color:var(--accent);font-family:var(--font-pixel);font-size:8px;letter-spacing:1px;">→ homework-m7rr.onrender.com</a>
+      </div>
+
       <div class="home-header">
         <h1 class="home-title">VEXIS AI ✦</h1>
         <p class="home-sub">Your AI assistant. Just talk to it like a normal person.</p>
@@ -2634,6 +2650,10 @@
         <button class="btn-primary" id="pulse-btn">+ PULSE</button>
         <button class="btn-secondary" id="shuffle-btn">↺ SHUFFLE</button>
       </div>
+      <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;margin-bottom:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
+          These AI features cost real money to run. Please don't spam — be considerate.
+        </div>
       <div class="chat-wrap">
         <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input-area">
@@ -2720,10 +2740,13 @@
 
   <section class="section" id="ai-tools-section">
     <div class="section-title">✦ AI TOOLS</div>
+    <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 14px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
+      <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
+      These AI features cost real money to run. Please be considerate and don't spam requests.
+    </div>
     <div class="big-btn-row">
       <button class="big-btn" id="open-ai-chat-btn">✦ OPEN AI CHAT</button>
       <button class="big-btn" id="new-conv-btn2">+ NEW CONVERSATION</button>
-      <button class="big-btn" id="coding-mode-btn">💻 CODING</button>
       <button class="big-btn" id="imagegen-open-btn">🎨 IMAGE GEN</button>
     </div>
     <div class="conv-panel">
@@ -2886,8 +2909,8 @@
     let unreadSocialCount = 0;
     let socialChatOpen = false;
     let codingMode = false;
-    let imagegenW = 512;
-    let imagegenH = 512;
+    let imagegenSize = "1024x1024";
+    let imagegenQuality = "standard";
 
     // DM state
     let activeDmId = null;
@@ -3275,8 +3298,8 @@
     /* ─── AI Tools section wiring ─── */
     document.getElementById("open-ai-chat-btn").addEventListener("click", () => { showSection("home"); document.getElementById("chat-input").focus(); });
     document.getElementById("new-conv-btn2").addEventListener("click", () => { newConversation(); showSection("home"); });
-    document.getElementById("coding-mode-btn").addEventListener("click", () => startCodingMode());
-    document.getElementById("imagegen-open-btn").addEventListener("click", () => openModal("imagegen-modal"));
+    // coding-mode-btn removed
+    document.getElementById("imagegen-open-btn").addEventListener("click", () => { openModal("imagegen-modal"); updateImagegenCounter(); });
     document.getElementById("clear-all-btn").addEventListener("click", () => {
       if (window.confirm("Delete all saved conversations?")) {
         localStorage.removeItem(getConvStorageKey());
@@ -3291,12 +3314,19 @@
     /* =====================================================
        IMAGE GENERATOR
     ===================================================== */
-    document.querySelectorAll(".imagegen-size-btn").forEach(btn => {
+    document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".imagegen-size-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        imagegenW = parseInt(btn.dataset.w);
-        imagegenH = parseInt(btn.dataset.h);
+        imagegenSize = btn.dataset.size;
+      });
+    });
+
+    document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        imagegenQuality = btn.dataset.quality;
       });
     });
 
@@ -3305,61 +3335,99 @@
       if (e.key === "Enter") generateImage();
     });
 
+    // ── Image gen rate limit state ───────────────────────────────────────────
+    const IMAGEGEN_MAX       = 5;
+    const IMAGEGEN_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+    let imagegenTimestamps   = [];              // timestamps of recent generates
+
     async function generateImage() {
       const input = document.getElementById("imagegen-input");
       const prompt = input.value.trim();
       if (!prompt) return;
+
+      // ── Rate limit check ───────────────────────────────────────────────────
+      const now = Date.now();
+      imagegenTimestamps = imagegenTimestamps.filter(t => now - t < IMAGEGEN_WINDOW_MS);
+      if (imagegenTimestamps.length >= IMAGEGEN_MAX) {
+        const oldest = imagegenTimestamps[0];
+        const resetIn = Math.ceil((IMAGEGEN_WINDOW_MS - (now - oldest)) / 60000);
+        showToast(`LIMIT REACHED — ${IMAGEGEN_MAX} IMAGES PER 10 MIN. RESET IN ~${resetIn} MIN`);
+        return;
+      }
+      imagegenTimestamps.push(now);
+      // ──────────────────────────────────────────────────────────────────────
+
       const btn = document.getElementById("imagegen-btn");
       btn.disabled = true;
       btn.textContent = "...";
       const output = document.getElementById("imagegen-output");
-      // Add loading placeholder
+
       const loadDiv = document.createElement("div");
-      loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;";
-      loadDiv.textContent = "GENERATING...";
+      loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
+      loadDiv.textContent = "GENERATING WITH DALL-E 3...";
       output.insertBefore(loadDiv, output.firstChild);
 
       try {
-        // Pollinations.ai - free image gen, no API key needed
-        const encodedPrompt = encodeURIComponent(prompt);
-        const seed = Math.floor(Math.random() * 99999);
-        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${imagegenW}&height=${imagegenH}&seed=${seed}&nologo=true`;
+        const res = await fetch("/api/imagegen", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.url) {
+          throw new Error(data.error || "Generation failed");
+        }
+
+        output.removeChild(loadDiv);
 
         const wrapper = document.createElement("div");
         wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
 
         const img = document.createElement("img");
-        img.style.cssText = `max-width:100%;border:var(--border);display:block;`;
+        img.style.cssText = "max-width:100%;border:var(--border);display:block;";
         img.alt = prompt;
+        img.src = data.url;
 
         const promptLabel = document.createElement("div");
         promptLabel.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;";
-        promptLabel.textContent = prompt;
+        promptLabel.textContent = data.revised_prompt || prompt;
 
         const downloadBtn = document.createElement("a");
-        downloadBtn.href = url;
-        downloadBtn.download = "vexis-gen.jpg";
+        downloadBtn.href = data.url;
+        downloadBtn.download = "vexis-gen.png";
         downloadBtn.target = "_blank";
         downloadBtn.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;";
         downloadBtn.textContent = "↓ DOWNLOAD";
 
-        img.onload = () => { output.removeChild(loadDiv); btn.disabled = false; btn.textContent = "GENERATE"; };
-        img.onerror = () => {
-          output.removeChild(loadDiv);
-          loadDiv.textContent = "Generation failed. Try a different prompt.";
-          output.insertBefore(loadDiv, output.firstChild);
-          btn.disabled = false; btn.textContent = "GENERATE";
-        };
-        img.src = url;
         wrapper.appendChild(img);
         wrapper.appendChild(promptLabel);
         wrapper.appendChild(downloadBtn);
         output.insertBefore(wrapper, output.firstChild);
+
+        // Update counter display
+        updateImagegenCounter();
+
+        btn.disabled = false; btn.textContent = "GENERATE";
       } catch (err) {
-        output.removeChild(loadDiv);
+        if (output.contains(loadDiv)) output.removeChild(loadDiv);
+        const errDiv = document.createElement("div");
+        errDiv.style.cssText = "padding:12px;color:#f55;font-family:var(--font-pixel);font-size:7px;text-align:center;border:1px solid #f55;";
+        errDiv.textContent = "ERROR: " + (err.message || "Image generation failed");
+        output.insertBefore(errDiv, output.firstChild);
+        // Roll back the timestamp we just pushed on error
+        imagegenTimestamps.pop();
         btn.disabled = false; btn.textContent = "GENERATE";
         showToast("IMAGE GEN FAILED");
       }
+    }
+
+    function updateImagegenCounter() {
+      const now = Date.now();
+      imagegenTimestamps = imagegenTimestamps.filter(t => now - t < IMAGEGEN_WINDOW_MS);
+      const remaining = IMAGEGEN_MAX - imagegenTimestamps.length;
+      const el = document.getElementById("imagegen-counter");
+      if (el) el.textContent = `${remaining} generation${remaining !== 1 ? "s" : ""} left this window`;
     }
 
     /* =====================================================
@@ -3436,11 +3504,37 @@
     /* =====================================================
        SEND AI MESSAGE
     ===================================================== */
+    // ── Chat anti-spam state ─────────────────────────────────────────────────
+    const CHAT_COOLDOWN_MS = 4000;      // 4 s between messages
+    const CHAT_WINDOW_MS   = 60000;     // 1 minute window
+    const CHAT_MAX_PER_WIN = 12;        // max 12 messages per minute
+    let chatLastSent       = 0;
+    let chatSentTimes      = [];        // timestamps of recent sends
+
     async function sendChatMessage() {
       if (isBusy) return;
       const chatInput = document.getElementById("chat-input");
       const text = chatInput.value.trim();
       if (!text && !attachedB64) return;
+
+      // ── Anti-spam checks ────────────────────────────────────────────────────
+      const now = Date.now();
+      // Cooldown between individual messages
+      if (now - chatLastSent < CHAT_COOLDOWN_MS) {
+        const remaining = Math.ceil((CHAT_COOLDOWN_MS - (now - chatLastSent)) / 1000);
+        showToast(`SLOW DOWN — WAIT ${remaining}s`);
+        return;
+      }
+      // Rolling-window cap
+      chatSentTimes = chatSentTimes.filter(t => now - t < CHAT_WINDOW_MS);
+      if (chatSentTimes.length >= CHAT_MAX_PER_WIN) {
+        showToast("TOO MANY MESSAGES — CHILL FOR A BIT");
+        return;
+      }
+      chatLastSent = now;
+      chatSentTimes.push(now);
+      // ────────────────────────────────────────────────────────────────────────
+
       if (!currentConvId) currentConvId = String(Date.now());
 
       const ts = fmtTime();
