@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 // ── Middleware ────────────────────────────────────────────────────────────────
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "25mb" }));
 app.use(express.static(path.join(__dirname)));
 
 // ── POST /api/imagegen ───────────────────────────────────────────────────────
@@ -47,12 +47,11 @@ app.post("/api/imagegen", async (req, res) => {
 
   try {
     const response = await openai.images.generate({
-      model: "gpt-image-1.5",
+      model: "dall-e-3",
       prompt: prompt.trim(),
       n: 1,
       size: safeSize,
       quality,
-      response_format: "url",
     });
 
     const imageUrl = response.data[0].url;
@@ -62,6 +61,40 @@ app.post("/api/imagegen", async (req, res) => {
     console.error("DALL-E error:", err.message);
     const status = err.status || 500;
     return res.status(status).json({ error: err.message || "Image generation failed." });
+  }
+});
+
+// ── POST /api/imageedit ──────────────────────────────────────────────────────
+app.post("/api/imageedit", async (req, res) => {
+  const { prompt, imageBase64, mimeType = "image/png", size = "1024x1024" } = req.body;
+
+  if (!prompt || !imageBase64) {
+    return res.status(400).json({ error: "prompt and imageBase64 are required." });
+  }
+
+  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
+  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
+
+  try {
+    const imageBuffer = Buffer.from(imageBase64, "base64");
+    const imageFile = await toFile(imageBuffer, "image.png", { type: mimeType });
+
+    const response = await openai.images.edit({
+      model: "gpt-image-1",
+      image: imageFile,
+      prompt: prompt.trim(),
+      n: 1,
+      size: safeSize,
+    });
+
+    // gpt-image-1 returns b64_json
+    const b64 = response.data[0].b64_json;
+    const url = response.data[0].url || null;
+    return res.json({ b64, url, revised_prompt: prompt });
+  } catch (err) {
+    console.error("Image edit error:", err.message);
+    const status = err.status || 500;
+    return res.status(status).json({ error: err.message || "Image edit failed." });
   }
 });
 
