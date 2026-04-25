@@ -1603,6 +1603,45 @@
       grid-column: 1/-1;
     }
 
+    /* ─── AI FULLSCREEN ─── */
+    #home-section.ai-fullscreen {
+      position: fixed;
+      inset: 52px 0 0 0;
+      z-index: 250;
+      overflow-y: auto;
+      background: var(--bg);
+      padding: 20px;
+      min-height: unset;
+    }
+    #home-section.ai-fullscreen #home-inner { max-width: 100%; }
+    #home-section.ai-fullscreen .chat-messages { height: calc(100vh - 320px); }
+    #home-section.ai-fullscreen .imagegen-output { min-height: calc(100vh - 340px); }
+    .ai-fs-btn {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      padding: 10px 12px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: var(--modal-bg);
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    .ai-fs-btn:hover { color: var(--fg); }
+    .imagegen-upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-bottom: var(--border);
+      background: var(--bg2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .imagegen-upload-preview img { height: 36px; width: 36px; object-fit: cover; border: var(--border); }
+    .imagegen-upload-clear { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; }
+
     /* ─── IMAGE GEN MODAL ─── */
     #imagegen-modal .modal-box {
       max-width: 640px;
@@ -2630,6 +2669,7 @@
       <div style="display:flex;border-left:var(--border);border-right:var(--border);border-bottom:var(--border);margin-bottom:10px;">
         <button id="ai-tab-chat" onclick="switchAiTab('chat')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid var(--fg);background:var(--modal-bg);color:var(--fg);cursor:pointer;letter-spacing:1px;">✦ CHAT</button>
         <button id="ai-tab-imagegen" onclick="switchAiTab('imagegen')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid transparent;background:var(--modal-bg);color:var(--muted);cursor:pointer;letter-spacing:1px;">🎨 IMAGE GEN</button>
+        <button class="ai-fs-btn" id="ai-fullscreen-btn" onclick="toggleAiFullscreen()" title="Fullscreen">⤢ FULLSCREEN</button>
       </div>
 
       <!-- CHAT PANEL -->
@@ -2671,6 +2711,12 @@
             <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
           </div>
           <div class="imagegen-input-area" style="flex-shrink:0;">
+            <!-- Upload preview (shown when image attached) -->
+            <div id="imagegen-upload-preview" class="imagegen-upload-preview" style="display:none;">
+              <img id="imagegen-upload-thumb" src="" alt="reference">
+              <span id="imagegen-upload-label">Reference image attached — describe your edits below</span>
+              <button class="imagegen-upload-clear" onclick="clearImagegenUpload()">✕</button>
+            </div>
             <div class="imagegen-input-row">
               <input class="imagegen-input" id="imagegen-input" placeholder="A futuristic city at sunset, neon lights...">
               <button class="imagegen-btn" id="imagegen-btn">GENERATE</button>
@@ -2683,7 +2729,9 @@
               <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px;">QUALITY:</span>
               <button class="imagegen-size-btn active" id="imagegen-quality-standard" data-quality="standard">STANDARD</button>
               <button class="imagegen-size-btn" id="imagegen-quality-hd" data-quality="hd">HD</button>
-              <span style="font-size:11px;color:var(--muted);margin-left:auto;">gpt-image-1.5</span>
+              <button class="tool-btn" id="imagegen-upload-btn" style="margin-left:auto;font-size:7px;" title="Upload image to edit">📎 EDIT IMAGE</button>
+              <input type="file" id="imagegen-file-input" accept="image/*" style="display:none;">
+              <span style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px;">Generate with DALL-E 3 · Edit with GPT Image 1</span>
             </div>
           </div>
         </div>
@@ -3372,19 +3420,35 @@
 
       const loadDiv = document.createElement("div");
       loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
-      loadDiv.textContent = "GENERATING WITH gpt-image-1.5...";
+      loadDiv.textContent = imagegenUploadB64 ? "EDITING WITH GPT IMAGE 1..." : "GENERATING WITH DALL-E 3...";
       output.insertBefore(loadDiv, output.firstChild);
 
       try {
-        const res = await fetch("/api/imagegen", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality })
-        });
-        const data = await res.json();
+        let resultUrl = null, resultB64 = null, revisedPrompt = prompt;
 
-        if (!res.ok || !data.url) {
-          throw new Error(data.error || "Generation failed");
+        if (imagegenUploadB64) {
+          // Edit mode
+          const res = await fetch("/api/imageedit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, imageBase64: imagegenUploadB64, mimeType: imagegenUploadMime, size: imagegenSize })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Edit failed");
+          resultB64 = data.b64;
+          resultUrl = data.url;
+          revisedPrompt = data.revised_prompt || prompt;
+        } else {
+          // Generate mode
+          const res = await fetch("/api/imagegen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
+          resultUrl = data.url;
+          revisedPrompt = data.revised_prompt || prompt;
         }
 
         output.removeChild(loadDiv);
@@ -3395,14 +3459,14 @@
         const img = document.createElement("img");
         img.style.cssText = "max-width:100%;border:var(--border);display:block;";
         img.alt = prompt;
-        img.src = data.url;
+        img.src = resultB64 ? `data:image/png;base64,${resultB64}` : resultUrl;
 
         const promptLabel = document.createElement("div");
         promptLabel.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;";
-        promptLabel.textContent = data.revised_prompt || prompt;
+        promptLabel.textContent = revisedPrompt;
 
         const downloadBtn = document.createElement("a");
-        downloadBtn.href = data.url;
+        downloadBtn.href = img.src;
         downloadBtn.download = "vexis-gen.png";
         downloadBtn.target = "_blank";
         downloadBtn.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;";
@@ -4660,8 +4724,15 @@
        INIT
     ===================================================== */
     /* =====================================================
-       AI TAB SWITCHER
+       AI TAB SWITCHER + FULLSCREEN
     ===================================================== */
+    let aiFullscreen = false;
+    function toggleAiFullscreen() {
+      aiFullscreen = !aiFullscreen;
+      document.getElementById("home-section").classList.toggle("ai-fullscreen", aiFullscreen);
+      document.getElementById("ai-fullscreen-btn").textContent = aiFullscreen ? "⤡ EXIT" : "⤢ FULLSCREEN";
+    }
+
     function switchAiTab(tab) {
       const isChat = tab === "chat";
       document.getElementById("ai-panel-chat").style.display = isChat ? "block" : "none";
@@ -4674,6 +4745,40 @@
       imageTab.style.color = isChat ? "var(--muted)" : "var(--fg)";
       if (!isChat) updateImagegenCounter();
     }
+
+    // ── Imagegen upload state ────────────────────────────────────────────────
+    let imagegenUploadB64 = null;
+    let imagegenUploadMime = "image/png";
+
+    function clearImagegenUpload() {
+      imagegenUploadB64 = null;
+      imagegenUploadMime = "image/png";
+      document.getElementById("imagegen-upload-preview").style.display = "none";
+      document.getElementById("imagegen-upload-thumb").src = "";
+      document.getElementById("imagegen-file-input").value = "";
+      document.getElementById("imagegen-input").placeholder = "A futuristic city at sunset, neon lights...";
+    }
+
+    document.getElementById("imagegen-upload-btn").addEventListener("click", () => {
+      document.getElementById("imagegen-file-input").click();
+    });
+
+    document.getElementById("imagegen-file-input").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const dataUrl = ev.target.result;
+        const base64 = dataUrl.split(",")[1];
+        imagegenUploadB64 = base64;
+        imagegenUploadMime = file.type || "image/png";
+        document.getElementById("imagegen-upload-thumb").src = dataUrl;
+        document.getElementById("imagegen-upload-label").textContent = `${file.name} — describe your edits below`;
+        document.getElementById("imagegen-upload-preview").style.display = "flex";
+        document.getElementById("imagegen-input").placeholder = "Make the sky purple, add a dragon in the background...";
+      };
+      reader.readAsDataURL(file);
+    });
 
     function init() {
       loadSettings();
