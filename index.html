@@ -2525,38 +2525,7 @@
     </div>
   </div>
 
-  <!-- ─── IMAGE GENERATOR MODAL ─── -->
-  <div class="modal-overlay" id="imagegen-modal">
-    <div class="modal-box" style="max-width:680px;height:84vh;display:flex;flex-direction:column;overflow:hidden;">
-      <div class="modal-hdr" style="flex-shrink:0;">
-        <span>🎨 IMAGE GENERATOR</span>
-        <button class="modal-close" id="imagegen-close">✕</button>
-      </div>
-      <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸</span> Each image costs ~$0.04–$0.08. Please don't spam.</span>
-        <span id="imagegen-counter" style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);white-space:nowrap;">5 generations left this window</span>
-      </div>
-      <div class="imagegen-output" id="imagegen-output">
-        <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
-      </div>
-      <div class="imagegen-input-area" style="flex-shrink:0;">
-        <div class="imagegen-input-row">
-          <input class="imagegen-input" id="imagegen-input" placeholder="A futuristic city at sunset, neon lights...">
-          <button class="imagegen-btn" id="imagegen-btn">GENERATE</button>
-        </div>
-        <div class="imagegen-opts">
-          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);">SIZE:</span>
-          <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
-          <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
-          <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
-          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px;">QUALITY:</span>
-          <button class="imagegen-size-btn active" id="imagegen-quality-standard" data-quality="standard">STANDARD</button>
-          <button class="imagegen-size-btn" id="imagegen-quality-hd" data-quality="hd">HD</button>
-          <span style="font-size:11px;color:var(--muted);margin-left:auto;">Powered by DALL-E 3</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- imagegen modal removed — now inline in home section -->
 
   <!-- ─── DIRECT MESSAGES MODAL ─── -->
   <div class="modal-overlay" id="dm-modal">
@@ -2650,35 +2619,76 @@
         <button class="btn-primary" id="pulse-btn">+ PULSE</button>
         <button class="btn-secondary" id="shuffle-btn">↺ SHUFFLE</button>
       </div>
-      <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;margin-bottom:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
-          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
-          These AI features cost real money to run. Please don't spam — be considerate.
-        </div>
-      <div class="chat-wrap">
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input-area">
-          <div class="img-preview-wrap" id="img-preview-wrap"></div>
-          <div class="chat-input-row">
-            <input class="chat-input" id="chat-input" placeholder="Ask VEXIS anything..." autocomplete="off">
-            <button class="chat-send-btn" id="chat-send-btn">SEND</button>
+
+      <!-- Cost note -->
+      <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;margin-bottom:0;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
+        <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
+        These AI features cost real money to run. Please don't spam — be considerate.
+      </div>
+
+      <!-- AI Mode Tabs -->
+      <div style="display:flex;border-left:var(--border);border-right:var(--border);border-bottom:var(--border);margin-bottom:10px;">
+        <button id="ai-tab-chat" onclick="switchAiTab('chat')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid var(--fg);background:var(--modal-bg);color:var(--fg);cursor:pointer;letter-spacing:1px;">✦ CHAT</button>
+        <button id="ai-tab-imagegen" onclick="switchAiTab('imagegen')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid transparent;background:var(--modal-bg);color:var(--muted);cursor:pointer;letter-spacing:1px;">🎨 IMAGE GEN</button>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div id="ai-panel-chat">
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-area">
+            <div class="img-preview-wrap" id="img-preview-wrap"></div>
+            <div class="chat-input-row">
+              <input class="chat-input" id="chat-input" placeholder="Ask VEXIS anything..." autocomplete="off">
+              <button class="chat-send-btn" id="chat-send-btn">SEND</button>
+            </div>
+            <div class="chat-tools-row">
+              <button class="tool-btn" id="attach-img-btn">📷 IMAGE</button>
+              <button class="tool-btn" id="new-conv-btn">+ NEW</button>
+              <button class="tool-btn" id="history-btn">📁 HISTORY</button>
+              <input type="file" id="image-upload-input" accept="image/*">
+            </div>
           </div>
-          <div class="chat-tools-row">
-            <button class="tool-btn" id="attach-img-btn">📷 IMAGE</button>
-            <button class="tool-btn" id="new-conv-btn">+ NEW</button>
-            <button class="tool-btn" id="history-btn">📁 HISTORY</button>
-            <button class="tool-btn" id="imagegen-open-btn">🎨 IMAGE GEN</button>
-            <input type="file" id="image-upload-input" accept="image/*">
+        </div>
+        <!-- Inline conversation history panel -->
+        <div class="conv-panel" id="home-conv-panel" style="display:none;margin-top:14px;">
+          <div class="conv-panel-hdr">
+            <span>CONVERSATION HISTORY</span>
+            <button class="tool-btn" id="clear-all-btn">CLEAR ALL</button>
+          </div>
+          <div class="conv-list" id="conv-list"></div>
+        </div>
+      </div>
+
+      <!-- IMAGE GEN PANEL -->
+      <div id="ai-panel-imagegen" style="display:none;">
+        <div style="display:flex;flex-direction:column;border:var(--border);background:var(--modal-bg);min-height:480px;">
+          <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸</span> Each image costs ~$0.04–$0.08. Please don't spam.</span>
+            <span id="imagegen-counter" style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);white-space:nowrap;">5 generations left this window</span>
+          </div>
+          <div class="imagegen-output" id="imagegen-output" style="flex:1;min-height:320px;">
+            <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
+          </div>
+          <div class="imagegen-input-area" style="flex-shrink:0;">
+            <div class="imagegen-input-row">
+              <input class="imagegen-input" id="imagegen-input" placeholder="A futuristic city at sunset, neon lights...">
+              <button class="imagegen-btn" id="imagegen-btn">GENERATE</button>
+            </div>
+            <div class="imagegen-opts">
+              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);">SIZE:</span>
+              <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
+              <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
+              <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
+              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px;">QUALITY:</span>
+              <button class="imagegen-size-btn active" id="imagegen-quality-standard" data-quality="standard">STANDARD</button>
+              <button class="imagegen-size-btn" id="imagegen-quality-hd" data-quality="hd">HD</button>
+              <span style="font-size:11px;color:var(--muted);margin-left:auto;">gpt-image-1.5</span>
+            </div>
           </div>
         </div>
       </div>
-      <!-- Inline conversation history panel (toggled by HISTORY btn) -->
-      <div class="conv-panel" id="home-conv-panel" style="display:none;margin-top:14px;">
-        <div class="conv-panel-hdr">
-          <span>CONVERSATION HISTORY</span>
-          <button class="tool-btn" id="clear-all-btn">CLEAR ALL</button>
-        </div>
-        <div class="conv-list" id="conv-list"></div>
-      </div>
+
     </div>
   </section>
 
@@ -3050,7 +3060,8 @@
     document.getElementById("gif-picker-close").addEventListener("click", () => closeModal("gif-picker-modal"));
     document.getElementById("profile-modal-close").addEventListener("click", () => closeModal("profile-modal"));
     document.getElementById("switch-account-close").addEventListener("click", () => closeModal("switch-account-modal"));
-    document.getElementById("imagegen-close").addEventListener("click", () => closeModal("imagegen-modal"));
+    document.getElementById("imagegen-close") && document.getElementById("imagegen-close").addEventListener("click", () => closeModal("imagegen-modal"));
+    // imagegen-open-btn removed — now a tab on home screen
     document.getElementById("dm-close").addEventListener("click", () => {
       closeModal("dm-modal");
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
@@ -3289,10 +3300,9 @@
     }
 
     /* ─── AI Tools section wiring ─── */
-    document.getElementById("open-ai-chat-btn").addEventListener("click", () => { showSection("home"); document.getElementById("chat-input").focus(); });
-    document.getElementById("new-conv-btn2").addEventListener("click", () => { newConversation(); showSection("home"); });
+    // open-ai-chat-btn and new-conv-btn2 removed (ai-tools section gone)
     // coding-mode-btn removed
-    document.getElementById("imagegen-open-btn").addEventListener("click", () => { openModal("imagegen-modal"); updateImagegenCounter(); });
+    // imagegen-open-btn removed — now a tab
     document.getElementById("clear-all-btn").addEventListener("click", () => {
       if (window.confirm("Delete all saved conversations?")) {
         localStorage.removeItem(getConvStorageKey());
@@ -3362,7 +3372,7 @@
 
       const loadDiv = document.createElement("div");
       loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
-      loadDiv.textContent = "GENERATING WITH DALL-E 3...";
+      loadDiv.textContent = "GENERATING WITH gpt-image-1.5...";
       output.insertBefore(loadDiv, output.firstChild);
 
       try {
@@ -4649,6 +4659,22 @@
     /* =====================================================
        INIT
     ===================================================== */
+    /* =====================================================
+       AI TAB SWITCHER
+    ===================================================== */
+    function switchAiTab(tab) {
+      const isChat = tab === "chat";
+      document.getElementById("ai-panel-chat").style.display = isChat ? "block" : "none";
+      document.getElementById("ai-panel-imagegen").style.display = isChat ? "none" : "block";
+      const chatTab = document.getElementById("ai-tab-chat");
+      const imageTab = document.getElementById("ai-tab-imagegen");
+      chatTab.style.borderBottomColor = isChat ? "var(--fg)" : "transparent";
+      chatTab.style.color = isChat ? "var(--fg)" : "var(--muted)";
+      imageTab.style.borderBottomColor = isChat ? "transparent" : "var(--fg)";
+      imageTab.style.color = isChat ? "var(--muted)" : "var(--fg)";
+      if (!isChat) updateImagegenCounter();
+    }
+
     function init() {
       loadSettings();
       applyTheme(settings.theme || "dark");
