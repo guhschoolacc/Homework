@@ -2666,9 +2666,18 @@
             <button class="tool-btn" id="attach-img-btn">📷 IMAGE</button>
             <button class="tool-btn" id="new-conv-btn">+ NEW</button>
             <button class="tool-btn" id="history-btn">📁 HISTORY</button>
+            <button class="tool-btn" id="imagegen-open-btn">🎨 IMAGE GEN</button>
             <input type="file" id="image-upload-input" accept="image/*">
           </div>
         </div>
+      </div>
+      <!-- Inline conversation history panel (toggled by HISTORY btn) -->
+      <div class="conv-panel" id="home-conv-panel" style="display:none;margin-top:14px;">
+        <div class="conv-panel-hdr">
+          <span>CONVERSATION HISTORY</span>
+          <button class="tool-btn" id="clear-all-btn">CLEAR ALL</button>
+        </div>
+        <div class="conv-list" id="conv-list"></div>
       </div>
     </div>
   </section>
@@ -2738,25 +2747,7 @@
     </div>
   </section>
 
-  <section class="section" id="ai-tools-section">
-    <div class="section-title">✦ AI TOOLS</div>
-    <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 14px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
-      <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
-      These AI features cost real money to run. Please be considerate and don't spam requests.
-    </div>
-    <div class="big-btn-row">
-      <button class="big-btn" id="open-ai-chat-btn">✦ OPEN AI CHAT</button>
-      <button class="big-btn" id="new-conv-btn2">+ NEW CONVERSATION</button>
-      <button class="big-btn" id="imagegen-open-btn">🎨 IMAGE GEN</button>
-    </div>
-    <div class="conv-panel">
-      <div class="conv-panel-hdr">
-        <span>CONVERSATION HISTORY</span>
-        <button class="tool-btn" id="clear-all-btn">CLEAR ALL</button>
-      </div>
-      <div class="conv-list" id="conv-list"></div>
-    </div>
-  </section>
+  <section class="section" id="ai-tools-section" style="display:none!important;"></section>
 
   <section class="section" id="social-section">
     <div class="section-title">◉ SOCIAL</div>
@@ -3075,7 +3066,7 @@
        NAVIGATION
     ===================================================== */
     const NAV_MAP = {
-      "home": null,
+      "home": "nav-ai",
       "games": "nav-games",
       "tools": "nav-tools",
       "ai-tools": "nav-ai",
@@ -3091,14 +3082,14 @@
       if (sec) sec.classList.add("active");
       const navId = NAV_MAP[name];
       if (navId) { const nb = document.getElementById(navId); if (nb) nb.classList.add("active"); }
-      if (name === "ai-tools") { renderConvList(); }
+      if (name === "ai-tools") { showSection("home"); return; }
       if (name === "admin") { loadAdminData(); }
     }
 
     document.getElementById("nav-logo").addEventListener("click", () => showSection("home"));
     document.getElementById("nav-games").addEventListener("click", () => showSection("games"));
     document.getElementById("nav-tools").addEventListener("click", () => showSection("tools"));
-    document.getElementById("nav-ai").addEventListener("click", () => showSection("ai-tools"));
+    document.getElementById("nav-ai").addEventListener("click", () => showSection("home"));
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
     document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
@@ -3209,6 +3200,7 @@
       removeAttachedImage();
       isBusy = false;
       document.getElementById("chat-send-btn").disabled = false;
+      document.getElementById("home-conv-panel").style.display = "none";
       const greeting = modeLabel
         ? `💻 Coding Mode activated. I'm VEXIS — paste your code or ask me anything technical.`
         : "Hey! What's up? I'm VEXIS — ask me anything.";
@@ -3255,6 +3247,7 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
       showSection("home");
+      document.getElementById("home-conv-panel").style.display = "none";
       showToast("CONVERSATION LOADED");
     }
 
@@ -3309,7 +3302,12 @@
       }
     });
     document.getElementById("new-conv-btn").addEventListener("click", () => newConversation());
-    document.getElementById("history-btn").addEventListener("click", () => showSection("ai-tools"));
+    document.getElementById("history-btn").addEventListener("click", () => {
+      const panel = document.getElementById("home-conv-panel");
+      const isHidden = panel.style.display === "none";
+      panel.style.display = isHidden ? "block" : "none";
+      if (isHidden) renderConvList();
+    });
 
     /* =====================================================
        IMAGE GENERATOR
