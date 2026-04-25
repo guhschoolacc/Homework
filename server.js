@@ -34,6 +34,37 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "10mb" }));
 app.use(express.static(path.join(__dirname)));
 
+// ── POST /api/imagegen ───────────────────────────────────────────────────────
+app.post("/api/imagegen", async (req, res) => {
+  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
+
+  if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
+    return res.status(400).json({ error: "prompt is required." });
+  }
+
+  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
+  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
+
+  try {
+    const response = await openai.images.generate({
+      model: "gpt-image-1.5",
+      prompt: prompt.trim(),
+      n: 1,
+      size: safeSize,
+      quality,
+      response_format: "url",
+    });
+
+    const imageUrl = response.data[0].url;
+    const revisedPrompt = response.data[0].revised_prompt || prompt;
+    return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
+  } catch (err) {
+    console.error("DALL-E error:", err.message);
+    const status = err.status || 500;
+    return res.status(status).json({ error: err.message || "Image generation failed." });
+  }
+});
+
 // ── POST /api/chat ────────────────────────────────────────────────────────────
 app.post("/api/chat", async (req, res) => {
   const { messages } = req.body;
