@@ -1705,14 +1705,6 @@
     .report-entry { border:var(--border); border-left:3px solid #f55; padding:10px 14px; margin-bottom:8px; background:var(--card-bg); font-family:var(--font-mono); font-size:11px; }
     .report-entry .report-meta { color:var(--muted); font-size:10px; margin-top:4px; }
 
-    /* ─── BROADCAST OVERLAY ─── */
-    #broadcast-overlay { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.75); align-items:center; justify-content:center; }
-    #broadcast-overlay.open { display:flex; }
-    .broadcast-box { background:var(--bg); border:2px solid var(--fg); padding:28px 32px; max-width:480px; width:90%; text-align:center; }
-    .broadcast-box .b-title { font-family:var(--font-pixel); font-size:10px; margin-bottom:12px; letter-spacing:2px; }
-    .broadcast-box .b-msg { font-family:var(--font-mono); font-size:13px; line-height:1.7; margin-bottom:20px; }
-    .broadcast-box .b-close { font-family:var(--font-pixel); font-size:7px; padding:8px 20px; background:var(--fg); color:var(--bg); border:none; cursor:pointer; }
-
     /* ─── ONLINE STATUS ─── */
     .online-dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
     .online-dot.online { background:#5f5; }
@@ -2916,13 +2908,19 @@
       <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:auto;" id="admin-role-badge"></span>
     </div>
 
+    <!-- Firestore rules reminder -->
+    <div id="firestore-rules-notice" style="border:1px solid #fa0;background:var(--bg2);padding:10px 14px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;display:flex;align-items:flex-start;gap:10px;">
+      <span style="font-family:var(--font-pixel);font-size:7px;color:#fa0;white-space:nowrap;margin-top:2px;">⚠ RULES</span>
+      <span>If banning, editing, or reports show "Missing permissions", you need to set your Firestore security rules. Go to <strong>Firebase Console → Firestore → Rules</strong> and paste the rules from your setup guide. For quick dev testing, use: <code style="background:var(--bg);padding:2px 6px;">allow read, write: if request.auth != null;</code></span>
+      <button onclick="document.getElementById('firestore-rules-notice').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
+    </div>
+
     <div class="admin-tabs">
       <button class="admin-tab active" data-panel="users">👥 USERS</button>
       <button class="admin-tab" data-panel="online">🟢 ONLINE</button>
       <button class="admin-tab" data-panel="roles">🎖 ROLES</button>
       <button class="admin-tab" data-panel="whitelist">✅ WHITELIST</button>
       <button class="admin-tab" data-panel="reports">🚩 REPORTS</button>
-      <button class="admin-tab" data-panel="broadcast">📢 BROADCAST</button>
       <button class="admin-tab" data-panel="logs">📋 LOGS</button>
       <button class="admin-tab" data-panel="settings">⚙ SETTINGS</button>
     </div>
@@ -3102,25 +3100,6 @@
       <div id="reports-list"><div style="color:var(--muted);font-size:12px;">Click refresh to load reports.</div></div>
     </div>
 
-    <!-- ── BROADCAST TAB ── -->
-    <div class="admin-panel" id="admin-panel-broadcast">
-      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:16px;">Send a message that instantly pops up on every active user's screen.</div>
-      <div style="max-width:500px;display:flex;flex-direction:column;gap:10px;">
-        <div class="drawer-field">
-          <label>BROADCAST TITLE (optional)</label>
-          <input id="broadcast-title-input" type="text" placeholder="e.g. 📢 ANNOUNCEMENT" style="font-family:var(--font-mono);font-size:13px;padding:8px 12px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;width:100%;box-sizing:border-box;">
-        </div>
-        <div class="drawer-field">
-          <label>MESSAGE</label>
-          <textarea id="broadcast-msg-input" placeholder="Type your message here..." style="font-family:var(--font-mono);font-size:13px;padding:8px 12px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;width:100%;min-height:100px;resize:vertical;box-sizing:border-box;"></textarea>
-        </div>
-        <button class="admin-action-btn" style="width:fit-content;" onclick="sendBroadcast()">📢 SEND TO ALL USERS</button>
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">Users will see a modal overlay. It clears automatically after they dismiss it.</div>
-        <div class="drawer-section-title" style="margin-top:10px;">BROADCAST HISTORY</div>
-        <div id="broadcast-history-list"><div style="color:var(--muted);font-size:12px;">No broadcasts yet.</div></div>
-      </div>
-    </div>
-
     <!-- ── WHITELIST TAB ── -->
     <div class="admin-panel" id="admin-panel-whitelist">
       <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:14px;">Whitelisted users get access to restricted features.</div>
@@ -3174,15 +3153,6 @@
         <button class="admin-action-btn ghost" onclick="closeAdminConfirm()">CANCEL</button>
         <button class="admin-action-btn danger" id="confirm-ok-btn">CONFIRM</button>
       </div>
-    </div>
-  </div>
-
-  <!-- ─── BROADCAST OVERLAY ─── -->
-  <div id="broadcast-overlay">
-    <div class="broadcast-box">
-      <div class="b-title">📢 MESSAGE FROM OWNER</div>
-      <div class="b-msg" id="broadcast-msg-text"></div>
-      <button class="b-close" onclick="document.getElementById('broadcast-overlay').classList.remove('open')">DISMISS</button>
     </div>
   </div>
 
@@ -4998,7 +4968,6 @@
         if (tab.dataset.panel === "settings")    renderBannedList();
         if (tab.dataset.panel === "online")      loadOnlineStatus();
         if (tab.dataset.panel === "reports")     loadReports();
-        if (tab.dataset.panel === "broadcast")   loadBroadcastHistory();
       });
     });
 
@@ -5064,15 +5033,19 @@
             const uid = e.target.dataset.uid;
             if (banned) {
               adminConfirm("Unban", `Unban ${u.displayName || uid}?`, async () => {
-                await db.collection("bannedUsers").doc(uid).delete();
-                await writeAdminLog("unban", uid, u.displayName || uid);
-                showToast("UNBANNED"); refreshModUserList();
+                try {
+                  await db.collection("bannedUsers").doc(uid).delete();
+                  writeAdminLog("unban", uid, u.displayName || uid);
+                  showToast("UNBANNED"); refreshModUserList();
+                } catch (err) { showToast("ERROR: " + err.message); }
               });
             } else {
               adminConfirm("Ban", `Ban ${u.displayName || uid}?`, async () => {
-                await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid });
-                await writeAdminLog("ban", uid, u.displayName || uid);
-                showToast("BANNED"); refreshModUserList();
+                try {
+                  await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid });
+                  writeAdminLog("ban", uid, u.displayName || uid);
+                  showToast("BANNED"); refreshModUserList();
+                } catch (err) { showToast("ERROR: " + err.message); }
               });
             }
           });
@@ -5214,19 +5187,25 @@
         const actionBtn = tr.querySelector(".ban-btn, .unban-btn");
         actionBtn.addEventListener("click", async e => {
           e.stopPropagation();
-          if (!canDo("ban")) { showToast("PERMISSION DENIED"); return; }
           const uid = e.target.dataset.uid;
           if (banned) {
             adminConfirm("Unban User", `Unban ${user.displayName || uid}?`, async () => {
-              await db.collection("bannedUsers").doc(uid).delete();
-              await writeAdminLog("unban", uid, user.displayName || uid);
-              showToast("USER UNBANNED");
+              try {
+                await db.collection("bannedUsers").doc(uid).delete();
+                writeAdminLog("unban", uid, user.displayName || uid);
+                showToast("USER UNBANNED");
+              } catch (err) { showToast("ERROR: " + err.message); }
             });
           } else {
-            adminConfirm("Ban User", `Ban ${user.displayName || uid}? They will be blocked from chat.`, async () => {
-              await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid });
-              await writeAdminLog("ban", uid, user.displayName || uid);
-              showToast("USER BANNED");
+            adminConfirm("Ban User", `Ban ${user.displayName || uid}?`, async () => {
+              try {
+                await db.collection("bannedUsers").doc(uid).set({
+                  bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                  bannedBy: currentUser.uid
+                });
+                writeAdminLog("ban", uid, user.displayName || uid);
+                showToast("USER BANNED");
+              } catch (err) { showToast("ERROR: " + err.message); }
             });
           }
         });
@@ -5234,16 +5213,17 @@
         // Del msgs
         tr.querySelector(".del-msgs-btn").addEventListener("click", async e => {
           e.stopPropagation();
-          if (!canDo("ban")) { showToast("PERMISSION DENIED"); return; }
           const uid = e.target.dataset.uid;
           adminConfirm("Delete Messages", `Delete ALL chat messages from ${user.displayName || uid}?`, async () => {
-            const msgs = await db.collection("socialMessages").where("userId", "==", uid).get();
-            if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; }
-            const batch = db.batch();
-            msgs.forEach(doc => batch.delete(doc.ref));
-            await batch.commit();
-            await writeAdminLog("delete", uid, `${msgs.size} messages deleted`);
-            showToast(`DELETED ${msgs.size} MESSAGES`);
+            try {
+              const msgs = await db.collection("socialMessages").where("userId", "==", uid).get();
+              if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; }
+              const batch = db.batch();
+              msgs.forEach(doc => batch.delete(doc.ref));
+              await batch.commit();
+              writeAdminLog("delete", uid, `${msgs.size} messages deleted`);
+              showToast(`DELETED ${msgs.size} MESSAGES`);
+            } catch (err) { showToast("ERROR: " + err.message); }
           });
         });
 
@@ -5320,13 +5300,82 @@
     // ── User detail drawer ───────────────────────────────────────────────────
     function openUserDrawer(uid) {
       drawerUid = uid;
-      refreshDrawer(uid);
+      const user = adminAllUsers.find(u => u.uid === uid);
+      if (!user) { showToast("USER NOT FOUND — TRY REFRESHING"); return; }
+      populateDrawer(user);
       document.getElementById("user-detail-drawer").classList.add("open");
-      document.getElementById("user-detail-drawer").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      document.getElementById("user-detail-drawer").scrollIntoView({ behavior: "smooth", block: "start" });
     }
     function closeUserDrawer() {
       drawerUid = null;
       document.getElementById("user-detail-drawer").classList.remove("open");
+    }
+    function populateDrawer(user) {
+      const uid = user.uid;
+      const banned = adminBannedIds.has(uid);
+      const role = user.role || "user";
+
+      document.getElementById("drawer-name").textContent = user.displayName || "Anonymous";
+      document.getElementById("drawer-uid").textContent = uid;
+
+      const avEl = document.getElementById("drawer-avatar");
+      avEl.innerHTML = user.photoURL
+        ? `<img class="admin-user-avatar" src="${escHtml(user.photoURL)}" style="width:44px;height:44px;">`
+        : `<span class="admin-user-initials" style="width:44px;height:44px;font-size:14px;">${(user.displayName||"?")[0].toUpperCase()}</span>`;
+
+      document.getElementById("drawer-badges").innerHTML =
+        `<span class="role-badge ${role}">${role.toUpperCase()}</span>&nbsp;` +
+        (banned ? '<span class="banned-badge">BANNED</span>' : '');
+
+      document.getElementById("df-displayName").value = user.displayName || "";
+      document.getElementById("df-email").value = user.email || "";
+      document.getElementById("df-photoURL").value = user.photoURL || "";
+      document.getElementById("df-coins").value = user.coins ?? "";
+      document.getElementById("df-email-reset").value = user.email || "";
+      document.getElementById("df-role").value = role;
+
+      const url = user.photoURL || "";
+      const preview = document.getElementById("df-pfp-preview");
+      preview.src = url;
+      preview.style.display = url ? "block" : "none";
+
+      const known = new Set(["uid","displayName","email","photoURL","role","coins","lastSeen","createdAt","providerId","lastCoinRefill"]);
+      renderCustomFields(Object.entries(user).filter(([k]) => !known.has(k)));
+
+      const banBtn = document.getElementById("drawer-ban-btn");
+      banBtn.textContent = banned ? "✅ UNBAN" : "🚫 BAN";
+      banBtn.className = banned ? "admin-action-btn success" : "admin-action-btn warn";
+      banBtn.onclick = () => {
+        const name = user.displayName || uid;
+        if (banned) {
+          adminConfirm("Unban User", `Unban ${name}?`, async () => {
+            try {
+              await db.collection("bannedUsers").doc(uid).delete();
+              writeAdminLog("unban", uid, name);
+              showToast("UNBANNED");
+            } catch (err) { showToast("ERROR: " + err.message); }
+          });
+        } else {
+          adminConfirm("Ban User", `Ban ${name}?`, async () => {
+            try {
+              await db.collection("bannedUsers").doc(uid).set({
+                bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                bannedBy: currentUser.uid
+              });
+              writeAdminLog("ban", uid, name);
+              showToast("BANNED");
+            } catch (err) { showToast("ERROR: " + err.message); }
+          });
+        }
+      };
+      document.getElementById("drawer-status").textContent = "";
+    }
+    // Also call populateDrawer when real-time listener refreshes the user list
+    function refreshDrawer(uid) {
+      const user = adminAllUsers.find(u => u.uid === uid);
+      if (user && document.getElementById("user-detail-drawer").classList.contains("open")) {
+        populateDrawer(user);
+      }
     }
     /* =====================================================
        REPORT SYSTEM
@@ -5398,65 +5447,6 @@
         closeReportModal();
         showToast("REPORT SUBMITTED — THANKS");
       } catch (err) { showToast("ERROR: " + err.message); }
-    }
-
-    /* =====================================================
-       BROADCAST SYSTEM
-    ===================================================== */
-    // Listen for broadcasts on load
-    function startBroadcastListener() {
-      db.collection("siteSettings").doc("broadcast").onSnapshot(snap => {
-        if (!snap.exists) return;
-        const data = snap.data();
-        if (!data.active) return;
-        // Don't show to self (owner who sent it)
-        if (currentUser && data.sentBy === currentUser.uid) return;
-        document.getElementById("broadcast-msg-text").textContent = data.message || "";
-        const overlay = document.getElementById("broadcast-overlay");
-        overlay.querySelector(".b-title").textContent = data.title || "📢 MESSAGE FROM OWNER";
-        overlay.classList.add("open");
-      });
-    }
-    async function sendBroadcast() {
-      const title = document.getElementById("broadcast-title-input").value.trim() || "📢 MESSAGE FROM OWNER";
-      const msg = document.getElementById("broadcast-msg-input").value.trim();
-      if (!msg) { showToast("ENTER A MESSAGE"); return; }
-      adminConfirm("Send Broadcast", `Send "${msg}" to all active users?`, async () => {
-        await db.collection("siteSettings").doc("broadcast").set({
-          active: true,
-          title,
-          message: msg,
-          sentBy: currentUser.uid,
-          sentAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        // Log it
-        await db.collection("broadcastHistory").add({
-          title, message: msg,
-          sentBy: currentUser.uid,
-          sentAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        await writeAdminLog("edit", "broadcast", `Sent broadcast: "${msg.slice(0,50)}"`);
-        showToast("BROADCAST SENT");
-        document.getElementById("broadcast-msg-input").value = "";
-        document.getElementById("broadcast-title-input").value = "";
-        loadBroadcastHistory();
-      });
-    }
-    async function loadBroadcastHistory() {
-      const container = document.getElementById("broadcast-history-list");
-      try {
-        const snap = await db.collection("broadcastHistory").orderBy("sentAt","desc").limit(20).get();
-        if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);font-size:12px;">No broadcasts yet.</div>'; return; }
-        container.innerHTML = "";
-        snap.forEach(doc => {
-          const d = doc.data();
-          const t = d.sentAt ? new Date(d.sentAt.toMillis()).toLocaleString() : "—";
-          const div = document.createElement("div");
-          div.className = "log-entry";
-          div.innerHTML = `<span class="log-action edit">BROADCAST</span><span class="log-detail"><strong>${escHtml(d.title||"")}</strong> — ${escHtml(d.message||"")}</span><span class="log-time">${t}</span>`;
-          container.appendChild(div);
-        });
-      } catch (_e) { container.innerHTML = '<div style="color:var(--muted);font-size:12px;">No history.</div>'; }
     }
 
     /* =====================================================
@@ -5815,8 +5805,9 @@
       _confirmCallback = null;
     }
     document.getElementById("confirm-ok-btn").addEventListener("click", async () => {
+      const cb = _confirmCallback;   // save BEFORE closing (closing nulls it)
       closeAdminConfirm();
-      if (_confirmCallback) { try { await _confirmCallback(); } catch (err) { showToast("ERROR: " + err.message); } }
+      if (cb) { try { await cb(); } catch (err) { showToast("ERROR: " + err.message); } }
     });
     document.getElementById("admin-confirm-modal").addEventListener("click", e => {
       if (e.target === e.currentTarget) closeAdminConfirm();
@@ -5891,7 +5882,6 @@
       appendBotMsg("Hey! What's up? I'm VEXIS — ask me anything.");
       requestNotifPermission();
       lastSocialMsgTime = Date.now();
-      startBroadcastListener();
     }
     init();
   </script>
