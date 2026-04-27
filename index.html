@@ -3312,7 +3312,6 @@
 </div>
 
 <!-- AUDIO ELEMENTS -->
-<audio id="local-audio" class="call-audio" muted autoplay playsinline></audio>
 <audio id="remote-audio" class="call-audio" autoplay playsinline></audio>
 <video id="remote-video" style="display:none;position:fixed;bottom:60px;right:16px;width:200px;border-radius:8px;z-index:850;background:#000" autoplay playsinline></video>
 
@@ -5381,7 +5380,6 @@
           video: false
         });
       } catch (err) { showToast("MIC ACCESS DENIED — CHECK BROWSER PERMISSIONS"); return; }
-      document.getElementById("local-audio").srcObject = localStream;
       isCallerRole = true;
       callDocId = "call_" + activeDmId;
 
@@ -5434,7 +5432,6 @@
           video: false
         });
       } catch (err) { showToast("MIC ACCESS DENIED"); await db.collection("calls").doc(callDocId).update({ status: "declined" }); return; }
-      document.getElementById("local-audio").srcObject = localStream;
       isCallerRole = false;
 
       peerConnection = new RTCPeerConnection(STUN_SERVERS);
@@ -5525,7 +5522,6 @@
       stopSpeakingDetection();
       if (peerConnection) { peerConnection.close(); peerConnection = null; }
       document.getElementById("remote-audio").srcObject = null;
-      document.getElementById("local-audio").srcObject = null;
       const rv = document.getElementById("remote-video"); rv.srcObject = null; rv.style.display = "none";
       isMuted = false; isDeafened = false; isCameraOn = false; callSeconds = 0;
       document.getElementById("call-panel").classList.remove("show");
