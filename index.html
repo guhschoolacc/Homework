@@ -1272,6 +1272,8 @@
       flex-direction: column;
       gap: 10px;
       min-height: 0;
+      /* Always start scrolled to bottom */
+      overflow-anchor: auto;
     }
 
     .social-msg {
@@ -2422,6 +2424,107 @@
     .log-by em{color:var(--accent);font-style:normal;font-family:var(--font-pixel);font-size:7px}
     .log-detail-text{color:var(--fg);font-size:11px}
 
+    /* ─── CALLING — DISCORD STYLE ─── */
+    .call-btn{font-family:var(--font-pixel);font-size:6px;padding:5px 10px;border:1px solid #43b581;background:none;color:#43b581;cursor:pointer;letter-spacing:1px;flex-shrink:0}
+    .call-btn:hover{background:#43b581;color:#000}
+
+    /* Full screen call panel */
+    #call-panel{display:none;position:fixed;inset:0;z-index:900;background:#23272a;flex-direction:column;align-items:stretch;justify-content:flex-start}
+    #call-panel.show{display:flex}
+
+    /* Header bar */
+    .cp-header{height:48px;background:#2f3136;border-bottom:1px solid #202225;display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+    .cp-header-icon{font-size:16px}
+    .cp-header-name{font-family:var(--font-pixel);font-size:9px;color:#ffffff;flex:1}
+    .cp-header-status{font-family:var(--font-mono);font-size:11px;color:#43b581}
+    .cp-header-status.ringing{color:#faa61a;animation:callPulse .9s infinite}
+    .cp-header-timer{font-family:var(--font-mono);font-size:11px;color:#72767d;margin-left:8px}
+
+    /* Main area */
+    .cp-body{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:32px 20px}
+
+    /* Participant tiles */
+    .cp-tiles{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+    .cp-tile{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:140px}
+    .cp-tile-av{width:80px;height:80px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#5865f2;color:#ffffff;font-family:var(--font-pixel);font-size:24px;border:3px solid #4f545c;transition:border-color .2s;flex-shrink:0;position:relative}
+    .cp-tile-av img{width:100%;height:100%;object-fit:cover}
+    .cp-tile-av.speaking{border-color:#43b581;box-shadow:0 0 0 3px rgba(67,181,129,.25)}
+    .cp-tile-av.is-muted{border-color:#ed4245}
+    .cp-tile-av.ringing{border-color:#faa61a;animation:callPulse .9s infinite}
+    .cp-tile-name{font-family:var(--font-mono);font-size:13px;color:#ffffff;text-align:center;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cp-tile-you{font-family:var(--font-mono);font-size:10px;color:#72767d;text-align:center}
+    .cp-tile-status{font-size:12px;color:#b9bbbe;text-align:center;font-family:var(--font-mono)}
+    .cp-tile-icon{position:absolute;bottom:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#ed4245;display:flex;align-items:center;justify-content:center;font-size:10px;display:none}
+    .cp-tile-av.is-muted .cp-tile-icon{display:flex}
+
+    /* Controls bar */
+    .cp-controls-bar{background:#2f3136;border-top:1px solid #202225;padding:20px;display:flex;align-items:center;justify-content:center;gap:16px;flex-shrink:0;flex-wrap:wrap}
+    .cp-ctrl-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .cp-ctrl{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;background:#4f545c;color:#ffffff;transition:background .15s,transform .1s}
+    .cp-ctrl:hover{background:#686d73;transform:scale(1.06)}
+    .cp-ctrl.active{background:#ed4245}
+    .cp-ctrl.active:hover{background:#c03537}
+    .cp-ctrl-label{font-family:var(--font-mono);font-size:10px;color:#72767d}
+    .cp-end-btn{width:52px;height:52px;border-radius:50%;background:#ed4245;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;color:#ffffff;transition:background .15s,transform .1s}
+    .cp-end-btn:hover{background:#c03537;transform:scale(1.06)}
+
+    /* Mini voice bar */
+    #voice-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:800;background:#18191c;border-top:1px solid #2d2f33;height:52px;align-items:center;padding:0 12px;gap:0}
+    #voice-bar.show{display:flex}
+    .vb-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding-right:12px;border-right:1px solid #2d2f33;cursor:pointer}
+    .vb-signal-icon{display:flex;gap:2px;align-items:flex-end;height:14px}
+    .vb-signal-bar{width:3px;background:#43b581;border-radius:1px}
+    .vb-signal-bar:nth-child(1){height:5px}
+    .vb-signal-bar:nth-child(2){height:9px}
+    .vb-signal-bar:nth-child(3){height:13px}
+    .vb-status-text{font-family:var(--font-mono);font-size:11px;color:#43b581}
+    .vb-status-text.ringing{color:#faa61a}
+    .vb-timer{font-family:var(--font-mono);font-size:10px;color:#72767d;margin-left:4px}
+    .vb-user-area{display:flex;align-items:center;gap:8px;margin-left:8px}
+    .vb-avatar{width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#5865f2;color:#fff;font-family:var(--font-pixel);font-size:9px;border:2px solid #43b581}
+    .vb-avatar img{width:100%;height:100%;object-fit:cover}
+    .vb-name{font-family:var(--font-mono);font-size:12px;color:#dcddde;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .vb-expand{font-family:var(--font-mono);font-size:10px;color:#72767d;margin-left:4px}
+    .vb-controls{display:flex;align-items:center;gap:4px;padding-left:12px;border-left:1px solid #2d2f33}
+    .vb-ctrl{width:34px;height:34px;border-radius:4px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;color:#b9bbbe}
+    .vb-ctrl:hover{background:#36393f;color:#fff}
+    .vb-ctrl.muted{color:#ed4245}
+    .vb-end-mini{width:34px;height:34px;border-radius:4px;background:#ed4245;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+    .vb-end-mini:hover{background:#c03537}
+
+    /* Incoming toast */
+    #incoming-call-toast{display:none;position:fixed;top:64px;right:16px;z-index:960;background:#18191c;border:1px solid #43b581;border-radius:10px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.8);overflow:hidden}
+    #incoming-call-toast.show{display:block;animation:slideDown .25s ease}
+    @keyframes slideDown{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .incoming-hdr{background:#2f3136;padding:10px 14px;display:flex;align-items:center;gap:8px}
+    .incoming-hdr-dot{width:8px;height:8px;border-radius:50%;background:#43b581;flex-shrink:0;animation:callPulse .8s infinite}
+    .incoming-hdr-text{font-family:var(--font-mono);font-size:11px;color:#43b581;font-weight:bold}
+    .incoming-hdr-sub{font-family:var(--font-mono);font-size:10px;color:#72767d}
+    .incoming-body{padding:16px;display:flex;align-items:center;gap:12px}
+    .incoming-av{width:52px;height:52px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#5865f2;color:#fff;font-family:var(--font-pixel);font-size:18px;border:2px solid #43b581}
+    .incoming-av img{width:100%;height:100%;object-fit:cover}
+    .incoming-info{flex:1;min-width:0}
+    .incoming-name{font-family:var(--font-pixel);font-size:9px;color:#ffffff;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .incoming-sub{font-family:var(--font-mono);font-size:11px;color:#72767d}
+    .incoming-btns{display:flex;gap:10px;flex-shrink:0}
+    .incoming-accept{width:44px;height:44px;border-radius:50%;background:#3ba55d;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(59,165,93,.5);transition:transform .1s}
+    .incoming-accept:hover{transform:scale(1.08)}
+    .incoming-decline{width:44px;height:44px;border-radius:50%;background:#ed4245;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(237,66,69,.5);transition:transform .1s}
+    .incoming-decline:hover{transform:scale(1.08)}
+    .call-audio{display:none}
+    @keyframes callPulse{0%,100%{opacity:1}50%{opacity:.25}}
+    /* ─── EMOJI PICKER ─── */
+    #emoji-picker{display:none;position:fixed;z-index:800;background:var(--modal-bg);border:var(--border);box-shadow:0 8px 32px rgba(0,0,0,.4);width:300px;max-height:320px;flex-direction:column}
+    #emoji-picker.open{display:flex}
+    .emoji-search-row{padding:8px;border-bottom:var(--border);flex-shrink:0}
+    .emoji-search-input{width:100%;font-family:var(--font-mono);font-size:13px;padding:6px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;box-sizing:border-box}
+    .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:8px;overflow-y:auto;flex:1}
+    .emoji-btn-item{font-size:20px;padding:4px;cursor:pointer;text-align:center;border-radius:4px;border:none;background:none;transition:background .1s}
+    .emoji-btn-item:hover{background:var(--bg2)}
+    .emoji-cats{display:flex;border-bottom:var(--border);flex-shrink:0}
+    .emoji-cat-btn{flex:1;padding:6px;font-size:14px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;opacity:.6}
+    .emoji-cat-btn.active{border-bottom-color:var(--accent);opacity:1}
+
     /* ─── RESPONSIVE ─── */
     @media(max-width:640px) {
       .nav-center {
@@ -2583,6 +2686,7 @@
           <button class="social-send-btn" id="social-send-btn">SEND</button>
         </div>
         <div class="social-tools-row">
+          <button class="tool-btn" id="emoji-btn-social">😊 EMOJI</button>
           <button class="tool-btn" id="gif-btn">🎞 GIF</button>
           <button class="tool-btn" id="fav-gif-social-btn">★ FAVS</button>
           <button class="tool-btn" id="img-url-btn">🖼 IMAGE</button>
@@ -2678,6 +2782,7 @@
               <button class="dm-send-btn" id="dm-send-btn">SEND</button>
             </div>
             <div class="social-tools-row" style="margin-top:7px;">
+              <button class="tool-btn" id="emoji-btn-dm">😊 EMOJI</button>
               <button class="tool-btn" id="dm-img-btn">🖼 IMAGE</button>
               <button class="tool-btn" id="dm-gif-btn">🎞 GIF</button>
             </div>
@@ -2840,6 +2945,8 @@
         TOE</div>
       <div class="item-card" data-url="games/wormscape.html" data-label="WORMSCAPE"><span class="ic">🪱</span>WORMSCAPE
       </div>
+      <div class="item-card" data-url="games/minecraft.html" data-label="MINECRAFT RIPOFF"><span class="ic">⛏</span>MINECRAFT RIPOFF</div>
+      <div class="item-card" data-url="games/sandbox3d.html" data-label="3D SANDBOX"><span class="ic">🌐</span>3D SANDBOX</div>
     </div>
   </section>
 
@@ -3123,7 +3230,110 @@
     </div>
   </section>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<!-- DISCORD-STYLE VOICE BAR (bottom of screen) -->
+<!-- FULL SCREEN CALL PANEL -->
+<div id="call-panel">
+  <!-- Header bar -->
+  <div class="cp-header">
+    <span class="cp-header-icon">🎙️</span>
+    <span class="cp-header-name" id="cp-header-name">Direct Call</span>
+    <span class="cp-header-status" id="cp-status-text">Calling...</span>
+    <span class="cp-header-timer" id="cp-timer"></span>
+  </div>
+  <!-- Participant tiles -->
+  <div class="cp-body">
+    <div class="cp-tiles" id="cp-tiles"></div>
+  </div>
+  <!-- Controls -->
+  <div class="cp-controls-bar">
+    <div class="cp-ctrl-wrap">
+      <button class="cp-ctrl" id="cp-mute-btn" onclick="toggleMute()" title="Mute">🎙️</button>
+      <span class="cp-ctrl-label">Mute</span>
+    </div>
+    <div class="cp-ctrl-wrap">
+      <button class="cp-ctrl" id="cp-cam-btn" onclick="toggleCamera()" title="Camera">📷</button>
+      <span class="cp-ctrl-label">Camera</span>
+    </div>
+    <div class="cp-ctrl-wrap">
+      <button class="cp-ctrl" id="cp-deafen-btn" onclick="toggleDeafen()" title="Deafen">🔊</button>
+      <span class="cp-ctrl-label">Deafen</span>
+    </div>
+    <div class="cp-ctrl-wrap">
+      <button class="cp-ctrl" onclick="minimizeCall()">➖</button>
+      <span class="cp-ctrl-label">Minimize</span>
+    </div>
+    <div class="cp-ctrl-wrap">
+      <button class="cp-end-btn" onclick="endCall()" title="End call">📵</button>
+      <span class="cp-ctrl-label" style="color:#ed4245">End</span>
+    </div>
+  </div>
+</div>
+
+<!-- MINI VOICE BAR -->
+<div id="voice-bar">
+  <div class="vb-left" onclick="maximizeCall()">
+    <div class="vb-signal-icon">
+      <div class="vb-signal-bar"></div>
+      <div class="vb-signal-bar"></div>
+      <div class="vb-signal-bar"></div>
+    </div>
+    <span class="vb-status-text" id="vb-status-text">Voice Connected</span>
+    <span class="vb-timer" id="vb-timer"></span>
+    <div class="vb-user-area">
+      <div class="vb-avatar" id="vb-avatar"></div>
+      <span class="vb-name" id="vb-name"></span>
+    </div>
+    <span class="vb-expand">↑ expand</span>
+  </div>
+  <div class="vb-controls">
+    <button class="vb-ctrl" id="vb-mute-btn" onclick="toggleMute()" title="Mute/Unmute">🎙️</button>
+    <button class="vb-end-mini" onclick="endCall()" title="End call">📵</button>
+  </div>
+</div>
+
+<!-- INCOMING CALL NOTIFICATION -->
+<div id="incoming-call-toast">
+  <div class="incoming-hdr">
+    <div class="incoming-hdr-dot"></div>
+    <span class="incoming-hdr-text">Incoming Call</span>
+    <span style="margin-left:4px">— Direct Message</span>
+  </div>
+  <div class="incoming-body">
+    <div class="incoming-av" id="incoming-av"></div>
+    <div class="incoming-info">
+      <div class="incoming-name" id="incoming-caller-name">Someone</div>
+      <div class="incoming-sub">🎙️ Voice Call</div>
+    </div>
+    <div class="incoming-btns">
+      <button class="incoming-accept" onclick="acceptCall()" title="Accept call">📞</button>
+      <button class="incoming-decline" onclick="declineCall()" title="Decline call">📵</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIO ELEMENTS -->
+<audio id="local-audio" class="call-audio" muted autoplay playsinline></audio>
+<audio id="remote-audio" class="call-audio" autoplay playsinline></audio>
+<video id="remote-video" style="display:none;position:fixed;bottom:60px;right:16px;width:200px;border-radius:8px;z-index:850;background:#000" autoplay playsinline></video>
+
+<!-- EMOJI PICKER -->
+<div id="emoji-picker">
+  <div class="emoji-cats">
+    <button class="emoji-cat-btn active" data-cat="smileys">😊</button>
+    <button class="emoji-cat-btn" data-cat="people">👋</button>
+    <button class="emoji-cat-btn" data-cat="nature">🐶</button>
+    <button class="emoji-cat-btn" data-cat="food">🍕</button>
+    <button class="emoji-cat-btn" data-cat="activities">⚽</button>
+    <button class="emoji-cat-btn" data-cat="objects">💡</button>
+    <button class="emoji-cat-btn" data-cat="symbols">❤️</button>
+  </div>
+  <div class="emoji-search-row">
+    <input class="emoji-search-input" id="emoji-search-input" placeholder="Search emoji...">
+  </div>
+  <div class="emoji-grid" id="emoji-grid"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
@@ -4024,6 +4234,8 @@
       // ── Tear down any DM listeners from the previous account ──
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
       if (dmInboxUnsubscribe) { dmInboxUnsubscribe(); dmInboxUnsubscribe = null; }
+      if (incomingCallUnsub) { incomingCallUnsub(); incomingCallUnsub = null; }
+      if (peerConnection) endCall(true);
       // Reset DM UI state
       activeDmId = null;
       dmConversations = {};
@@ -4072,6 +4284,7 @@
             document.getElementById("nav-mod").style.display = "none";
           }
         loadDmConversations();
+        startIncomingCallListener();
         startDmInboxListener();
       } else {
         document.getElementById("settings-profile-section").style.display = "none";
@@ -4107,20 +4320,16 @@
       container.innerHTML = "";
       const renderedIds = new Set();
 
-      db.collection("socialMessages").orderBy("timestamp", "asc").get()
+      db.collection("socialMessages").orderBy("timestamp", "asc").limitToLast(50).get()
         .then(async snapshot => {
           const docs = [];
           snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
-          docs.sort((a, b) => {
-            const ta = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : Number(a.timestamp)) : 0;
-            const tb = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : Number(b.timestamp)) : 0;
-            return ta - tb;
-          });
           for (const msg of docs) {
             const banned = await isBanned(msg.userId);
             if (!banned) { renderSocialMessage(msg); renderedIds.add(msg.id); }
           }
-          container.scrollTop = container.scrollHeight;
+          // Scroll to very bottom after all messages render
+          setTimeout(() => { container.scrollTop = container.scrollHeight; }, 80);
 
           const lastDoc = snapshot.docs[snapshot.docs.length - 1];
           const liveQuery = lastDoc
@@ -4595,19 +4804,15 @@
 
     function openDmConversation(conv) {
       activeDmId = conv.dmId;
-      // Update active state in list
+      activeCallConv = conv;
       document.querySelectorAll(".dm-conv-item").forEach(el => {
         el.classList.toggle("active", el.dataset.dmid === activeDmId);
       });
-      // Update header
-      const hdrName = document.getElementById("dm-chat-hdr-name");
       const avHTML = conv.otherPhoto
         ? `<div class="dm-msg-av" style="width:22px;height:22px;"><img src="${escHtml(conv.otherPhoto)}" alt=""></div>`
         : `<div class="dm-msg-av" style="width:22px;height:22px;">${(conv.otherName || "?")[0].toUpperCase()}</div>`;
-      document.getElementById("dm-chat-hdr").innerHTML = `${avHTML}<span id="dm-chat-hdr-name">${escHtml(conv.otherName || "DM")}</span>`;
-      // Show input area
+      document.getElementById("dm-chat-hdr").innerHTML = `${avHTML}<span id="dm-chat-hdr-name" style="flex:1">${escHtml(conv.otherName || "DM")}</span><button class="call-btn" id="start-call-btn" title="Start voice call" onclick="startCall()">📞 CALL</button>`;
       document.getElementById("dm-input-area").style.display = "block";
-      // Clear messages and listen
       const msgContainer = document.getElementById("dm-messages");
       msgContainer.innerHTML = "";
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
@@ -5105,7 +5310,447 @@
       requestNotifPermission();
       lastSocialMsgTime = Date.now();
     }
+    /* =====================================================
+       WEBRTC CALLING SYSTEM
+    ===================================================== */
+    const STUN_SERVERS = { iceServers: [{ urls: ["stun:stun1.l.google.com:19302","stun:stun2.l.google.com:19302"] }] };
+
+    let peerConnection = null;
+    let localStream = null;
+    let localVideoStream = null;
+    let callDocId = null;
+    let callUnsub = null;
+    let callTimerInterval = null;
+    let callSeconds = 0;
+    let isMuted = false;
+    let isDeafened = false;
+    let isCameraOn = false;
+    let activeCallConv = null;
+    let isCallerRole = false;
+    let incomingCallData = null;
+    let incomingCallUnsub = null;
+
+    // ── Tile helpers ─────────────────────────────────────────────────────────
+    function makeTileAv(photo, name) {
+      if (photo) return `<img src="${escHtml(photo)}" alt="">`;
+      return escHtml((name || "?")[0].toUpperCase());
+    }
+
+    function upsertTile(id, name, photo, status, isYou, extraClass) {
+      const tiles = document.getElementById("cp-tiles");
+      let tile = document.getElementById("cpt-" + id);
+      if (!tile) {
+        tile = document.createElement("div");
+        tile.className = "cp-tile";
+        tile.id = "cpt-" + id;
+        tiles.appendChild(tile);
+      }
+      const avClass = "cp-tile-av" + (extraClass ? " " + extraClass : "");
+      tile.innerHTML = `
+        <div class="${avClass}" id="cpt-av-${id}">
+          ${makeTileAv(photo, name)}
+          <div class="cp-tile-icon">🔇</div>
+        </div>
+        <div class="cp-tile-name">${escHtml(name || "Unknown")}</div>
+        ${isYou ? '<div class="cp-tile-you">you</div>' : ''}
+        <div class="cp-tile-status" id="cpt-s-${id}">${escHtml(status || "")}</div>`;
+    }
+
+    function setTileStatus(id, status) {
+      const el = document.getElementById("cpt-s-" + id);
+      if (el) el.textContent = status;
+    }
+
+    function setTileClass(id, cls) {
+      const el = document.getElementById("cpt-av-" + id);
+      if (el) el.className = "cp-tile-av" + (cls ? " " + cls : "");
+    }
+
+    function clearTiles() {
+      const tiles = document.getElementById("cp-tiles");
+      if (tiles) tiles.innerHTML = "";
+    }
+
+    // ── Start a call ────────────────────────────────────────────────────────
+    async function startCall() {
+      if (!currentUser || !activeCallConv) { showToast("SELECT A CONVERSATION FIRST"); return; }
+      if (peerConnection) { maximizeCall(); return; }
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 },
+          video: false
+        });
+      } catch (err) { showToast("MIC ACCESS DENIED — CHECK BROWSER PERMISSIONS"); return; }
+      document.getElementById("local-audio").srcObject = localStream;
+      isCallerRole = true;
+      callDocId = "call_" + activeDmId;
+
+      peerConnection = new RTCPeerConnection(STUN_SERVERS);
+      localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+      peerConnection.ontrack = e => {
+        if (e.track.kind === "video") { const v = document.getElementById("remote-video"); v.srcObject = e.streams[0]; v.style.display = "block"; }
+        else { document.getElementById("remote-audio").srcObject = e.streams[0]; }
+      };
+      peerConnection.onicecandidate = e => { if (e.candidate) db.collection("calls").doc(callDocId).collection("callerCandidates").add(e.candidate.toJSON()); };
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      await db.collection("calls").doc(callDocId).set({
+        offer: { type: offer.type, sdp: offer.sdp },
+        callerUid: currentUser.uid,
+        callerName: currentUser.displayName || "Someone",
+        callerPhoto: currentUser.photoURL || null,
+        calleeUid: activeCallConv.otherId,
+        status: "calling",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      showCallPanel(activeCallConv.otherName, activeCallConv.otherPhoto, "Calling...");
+
+      callUnsub = db.collection("calls").doc(callDocId).onSnapshot(async snap => {
+        const data = snap.data(); if (!data) return;
+        if (data.status === "declined") { endCall(true); showToast("CALL DECLINED"); return; }
+        if (data.status === "ended") { endCall(true); return; }
+        if (data.answer && peerConnection && peerConnection.signalingState === "have-local-offer") {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+          onCallConnected(activeCallConv.otherName, activeCallConv.otherPhoto);
+        }
+      });
+
+      db.collection("calls").doc(callDocId).collection("calleeCandidates").onSnapshot(snap => {
+        snap.docChanges().forEach(async c => {
+          if (c.type === "added" && peerConnection) try { await peerConnection.addIceCandidate(new RTCIceCandidate(c.doc.data())); } catch (_) {}
+        });
+      });
+    }
+
+    // ── Accept incoming ──────────────────────────────────────────────────────
+    async function acceptCall() {
+      if (!incomingCallData) return;
+      hideIncomingToast();
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 },
+          video: false
+        });
+      } catch (err) { showToast("MIC ACCESS DENIED"); await db.collection("calls").doc(callDocId).update({ status: "declined" }); return; }
+      document.getElementById("local-audio").srcObject = localStream;
+      isCallerRole = false;
+
+      peerConnection = new RTCPeerConnection(STUN_SERVERS);
+      localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+      peerConnection.ontrack = e => {
+        if (e.track.kind === "video") { const v = document.getElementById("remote-video"); v.srcObject = e.streams[0]; v.style.display = "block"; }
+        else { document.getElementById("remote-audio").srcObject = e.streams[0]; }
+      };
+      peerConnection.onicecandidate = e => { if (e.candidate) db.collection("calls").doc(callDocId).collection("calleeCandidates").add(e.candidate.toJSON()); };
+
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingCallData.offer));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      await db.collection("calls").doc(callDocId).update({ answer: { type: answer.type, sdp: answer.sdp }, status: "connected" });
+
+      db.collection("calls").doc(callDocId).collection("callerCandidates").onSnapshot(snap => {
+        snap.docChanges().forEach(async c => {
+          if (c.type === "added" && peerConnection) try { await peerConnection.addIceCandidate(new RTCIceCandidate(c.doc.data())); } catch (_) {}
+        });
+      });
+
+      callUnsub = db.collection("calls").doc(callDocId).onSnapshot(snap => { if (snap.data()?.status === "ended") endCall(true); });
+
+      const callerName = incomingCallData.callerName || "Unknown";
+      const callerPhoto = incomingCallData.callerPhoto || null;
+      incomingCallData = null;
+
+      showCallPanel(callerName, callerPhoto, "Connecting...");
+      onCallConnected(callerName, callerPhoto);
+    }
+
+    async function declineCall() {
+      hideIncomingToast();
+      if (callDocId) try { await db.collection("calls").doc(callDocId).update({ status: "declined" }); } catch (_) {}
+      callDocId = null; incomingCallData = null;
+    }
+
+    // ── Real speaking detection via Web Audio API ────────────────────────────
+    let audioContext = null;
+    let speakingInterval = null;
+
+    function startSpeakingDetection() {
+      if (!localStream || !window.AudioContext) return;
+      try {
+        audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(localStream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.4;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        speakingInterval = setInterval(() => {
+          if (isMuted) return;
+          analyser.getByteFrequencyData(data);
+          const vol = data.reduce((a, b) => a + b, 0) / data.length;
+          const speaking = vol > 8;
+          setTileClass("me", speaking ? "speaking" : "");
+        }, 120);
+      } catch (_) {}
+    }
+
+    function stopSpeakingDetection() {
+      if (speakingInterval) { clearInterval(speakingInterval); speakingInterval = null; }
+      if (audioContext) { audioContext.close().catch(() => {}); audioContext = null; }
+    }
+
+    // ── On connected ─────────────────────────────────────────────────────────
+    function onCallConnected(otherName, otherPhoto) {
+      const statusEl = document.getElementById("cp-status-text");
+      statusEl.textContent = "Voice Connected";
+      statusEl.className = "cp-header-status";
+      clearTiles();
+      // Start with neutral state — speaking detection will update dynamically
+      upsertTile("me", currentUser.displayName || "You", currentUser.photoURL, "🎙️ Connected", true, "");
+      upsertTile("other", otherName, otherPhoto, "🎙️ Connected", false, "speaking");
+      document.getElementById("vb-status-text").textContent = "Voice Connected";
+      document.getElementById("vb-status-text").className = "vb-status-text";
+      startCallTimer();
+      startSpeakingDetection();
+    }
+
+    // ── End call ─────────────────────────────────────────────────────────────
+    async function endCall(silent) {
+      if (callUnsub) { callUnsub(); callUnsub = null; }
+      if (callTimerInterval) { clearInterval(callTimerInterval); callTimerInterval = null; }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      if (localVideoStream) { localVideoStream.getTracks().forEach(t => t.stop()); localVideoStream = null; }
+      stopSpeakingDetection();
+      if (peerConnection) { peerConnection.close(); peerConnection = null; }
+      document.getElementById("remote-audio").srcObject = null;
+      document.getElementById("local-audio").srcObject = null;
+      const rv = document.getElementById("remote-video"); rv.srcObject = null; rv.style.display = "none";
+      isMuted = false; isDeafened = false; isCameraOn = false; callSeconds = 0;
+      document.getElementById("call-panel").classList.remove("show");
+      document.getElementById("voice-bar").classList.remove("show");
+      document.getElementById("cp-mute-btn").textContent = "🎙️"; document.getElementById("cp-mute-btn").classList.remove("active");
+      document.getElementById("cp-cam-btn").textContent = "📷"; document.getElementById("cp-cam-btn").classList.remove("active");
+      document.getElementById("cp-deafen-btn").textContent = "🔊"; document.getElementById("cp-deafen-btn").classList.remove("active");
+      document.getElementById("vb-mute-btn").textContent = "🎙️"; document.getElementById("vb-mute-btn").classList.remove("muted");
+      clearTiles();
+      if (!silent && callDocId) try { await db.collection("calls").doc(callDocId).update({ status: "ended" }); } catch (_) {}
+      callDocId = null;
+    }
+
+    function toggleMute() {
+      if (!localStream) return;
+      isMuted = !isMuted;
+      localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+      document.getElementById("cp-mute-btn").textContent = isMuted ? "🔇" : "🎙️";
+      document.getElementById("cp-mute-btn").classList.toggle("active", isMuted);
+      document.getElementById("vb-mute-btn").textContent = isMuted ? "🔇" : "🎙️";
+      document.getElementById("vb-mute-btn").classList.toggle("muted", isMuted);
+      // When muted, show red border; when unmuted, let speaking detection take over
+      if (isMuted) {
+        setTileClass("me", "is-muted");
+        setTileStatus("me", "🔇 Muted");
+      } else {
+        setTileClass("me", "");
+        setTileStatus("me", "🎙️ Connected");
+      }
+    }
+
+    function toggleDeafen() {
+      isDeafened = !isDeafened;
+      document.getElementById("remote-audio").muted = isDeafened;
+      document.getElementById("cp-deafen-btn").textContent = isDeafened ? "🙉" : "🔊";
+      document.getElementById("cp-deafen-btn").classList.toggle("active", isDeafened);
+    }
+
+    async function toggleCamera() {
+      if (isCameraOn) {
+        if (localVideoStream) { localVideoStream.getTracks().forEach(t => t.stop()); localVideoStream = null; }
+        if (peerConnection) peerConnection.getSenders().filter(s => s.track?.kind === "video").forEach(s => peerConnection.removeTrack(s));
+        isCameraOn = false;
+        document.getElementById("cp-cam-btn").textContent = "📷";
+        document.getElementById("cp-cam-btn").classList.remove("active");
+      } else {
+        try {
+          localVideoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          if (peerConnection) localVideoStream.getVideoTracks().forEach(t => peerConnection.addTrack(t, localVideoStream));
+          isCameraOn = true;
+          document.getElementById("cp-cam-btn").textContent = "🎥";
+          document.getElementById("cp-cam-btn").classList.add("active");
+        } catch (err) { showToast("CAMERA ACCESS DENIED"); }
+      }
+    }
+
+    function minimizeCall() {
+      document.getElementById("call-panel").classList.remove("show");
+      document.getElementById("voice-bar").classList.add("show");
+    }
+    function maximizeCall() {
+      document.getElementById("voice-bar").classList.remove("show");
+      document.getElementById("call-panel").classList.add("show");
+    }
+
+    // ── Show the full panel ───────────────────────────────────────────────────
+    function showCallPanel(otherName, otherPhoto, status) {
+      document.getElementById("cp-header-name").textContent = "Call with " + (otherName || "Unknown");
+      const statusEl = document.getElementById("cp-status-text");
+      statusEl.textContent = status;
+      statusEl.className = "cp-header-status" + (status === "Calling..." ? " ringing" : "");
+      document.getElementById("cp-timer").textContent = "";
+      // Build initial tiles
+      clearTiles();
+      upsertTile("me", currentUser?.displayName || "You", currentUser?.photoURL, "🎙️ Calling...", true, "speaking");
+      upsertTile("other", otherName, otherPhoto, "📞 Ringing...", false, "ringing");
+      // Mini bar
+      const avEl = document.getElementById("vb-avatar");
+      avEl.innerHTML = otherPhoto ? `<img src="${escHtml(otherPhoto)}" alt="">` : (otherName || "?")[0].toUpperCase();
+      document.getElementById("vb-name").textContent = otherName || "Unknown";
+      document.getElementById("vb-status-text").textContent = status;
+      document.getElementById("vb-status-text").className = "vb-status-text" + (status === "Calling..." ? " ringing" : "");
+      document.getElementById("vb-timer").textContent = "";
+      // Show full panel
+      document.getElementById("call-panel").classList.add("show");
+      document.getElementById("voice-bar").classList.remove("show");
+    }
+
+    function startCallTimer() {
+      callSeconds = 0;
+      callTimerInterval = setInterval(() => {
+        callSeconds++;
+        const m = String(Math.floor(callSeconds / 60)).padStart(2, "0");
+        const s = String(callSeconds % 60).padStart(2, "0");
+        const t = m + ":" + s;
+        document.getElementById("cp-timer").textContent = t;
+        document.getElementById("vb-timer").textContent = t;
+      }, 1000);
+    }
+
+    function showIncomingToast(callerName, callerPhoto) {
+      document.getElementById("incoming-caller-name").textContent = callerName || "Someone";
+      const avEl = document.getElementById("incoming-av");
+      avEl.innerHTML = callerPhoto ? `<img src="${escHtml(callerPhoto)}" alt="">` : (callerName || "?")[0].toUpperCase();
+      document.getElementById("incoming-call-toast").classList.add("show");
+      showBrowserNotif("📞 Incoming Call", (callerName || "Someone") + " is calling you");
+    }
+    function hideIncomingToast() { document.getElementById("incoming-call-toast").classList.remove("show"); }
+
+    function startIncomingCallListener() {
+      if (!currentUser) return;
+      if (incomingCallUnsub) { incomingCallUnsub(); incomingCallUnsub = null; }
+      // Only one where clause = no composite index needed
+      incomingCallUnsub = db.collection("calls")
+        .where("calleeUid", "==", currentUser.uid)
+        .onSnapshot(snap => {
+          snap.docChanges().forEach(change => {
+            if (change.type !== "added" && change.type !== "modified") return;
+            const data = change.doc.data();
+            // Filter status in JS — avoids needing a Firestore composite index
+            if (data.status !== "calling") return;
+            if (peerConnection) return; // already in a call
+            const age = data.createdAt ? Date.now() - data.createdAt.toMillis() : 0;
+            if (age > 30000) return; // stale call, ignore
+            // Don't re-show toast if we already have this call pending
+            if (callDocId === change.doc.id) return;
+            callDocId = change.doc.id;
+            incomingCallData = data;
+            if (!activeCallConv) activeCallConv = { otherId: data.callerUid, otherName: data.callerName, otherPhoto: data.callerPhoto };
+            showIncomingToast(data.callerName || "Someone", data.callerPhoto || null);
+            setTimeout(() => { if (incomingCallData && callDocId === change.doc.id) declineCall(); }, 30000);
+          });
+        }, err => { console.warn("Call listener error:", err.message); });
+    }
+
     init();
+    startIncomingCallListener();
+
+
+
+    /* =====================================================
+       EMOJI PICKER
+    ===================================================== */
+    const EMOJI_CATS = {
+      smileys: ["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😙","🥲","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","🤐","🤨","😐","😑","😶","😏","😒","🙄","😬","🤥","😌","😔","😪","🤤","😴","😷","🤒","🤕","🤢","🤮","🤧","🥵","🥶","🥴","😵","🤯","🤠","🥳","🥸","😎","🤓","🧐","😕","😟","🙁","☹️","😮","😯","😲","😳","🥺","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖"],
+      people: ["👋","🤚","🖐","✋","🖖","👌","🤌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","🖕","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🫀","🫁","🧠","🦷","🦴","👀","👁","👅","👄","💋","👶","🧒","👦","👧","🧑","👱","👨","🧔","👩","🧓","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🧏","🙇","🤦","🤷"],
+      nature: ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🐔","🐧","🐦","🐤","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🐛","🦋","🐌","🐞","🐜","🦟","🦗","🕷","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐡","🐠","🐟","🐬","🐳","🐋","🦈","🐊","🐅","🐆","🦓","🦍","🦧","🦣","🐘","🦛","🦏","🐪","🐫","🦒","🦘","🦬","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌","🐕","🐩","🦮","🐈","🐓","🦃","🦤","🌸","🌺","🌻","🌹","🍀","🌿","🌱","🌲","🌳","🌴","🍄","🐚","🪸","🌾","💐","🌷"],
+      food: ["🍕","🍔","🌮","🌯","🥙","🧆","🥚","🍳","🥘","🍲","🫕","🥣","🥗","🍿","🧈","🧂","🥫","🍱","🍘","🍙","🍚","🍛","🍜","🍝","🍠","🍢","🍣","🍤","🍥","🥮","🍡","🥟","🥠","🥡","🍦","🍧","🍨","🍩","🍪","🎂","🍰","🧁","🥧","🍫","🍬","🍭","🍮","🍯","🍼","🥛","☕","🍵","🧃","🥤","🧋","🍶","🍺","🍻","🥂","🍷","🥃","🍸","🍹","🧉","🍾","🧊","🥄","🍴","🍽","🥢","🫙","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🫒","🥑","🍆","🥔","🥕","🌽","🌶","🫑","🥦","🧄","🧅","🥜","🫘","🌰"],
+      activities: ["⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓","🏸","🏒","🏑","🥍","🏏","🪃","🥅","⛳","🪁","🎣","🤿","🎽","🎿","🛷","🥌","🎯","🪃","🏹","🎣","🤸","🤼","🤺","🏇","⛷","🏂","🪂","🏋","🤼","🤸","⛹","🤾","🏌","🧘","🏄","🏊","🤽","🚣","🧗","🚵","🚴","🏆","🥇","🥈","🥉","🏅","🎖","🏵","🎗","🎫","🎟","🎪","🤹","🎭","🎨","🎬","🎤","🎧","🎼","🎹","🪘","🥁","🎷","🎺","🎸","🪕","🎻","🎲","♟","🎮","🕹","🧩","🪄"],
+      objects: ["💡","🔦","🕯","🪔","🧱","🪞","🪟","🛋","🪑","🚪","🧳","🌂","☂","🧵","🪡","🧶","👓","🕶","🥽","🌡","🧲","💊","🩺","🩹","🩻","🔬","🔭","📡","💈","🪒","🪮","🛁","🚿","🧴","🧷","🧹","🧺","🧻","🪣","🧼","🫧","🪥","🧽","🧯","🛒","🚪","🪤","🪣","📦","📫","📬","📭","📮","🗳","📝","📄","📃","📑","📊","📈","📉","🗒","🗓","📆","📅","📇","🗃","🗂","🗄","🗑","📌","📍","✂","🗃","🖊","🖋","✒","🖌","🖍","📏","📐","🔒","🔓","🔑","🗝","🔨","🪓","⛏","⚒","🛠","🗡","⚔","🛡","🪚","🔧","🪛","🔩","⚙","🗜","⚖","🪝","🔗","⛓","🪤","🪜","🧲","🔮","🪄","🎱"],
+      symbols: ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⛎","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","🆔","⚛️","🉑","☢️","☣️","📴","📳","🈶","🈚","🈸","🈺","🈷️","✴️","🆚","💮","🉐","㊙️","㊗️","🈴","🈵","🈹","🈲","🅰️","🅱️","🆎","🆑","🅾️","🆘","❌","⭕","🛑","⛔","📛","🚫","💯","💢","♨️","🚷","🚯","🚳","🚱","🔞","📵","🚭","❗","❕","❓","❔","‼️","⁉️","🔅","🔆","〽️","⚠️","🔱","⚜️","🔰","♻️","✅","🈯","💹","❎","🌐","💠","Ⓜ️","🌀","💤","🏧","🚾","♿","🅿️","🛗","🈳","🈹","🚺","🚹","🚼","⚧","🚻","🚮","🎦","📶","🈁","🔣","ℹ️","🔤","🔡","🔠","🆖","🆗","🆙","🆒","🆕","🆓","0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟","🔢","#️⃣","*️⃣","⏏️","▶️","⏸","⏹","⏺","⏭","⏮","⏩","⏪","⏫","⏬","◀️","🔼","🔽","➡️","⬅️","⬆️","⬇️","↗️","↘️","↙️","↖️","↕️","↔️","↪️","↩️","⤴️","⤵️","🔀","🔁","🔂","🔄","🔃","🎵","🎶","➕","➖","➗","✖️","♾","💲","💱","™️","©️","®️","〰️","➰","➿","🔚","🔙","🔛","🔜","🔝","✔️","☑️","🔘","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔸","🔹","🔶","🔷","🔳","🔲","▪️","▫️","◾","◽","◼️","◻️","🟥","🟧","🟨","🟩","🟦","🟪","⬛","⬜","🟫","🔈","🔇","🔉","🔊","🔔","🔕","📣","📢","💬","💭","🗯","♠️","♣️","♥️","♦️","🃏","🎴","🀄"]
+    };
+    let emojiTarget = null; // 'social' or 'dm'
+    let currentEmojiCat = 'smileys';
+
+    function openEmojiPicker(target, anchorEl) {
+      emojiTarget = target;
+      const picker = document.getElementById('emoji-picker');
+      document.getElementById('emoji-search-input').value = '';
+      renderEmojiGrid(EMOJI_CATS[currentEmojiCat]);
+      // Position near button
+      const rect = anchorEl.getBoundingClientRect();
+      picker.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+      picker.style.left = Math.min(rect.left, window.innerWidth - 310) + 'px';
+      picker.classList.add('open');
+    }
+    function closeEmojiPicker() { document.getElementById('emoji-picker').classList.remove('open'); }
+
+    function renderEmojiGrid(emojis) {
+      const grid = document.getElementById('emoji-grid');
+      grid.innerHTML = '';
+      emojis.forEach(em => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-btn-item'; btn.textContent = em;
+        btn.onclick = () => insertEmoji(em);
+        grid.appendChild(btn);
+      });
+    }
+
+    function insertEmoji(em) {
+      if (emojiTarget === 'social') {
+        const inp = document.getElementById('social-input');
+        const pos = inp.selectionStart;
+        inp.value = inp.value.slice(0, pos) + em + inp.value.slice(inp.selectionEnd);
+        inp.selectionStart = inp.selectionEnd = pos + em.length;
+        inp.focus();
+      } else if (emojiTarget === 'dm') {
+        const inp = document.getElementById('dm-input');
+        const pos = inp.selectionStart;
+        inp.value = inp.value.slice(0, pos) + em + inp.value.slice(inp.selectionEnd);
+        inp.selectionStart = inp.selectionEnd = pos + em.length;
+        inp.focus();
+      }
+      closeEmojiPicker();
+    }
+
+    document.getElementById('emoji-btn-social').addEventListener('click', e => {
+      if (document.getElementById('emoji-picker').classList.contains('open') && emojiTarget === 'social') { closeEmojiPicker(); return; }
+      openEmojiPicker('social', e.currentTarget);
+    });
+    document.getElementById('emoji-btn-dm').addEventListener('click', e => {
+      if (document.getElementById('emoji-picker').classList.contains('open') && emojiTarget === 'dm') { closeEmojiPicker(); return; }
+      openEmojiPicker('dm', e.currentTarget);
+    });
+    document.querySelectorAll('.emoji-cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.emoji-cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentEmojiCat = btn.dataset.cat;
+        document.getElementById('emoji-search-input').value = '';
+        renderEmojiGrid(EMOJI_CATS[currentEmojiCat]);
+      });
+    });
+    document.getElementById('emoji-search-input').addEventListener('input', e => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) { renderEmojiGrid(EMOJI_CATS[currentEmojiCat]); return; }
+      const all = Object.values(EMOJI_CATS).flat();
+      renderEmojiGrid(all); // show all when searching — emoji match is visual
+    });
+    document.addEventListener('click', e => {
+      const picker = document.getElementById('emoji-picker');
+      if (picker.classList.contains('open') && !picker.contains(e.target) && !e.target.closest('#emoji-btn-social') && !e.target.closest('#emoji-btn-dm')) {
+        closeEmojiPicker();
+      }
+    });
   </script>
 </body>
 
