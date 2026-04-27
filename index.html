@@ -1603,126 +1603,6 @@
       grid-column: 1/-1;
     }
 
-    /* ─── AI FULLSCREEN ─── */
-    .ai-fs-btn {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      padding: 10px 12px;
-      border: none;
-      border-bottom: 2px solid transparent;
-      background: var(--modal-bg);
-      color: var(--muted);
-      cursor: pointer;
-      letter-spacing: 1px;
-    }
-    .ai-fs-btn:hover { color: var(--fg); }
-
-    #home-section.ai-fullscreen {
-      position: fixed;
-      inset: 0;
-      z-index: 500;
-      background: var(--bg);
-      overflow-y: auto;
-      padding: 0 !important;
-      margin: 0 !important;
-      max-width: 100% !important;
-      width: 100% !important;
-    }
-    #home-section.ai-fullscreen #home-inner {
-      max-width: 100%;
-      padding: 0;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    #home-section.ai-fullscreen .home-header,
-    #home-section.ai-fullscreen .home-actions,
-    #home-section.ai-fullscreen #github-notice {
-      display: none !important;
-    }
-    #home-section.ai-fullscreen .chat-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    #home-section.ai-fullscreen .chat-messages {
-      flex: 1;
-      height: unset;
-      min-height: 0;
-    }
-    #home-section.ai-fullscreen #ai-panel-imagegen > div {
-      height: 100%;
-    }
-    #home-section.ai-fullscreen .imagegen-output {
-      flex: 1;
-      min-height: 0;
-    }
-    #home-section.ai-fullscreen #ai-panel-chat,
-    #home-section.ai-fullscreen #ai-panel-imagegen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    /* Fullscreen top bar for AI */
-    #ai-fs-bar {
-      display: none;
-      height: 44px;
-      background: var(--nav-bg);
-      border-bottom: var(--border);
-      align-items: center;
-      padding: 0 14px;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    #home-section.ai-fullscreen #ai-fs-bar {
-      display: flex;
-    }
-    #home-section.ai-fullscreen > #home-inner > .cost-note-bar {
-      flex-shrink: 0;
-    }
-
-    /* ─── IMAGEGEN UPLOAD PREVIEW ─── */
-    .imagegen-upload-preview {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-bottom: var(--border);
-      background: var(--bg2);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .imagegen-upload-preview img { height: 36px; width: 36px; object-fit: cover; border: var(--border); }
-    .imagegen-upload-clear { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; }
-
-    /* ─── REPORT SYSTEM ─── */
-    .msg-report-btn { font-family:var(--font-pixel); font-size:6px; padding:3px 7px; background:none; border:1px solid #f55; color:#f55; cursor:pointer; margin-left:4px; }
-    .msg-report-btn:hover { background:#f55; color:#fff; }
-    .report-badge { font-family:var(--font-pixel); font-size:6px; padding:2px 6px; background:#f55; color:#fff; }
-    .report-entry { border:var(--border); border-left:3px solid #f55; padding:10px 14px; margin-bottom:8px; background:var(--card-bg); font-family:var(--font-mono); font-size:11px; }
-    .report-entry .report-meta { color:var(--muted); font-size:10px; margin-top:4px; }
-
-    /* ─── ONLINE STATUS ─── */
-    .online-dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
-    .online-dot.online { background:#5f5; }
-    .online-dot.offline { background:var(--muted); }
-    .online-user-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border:var(--border); margin-bottom:5px; background:var(--card-bg); font-family:var(--font-mono); font-size:12px; }
-
-    /* ─── REPORT MODAL ─── */
-    #report-modal { display:none; position:fixed; inset:0; z-index:700; background:rgba(0,0,0,.6); align-items:center; justify-content:center; }
-    #report-modal.open { display:flex; }
-    .report-modal-box { background:var(--bg); border:var(--border); padding:22px; max-width:380px; width:90%; }
-    .report-modal-box h3 { font-family:var(--font-pixel); font-size:9px; margin:0 0 10px; }
-    .report-modal-box select, .report-modal-box textarea { width:100%; font-family:var(--font-mono); font-size:12px; padding:8px; border:var(--border); background:var(--input-bg); color:var(--fg); outline:none; margin-bottom:10px; box-sizing:border-box; }
-    .report-modal-box textarea { resize:vertical; min-height:80px; }
-
-    /* ─── PROFILE PIC EDIT ─── */
-    .drawer-pfp-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .drawer-pfp-preview { width:44px; height:44px; border-radius:50%; border:var(--border); object-fit:cover; }
-
     /* ─── IMAGE GEN MODAL ─── */
     #imagegen-modal .modal-box {
       max-width: 640px;
@@ -2244,118 +2124,211 @@
     }
 
     /* ─── ADMIN SECTION ─── */
-    #admin-section { max-width: 1100px; margin: 0 auto; }
+    #admin-section {
+      max-width: 960px;
+      margin: 0 auto;
+    }
 
-    .admin-tabs { display:flex; gap:0; border-bottom:var(--border); margin-bottom:20px; flex-wrap:wrap; }
-    .admin-tab { font-family:var(--font-pixel); font-size:7px; padding:10px 18px; border:none; background:none; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; letter-spacing:1px; }
-    .admin-tab.active { color:var(--fg); border-bottom-color:var(--fg); }
-    .admin-panel { display:none; }
-    .admin-panel.active { display:block; }
+    .admin-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: var(--border);
+      margin-bottom: 20px;
+    }
 
-    /* toolbar */
-    .admin-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
-    .admin-search { font-family:var(--font-mono); font-size:13px; padding:7px 12px; border:var(--border); background:var(--input-bg); color:var(--fg); outline:none; flex:1; min-width:160px; }
-    .admin-action-btn { font-family:var(--font-pixel); font-size:7px; padding:8px 14px; background:var(--fg); color:var(--bg); border:var(--border); cursor:pointer; letter-spacing:1px; white-space:nowrap; }
-    .admin-action-btn:hover { opacity:.8; }
-    .admin-action-btn.danger { background:#f55; color:#fff; border-color:#f55; }
-    .admin-action-btn.success { background:#5f5; color:#000; border-color:#5f5; }
-    .admin-action-btn.warn { background:#fa0; color:#000; border-color:#fa0; }
-    .admin-action-btn.ghost { background:none; color:var(--fg); }
-    .admin-action-btn.ghost:hover { background:var(--bg2); }
+    .admin-tab {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
 
-    /* user table */
-    .user-table { width:100%; border-collapse:collapse; }
-    .user-table th, .user-table td { border:1px solid var(--border-col); padding:9px 12px; font-family:var(--font-mono); font-size:12px; text-align:left; vertical-align:middle; }
-    .user-table th { font-family:var(--font-pixel); font-size:7px; background:var(--fg); color:var(--bg); white-space:nowrap; }
-    .user-table tr:hover td { background:var(--bg2); cursor:pointer; }
-    .user-table tr.selected td { background:var(--bg2); outline:1px solid var(--fg); }
-    .user-table .check-col { width:32px; text-align:center; }
+    .admin-tab.active {
+      color: var(--fg);
+      border-bottom-color: var(--fg);
+    }
 
-    /* badges */
-    .role-badge { font-family:var(--font-pixel); font-size:6px; padding:3px 7px; border:1px solid; display:inline-block; }
-    .role-badge.owner { color:#f0b; border-color:#f0b; }
-    .role-badge.admin { color:#fa0; border-color:#fa0; }
-    .role-badge.user { color:var(--muted); border-color:var(--border-col); }
-    .banned-badge { font-family:var(--font-pixel); font-size:6px; padding:3px 7px; background:#f55; color:#fff; border:none; display:inline-block; }
-    .status-dot-active { font-size:11px; color:#5f5; }
-    .status-dot-banned { font-size:11px; color:#f55; }
+    .admin-panel {
+      display: none;
+    }
 
-    /* action buttons in table */
-    .ban-btn  { font-family:var(--font-pixel); font-size:6px; padding:4px 8px; background:none; border:1px solid #f55; color:#f55; cursor:pointer; }
-    .ban-btn:hover { background:#f55; color:#fff; }
-    .unban-btn { font-family:var(--font-pixel); font-size:6px; padding:4px 8px; background:none; border:1px solid #5f5; color:#5f5; cursor:pointer; }
-    .unban-btn:hover { background:#5f5; color:#000; }
-    .del-msgs-btn { font-family:var(--font-pixel); font-size:6px; padding:4px 8px; background:none; border:1px solid #f55; color:#f55; cursor:pointer; }
-    .del-msgs-btn:hover { background:#f55; color:#fff; }
-    .action-btn-group { display:flex; gap:4px; flex-wrap:wrap; }
+    .admin-panel.active {
+      display: block;
+    }
 
-    /* avatars */
-    .admin-user-avatar { width:28px; height:28px; border-radius:50%; border:var(--border); object-fit:cover; vertical-align:middle; margin-right:6px; }
-    .admin-user-initials { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; border:var(--border); background:var(--fg); color:var(--bg); font-family:var(--font-pixel); font-size:9px; vertical-align:middle; margin-right:6px; flex-shrink:0; }
-    .admin-name-cell { display:flex; align-items:center; }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-    /* user detail drawer */
-    #user-detail-drawer { display:none; border:var(--border); background:var(--bg2); padding:20px; margin-bottom:20px; position:relative; }
-    #user-detail-drawer.open { display:block; }
-    .drawer-close { position:absolute; top:10px; right:12px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; }
-    .drawer-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
-    .drawer-name { font-family:var(--font-pixel); font-size:11px; }
-    .drawer-uid { font-family:var(--font-mono); font-size:10px; color:var(--muted); word-break:break-all; }
-    .drawer-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-    @media(max-width:600px){ .drawer-grid { grid-template-columns:1fr; } }
-    .drawer-field { display:flex; flex-direction:column; gap:4px; }
-    .drawer-field label { font-family:var(--font-pixel); font-size:7px; color:var(--muted); }
-    .drawer-field input, .drawer-field select { font-family:var(--font-mono); font-size:12px; padding:6px 10px; border:var(--border); background:var(--input-bg); color:var(--fg); outline:none; width:100%; }
-    .drawer-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-    .drawer-section-title { font-family:var(--font-pixel); font-size:7px; color:var(--muted); margin:14px 0 8px; letter-spacing:1px; }
-    .custom-fields-list { display:flex; flex-direction:column; gap:6px; }
-    .custom-field-row { display:flex; gap:6px; align-items:center; }
-    .custom-field-row input { font-family:var(--font-mono); font-size:12px; padding:5px 8px; border:var(--border); background:var(--input-bg); color:var(--fg); outline:none; flex:1; }
-    .custom-field-remove { background:none; border:none; color:#f55; cursor:pointer; font-size:14px; padding:0 4px; }
+    .user-table th,
+    .user-table td {
+      border: 1px solid var(--border-col);
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
 
-    /* whitelist */
-    .whitelist-input-row { display:flex; gap:8px; margin-bottom:16px; }
-    .whitelist-input { flex:1; font-family:var(--font-mono); font-size:13px; padding:8px 12px; border:var(--border); background:var(--input-bg); color:var(--fg); outline:none; }
-    .wl-entry { display:flex; justify-content:space-between; align-items:center; border:var(--border); padding:9px 12px; margin-bottom:6px; background:var(--card-bg); font-size:12px; font-family:var(--font-mono); }
-    .wl-remove { font-family:var(--font-pixel); font-size:6px; padding:4px 8px; background:none; border:var(--border); color:#f55; cursor:pointer; }
-    .wl-remove:hover { background:#f55; color:#fff; }
+    .user-table th {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      background: var(--fg);
+      color: var(--bg);
+    }
 
-    /* logs */
-    .log-entry { border:var(--border); padding:9px 14px; margin-bottom:6px; background:var(--card-bg); font-family:var(--font-mono); font-size:11px; display:flex; gap:12px; align-items:flex-start; }
-    .log-time { color:var(--muted); white-space:nowrap; font-size:10px; flex-shrink:0; }
-    .log-action { font-family:var(--font-pixel); font-size:7px; padding:2px 6px; background:var(--fg); color:var(--bg); flex-shrink:0; }
-    .log-action.ban { background:#f55; }
-    .log-action.unban { background:#5f5; color:#000; }
-    .log-action.role { background:#fa0; color:#000; }
-    .log-action.delete { background:#a00; }
-    .log-action.edit { background:#55f; }
-    .log-detail { color:var(--muted); flex:1; }
+    .user-table tr:hover td {
+      background: var(--bg2);
+    }
 
-    /* confirm modal */
-    #admin-confirm-modal { display:none; position:fixed; inset:0; z-index:900; background:rgba(0,0,0,.7); align-items:center; justify-content:center; }
-    #admin-confirm-modal.open { display:flex; }
-    .admin-confirm-box { background:var(--bg); border:var(--border); padding:24px; max-width:400px; width:90%; }
-    .admin-confirm-box h3 { font-family:var(--font-pixel); font-size:9px; margin:0 0 12px; }
-    .admin-confirm-box p { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin:0 0 20px; line-height:1.6; }
-    .admin-confirm-btns { display:flex; gap:8px; justify-content:flex-end; }
+    .ban-btn {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 4px 8px;
+      background: none;
+      border: var(--border);
+      color: #f55;
+      cursor: pointer;
+    }
 
-    /* stats row */
-    .admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:18px; }
-    .admin-stat-card { border:var(--border); background:var(--bg2); padding:12px 14px; }
-    .admin-stat-val { font-family:var(--font-pixel); font-size:14px; margin-bottom:4px; }
-    .admin-stat-label { font-family:var(--font-mono); font-size:10px; color:var(--muted); }
+    .ban-btn:hover {
+      background: #f55;
+      color: #fff;
+    }
 
-    /* bulk bar */
-    #bulk-bar { display:none; background:var(--fg); color:var(--bg); padding:8px 14px; margin-bottom:10px; font-family:var(--font-pixel); font-size:7px; align-items:center; gap:10px; }
-    #bulk-bar.visible { display:flex; }
-    .bulk-bar-btn { font-family:var(--font-pixel); font-size:6px; padding:5px 10px; border:1px solid var(--bg); background:none; color:var(--bg); cursor:pointer; }
-    .bulk-bar-btn:hover { background:var(--bg); color:var(--fg); }
-    .bulk-bar-btn.danger { border-color:#f55; color:#f55; }
-    .bulk-bar-btn.danger:hover { background:#f55; color:#fff; }
+    .unban-btn {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 4px 8px;
+      background: none;
+      border: var(--border);
+      color: #5f5;
+      cursor: pointer;
+    }
 
-    /* realtime dot */
-    .rt-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#5f5; margin-right:6px; animation:pulse-dot 2s infinite; }
-    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .unban-btn:hover {
+      background: #5f5;
+      color: #000;
+    }
+
+    .del-msgs-btn {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 4px 8px;
+      background: none;
+      border: 1px solid #f55;
+      color: #f55;
+      cursor: pointer;
+    }
+
+    .del-msgs-btn:hover {
+      background: #f55;
+      color: #fff;
+    }
+
+    .whitelist-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .whitelist-input {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 12px;
+      border: var(--border);
+      background: var(--input-bg);
+      color: var(--fg);
+      outline: none;
+    }
+
+    .admin-action-btn {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      padding: 8px 14px;
+      background: var(--fg);
+      color: var(--bg);
+      border: var(--border);
+      cursor: pointer;
+    }
+
+    .admin-action-btn:hover {
+      opacity: .8;
+    }
+
+    .wl-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: var(--border);
+      padding: 9px 12px;
+      margin-bottom: 6px;
+      background: var(--card-bg);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .wl-remove {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 4px 8px;
+      background: none;
+      border: var(--border);
+      color: #f55;
+      cursor: pointer;
+    }
+
+    .wl-remove:hover {
+      background: #f55;
+      color: #fff;
+    }
+
+    .banned-badge {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 3px 6px;
+      background: #f55;
+      color: #fff;
+      border: none;
+    }
+
+    .admin-user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: var(--border);
+      object-fit: cover;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .admin-user-initials {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: var(--border);
+      background: var(--fg);
+      color: var(--bg);
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      vertical-align: middle;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+
+    .admin-name-cell {
+      display: flex;
+      align-items: center;
+    }
 
     .action-btn-group {
       display: flex;
@@ -2363,6 +2336,91 @@
       flex-wrap: wrap;
       align-items: center;
     }
+
+
+    /* ─── COINS / INLINE IMAGEGEN ─── */
+    .cost-note{border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:0}
+    .ai-tab-bar{display:flex;border-left:var(--border);border-right:var(--border);border-bottom:var(--border);margin-bottom:10px}
+    .ai-tab-btn{flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid transparent;background:var(--modal-bg);color:var(--muted);cursor:pointer;letter-spacing:1px}
+    .ai-tab-btn.active{color:var(--fg);border-bottom-color:var(--fg)}
+    .ai-fs-btn2{font-family:var(--font-pixel);font-size:7px;padding:10px 12px;border:none;border-bottom:2px solid transparent;background:var(--modal-bg);color:var(--muted);cursor:pointer;letter-spacing:1px}
+    .ai-fs-btn2:hover{color:var(--fg)}
+    #home-section.ai-fs{position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;padding:0!important;margin:0!important;max-width:100%!important;width:100%!important}
+    #home-section.ai-fs #home-inner{max-width:100%;padding:0;height:100%;display:flex;flex-direction:column}
+    #home-section.ai-fs .home-header,#home-section.ai-fs .home-actions,#home-section.ai-fs #github-notice,#home-section.ai-fs .cost-note{display:none!important}
+    #home-section.ai-fs .chat-wrap{flex:1;display:flex;flex-direction:column}
+    #home-section.ai-fs .chat-messages{flex:1;height:unset;min-height:0}
+    #home-section.ai-fs #ai-panel-chat,#home-section.ai-fs #ai-panel-img{flex:1;display:flex;flex-direction:column;min-height:0}
+    #home-section.ai-fs .imagegen-output{flex:1;min-height:0}
+    #ai-fs-bar{display:none;height:44px;background:var(--nav-bg);border-bottom:var(--border);align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
+    #home-section.ai-fs #ai-fs-bar{display:flex}
+    .img-upload-preview{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:var(--border);background:var(--bg2);font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+    .img-upload-preview img{height:36px;width:36px;object-fit:cover;border:var(--border)}
+    .img-upload-clear{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px}
+    /* report modal */
+    #report-modal{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+    #report-modal.open{display:flex}
+    .report-modal-box{background:var(--bg);border:var(--border);padding:22px;max-width:380px;width:90%}
+    .report-modal-box h3{font-family:var(--font-pixel);font-size:9px;margin:0 0 10px}
+    .report-modal-box select,.report-modal-box textarea{width:100%;font-family:var(--font-mono);font-size:12px;padding:8px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;margin-bottom:10px;box-sizing:border-box}
+    .report-modal-box textarea{resize:vertical;min-height:80px}
+    /* confirm modal */
+    #admin-confirm-modal{display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
+    #admin-confirm-modal.open{display:flex}
+    .admin-confirm-box{background:var(--bg);border:var(--border);padding:24px;max-width:400px;width:90%}
+    .admin-confirm-box h3{font-family:var(--font-pixel);font-size:9px;margin:0 0 12px}
+    .admin-confirm-box p{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin:0 0 20px;line-height:1.6}
+    .admin-confirm-btns{display:flex;gap:8px;justify-content:flex-end}
+    /* drawer */
+    #user-detail-drawer{display:none;border:var(--border);background:var(--bg2);padding:20px;margin-bottom:20px;position:relative}
+    #user-detail-drawer.open{display:block}
+    .drawer-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+    .drawer-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+    .drawer-name{font-family:var(--font-pixel);font-size:11px}
+    .drawer-uid{font-family:var(--font-mono);font-size:10px;color:var(--muted);word-break:break-all}
+    .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+    @media(max-width:600px){.drawer-grid{grid-template-columns:1fr}}
+    .drawer-field{display:flex;flex-direction:column;gap:4px}
+    .drawer-field label{font-family:var(--font-pixel);font-size:7px;color:var(--muted)}
+    .drawer-field input,.drawer-field select{font-family:var(--font-mono);font-size:12px;padding:6px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;width:100%}
+    .drawer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .drawer-section-title{font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin:14px 0 8px;letter-spacing:1px}
+    .custom-fields-list{display:flex;flex-direction:column;gap:6px}
+    .custom-field-row{display:flex;gap:6px;align-items:center}
+    .custom-field-row input{font-family:var(--font-mono);font-size:12px;padding:5px 8px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;flex:1}
+    .custom-field-remove{background:none;border:none;color:#f55;cursor:pointer;font-size:14px;padding:0 4px}
+    /* mod panel / owner panel extras */
+    .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+    .admin-stat-card{border:var(--border);background:var(--bg2);padding:12px 14px}
+    .admin-stat-val{font-family:var(--font-pixel);font-size:14px;margin-bottom:4px}
+    .admin-stat-label{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+    #bulk-bar{display:none;background:var(--fg);color:var(--bg);padding:8px 14px;margin-bottom:10px;font-family:var(--font-pixel);font-size:7px;align-items:center;gap:10px}
+    #bulk-bar.visible{display:flex}
+    .bulk-bar-btn{font-family:var(--font-pixel);font-size:6px;padding:5px 10px;border:1px solid var(--bg);background:none;color:var(--bg);cursor:pointer}
+    .bulk-bar-btn:hover{background:var(--bg);color:var(--fg)}
+    .bulk-bar-btn.danger{border-color:#f55;color:#f55}.bulk-bar-btn.danger:hover{background:#f55;color:#fff}
+    .rt-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5f5;margin-right:6px;animation:pdot 2s infinite}
+    @keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
+    .msg-report-btn{font-family:var(--font-pixel);font-size:6px;padding:3px 7px;background:none;border:1px solid #f55;color:#f55;cursor:pointer}
+    .msg-report-btn:hover{background:#f55;color:#fff}
+
+    /* ─── ADMIN LOGS ─── */
+    .log-entry{border:var(--border);border-left:3px solid var(--border-col);padding:0;margin-bottom:8px;background:var(--card-bg);display:flex;flex-direction:column;overflow:hidden;transition:border-color .15s}
+    .log-entry:hover{border-left-color:var(--accent)}
+    .log-entry-header{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bg2)}
+    .log-entry-body{padding:8px 14px;font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.6}
+    .log-action{font-family:var(--font-pixel);font-size:6px;padding:3px 8px;border-radius:0;display:inline-block;flex-shrink:0;letter-spacing:1px}
+    .log-action.ban{background:#f55;color:#fff}
+    .log-action.unban{background:#5f5;color:#000}
+    .log-action.edit{background:#5af;color:#000}
+    .log-action.delete{background:#f80;color:#000}
+    .log-action.role{background:#d0f;color:#fff}
+    .log-action.default{background:var(--fg);color:var(--bg)}
+    .log-target{font-family:var(--font-pixel);font-size:7px;color:var(--fg);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .log-time{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0;font-family:var(--font-mono)}
+    .log-by{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+    .log-by em{color:var(--accent);font-style:normal;font-family:var(--font-pixel);font-size:7px}
+    .log-detail-text{color:var(--fg);font-size:11px}
 
     /* ─── RESPONSIVE ─── */
     @media(max-width:640px) {
@@ -2422,7 +2480,6 @@
       <button class="nav-btn" id="nav-changelog">📋 LOG</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
       <button class="nav-btn" id="nav-owner" style="display:none;">👑 OWNER</button>
-      <button class="nav-btn" id="nav-admin" style="display:none;"></button>
     </div>
     <div class="nav-right">
       <button class="nav-icon-btn" id="nav-settings-btn" title="Settings">⚙</button>
@@ -2554,7 +2611,32 @@
     </div>
   </div>
 
-  <!-- imagegen modal removed — now inline in home section -->
+  <!-- ─── IMAGE GENERATOR MODAL ─── -->
+  <div class="modal-overlay" id="imagegen-modal">
+    <div class="modal-box" style="max-width:680px;height:84vh;display:flex;flex-direction:column;overflow:hidden;">
+      <div class="modal-hdr" style="flex-shrink:0;">
+        <span>🎨 IMAGE GENERATOR</span>
+        <button class="modal-close" id="imagegen-close">✕</button>
+      </div>
+      <div class="imagegen-output" id="imagegen-output">
+        <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
+      </div>
+      <div class="imagegen-input-area" style="flex-shrink:0;">
+        <div class="imagegen-input-row">
+          <input class="imagegen-input" id="imagegen-input" placeholder="A futuristic city at sunset, neon lights...">
+          <button class="imagegen-btn" id="imagegen-btn">GENERATE</button>
+        </div>
+        <div class="imagegen-opts">
+          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);">SIZE:</span>
+          <button class="imagegen-size-btn active" data-w="512" data-h="512">512×512</button>
+          <button class="imagegen-size-btn" data-w="768" data-h="512">768×512</button>
+          <button class="imagegen-size-btn" data-w="512" data-h="768">512×768</button>
+          <button class="imagegen-size-btn" data-w="1024" data-h="768">1024×768</button>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto;">Powered by Pollinations.ai</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── DIRECT MESSAGES MODAL ─── -->
   <div class="modal-overlay" id="dm-modal">
@@ -2634,7 +2716,7 @@
       <!-- Fullscreen top bar (only visible in fullscreen mode) -->
       <div id="ai-fs-bar">
         <span style="font-family:var(--font-pixel);font-size:9px;flex:1;">✦ VEXIS AI</span>
-        <button onclick="toggleAiFullscreen()" style="font-family:var(--font-pixel);font-size:8px;padding:6px 14px;background:var(--fg);color:var(--bg);border:none;cursor:pointer;">✕ EXIT FULLSCREEN</button>
+        <button onclick="toggleAiFs()" style="font-family:var(--font-pixel);font-size:8px;padding:6px 14px;background:var(--fg);color:var(--bg);border:none;cursor:pointer;">✕ EXIT FULLSCREEN</button>
       </div>
 
       <!-- GitHub / AI cost notice -->
@@ -2656,16 +2738,16 @@
       </div>
 
       <!-- Cost note -->
-      <div style="border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;margin-bottom:0;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
+      <div class="cost-note" style="border:1px solid var(--accent);background:var(--bg2);padding:8px 12px;margin-bottom:0;font-family:var(--font-mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;">
         <span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸 NOTE</span>
         These AI features cost real money to run. Please don't spam — be considerate.
       </div>
 
       <!-- AI Mode Tabs -->
-      <div style="display:flex;border-left:var(--border);border-right:var(--border);border-bottom:var(--border);margin-bottom:10px;">
-        <button id="ai-tab-chat" onclick="switchAiTab('chat')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid var(--fg);background:var(--modal-bg);color:var(--fg);cursor:pointer;letter-spacing:1px;">✦ CHAT</button>
-        <button id="ai-tab-imagegen" onclick="switchAiTab('imagegen')" style="flex:1;font-family:var(--font-pixel);font-size:8px;padding:10px;border:none;border-bottom:2px solid transparent;background:var(--modal-bg);color:var(--muted);cursor:pointer;letter-spacing:1px;">🎨 IMAGE GEN</button>
-        <button class="ai-fs-btn" id="ai-fullscreen-btn" onclick="toggleAiFullscreen()" title="Fullscreen">⤢ FULLSCREEN</button>
+      <div class="ai-tab-bar">
+        <button class="ai-tab-btn active" id="ai-tab-chat" onclick="switchAiTab('chat')">✦ CHAT</button>
+        <button class="ai-tab-btn" id="ai-tab-img" onclick="switchAiTab('img')">🎨 IMAGE GEN</button>
+        <button class="ai-fs-btn2" id="ai-fs-btn" onclick="toggleAiFs()">⤢ FULLSCREEN</button>
       </div>
 
       <!-- CHAT PANEL -->
@@ -2697,43 +2779,40 @@
       </div>
 
       <!-- IMAGE GEN PANEL -->
-      <div id="ai-panel-imagegen" style="display:none;">
-        <div style="display:flex;flex-direction:column;border:var(--border);background:var(--modal-bg);min-height:480px;">
-          <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent);">💸</span> Each image costs 1 coin. You get 5 free coins per day.</span>
-            <span id="imagegen-coin-display" style="font-family:var(--font-pixel);font-size:8px;color:#fa0;white-space:nowrap;">🪙 — coins</span>
+      <div id="ai-panel-img" style="display:none">
+      <div style="display:flex;flex-direction:column;border:var(--border);background:var(--modal-bg);min-height:480px">
+        <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent)">💸</span> 1 coin per image · 5 free coins/day</span>
+          <span id="coin-display" style="font-family:var(--font-pixel);font-size:8px;color:#fa0;white-space:nowrap">🪙 — coins</span>
+        </div>
+        <div class="imagegen-output" id="imagegen-output2" style="flex:1;min-height:320px"><p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p></div>
+        <div class="imagegen-input-area" style="flex-shrink:0">
+          <div id="img-upload-preview" class="img-upload-preview" style="display:none">
+            <img id="img-upload-thumb" src="" alt="">
+            <span id="img-upload-label">Reference image attached — describe your edits below</span>
+            <button class="img-upload-clear" onclick="clearImgUpload()">✕</button>
           </div>
-          <div class="imagegen-output" id="imagegen-output" style="flex:1;min-height:320px;">
-            <p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p>
+          <div class="imagegen-input-row">
+            <input class="imagegen-input" id="imagegen-input2" placeholder="A futuristic city at sunset, neon lights...">
+            <button class="imagegen-btn" id="imagegen-btn2">GENERATE</button>
           </div>
-          <div class="imagegen-input-area" style="flex-shrink:0;">
-            <!-- Upload preview (shown when image attached) -->
-            <div id="imagegen-upload-preview" class="imagegen-upload-preview" style="display:none;">
-              <img id="imagegen-upload-thumb" src="" alt="reference">
-              <span id="imagegen-upload-label">Reference image attached — describe your edits below</span>
-              <button class="imagegen-upload-clear" onclick="clearImagegenUpload()">✕</button>
-            </div>
-            <div class="imagegen-input-row">
-              <input class="imagegen-input" id="imagegen-input" placeholder="A futuristic city at sunset, neon lights...">
-              <button class="imagegen-btn" id="imagegen-btn">GENERATE</button>
-            </div>
-            <div class="imagegen-opts">
-              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);">SIZE:</span>
-              <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
-              <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
-              <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
-              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px;">QUALITY:</span>
-              <button class="imagegen-size-btn active" id="imagegen-quality-standard" data-quality="standard">STANDARD</button>
-              <button class="imagegen-size-btn" id="imagegen-quality-hd" data-quality="hd">HD</button>
-              <button class="tool-btn" id="imagegen-upload-btn" style="margin-left:auto;font-size:7px;" title="Upload image to edit">📎 EDIT IMAGE</button>
-              <input type="file" id="imagegen-file-input" accept="image/*" style="display:none;">
-              <span style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px;">Generate with DALL-E 3 · Edit with GPT Image 1</span>
-            </div>
+          <div class="imagegen-opts">
+            <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted)">SIZE:</span>
+            <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
+            <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
+            <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
+            <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px">QUALITY:</span>
+            <button class="imagegen-size-btn active" data-quality="standard">STANDARD</button>
+            <button class="imagegen-size-btn" data-quality="hd">HD</button>
+            <button class="tool-btn" id="img-upload-btn" style="margin-left:auto;font-size:7px">📎 EDIT IMAGE</button>
+            <input type="file" id="img-file-input" accept="image/*" style="display:none">
+            <span style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px">Generate with DALL-E 3 · Edit with GPT Image 1</span>
           </div>
         </div>
       </div>
+    </div><!-- end ai-panel-img -->
 
-    </div>
+    </div><!-- end home-inner -->
   </section>
 
   <section class="section" id="games-section">
@@ -2801,7 +2880,7 @@
     </div>
   </section>
 
-  <section class="section" id="ai-tools-section" style="display:none!important;"></section>
+
 
   <section class="section" id="social-section">
     <div class="section-title">◉ SOCIAL</div>
@@ -2860,291 +2939,30 @@
     </div>
   </section>
 
-  <!-- ─── MOD SECTION (admins + whitelisted) ─── -->
-  <section class="section" id="mod-section">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-      <div class="section-title" style="margin-bottom:0;">🛡 MOD PANEL</div>
-      <span style="font-family:var(--font-pixel);font-size:7px;padding:3px 8px;border:1px solid #fa0;color:#fa0;" id="mod-role-badge">MODERATOR</span>
-    </div>
-    <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:18px;">You can ban/unban users and review reports. For full admin controls, contact the site owner.</div>
+  <!-- ─── ADMIN SECTION ─── -->
 
-    <div class="admin-tabs" id="mod-tabs">
-      <button class="admin-tab active" data-modpanel="users">👥 USERS</button>
-      <button class="admin-tab" data-modpanel="reports">🚩 REPORTS</button>
-    </div>
-
-    <div id="mod-subpanel-users">
-      <div class="admin-toolbar">
-        <input class="admin-search" id="mod-search" placeholder="Search by name or UID...">
-        <button class="admin-action-btn" id="mod-refresh-btn">↺ REFRESH</button>
-        <span style="font-size:11px;color:var(--muted);" id="mod-user-count"></span>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="user-table" id="mod-users-table">
-          <thead>
-            <tr><th>USER</th><th>UID</th><th>STATUS</th><th>ACTION</th></tr>
-          </thead>
-          <tbody id="mod-users-body">
-            <tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">Click REFRESH to load users</td></tr>
-          </tbody>
-        </table>
+  <!-- REPORT MODAL -->
+  <div id="report-modal">
+    <div class="report-modal-box">
+      <h3>🚩 REPORT</h3>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px" id="report-modal-target"></div>
+      <select id="report-reason">
+        <option value="">Select a reason...</option>
+        <option value="spam">Spam</option>
+        <option value="harassment">Harassment</option>
+        <option value="inappropriate">Inappropriate Content</option>
+        <option value="hate">Hate Speech</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea id="report-details" placeholder="Additional details (optional)..."></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="admin-action-btn ghost" onclick="closeReportModal()">CANCEL</button>
+        <button class="admin-action-btn danger" onclick="submitReport()">SUBMIT REPORT</button>
       </div>
     </div>
+  </div>
 
-    <div id="mod-subpanel-reports" style="display:none;">
-      <div class="admin-toolbar">
-        <button class="admin-action-btn" onclick="loadReports(); document.getElementById('reports-list-mod').innerHTML = document.getElementById('reports-list').innerHTML || ''">↺ REFRESH</button>
-        <span id="mod-reports-count" style="font-size:11px;color:var(--muted);"></span>
-      </div>
-      <div id="reports-list-mod"><div style="color:var(--muted);font-size:12px;">Click refresh to load.</div></div>
-    </div>
-  </section>
-
-  <!-- ─── ADMIN SECTION (owner only) ─── -->
-  <section class="section" id="admin-section">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
-      <div class="section-title" style="margin-bottom:0;">👑 OWNER PANEL</div>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"><span class="rt-dot"></span>LIVE</span>
-      <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:auto;" id="admin-role-badge"></span>
-    </div>
-
-    <!-- Firestore rules reminder -->
-    <div id="firestore-rules-notice" style="border:1px solid #fa0;background:var(--bg2);padding:10px 14px;margin-bottom:14px;font-family:var(--font-mono);font-size:11px;line-height:1.7;display:flex;align-items:flex-start;gap:10px;">
-      <span style="font-family:var(--font-pixel);font-size:7px;color:#fa0;white-space:nowrap;margin-top:2px;">⚠ RULES</span>
-      <span>If banning, editing, or reports show "Missing permissions", you need to set your Firestore security rules. Go to <strong>Firebase Console → Firestore → Rules</strong> and paste the rules from your setup guide. For quick dev testing, use: <code style="background:var(--bg);padding:2px 6px;">allow read, write: if request.auth != null;</code></span>
-      <button onclick="document.getElementById('firestore-rules-notice').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;flex-shrink:0;">✕</button>
-    </div>
-
-    <div class="admin-tabs">
-      <button class="admin-tab active" data-panel="users">👥 USERS</button>
-      <button class="admin-tab" data-panel="online">🟢 ONLINE</button>
-      <button class="admin-tab" data-panel="roles">🎖 ROLES</button>
-      <button class="admin-tab" data-panel="whitelist">✅ WHITELIST</button>
-      <button class="admin-tab" data-panel="reports">🚩 REPORTS</button>
-      <button class="admin-tab" data-panel="logs">📋 LOGS</button>
-      <button class="admin-tab" data-panel="settings">⚙ SETTINGS</button>
-    </div>
-
-    <!-- ── USERS TAB ── -->
-    <div class="admin-panel active" id="admin-panel-users">
-      <!-- Stats row -->
-      <div class="admin-stats" id="admin-stats-row">
-        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-total">—</div><div class="admin-stat-label">TOTAL USERS</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-banned" style="color:#f55;">—</div><div class="admin-stat-label">BANNED</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-admins" style="color:#fa0;">—</div><div class="admin-stat-label">ADMINS</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-new" style="color:#5f5;">—</div><div class="admin-stat-label">NEW (7 DAYS)</div></div>
-      </div>
-
-      <!-- Bulk bar -->
-      <div id="bulk-bar">
-        <span id="bulk-count">0 selected</span>
-        <button class="bulk-bar-btn" onclick="adminBulkBan()">BAN ALL</button>
-        <button class="bulk-bar-btn" onclick="adminBulkUnban()">UNBAN ALL</button>
-        <button class="bulk-bar-btn danger" onclick="adminBulkDeleteMsgs()">DEL MSGS</button>
-        <button class="bulk-bar-btn" onclick="clearBulkSelection()" style="margin-left:auto;">✕ CLEAR</button>
-      </div>
-
-      <!-- Toolbar -->
-      <div class="admin-toolbar">
-        <input class="admin-search" id="admin-search" placeholder="Search by name, email, UID, role...">
-        <select id="admin-filter-role" style="font-family:var(--font-mono);font-size:12px;padding:7px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;">
-          <option value="">All Roles</option>
-          <option value="owner">Owner</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-        </select>
-        <select id="admin-filter-status" style="font-family:var(--font-mono);font-size:12px;padding:7px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="banned">Banned</option>
-        </select>
-        <button class="admin-action-btn" id="admin-refresh-btn">↺ REFRESH</button>
-        <span style="font-size:11px;color:var(--muted);" id="admin-user-count"></span>
-      </div>
-
-      <!-- User detail drawer -->
-      <div id="user-detail-drawer">
-        <button class="drawer-close" onclick="closeUserDrawer()">✕</button>
-        <div class="drawer-header">
-          <div id="drawer-avatar"></div>
-          <div>
-            <div class="drawer-name" id="drawer-name">—</div>
-            <div class="drawer-uid" id="drawer-uid">—</div>
-            <div style="margin-top:6px;" id="drawer-badges"></div>
-          </div>
-        </div>
-
-        <div class="drawer-grid">
-          <div class="drawer-field">
-            <label>DISPLAY NAME</label>
-            <input id="df-displayName" type="text" placeholder="Display name">
-          </div>
-          <div class="drawer-field">
-            <label>EMAIL (read-only)</label>
-            <input id="df-email" type="text" placeholder="email@example.com" disabled style="opacity:.5;">
-          </div>
-          <div class="drawer-field">
-            <label>PROFILE PICTURE URL</label>
-            <div class="drawer-pfp-row">
-              <img id="df-pfp-preview" class="drawer-pfp-preview" src="" alt="" onerror="this.src=''">
-              <input id="df-photoURL" type="text" placeholder="https://..." style="flex:1;" oninput="updatePfpPreview()">
-            </div>
-          </div>
-          <div class="drawer-field">
-            <label>ROLE</label>
-            <select id="df-role">
-              <option value="user">user</option>
-              <option value="admin">admin</option>
-              <option value="owner">owner</option>
-            </select>
-          </div>
-          <div class="drawer-field">
-            <label>COINS</label>
-            <input id="df-coins" type="number" placeholder="0">
-          </div>
-          <div class="drawer-field">
-            <label>SET NEW PASSWORD (sends reset email to user)</label>
-            <div style="display:flex;gap:6px;">
-              <input id="df-email-reset" type="text" placeholder="Will use their email on file" disabled style="flex:1;opacity:.5;">
-              <button class="admin-action-btn warn" style="white-space:nowrap;" onclick="sendPasswordReset()">📧 SEND RESET</button>
-            </div>
-            <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px;">Sends a Firebase password reset email. Setting passwords directly requires a Cloud Function.</div>
-          </div>
-        </div>
-
-        <div class="drawer-section-title">CUSTOM FIELDS</div>
-        <div class="custom-fields-list" id="custom-fields-list"></div>
-        <button class="admin-action-btn ghost" style="margin-top:8px;font-size:6px;" onclick="addCustomField()">+ ADD FIELD</button>
-
-        <div class="drawer-actions">
-          <button class="admin-action-btn" id="drawer-save-btn">💾 SAVE CHANGES</button>
-          <button class="admin-action-btn warn" id="drawer-ban-btn">🚫 BAN</button>
-          <button class="admin-action-btn ghost" id="drawer-delmsg-btn">🗑 DELETE MESSAGES</button>
-          <button class="admin-action-btn danger" id="drawer-delete-btn">⚠ DELETE USER</button>
-        </div>
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:8px;" id="drawer-status"></div>
-      </div>
-
-      <!-- Users table -->
-      <div style="overflow-x:auto;">
-        <table class="user-table" id="users-table">
-          <thead>
-            <tr>
-              <th class="check-col"><input type="checkbox" id="select-all-check" title="Select all"></th>
-              <th>USER</th>
-              <th>UID</th>
-              <th>EMAIL</th>
-              <th>ROLE</th>
-              <th>JOINED</th>
-              <th>LAST SEEN</th>
-              <th>STATUS</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody id="users-table-body">
-            <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;">Click REFRESH to load users</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── ROLES TAB ── -->
-    <div class="admin-panel" id="admin-panel-roles">
-      <div style="font-family:var(--font-mono);font-size:12px;line-height:1.8;margin-bottom:20px;color:var(--muted);">
-        Roles control what users can do across the site. Changes update instantly in Firestore and are enforced by security rules.
-      </div>
-      <div style="display:grid;gap:14px;">
-        <div style="border:var(--border);background:var(--bg2);padding:16px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span class="role-badge owner">OWNER</span>
-            <span style="font-family:var(--font-pixel);font-size:8px;">Full access</span>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);">Can do everything — assign/remove admins, delete users, change all data. Only you (set via ADMIN_UID constant).</div>
-        </div>
-        <div style="border:var(--border);background:var(--bg2);padding:16px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span class="role-badge admin">ADMIN</span>
-            <span style="font-family:var(--font-pixel);font-size:8px;">Moderation access</span>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);">Can ban/unban users, delete messages, view all user data. Cannot assign other admins or delete users.</div>
-        </div>
-        <div style="border:var(--border);background:var(--bg2);padding:16px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span class="role-badge user">USER</span>
-            <span style="font-family:var(--font-pixel);font-size:8px;">Standard access</span>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);">Default role. Can use chat, DMs, tools. No admin access.</div>
-        </div>
-      </div>
-      <div class="drawer-section-title" style="margin-top:20px;">CURRENT ADMINS</div>
-      <div id="roles-admin-list"><div style="color:var(--muted);font-size:12px;">Loading...</div></div>
-    </div>
-
-    <!-- ── ONLINE TAB ── -->
-    <div class="admin-panel" id="admin-panel-online">
-      <div class="admin-toolbar">
-        <span style="font-family:var(--font-pixel);font-size:8px;">🟢 ONLINE = active in last 5 min</span>
-        <button class="admin-action-btn" onclick="loadOnlineStatus()">↺ REFRESH</button>
-        <span id="online-count" style="font-size:11px;color:var(--muted);"></span>
-      </div>
-      <div id="online-list"><div style="color:var(--muted);font-size:12px;">Click refresh to load.</div></div>
-    </div>
-
-    <!-- ── REPORTS TAB ── -->
-    <div class="admin-panel" id="admin-panel-reports">
-      <div class="admin-toolbar">
-        <button class="admin-action-btn" onclick="loadReports()">↺ REFRESH</button>
-        <button class="admin-action-btn danger" onclick="clearReports()">🗑 CLEAR ALL</button>
-        <span id="reports-count" style="font-size:11px;color:var(--muted);"></span>
-      </div>
-      <div id="reports-list"><div style="color:var(--muted);font-size:12px;">Click refresh to load reports.</div></div>
-    </div>
-
-    <!-- ── WHITELIST TAB ── -->
-    <div class="admin-panel" id="admin-panel-whitelist">
-      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:14px;">Whitelisted users get access to restricted features.</div>
-      <div class="whitelist-input-row">
-        <input class="whitelist-input" id="wl-uid-input" placeholder="Enter user UID to whitelist...">
-        <button class="admin-action-btn" id="wl-add-btn">+ ADD</button>
-      </div>
-      <div id="whitelist-list"></div>
-    </div>
-
-    <!-- ── LOGS TAB ── -->
-    <div class="admin-panel" id="admin-panel-logs">
-      <div class="admin-toolbar">
-        <input class="admin-search" id="log-search" placeholder="Filter logs..." style="max-width:300px;">
-        <button class="admin-action-btn" onclick="loadAdminLogs()">↺ REFRESH</button>
-        <button class="admin-action-btn danger" onclick="clearAdminLogs()">🗑 CLEAR LOGS</button>
-      </div>
-      <div id="admin-logs-list"><div style="color:var(--muted);font-size:12px;padding:10px 0;">Load logs to view activity.</div></div>
-    </div>
-
-    <!-- ── SETTINGS TAB ── -->
-    <div class="admin-panel" id="admin-panel-settings">
-      <div style="display:grid;gap:14px;max-width:500px;">
-        <div style="border:var(--border);background:var(--bg2);padding:16px;">
-          <div style="font-family:var(--font-pixel);font-size:8px;margin-bottom:10px;">SITE MAINTENANCE</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:12px;">Enabling maintenance mode will show a message to all non-admin users.</div>
-          <div style="display:flex;gap:8px;">
-            <button class="admin-action-btn warn" onclick="setMaintenanceMode(true)">ENABLE MAINTENANCE</button>
-            <button class="admin-action-btn success" onclick="setMaintenanceMode(false)">DISABLE MAINTENANCE</button>
-          </div>
-        </div>
-        <div style="border:var(--border);background:var(--bg2);padding:16px;">
-          <div style="font-family:var(--font-pixel);font-size:8px;margin-bottom:10px;">BANNED USERS</div>
-          <div id="banned-list"></div>
-        </div>
-        <div style="border:1px solid #f55;background:var(--bg2);padding:16px;">
-          <div style="font-family:var(--font-pixel);font-size:8px;color:#f55;margin-bottom:10px;">⚠ DANGER ZONE</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:12px;">Irreversible actions. Deleting an Auth user requires a Cloud Function — see setup instructions.</div>
-          <button class="admin-action-btn danger" onclick="adminNukeMessages()">DELETE ALL SOCIAL MESSAGES</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ADMIN CONFIRM MODAL ── -->
+  <!-- ADMIN CONFIRM MODAL -->
   <div id="admin-confirm-modal">
     <div class="admin-confirm-box">
       <h3 id="confirm-title">Confirm Action</h3>
@@ -3156,26 +2974,154 @@
     </div>
   </div>
 
-  <!-- ─── REPORT MODAL ─── -->
-  <div id="report-modal">
-    <div class="report-modal-box">
-      <h3>🚩 REPORT</h3>
-      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px;" id="report-modal-target"></div>
-      <select id="report-reason">
-        <option value="">Select a reason...</option>
-        <option value="spam">Spam</option>
-        <option value="harassment">Harassment / Bullying</option>
-        <option value="inappropriate">Inappropriate Content</option>
-        <option value="hate">Hate Speech</option>
-        <option value="other">Other</option>
-      </select>
-      <textarea id="report-details" placeholder="Additional details (optional)..."></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="admin-action-btn ghost" onclick="closeReportModal()">CANCEL</button>
-        <button class="admin-action-btn danger" onclick="submitReport()">SUBMIT REPORT</button>
+  <!-- MOD SECTION -->
+  <section class="section" id="mod-section">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div class="section-title" style="margin-bottom:0">🛡 MOD PANEL</div>
+      <span style="font-family:var(--font-pixel);font-size:7px;padding:3px 8px;border:1px solid #fa0;color:#fa0" id="mod-role-badge">MODERATOR</span>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:18px">Ban/unban users and view reports. For full controls, contact the site owner.</div>
+    <div class="admin-tabs" id="mod-tabs">
+      <button class="admin-tab active" data-modpanel="users">👥 USERS</button>
+      <button class="admin-tab" data-modpanel="reports">🚩 REPORTS</button>
+    </div>
+    <div id="mod-subpanel-users">
+      <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input class="admin-search" id="mod-search" placeholder="Search by name or UID..." style="max-width:300px">
+        <button class="admin-action-btn" id="mod-refresh-btn">↺ REFRESH</button>
+        <span style="font-size:11px;color:var(--muted)" id="mod-user-count"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="user-table"><thead><tr><th>USER</th><th>UID</th><th>STATUS</th><th>ACTION</th></tr></thead>
+        <tbody id="mod-users-body"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Click REFRESH to load</td></tr></tbody>
+        </table>
       </div>
     </div>
-  </div>
+    <div id="mod-subpanel-reports" style="display:none">
+      <div style="margin-bottom:12px"><button class="admin-action-btn" onclick="loadReports('mod-reports-list')">↺ REFRESH</button></div>
+      <div id="mod-reports-list"><div style="color:var(--muted);font-size:12px">Click refresh to load.</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="admin-section">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+      <div class="section-title" style="margin-bottom:0">👑 OWNER PANEL</div>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"><span class="rt-dot"></span>LIVE</span>
+      <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:auto" id="admin-role-badge"></span>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-panel="users">👥 USERS</button>
+      <button class="admin-tab" data-panel="reports">🚩 REPORTS</button>
+      <button class="admin-tab" data-panel="roles">🎖 ROLES</button>
+      <button class="admin-tab" data-panel="whitelist">✅ WHITELIST</button>
+      <button class="admin-tab" data-panel="logs">📋 LOGS</button>
+      <button class="admin-tab" data-panel="settings">⚙ SETTINGS</button>
+    </div>
+
+    <div class="admin-panel active" id="admin-panel-users">
+      <div class="admin-stats">
+        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-total">—</div><div class="admin-stat-label">TOTAL USERS</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-banned" style="color:#f55">—</div><div class="admin-stat-label">BANNED</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-admins" style="color:#fa0">—</div><div class="admin-stat-label">ADMINS</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-val" id="stat-new" style="color:#5f5">—</div><div class="admin-stat-label">NEW (7 DAYS)</div></div>
+      </div>
+      <div id="bulk-bar">
+        <span id="bulk-count">0 selected</span>
+        <button class="bulk-bar-btn" onclick="adminBulkBan()">BAN ALL</button>
+        <button class="bulk-bar-btn" onclick="adminBulkUnban()">UNBAN ALL</button>
+        <button class="bulk-bar-btn danger" onclick="adminBulkDelMsgs()">DEL MSGS</button>
+        <button class="bulk-bar-btn" onclick="clearBulkSel()" style="margin-left:auto">✕ CLEAR</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+        <input class="admin-search" id="admin-search" placeholder="Search by name, email, UID, role...">
+        <select id="admin-filter-role" style="font-family:var(--font-mono);font-size:12px;padding:7px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none">
+          <option value="">All Roles</option><option value="owner">Owner</option><option value="admin">Admin</option><option value="user">User</option>
+        </select>
+        <select id="admin-filter-status" style="font-family:var(--font-mono);font-size:12px;padding:7px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none">
+          <option value="">All Status</option><option value="active">Active</option><option value="banned">Banned</option>
+        </select>
+        <button class="admin-action-btn" id="admin-refresh-btn">↺ REFRESH</button>
+        <span style="font-size:11px;color:var(--muted)" id="admin-user-count"></span>
+      </div>
+      <div id="user-detail-drawer">
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        <div class="drawer-header">
+          <div id="drawer-avatar"></div>
+          <div><div class="drawer-name" id="drawer-name">—</div><div class="drawer-uid" id="drawer-uid">—</div><div style="margin-top:6px" id="drawer-badges"></div></div>
+        </div>
+        <div class="drawer-grid">
+          <div class="drawer-field"><label>DISPLAY NAME</label><input id="df-name" type="text"></div>
+          <div class="drawer-field"><label>EMAIL (read-only)</label><input id="df-email" type="text" disabled style="opacity:.5"></div>
+          <div class="drawer-field"><label>ROLE</label><select id="df-role"><option value="user">user</option><option value="admin">admin</option><option value="owner">owner</option></select></div>
+          <div class="drawer-field"><label>COINS</label><input id="df-coins" type="number"></div>
+        </div>
+        <div class="drawer-section-title">CUSTOM FIELDS</div>
+        <div class="custom-fields-list" id="custom-fields-list"></div>
+        <button class="admin-action-btn ghost" style="margin-top:8px;font-size:6px" onclick="addCustomField()">+ ADD FIELD</button>
+        <div class="drawer-actions">
+          <button class="admin-action-btn" id="drawer-save-btn">💾 SAVE CHANGES</button>
+          <button class="admin-action-btn warn" id="drawer-ban-btn">🚫 BAN</button>
+          <button class="admin-action-btn ghost" id="drawer-delmsg-btn">🗑 DELETE MESSAGES</button>
+          <button class="admin-action-btn danger" id="drawer-delete-btn">⚠ DELETE USER</button>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:8px" id="drawer-status"></div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="user-table" id="users-table"><thead><tr>
+          <th class="check-col"><input type="checkbox" id="select-all-check"></th>
+          <th>USER</th><th>UID</th><th>EMAIL</th><th>ROLE</th><th>JOINED</th><th>LAST SEEN</th><th>STATUS</th><th>ACTIONS</th>
+        </tr></thead><tbody id="users-table-body">
+          <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px">Click REFRESH to load users</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="admin-panel" id="admin-panel-reports">
+      <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+        <button class="admin-action-btn" onclick="loadReports('owner-reports-list')">↺ REFRESH</button>
+        <button class="admin-action-btn danger" onclick="clearAllReports()">🗑 CLEAR ALL</button>
+        <span id="reports-count" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <div id="owner-reports-list"><div style="color:var(--muted);font-size:12px">Click refresh to load.</div></div>
+    </div>
+
+    <div class="admin-panel" id="admin-panel-roles">
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:20px">Assign and manage admin roles.</div>
+      <div class="drawer-section-title">CURRENT ADMINS</div>
+      <div id="roles-admin-list"><div style="color:var(--muted);font-size:12px">Loading...</div></div>
+    </div>
+
+    <div class="admin-panel" id="admin-panel-whitelist">
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:14px">Whitelisted users get mod panel access.</div>
+      <div class="whitelist-input-row">
+        <input class="whitelist-input" id="wl-uid-input" placeholder="Enter user UID...">
+        <button class="admin-action-btn" id="wl-add-btn">+ ADD</button>
+      </div>
+      <div id="whitelist-list"></div>
+    </div>
+
+    <div class="admin-panel" id="admin-panel-logs">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+        <input class="admin-search" id="log-search" placeholder="Filter logs..." style="max-width:300px">
+        <button class="admin-action-btn" onclick="loadAdminLogs()">↺ REFRESH</button>
+        <button class="admin-action-btn danger" onclick="clearAdminLogs()">🗑 CLEAR LOGS</button>
+      </div>
+      <div id="admin-logs-list"><div style="color:var(--muted);font-size:12px;padding:10px 0">Click refresh to view logs.</div></div>
+    </div>
+
+    <div class="admin-panel" id="admin-panel-settings">
+      <div style="display:grid;gap:14px;max-width:500px">
+        <div style="border:var(--border);background:var(--bg2);padding:16px">
+          <div style="font-family:var(--font-pixel);font-size:8px;margin-bottom:10px">BANNED USERS</div>
+          <div id="banned-list"></div>
+        </div>
+        <div style="border:1px solid #f55;background:var(--bg2);padding:16px">
+          <div style="font-family:var(--font-pixel);font-size:8px;color:#f55;margin-bottom:10px">⚠ DANGER ZONE</div>
+          <button class="admin-action-btn danger" onclick="adminNukeMsgs()">DELETE ALL SOCIAL MESSAGES</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -3187,7 +3133,6 @@
     const TENOR_KEY = "LIVDSRZULELA";
     const ADMIN_UID = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
     const AI_SYSTEM = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`;
-    const CODING_SYSTEM = `You are VEXIS in Coding Mode. You are an expert programmer. Help the user with any programming task — debugging, explaining code, writing functions, architecture questions, or anything technical. Give clean, well-commented code examples and concise explanations. Support all major languages.`;
 
     /* =====================================================
        FIREBASE INIT
@@ -3222,9 +3167,6 @@
     let lastSocialMsgTime = 0;
     let unreadSocialCount = 0;
     let socialChatOpen = false;
-    let codingMode = false;
-    let imagegenSize = "1024x1024";
-    let imagegenQuality = "standard";
 
     // DM state
     let activeDmId = null;
@@ -3373,8 +3315,7 @@
     document.getElementById("gif-picker-close").addEventListener("click", () => closeModal("gif-picker-modal"));
     document.getElementById("profile-modal-close").addEventListener("click", () => closeModal("profile-modal"));
     document.getElementById("switch-account-close").addEventListener("click", () => closeModal("switch-account-modal"));
-    document.getElementById("imagegen-close") && document.getElementById("imagegen-close").addEventListener("click", () => closeModal("imagegen-modal"));
-    // imagegen-open-btn removed — now a tab on home screen
+    document.getElementById("imagegen-close").addEventListener("click", () => closeModal("imagegen-modal"));
     document.getElementById("dm-close").addEventListener("click", () => {
       closeModal("dm-modal");
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
@@ -3390,14 +3331,14 @@
        NAVIGATION
     ===================================================== */
     const NAV_MAP = {
-      "home": "nav-ai",
+      "home": null,
       "games": "nav-games",
       "tools": "nav-tools",
       "ai-tools": "nav-ai",
       "social": "nav-social",
       "changelog": "nav-changelog",
-      "mod": "nav-mod",
-      "admin": "nav-owner"
+      "admin": "nav-owner",
+      "mod": "nav-mod"
     };
     function showSection(name) {
       currentSection = name;
@@ -3418,13 +3359,12 @@
     document.getElementById("nav-ai").addEventListener("click", () => showSection("home"));
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
     document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
-    document.getElementById("nav-mod").addEventListener("click", () => showSection("mod"));
-    document.getElementById("nav-owner").addEventListener("click", () => showSection("admin"));
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
     document.getElementById("nav-auth-btn").addEventListener("click", () => {
       if (currentUser) { openProfileModal(); } else { openAuthModal(); }
     });
-    document.getElementById("nav-admin").addEventListener("click", () => showSection("admin"));
+    document.getElementById("nav-mod").addEventListener("click", () => showSection("mod"));
+    document.getElementById("nav-owner").addEventListener("click", () => showSection("admin"));
 
     /* =====================================================
        TOAST
@@ -3447,7 +3387,6 @@
       document.getElementById("fullscreen-overlay").classList.add("open");
     }
     function closeFullscreen() {
-      if (aiFullscreen) { toggleAiFullscreen(); return; }
       document.getElementById("fullscreen-overlay").classList.remove("open");
       document.getElementById("fullscreen-frame").src = "";
     }
@@ -3523,13 +3462,11 @@
     ===================================================== */
     function newConversation(modeLabel) {
       currentConvId = String(Date.now());
-      codingMode = false;
       const chatMessages = document.getElementById("chat-messages");
       chatMessages.innerHTML = "";
       removeAttachedImage();
       isBusy = false;
       document.getElementById("chat-send-btn").disabled = false;
-      document.getElementById("home-conv-panel").style.display = "none";
       const greeting = modeLabel
         ? `💻 Coding Mode activated. I'm VEXIS — paste your code or ask me anything technical.`
         : "Hey! What's up? I'm VEXIS — ask me anything.";
@@ -3537,25 +3474,13 @@
       showToast(modeLabel || "NEW CONVERSATION");
     }
 
-    function startCodingMode() {
-      currentConvId = String(Date.now());
-      codingMode = true;
-      const chatMessages = document.getElementById("chat-messages");
-      chatMessages.innerHTML = "";
-      removeAttachedImage();
-      isBusy = false;
-      document.getElementById("chat-send-btn").disabled = false;
-      appendBotMsg("💻 Coding Mode activated. Paste your code, describe the bug, or ask me any programming question.");
-      showSection("home");
-      showToast("CODING MODE");
-    }
+
 
     function loadConversation(id) {
       const convs = getConvs();
       const conv = convs[id];
       if (!conv) return;
       currentConvId = id;
-      codingMode = false;
       const chatMessages = document.getElementById("chat-messages");
       chatMessages.innerHTML = "";
       if (conv.messages) {
@@ -3576,7 +3501,6 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
       showSection("home");
-      document.getElementById("home-conv-panel").style.display = "none";
       showToast("CONVERSATION LOADED");
     }
 
@@ -3618,9 +3542,7 @@
     }
 
     /* ─── AI Tools section wiring ─── */
-    // open-ai-chat-btn and new-conv-btn2 removed (ai-tools section gone)
-    // coding-mode-btn removed
-    // imagegen-open-btn removed — now a tab
+    // (open-ai-chat-btn and new-conv-btn2 removed with ai-tools section)
     document.getElementById("clear-all-btn").addEventListener("click", () => {
       if (window.confirm("Delete all saved conversations?")) {
         localStorage.removeItem(getConvStorageKey());
@@ -3640,171 +3562,121 @@
     /* =====================================================
        IMAGE GENERATOR
     ===================================================== */
-    document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        imagegenSize = btn.dataset.size;
-      });
-    });
+    // Old modal imagegen btn (keep wired to close gracefully)
+    document.getElementById("imagegen-btn") && document.getElementById("imagegen-btn").addEventListener("click", () => showToast("USE THE IMAGE GEN TAB ON HOME"));
+    document.getElementById("imagegen-input") && document.getElementById("imagegen-input").addEventListener("keydown", e => { if (e.key === "Enter") showToast("USE THE IMAGE GEN TAB ON HOME"); });
 
-    document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        imagegenQuality = btn.dataset.quality;
-      });
-    });
-
-    document.getElementById("imagegen-btn").addEventListener("click", generateImage);
-    document.getElementById("imagegen-input").addEventListener("keydown", e => {
-      if (e.key === "Enter") generateImage();
-    });
-
-    // ── Image gen coin system ────────────────────────────────────────────────
+    // ── INLINE IMAGE GEN (DALL-E 3 + coins) ──────────────────────────────
     const COINS_PER_DAY = 5;
+    let imagegenSize = "1024x1024", imagegenQuality = "standard";
+    let imgUploadB64 = null, imgUploadMime = "image/png";
 
+    document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(x => x.classList.remove("active"));
+      b.classList.add("active"); imagegenSize = b.dataset.size;
+    }));
+    document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(x => x.classList.remove("active"));
+      b.classList.add("active"); imagegenQuality = b.dataset.quality;
+    }));
+    document.getElementById("imagegen-btn2").addEventListener("click", generateImage);
+    document.getElementById("imagegen-input2").addEventListener("keydown", e => { if (e.key === "Enter") generateImage(); });
+    document.getElementById("img-upload-btn").addEventListener("click", () => document.getElementById("img-file-input").click());
+    document.getElementById("img-file-input").addEventListener("change", e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const d = ev.target.result; imgUploadB64 = d.split(",")[1]; imgUploadMime = file.type || "image/png";
+        document.getElementById("img-upload-thumb").src = d;
+        document.getElementById("img-upload-label").textContent = file.name + " — describe your edits below";
+        document.getElementById("img-upload-preview").style.display = "flex";
+        document.getElementById("imagegen-input2").placeholder = "Describe the edits...";
+      };
+      reader.readAsDataURL(file);
+    });
+    function clearImgUpload() {
+      imgUploadB64 = null; imgUploadMime = "image/png";
+      document.getElementById("img-upload-preview").style.display = "none";
+      document.getElementById("img-upload-thumb").src = "";
+      document.getElementById("img-file-input").value = "";
+      document.getElementById("imagegen-input2").placeholder = "A futuristic city at sunset, neon lights...";
+    }
+    function switchAiTab(tab) {
+      const isChat = tab === "chat";
+      document.getElementById("ai-panel-chat").style.display = isChat ? "block" : "none";
+      document.getElementById("ai-panel-img").style.display = isChat ? "none" : "block";
+      document.getElementById("ai-tab-chat").classList.toggle("active", isChat);
+      document.getElementById("ai-tab-img").classList.toggle("active", !isChat);
+      if (!isChat) refreshCoinDisplay();
+    }
+    let aiFsOn = false;
+    function toggleAiFs() {
+      aiFsOn = !aiFsOn;
+      document.getElementById("home-section").classList.toggle("ai-fs", aiFsOn);
+      document.getElementById("ai-fs-btn").textContent = aiFsOn ? "⤡ EXIT" : "⤢ FULLSCREEN";
+    }
     async function getUserCoins() {
       if (!currentUser) return 0;
       const doc = await db.collection("users").doc(currentUser.uid).get();
       const data = doc.data() || {};
       const today = new Date().toDateString();
-      // Refill if new day
       if (data.lastCoinRefill !== today) {
-        await db.collection("users").doc(currentUser.uid).update({
-          coins: COINS_PER_DAY,
-          lastCoinRefill: today
-        });
+        await db.collection("users").doc(currentUser.uid).update({ coins: COINS_PER_DAY, lastCoinRefill: today });
         return COINS_PER_DAY;
       }
       return typeof data.coins === "number" ? data.coins : COINS_PER_DAY;
     }
-
-    async function spendCoin() {
-      if (!currentUser) return false;
-      const coins = await getUserCoins();
-      if (coins <= 0) return false;
-      await db.collection("users").doc(currentUser.uid).update({
-        coins: firebase.firestore.FieldValue.increment(-1)
-      });
-      return true;
-    }
-
-    async function updateImagegenCoinDisplay() {
-      const el = document.getElementById("imagegen-coin-display");
-      if (!el) return;
+    async function refreshCoinDisplay() {
+      const el = document.getElementById("coin-display"); if (!el) return;
       if (!currentUser) { el.textContent = "🪙 Sign in to generate"; return; }
       const coins = await getUserCoins();
       el.textContent = `🪙 ${coins} coin${coins !== 1 ? "s" : ""} left today`;
       el.style.color = coins <= 1 ? "#f55" : "#fa0";
     }
-
     async function generateImage() {
-      const input = document.getElementById("imagegen-input");
-      const prompt = input.value.trim();
+      const prompt = document.getElementById("imagegen-input2").value.trim();
       if (!prompt) return;
-
       if (!currentUser) { showToast("SIGN IN TO GENERATE IMAGES"); return; }
-
-      // ── Coin check ─────────────────────────────────────────────────────────
       const coins = await getUserCoins();
-      if (coins <= 0) {
-        showToast("NO COINS LEFT — COME BACK TOMORROW FOR 5 MORE");
-        document.getElementById("imagegen-coin-display").textContent = "🪙 0 coins left";
-        document.getElementById("imagegen-coin-display").style.color = "#f55";
-        return;
-      }
-
-      const btn = document.getElementById("imagegen-btn");
-      btn.disabled = true;
-      btn.textContent = "...";
-      const output = document.getElementById("imagegen-output");
-
+      if (coins <= 0) { showToast("NO COINS LEFT — COME BACK TOMORROW"); return; }
+      const btn = document.getElementById("imagegen-btn2"); btn.disabled = true; btn.textContent = "...";
+      const output = document.getElementById("imagegen-output2");
       const loadDiv = document.createElement("div");
       loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
-      loadDiv.textContent = imagegenUploadB64 ? "EDITING WITH GPT IMAGE 1..." : "GENERATING WITH DALL-E 3...";
+      loadDiv.textContent = imgUploadB64 ? "EDITING WITH GPT IMAGE 1..." : "GENERATING WITH DALL-E 3...";
       output.insertBefore(loadDiv, output.firstChild);
-
-      // Deduct coin immediately
-      const spent = await spendCoin();
-      if (!spent) {
-        if (output.contains(loadDiv)) output.removeChild(loadDiv);
-        btn.disabled = false; btn.textContent = "GENERATE";
-        showToast("COULD NOT DEDUCT COIN — TRY AGAIN");
-        return;
-      }
-      await updateImagegenCoinDisplay();
-
+      await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-1) });
+      await refreshCoinDisplay();
       try {
         let resultUrl = null, resultB64 = null, revisedPrompt = prompt;
-
-        if (imagegenUploadB64) {
-          const res = await fetch("/api/imageedit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, imageBase64: imagegenUploadB64, mimeType: imagegenUploadMime, size: imagegenSize })
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Edit failed");
-          resultB64 = data.b64;
-          resultUrl = data.url;
-          revisedPrompt = data.revised_prompt || prompt;
+        if (imgUploadB64) {
+          const res = await fetch("/api/imageedit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, imageBase64: imgUploadB64, mimeType: imgUploadMime, size: imagegenSize }) });
+          const data = await res.json(); if (!res.ok) throw new Error(data.error || "Edit failed");
+          resultB64 = data.b64; resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
         } else {
-          const res = await fetch("/api/imagegen", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality })
-          });
-          const data = await res.json();
-          if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
-          resultUrl = data.url;
-          revisedPrompt = data.revised_prompt || prompt;
+          const res = await fetch("/api/imagegen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality }) });
+          const data = await res.json(); if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
+          resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
         }
-
-        output.removeChild(loadDiv);
-
-        const wrapper = document.createElement("div");
-        wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
-
-        const img = document.createElement("img");
-        img.style.cssText = "max-width:100%;border:var(--border);display:block;";
-        img.alt = prompt;
+        if (output.contains(loadDiv)) output.removeChild(loadDiv);
+        const wrapper = document.createElement("div"); wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
+        const img = document.createElement("img"); img.style.cssText = "max-width:100%;border:var(--border);display:block;"; img.alt = prompt;
         img.src = resultB64 ? `data:image/png;base64,${resultB64}` : resultUrl;
-
-        const promptLabel = document.createElement("div");
-        promptLabel.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;";
-        promptLabel.textContent = revisedPrompt;
-
-        const downloadBtn = document.createElement("a");
-        downloadBtn.href = img.src;
-        downloadBtn.download = "vexis-gen.png";
-        downloadBtn.target = "_blank";
-        downloadBtn.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;";
-        downloadBtn.textContent = "↓ DOWNLOAD";
-
-        wrapper.appendChild(img);
-        wrapper.appendChild(promptLabel);
-        wrapper.appendChild(downloadBtn);
+        const lbl = document.createElement("div"); lbl.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;"; lbl.textContent = revisedPrompt;
+        const dl = document.createElement("a"); dl.href = img.src; dl.download = "vexis-gen.png"; dl.target = "_blank";
+        dl.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;"; dl.textContent = "↓ DOWNLOAD";
+        wrapper.appendChild(img); wrapper.appendChild(lbl); wrapper.appendChild(dl);
         output.insertBefore(wrapper, output.firstChild);
-
         btn.disabled = false; btn.textContent = "GENERATE";
       } catch (err) {
         if (output.contains(loadDiv)) output.removeChild(loadDiv);
-        // Refund the coin on error
-        await db.collection("users").doc(currentUser.uid).update({
-          coins: firebase.firestore.FieldValue.increment(1)
-        });
-        await updateImagegenCoinDisplay();
-        const errDiv = document.createElement("div");
-        errDiv.style.cssText = "padding:12px;color:#f55;font-family:var(--font-pixel);font-size:7px;text-align:center;border:1px solid #f55;";
-        errDiv.textContent = "ERROR: " + (err.message || "Image generation failed");
-        output.insertBefore(errDiv, output.firstChild);
-        btn.disabled = false; btn.textContent = "GENERATE";
-        showToast("IMAGE GEN FAILED — COIN REFUNDED");
+        await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(1) });
+        await refreshCoinDisplay();
+        const errDiv = document.createElement("div"); errDiv.style.cssText = "padding:12px;color:#f55;font-family:var(--font-pixel);font-size:7px;text-align:center;border:1px solid #f55;";
+        errDiv.textContent = "ERROR: " + (err.message || "Failed"); output.insertBefore(errDiv, output.firstChild);
+        btn.disabled = false; btn.textContent = "GENERATE"; showToast("IMAGE GEN FAILED — COIN REFUNDED");
       }
     }
-
-    function updateImagegenCounter() { updateImagegenCoinDisplay(); }
 
     /* =====================================================
        AI CHAT UI HELPERS
@@ -3880,37 +3752,11 @@
     /* =====================================================
        SEND AI MESSAGE
     ===================================================== */
-    // ── Chat anti-spam state ─────────────────────────────────────────────────
-    const CHAT_COOLDOWN_MS = 4000;      // 4 s between messages
-    const CHAT_WINDOW_MS   = 60000;     // 1 minute window
-    const CHAT_MAX_PER_WIN = 12;        // max 12 messages per minute
-    let chatLastSent       = 0;
-    let chatSentTimes      = [];        // timestamps of recent sends
-
     async function sendChatMessage() {
       if (isBusy) return;
       const chatInput = document.getElementById("chat-input");
       const text = chatInput.value.trim();
       if (!text && !attachedB64) return;
-
-      // ── Anti-spam checks ────────────────────────────────────────────────────
-      const now = Date.now();
-      // Cooldown between individual messages
-      if (now - chatLastSent < CHAT_COOLDOWN_MS) {
-        const remaining = Math.ceil((CHAT_COOLDOWN_MS - (now - chatLastSent)) / 1000);
-        showToast(`SLOW DOWN — WAIT ${remaining}s`);
-        return;
-      }
-      // Rolling-window cap
-      chatSentTimes = chatSentTimes.filter(t => now - t < CHAT_WINDOW_MS);
-      if (chatSentTimes.length >= CHAT_MAX_PER_WIN) {
-        showToast("TOO MANY MESSAGES — CHILL FOR A BIT");
-        return;
-      }
-      chatLastSent = now;
-      chatSentTimes.push(now);
-      // ────────────────────────────────────────────────────────────────────────
-
       if (!currentConvId) currentConvId = String(Date.now());
 
       const ts = fmtTime();
@@ -3951,7 +3797,7 @@
     }
 
     async function callOpenAI(msgs) {
-      const systemPrompt = codingMode ? CODING_SYSTEM : AI_SYSTEM;
+      const systemPrompt = AI_SYSTEM;
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -4196,60 +4042,39 @@
       newConversation();
       if (user) {
         try {
-          // Check existing doc first so we don't overwrite admin-edited displayName
-          const existingDoc = await db.collection("users").doc(user.uid).get();
-          const existingData = existingDoc.data() || {};
-          const updateData = {
+          await db.collection("users").doc(user.uid).set({
             uid: user.uid,
+            displayName: user.displayName || "Anonymous",
             photoURL: user.photoURL || null,
             email: user.email || null,
             lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
             createdAt: user.metadata.creationTime || null
-          };
-          // Only set displayName if not already set (preserve admin edits)
-          if (!existingData.displayName) {
-            updateData.displayName = user.displayName || "Anonymous";
-          }
-          // Give 5 coins if no coins field yet
-          if (existingData.coins === undefined) {
-            updateData.coins = 5;
-            updateData.lastCoinRefill = new Date().toDateString();
-          }
-          await db.collection("users").doc(user.uid).set(updateData, { merge: true });
+          }, { merge: true });
         } catch (_e) { }
-        upsertSavedAccount(user);
+        upsertSavedAccount(user); // persist this account for switch-account feature
         document.getElementById("settings-profile-section").style.display = "block";
-
-        // Determine which nav buttons to show
-        try {
-          const userDoc = await db.collection("users").doc(user.uid).get();
-          const userData = userDoc.data() || {};
-          const userRole = user.uid === ADMIN_UID ? "owner" : (userData.role || "user");
-
-          // Owner gets owner panel button
-          document.getElementById("nav-owner").style.display = userRole === "owner" ? "inline-block" : "none";
-
-          // Admins get mod panel button
-          if (userRole === "admin") {
-            document.getElementById("nav-mod").style.display = "inline-block";
-          } else if (userRole !== "owner") {
-            // Check whitelist
-            const wlDoc = await db.collection("whitelist").doc(user.uid).get();
-            document.getElementById("nav-mod").style.display = wlDoc.exists ? "inline-block" : "none";
-          } else {
-            // Owner also gets mod button
-            document.getElementById("nav-mod").style.display = "inline-block";
+        // Determine role
+          try {
+            const userDoc2 = await db.collection("users").doc(user.uid).get();
+            const userData2 = userDoc2.data() || {};
+            const userRole = user.uid === ADMIN_UID ? "owner" : (userData2.role || "user");
+            document.getElementById("nav-owner").style.display = userRole === "owner" ? "inline-block" : "none";
+            if (userRole === "owner" || userRole === "admin") {
+              document.getElementById("nav-mod").style.display = "inline-block";
+            } else {
+              document.getElementById("nav-mod").style.display = "none";
+              db.collection("whitelist").doc(user.uid).get().then(w => {
+                if (w.exists) document.getElementById("nav-mod").style.display = "inline-block";
+              }).catch(() => {});
+            }
+          } catch (_e) {
+            document.getElementById("nav-owner").style.display = "none";
+            document.getElementById("nav-mod").style.display = "none";
           }
-        } catch (_e) {
-          document.getElementById("nav-owner").style.display = "none";
-          document.getElementById("nav-mod").style.display = "none";
-        }
-
         loadDmConversations();
         startDmInboxListener();
       } else {
         document.getElementById("settings-profile-section").style.display = "none";
-        document.getElementById("nav-admin").style.display = "none";
         document.getElementById("nav-mod").style.display = "none";
         document.getElementById("nav-owner").style.display = "none";
       }
@@ -4377,9 +4202,9 @@
       row.dataset.msgId = msg.id;
       let avHTML;
       if (msg.photoURL) {
-        avHTML = `<div class="social-msg-av" style="cursor:pointer;" data-uid="${escHtml(msg.userId)}" data-name="${escHtml(msg.displayName||'?')}"><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
+        avHTML = `<div class="social-msg-av"><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
       } else {
-        avHTML = `<div class="social-msg-av" style="cursor:pointer;" data-uid="${escHtml(msg.userId)}" data-name="${escHtml(msg.displayName||'?')}">${(msg.displayName || "?")[0].toUpperCase()}</div>`;
+        avHTML = `<div class="social-msg-av">${(msg.displayName || "?")[0].toUpperCase()}</div>`;
       }
       let replyHTML = "";
       if (msg.replyTo) {
@@ -4392,28 +4217,25 @@
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
-      const reportBtn = !isOwn ? `<button class="msg-report-btn" data-msgid="${escHtml(msg.id)}" data-uid="${escHtml(msg.userId)}" data-name="${escHtml(msg.displayName||'?')}">🚩</button>` : "";
       row.innerHTML = `
     ${avHTML}
     <div class="social-msg-body">
       <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
       <div class="social-msg-bubble">${replyHTML}${contentHTML}</div>
       <div class="social-msg-time">${time}</div>
-      <div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${reportBtn}</div>
+      <div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${!isOwn ? `<button class="msg-report-btn">🚩</button>` : ""}</div>
     </div>`;
       row.querySelector(".reply-btn").addEventListener("click", () => setReplyingTo(msg));
-      // Avatar click → report user
-      row.querySelector(".social-msg-av").addEventListener("click", e => {
-        const uid = e.currentTarget.dataset.uid;
-        const name = e.currentTarget.dataset.name;
-        if (!currentUser || uid === currentUser.uid) return;
-        openReportModal({ type: "user", targetUid: uid, targetName: name });
+      // Avatar click = report user
+      const avEl = row.querySelector(".social-msg-av");
+      if (avEl) avEl.addEventListener("click", () => {
+        if (!currentUser || msg.userId === currentUser.uid) return;
+        openReportModal({type:"user", targetUid:msg.userId, targetName:msg.displayName||"?"});
       });
-      // Report message button
       const rBtn = row.querySelector(".msg-report-btn");
       if (rBtn) rBtn.addEventListener("click", e => {
         e.stopPropagation();
-        openReportModal({ type: "message", msgId: msg.id, targetUid: msg.userId, targetName: msg.displayName || "?", msgText: msg.text || "[media]" });
+        openReportModal({type:"message", msgId:msg.id, targetUid:msg.userId, targetName:msg.displayName||"?", msgText:msg.text||"[media]"});
       });
       container.appendChild(row);
     }
@@ -4927,34 +4749,8 @@
     });
 
     /* =====================================================
-       ADMIN PANEL — FULL REWRITE
+       ADMIN PANEL
     ===================================================== */
-
-    // ── Role hierarchy ──────────────────────────────────────────────────────
-    const ROLE_RANK = { owner: 3, admin: 2, user: 1 };
-    let adminMyRole = "user"; // resolved after auth
-    let adminAllUsers = [];   // cached user list
-    let adminBannedIds = new Set();
-    let adminSelectedUids = new Set();
-    let adminRtUnsubscribe = null;  // real-time listener
-    let drawerUid = null;           // currently open drawer UID
-
-    function getMyRole() {
-      if (!currentUser) return "user";
-      if (currentUser.uid === ADMIN_UID) return "owner";
-      const me = adminAllUsers.find(u => u.uid === currentUser.uid);
-      return me?.role || "user";
-    }
-    function canDo(action) {
-      const r = getMyRole();
-      if (action === "assign-admin") return r === "owner";
-      if (action === "delete-user") return r === "owner";
-      if (action === "ban")         return ROLE_RANK[r] >= 2;
-      if (action === "edit-fields") return ROLE_RANK[r] >= 2;
-      if (action === "view-logs")   return ROLE_RANK[r] >= 2;
-      return false;
-    }
-
     document.querySelectorAll(".admin-tab").forEach(tab => {
       tab.addEventListener("click", () => {
         document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
@@ -4962,917 +4758,343 @@
         tab.classList.add("active");
         const panel = document.getElementById("admin-panel-" + tab.dataset.panel);
         if (panel) panel.classList.add("active");
-        if (tab.dataset.panel === "whitelist")  renderWhitelist();
-        if (tab.dataset.panel === "logs")        loadAdminLogs();
-        if (tab.dataset.panel === "roles")       renderRolesTab();
-        if (tab.dataset.panel === "settings")    renderBannedList();
-        if (tab.dataset.panel === "online")      loadOnlineStatus();
-        if (tab.dataset.panel === "reports")     loadReports();
+        if (tab.dataset.panel === "whitelist") renderWhitelist();
+        if (tab.dataset.panel === "banned") renderBannedList();
       });
     });
-
-    // ── Entry point ─────────────────────────────────────────────────────────
-    async function loadAdminData() {
-      if (!currentUser) { showSection("home"); showToast("ACCESS DENIED"); return; }
-      const myDoc = await db.collection("users").doc(currentUser.uid).get();
-      const myData = myDoc.data() || {};
-      adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : (myData.role || "user");
-      if (adminMyRole !== "owner") { showSection("home"); showToast("OWNER ONLY"); return; }
-      document.getElementById("admin-role-badge").textContent = "OWNER";
-      startRealtimeUserListener();
+    /* =====================================================
+       ADMIN CONFIRM MODAL
+    ===================================================== */
+    let _confirmCb = null;
+    function adminConfirm(title, body, cb) {
+      document.getElementById("confirm-title").textContent = title;
+      document.getElementById("confirm-body").textContent = body;
+      _confirmCb = cb;
+      document.getElementById("admin-confirm-modal").classList.add("open");
     }
-
-    // ── Mod panel (admins + whitelisted) ─────────────────────────────────────
-    async function loadModData() {
-      if (!currentUser) { showSection("home"); showToast("ACCESS DENIED"); return; }
-      const userDoc = await db.collection("users").doc(currentUser.uid).get();
-      const userData = userDoc.data() || {};
-      const role = currentUser.uid === ADMIN_UID ? "owner" : (userData.role || "user");
-      // Check whitelist
-      const wlDoc = await db.collection("whitelist").doc(currentUser.uid).get();
-      if (role !== "owner" && role !== "admin" && !wlDoc.exists) {
-        showSection("home"); showToast("ACCESS DENIED"); return;
-      }
-      document.getElementById("mod-role-badge").textContent = role === "owner" ? "OWNER" : role === "admin" ? "ADMIN" : "MODERATOR";
-      await refreshModUserList();
-    }
-
-    async function refreshModUserList() {
-      const tbody = document.getElementById("mod-users-body");
-      const q = (document.getElementById("mod-search")?.value || "").toLowerCase();
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:14px;">Loading...</td></tr>';
-      try {
-        const [usersSnap, bannedSnap] = await Promise.all([
-          db.collection("users").get(),
-          db.collection("bannedUsers").get()
-        ]);
-        const bannedIds = new Set();
-        bannedSnap.forEach(d => bannedIds.add(d.id));
-        let users = [];
-        usersSnap.forEach(d => users.push({ uid: d.id, ...d.data() }));
-        if (q) users = users.filter(u => `${u.displayName||""} ${u.uid||""}`.toLowerCase().includes(q));
-        document.getElementById("mod-user-count").textContent = `${users.length} users`;
-        tbody.innerHTML = "";
-        users.forEach(u => {
-          const banned = bannedIds.has(u.uid);
-          const av = u.photoURL
-            ? `<img class="admin-user-avatar" src="${escHtml(u.photoURL)}" alt="">`
-            : `<span class="admin-user-initials">${(u.displayName||"?")[0].toUpperCase()}</span>`;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><div class="admin-name-cell">${av}<span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(u.displayName||"Anonymous")}</span></div></td>
-            <td style="font-size:10px;font-family:var(--font-mono);color:var(--muted);">${escHtml(u.uid?.slice(0,16)||"")}…</td>
-            <td>${banned ? '<span class="banned-badge">BANNED</span>' : '<span class="status-dot-active">● Active</span>'}</td>
-            <td><div class="action-btn-group">
-              ${banned
-                ? `<button class="unban-btn" data-uid="${escHtml(u.uid)}">UNBAN</button>`
-                : `<button class="ban-btn" data-uid="${escHtml(u.uid)}">BAN</button>`}
-            </div></td>`;
-          const btn = tr.querySelector(".ban-btn, .unban-btn");
-          btn.addEventListener("click", async e => {
-            const uid = e.target.dataset.uid;
-            if (banned) {
-              adminConfirm("Unban", `Unban ${u.displayName || uid}?`, async () => {
-                try {
-                  await db.collection("bannedUsers").doc(uid).delete();
-                  writeAdminLog("unban", uid, u.displayName || uid);
-                  showToast("UNBANNED"); refreshModUserList();
-                } catch (err) { showToast("ERROR: " + err.message); }
-              });
-            } else {
-              adminConfirm("Ban", `Ban ${u.displayName || uid}?`, async () => {
-                try {
-                  await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid });
-                  writeAdminLog("ban", uid, u.displayName || uid);
-                  showToast("BANNED"); refreshModUserList();
-                } catch (err) { showToast("ERROR: " + err.message); }
-              });
-            }
-          });
-          tbody.appendChild(tr);
-        });
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:#f55;padding:14px;">Error: ${escHtml(err.message)}</td></tr>`;
-      }
-    }
-    document.getElementById("mod-refresh-btn").addEventListener("click", refreshModUserList);
-    document.getElementById("mod-search").addEventListener("input", refreshModUserList);
-    // Mod sub-tabs
-    document.querySelectorAll("#mod-tabs .admin-tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll("#mod-tabs .admin-tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        const panel = tab.dataset.modpanel;
-        document.getElementById("mod-subpanel-users").style.display = panel === "users" ? "block" : "none";
-        document.getElementById("mod-subpanel-reports").style.display = panel === "reports" ? "block" : "none";
-        if (panel === "reports") {
-          loadReports().then(() => {
-            document.getElementById("reports-list-mod").innerHTML = document.getElementById("reports-list").innerHTML;
-          });
-        }
-      });
+    function closeAdminConfirm() { document.getElementById("admin-confirm-modal").classList.remove("open"); _confirmCb = null; }
+    document.getElementById("confirm-ok-btn").addEventListener("click", async () => {
+      const cb = _confirmCb; closeAdminConfirm();
+      if (cb) try { await cb(); } catch (err) { showToast("ERROR: " + err.message); }
     });
+    document.getElementById("admin-confirm-modal").addEventListener("click", e => { if (e.target === e.currentTarget) closeAdminConfirm(); });
 
-    // ── Real-time user listener ──────────────────────────────────────────────
-    function startRealtimeUserListener() {
-      if (adminRtUnsubscribe) adminRtUnsubscribe();
-      adminRtUnsubscribe = db.collection("users").onSnapshot(async snap => {
-        const bannedSnap = await db.collection("bannedUsers").get();
-        adminBannedIds = new Set();
-        bannedSnap.forEach(d => adminBannedIds.add(d.id));
-        adminAllUsers = [];
-        snap.forEach(d => adminAllUsers.push({ uid: d.id, ...d.data() }));
-        adminAllUsers.sort((a, b) => {
-          const ta = a.lastSeen?.toMillis?.() ?? 0;
-          const tb = b.lastSeen?.toMillis?.() ?? 0;
-          return tb - ta;
-        });
-        updateAdminStats();
-        renderUserTable();
-        if (drawerUid) refreshDrawer(drawerUid);
-      }, err => { showToast("RT ERROR: " + err.message); });
-    }
-
-    // ── Stats ────────────────────────────────────────────────────────────────
-    function updateAdminStats() {
-      const now = Date.now();
-      const week = 7 * 24 * 60 * 60 * 1000;
-      const newCount = adminAllUsers.filter(u => {
-        const ca = u.createdAt;
-        if (!ca) return false;
-        const ms = typeof ca === "number" ? ca : ca.toMillis?.() ?? 0;
-        return now - ms < week;
-      }).length;
-      document.getElementById("stat-total").textContent = adminAllUsers.length;
-      document.getElementById("stat-banned").textContent = adminBannedIds.size;
-      document.getElementById("stat-admins").textContent = adminAllUsers.filter(u => ROLE_RANK[u.role] >= 2).length;
-      document.getElementById("stat-new").textContent = newCount;
-      document.getElementById("admin-user-count").textContent =
-        `${adminAllUsers.length} user${adminAllUsers.length !== 1 ? "s" : ""}`;
-    }
-
-    // ── Render table ─────────────────────────────────────────────────────────
-    function getFilteredUsers() {
-      const q = (document.getElementById("admin-search")?.value || "").toLowerCase();
-      const roleF = document.getElementById("admin-filter-role")?.value || "";
-      const statusF = document.getElementById("admin-filter-status")?.value || "";
-      return adminAllUsers.filter(u => {
-        if (q) {
-          const hay = `${u.displayName||""} ${u.email||""} ${u.uid||""} ${u.role||""}`.toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        if (roleF && (u.role || "user") !== roleF) return false;
-        if (statusF === "banned" && !adminBannedIds.has(u.uid)) return false;
-        if (statusF === "active" && adminBannedIds.has(u.uid)) return false;
-        return true;
-      });
-    }
-
-    function renderUserTable() {
-      const tbody = document.getElementById("users-table-body");
-      const users = getFilteredUsers();
-      if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;">No users match filter.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = "";
-      users.forEach(user => {
-        const banned = adminBannedIds.has(user.uid);
-        const role = user.role || "user";
-        const lastSeen = user.lastSeen
-          ? new Date(user.lastSeen.toMillis ? user.lastSeen.toMillis() : user.lastSeen).toLocaleString()
-          : "—";
-        const joined = user.createdAt
-          ? new Date(typeof user.createdAt === "number" ? user.createdAt : user.createdAt.toMillis?.() ?? 0).toLocaleDateString()
-          : "—";
-        const avatarHTML = user.photoURL
-          ? `<img class="admin-user-avatar" src="${escHtml(user.photoURL)}" alt="">`
-          : `<span class="admin-user-initials">${(user.displayName||"?")[0].toUpperCase()}</span>`;
-        const selected = adminSelectedUids.has(user.uid);
-        const tr = document.createElement("tr");
-        if (selected) tr.classList.add("selected");
-        tr.innerHTML = `
-          <td class="check-col"><input type="checkbox" class="row-check" data-uid="${escHtml(user.uid)}" ${selected ? "checked" : ""}></td>
-          <td><div class="admin-name-cell">${avatarHTML}<span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(user.displayName||"Anonymous")}</span></div></td>
-          <td style="font-size:10px;font-family:var(--font-mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;cursor:text;" title="${escHtml(user.uid)}">${escHtml(user.uid.slice(0,14))}…</td>
-          <td style="font-size:11px;">${escHtml(user.email||"—")}</td>
-          <td><span class="role-badge ${escHtml(role)}">${escHtml(role.toUpperCase())}</span></td>
-          <td style="font-size:11px;color:var(--muted);">${joined}</td>
-          <td style="font-size:11px;color:var(--muted);">${lastSeen}</td>
-          <td>${banned ? '<span class="banned-badge">BANNED</span>' : '<span class="status-dot-active">● Active</span>'}</td>
-          <td>
-            <div class="action-btn-group">
-              ${banned
-                ? `<button class="unban-btn" data-uid="${escHtml(user.uid)}">UNBAN</button>`
-                : `<button class="ban-btn" data-uid="${escHtml(user.uid)}">BAN</button>`}
-              <button class="del-msgs-btn" data-uid="${escHtml(user.uid)}">DEL MSGS</button>
-            </div>
-          </td>`;
-
-        // Row click → open drawer (not on checkbox/button)
-        tr.addEventListener("click", e => {
-          if (e.target.type === "checkbox" || e.target.tagName === "BUTTON") return;
-          openUserDrawer(user.uid);
-        });
-
-        // Checkbox
-        tr.querySelector(".row-check").addEventListener("change", e => {
-          if (e.target.checked) adminSelectedUids.add(user.uid);
-          else adminSelectedUids.delete(user.uid);
-          updateBulkBar();
-          tr.classList.toggle("selected", e.target.checked);
-        });
-
-        // Ban/Unban
-        const actionBtn = tr.querySelector(".ban-btn, .unban-btn");
-        actionBtn.addEventListener("click", async e => {
-          e.stopPropagation();
-          const uid = e.target.dataset.uid;
-          if (banned) {
-            adminConfirm("Unban User", `Unban ${user.displayName || uid}?`, async () => {
-              try {
-                await db.collection("bannedUsers").doc(uid).delete();
-                writeAdminLog("unban", uid, user.displayName || uid);
-                showToast("USER UNBANNED");
-              } catch (err) { showToast("ERROR: " + err.message); }
-            });
-          } else {
-            adminConfirm("Ban User", `Ban ${user.displayName || uid}?`, async () => {
-              try {
-                await db.collection("bannedUsers").doc(uid).set({
-                  bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                  bannedBy: currentUser.uid
-                });
-                writeAdminLog("ban", uid, user.displayName || uid);
-                showToast("USER BANNED");
-              } catch (err) { showToast("ERROR: " + err.message); }
-            });
-          }
-        });
-
-        // Del msgs
-        tr.querySelector(".del-msgs-btn").addEventListener("click", async e => {
-          e.stopPropagation();
-          const uid = e.target.dataset.uid;
-          adminConfirm("Delete Messages", `Delete ALL chat messages from ${user.displayName || uid}?`, async () => {
-            try {
-              const msgs = await db.collection("socialMessages").where("userId", "==", uid).get();
-              if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; }
-              const batch = db.batch();
-              msgs.forEach(doc => batch.delete(doc.ref));
-              await batch.commit();
-              writeAdminLog("delete", uid, `${msgs.size} messages deleted`);
-              showToast(`DELETED ${msgs.size} MESSAGES`);
-            } catch (err) { showToast("ERROR: " + err.message); }
-          });
-        });
-
-        tbody.appendChild(tr);
-      });
-
-      // Select all
-      document.getElementById("select-all-check").onchange = e => {
-        const checks = document.querySelectorAll(".row-check");
-        checks.forEach(c => {
-          c.checked = e.target.checked;
-          if (e.target.checked) adminSelectedUids.add(c.dataset.uid);
-          else adminSelectedUids.delete(c.dataset.uid);
-          c.closest("tr").classList.toggle("selected", e.target.checked);
-        });
-        updateBulkBar();
-      };
-    }
-
-    // Search / filter live
-    ["admin-search","admin-filter-role","admin-filter-status"].forEach(id => {
-      document.getElementById(id)?.addEventListener("input", renderUserTable);
-    });
-    document.getElementById("admin-refresh-btn").addEventListener("click", () => {
-      if (adminRtUnsubscribe) { adminRtUnsubscribe(); adminRtUnsubscribe = null; }
-      startRealtimeUserListener();
-      showToast("REFRESHING...");
-    });
-
-    // ── Bulk actions ─────────────────────────────────────────────────────────
-    function updateBulkBar() {
-      const bar = document.getElementById("bulk-bar");
-      bar.classList.toggle("visible", adminSelectedUids.size > 0);
-      document.getElementById("bulk-count").textContent = `${adminSelectedUids.size} selected`;
-    }
-    function clearBulkSelection() {
-      adminSelectedUids.clear();
-      document.querySelectorAll(".row-check").forEach(c => { c.checked = false; c.closest("tr").classList.remove("selected"); });
-      document.getElementById("select-all-check").checked = false;
-      updateBulkBar();
-    }
-    async function adminBulkBan() {
-      if (!canDo("ban")) { showToast("PERMISSION DENIED"); return; }
-      adminConfirm("Bulk Ban", `Ban ${adminSelectedUids.size} users?`, async () => {
-        const batch = db.batch();
-        adminSelectedUids.forEach(uid => batch.set(db.collection("bannedUsers").doc(uid), { bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid }));
-        await batch.commit();
-        await writeAdminLog("ban", "bulk", `${adminSelectedUids.size} users banned`);
-        clearBulkSelection(); showToast(`${adminSelectedUids.size} USERS BANNED`);
-      });
-    }
-    async function adminBulkUnban() {
-      adminConfirm("Bulk Unban", `Unban ${adminSelectedUids.size} users?`, async () => {
-        const batch = db.batch();
-        adminSelectedUids.forEach(uid => batch.delete(db.collection("bannedUsers").doc(uid)));
-        await batch.commit();
-        await writeAdminLog("unban", "bulk", `${adminSelectedUids.size} users unbanned`);
-        clearBulkSelection(); showToast(`UNBANNED`);
-      });
-    }
-    async function adminBulkDeleteMsgs() {
-      if (!canDo("ban")) { showToast("PERMISSION DENIED"); return; }
-      adminConfirm("Bulk Delete Messages", `Delete ALL chat messages from ${adminSelectedUids.size} users?`, async () => {
-        let total = 0;
-        for (const uid of adminSelectedUids) {
-          const msgs = await db.collection("socialMessages").where("userId", "==", uid).get();
-          if (!msgs.empty) { const b = db.batch(); msgs.forEach(d => b.delete(d.ref)); await b.commit(); total += msgs.size; }
-        }
-        await writeAdminLog("delete", "bulk", `${total} messages deleted`);
-        clearBulkSelection(); showToast(`DELETED ${total} MESSAGES`);
-      });
-    }
-
-    // ── User detail drawer ───────────────────────────────────────────────────
-    function openUserDrawer(uid) {
-      drawerUid = uid;
-      const user = adminAllUsers.find(u => u.uid === uid);
-      if (!user) { showToast("USER NOT FOUND — TRY REFRESHING"); return; }
-      populateDrawer(user);
-      document.getElementById("user-detail-drawer").classList.add("open");
-      document.getElementById("user-detail-drawer").scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    function closeUserDrawer() {
-      drawerUid = null;
-      document.getElementById("user-detail-drawer").classList.remove("open");
-    }
-    function populateDrawer(user) {
-      const uid = user.uid;
-      const banned = adminBannedIds.has(uid);
-      const role = user.role || "user";
-
-      document.getElementById("drawer-name").textContent = user.displayName || "Anonymous";
-      document.getElementById("drawer-uid").textContent = uid;
-
-      const avEl = document.getElementById("drawer-avatar");
-      avEl.innerHTML = user.photoURL
-        ? `<img class="admin-user-avatar" src="${escHtml(user.photoURL)}" style="width:44px;height:44px;">`
-        : `<span class="admin-user-initials" style="width:44px;height:44px;font-size:14px;">${(user.displayName||"?")[0].toUpperCase()}</span>`;
-
-      document.getElementById("drawer-badges").innerHTML =
-        `<span class="role-badge ${role}">${role.toUpperCase()}</span>&nbsp;` +
-        (banned ? '<span class="banned-badge">BANNED</span>' : '');
-
-      document.getElementById("df-displayName").value = user.displayName || "";
-      document.getElementById("df-email").value = user.email || "";
-      document.getElementById("df-photoURL").value = user.photoURL || "";
-      document.getElementById("df-coins").value = user.coins ?? "";
-      document.getElementById("df-email-reset").value = user.email || "";
-      document.getElementById("df-role").value = role;
-
-      const url = user.photoURL || "";
-      const preview = document.getElementById("df-pfp-preview");
-      preview.src = url;
-      preview.style.display = url ? "block" : "none";
-
-      const known = new Set(["uid","displayName","email","photoURL","role","coins","lastSeen","createdAt","providerId","lastCoinRefill"]);
-      renderCustomFields(Object.entries(user).filter(([k]) => !known.has(k)));
-
-      const banBtn = document.getElementById("drawer-ban-btn");
-      banBtn.textContent = banned ? "✅ UNBAN" : "🚫 BAN";
-      banBtn.className = banned ? "admin-action-btn success" : "admin-action-btn warn";
-      banBtn.onclick = () => {
-        const name = user.displayName || uid;
-        if (banned) {
-          adminConfirm("Unban User", `Unban ${name}?`, async () => {
-            try {
-              await db.collection("bannedUsers").doc(uid).delete();
-              writeAdminLog("unban", uid, name);
-              showToast("UNBANNED");
-            } catch (err) { showToast("ERROR: " + err.message); }
-          });
-        } else {
-          adminConfirm("Ban User", `Ban ${name}?`, async () => {
-            try {
-              await db.collection("bannedUsers").doc(uid).set({
-                bannedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                bannedBy: currentUser.uid
-              });
-              writeAdminLog("ban", uid, name);
-              showToast("BANNED");
-            } catch (err) { showToast("ERROR: " + err.message); }
-          });
-        }
-      };
-      document.getElementById("drawer-status").textContent = "";
-    }
-    // Also call populateDrawer when real-time listener refreshes the user list
-    function refreshDrawer(uid) {
-      const user = adminAllUsers.find(u => u.uid === uid);
-      if (user && document.getElementById("user-detail-drawer").classList.contains("open")) {
-        populateDrawer(user);
-      }
-    }
     /* =====================================================
        REPORT SYSTEM
     ===================================================== */
-    function renderCustomFields(pairs) {
-      const container = document.getElementById("custom-fields-list");
-      container.innerHTML = "";
-      pairs.forEach(([key, val]) => {
-        const row = document.createElement("div");
-        row.className = "custom-field-row";
-        row.innerHTML = `
-          <input type="text" value="${escHtml(String(key))}" placeholder="field name" class="cf-key">
-          <input type="text" value="${escHtml(String(val))}" placeholder="value" class="cf-val">
-          <button class="custom-field-remove" title="Remove">✕</button>`;
-        row.querySelector(".custom-field-remove").onclick = () => row.remove();
-        container.appendChild(row);
-      });
-    }
-    function addCustomField() {
-      const container = document.getElementById("custom-fields-list");
-      const row = document.createElement("div");
-      row.className = "custom-field-row";
-      row.innerHTML = `
-        <input type="text" placeholder="field name" class="cf-key">
-        <input type="text" placeholder="value" class="cf-val">
-        <button class="custom-field-remove">✕</button>`;
-      row.querySelector(".custom-field-remove").onclick = () => row.remove();
-      container.appendChild(row);
-    }
-
-    let _reportContext = null;
+    let _rCtx = null;
     function openReportModal(ctx) {
       if (!currentUser) { showToast("SIGN IN TO REPORT"); return; }
-      _reportContext = ctx;
+      _rCtx = ctx;
       document.getElementById("report-reason").value = "";
       document.getElementById("report-details").value = "";
-      const label = ctx.type === "message"
+      document.getElementById("report-modal-target").textContent = ctx.type === "message"
         ? `Reporting message from ${ctx.targetName}: "${(ctx.msgText||"").slice(0,60)}"`
         : `Reporting user: ${ctx.targetName}`;
-      document.getElementById("report-modal-target").textContent = label;
       document.getElementById("report-modal").classList.add("open");
     }
-    function closeReportModal() {
-      document.getElementById("report-modal").classList.remove("open");
-      _reportContext = null;
-    }
-    document.getElementById("report-modal").addEventListener("click", e => {
-      if (e.target === e.currentTarget) closeReportModal();
-    });
+    function closeReportModal() { document.getElementById("report-modal").classList.remove("open"); _rCtx = null; }
+    document.getElementById("report-modal").addEventListener("click", e => { if (e.target === e.currentTarget) closeReportModal(); });
     async function submitReport() {
-      if (!_reportContext || !currentUser) return;
+      if (!_rCtx || !currentUser) return;
       const reason = document.getElementById("report-reason").value;
       if (!reason) { showToast("SELECT A REASON"); return; }
-      const details = document.getElementById("report-details").value.trim();
       try {
-        await db.collection("reports").add({
-          type: _reportContext.type,
-          targetUid: _reportContext.targetUid,
-          targetName: _reportContext.targetName,
-          msgId: _reportContext.msgId || null,
-          msgText: _reportContext.msgText || null,
-          reason,
-          details,
-          reportedBy: currentUser.uid,
-          reportedByName: currentUser.displayName || "Anonymous",
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          status: "pending"
-        });
-        closeReportModal();
-        showToast("REPORT SUBMITTED — THANKS");
+        await db.collection("reports").add({ type: _rCtx.type, targetUid: _rCtx.targetUid, targetName: _rCtx.targetName, msgId: _rCtx.msgId || null, msgText: _rCtx.msgText || null, reason, details: document.getElementById("report-details").value.trim(), reportedBy: currentUser.uid, reportedByName: currentUser.displayName || "Anonymous", timestamp: firebase.firestore.FieldValue.serverTimestamp(), status: "pending" });
+        closeReportModal(); showToast("REPORT SUBMITTED — THANKS");
       } catch (err) { showToast("ERROR: " + err.message); }
     }
 
     /* =====================================================
-       ONLINE STATUS
+       ADMIN LOG
     ===================================================== */
-    async function loadOnlineStatus() {
-      const container = document.getElementById("online-list");
-      const countEl = document.getElementById("online-count");
-      container.innerHTML = '<div style="color:var(--muted);font-size:12px;">Loading...</div>';
+    async function writeAdminLog(action, targetUid, detail) {
+      try { await db.collection("adminLogs").add({ action, targetUid, detail, adminUid: currentUser?.uid, adminName: currentUser?.displayName || "admin", timestamp: firebase.firestore.FieldValue.serverTimestamp() }); } catch (_) {}
+    }
+
+    /* =====================================================
+       OWNER PANEL
+    ===================================================== */
+    const ROLE_RANK = { owner: 3, admin: 2, user: 1 };
+    let adminAllUsers = [], adminBannedIds = new Set(), adminSelUids = new Set(), adminMyRole = "user", drawerUid = null, adminPollIv = null;
+
+    function canDo(action) {
+      const r = adminMyRole;
+      if (action === "assign-admin") return r === "owner";
+      if (action === "delete-user") return r === "owner";
+      if (action === "ban") return ROLE_RANK[r] >= 2;
+      return false;
+    }
+
+    document.querySelectorAll(".admin-tab").forEach(tab => tab.addEventListener("click", () => {
+      document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
+      tab.classList.add("active");
+      const panel = document.getElementById("admin-panel-" + tab.dataset.panel);
+      if (panel) panel.classList.add("active");
+      if (tab.dataset.panel === "whitelist") renderWhitelist();
+      if (tab.dataset.panel === "logs") loadAdminLogs();
+      if (tab.dataset.panel === "roles") renderRolesTab();
+      if (tab.dataset.panel === "settings") renderBannedList();
+      if (tab.dataset.panel === "reports") loadReports("owner-reports-list");
+    }));
+
+    async function loadAdminData() {
+      if (!currentUser) { showSection("home"); showToast("ACCESS DENIED"); return; }
+      try { const doc = await db.collection("users").doc(currentUser.uid).get(); adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : ((doc.data() || {}).role || "user"); } catch (_) { adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : "user"; }
+      if (adminMyRole !== "owner") { showSection("home"); showToast("OWNER ONLY"); return; }
+      document.getElementById("admin-role-badge").textContent = "OWNER";
+      fetchAdminUsers();
+      if (adminPollIv) clearInterval(adminPollIv);
+      adminPollIv = setInterval(fetchAdminUsers, 15000);
+    }
+    async function fetchAdminUsers() {
       try {
-        const snap = await db.collection("users").get();
-        const now = Date.now();
-        const ONLINE_THRESHOLD = 5 * 60 * 1000; // 5 minutes
-        const users = [];
-        snap.forEach(d => users.push({ uid: d.id, ...d.data() }));
-        users.sort((a, b) => {
-          const ta = a.lastSeen?.toMillis?.() ?? 0;
-          const tb = b.lastSeen?.toMillis?.() ?? 0;
-          return tb - ta;
-        });
-        const onlineUsers = users.filter(u => {
-          const ls = u.lastSeen?.toMillis?.() ?? 0;
-          return now - ls < ONLINE_THRESHOLD;
-        });
-        countEl.textContent = `${onlineUsers.length} online / ${users.length} total`;
-        container.innerHTML = "";
-        users.forEach(u => {
-          const ls = u.lastSeen?.toMillis?.() ?? 0;
-          const isOnline = now - ls < ONLINE_THRESHOLD;
-          const lastSeenStr = ls ? new Date(ls).toLocaleString() : "Never";
-          const av = u.photoURL
-            ? `<img class="admin-user-avatar" src="${escHtml(u.photoURL)}" style="width:28px;height:28px;">`
-            : `<span class="admin-user-initials" style="width:28px;height:28px;font-size:9px;">${(u.displayName||"?")[0].toUpperCase()}</span>`;
-          const row = document.createElement("div");
-          row.className = "online-user-row";
-          row.innerHTML = `
-            <span class="online-dot ${isOnline ? 'online' : 'offline'}"></span>
-            ${av}
-            <span style="font-family:var(--font-pixel);font-size:8px;flex:1;">${escHtml(u.displayName||"Anonymous")}</span>
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${isOnline ? '<span style="color:#5f5;">● ONLINE</span>' : `Last seen: ${lastSeenStr}`}</span>`;
-          container.appendChild(row);
-        });
-      } catch (err) {
-        container.innerHTML = `<div style="color:#f55;font-size:12px;">Error: ${escHtml(err.message)}</div>`;
-      }
+        const [usersSnap, bannedSnap] = await Promise.all([db.collection("users").get(), db.collection("bannedUsers").get()]);
+        adminBannedIds = new Set(); bannedSnap.forEach(d => adminBannedIds.add(d.id));
+        adminAllUsers = []; usersSnap.forEach(d => adminAllUsers.push({ uid: d.id, ...d.data() }));
+        adminAllUsers.sort((a, b) => (b.lastSeen?.toMillis?.() ?? 0) - (a.lastSeen?.toMillis?.() ?? 0));
+        updateAdminStats(); renderUserTable();
+        if (drawerUid) { const u = adminAllUsers.find(u => u.uid === drawerUid); if (u) populateDrawer(u); }
+      } catch (err) { showToast("FETCH ERROR: " + err.message); }
     }
+    document.getElementById("admin-refresh-btn").addEventListener("click", () => { fetchAdminUsers(); showToast("REFRESHING..."); });
 
-    /* =====================================================
-       REPORTS PANEL (owner/mod)
-    ===================================================== */
-    async function loadReports() {
-      const container = document.getElementById("reports-list");
-      const countEl = document.getElementById("reports-count");
-      container.innerHTML = '<div style="color:var(--muted);font-size:12px;">Loading...</div>';
-      try {
-        const snap = await db.collection("reports").orderBy("timestamp","desc").limit(100).get();
-        if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);font-size:12px;">No reports.</div>'; countEl.textContent = "0 reports"; return; }
-        countEl.textContent = `${snap.size} report${snap.size !== 1 ? "s" : ""}`;
-        container.innerHTML = "";
-        snap.forEach(doc => {
-          const d = doc.data();
-          const t = d.timestamp ? new Date(d.timestamp.toMillis()).toLocaleString() : "—";
-          const div = document.createElement("div");
-          div.className = "report-entry";
-          div.innerHTML = `
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-              <span class="report-badge">${escHtml(d.type?.toUpperCase()||"REPORT")}</span>
-              <span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(d.reason||"")}</span>
-              <span style="font-family:var(--font-pixel);font-size:6px;padding:2px 6px;background:${d.status==="resolved"?"#5f5":"#fa0"};color:#000;margin-left:auto;">${d.status?.toUpperCase()||"PENDING"}</span>
-            </div>
-            <div><strong>Target:</strong> ${escHtml(d.targetName||"")} <span style="color:var(--muted);font-size:10px;">(${escHtml(d.targetUid||"")})</span></div>
-            ${d.msgText ? `<div style="margin-top:4px;color:var(--muted);">Message: "${escHtml(d.msgText.slice(0,100))}"</div>` : ""}
-            ${d.details ? `<div style="margin-top:4px;">Details: ${escHtml(d.details)}</div>` : ""}
-            <div class="report-meta">Reported by ${escHtml(d.reportedByName||"?")} · ${t}</div>
-            <div style="display:flex;gap:6px;margin-top:8px;">
-              <button class="admin-action-btn success" style="font-size:6px;padding:4px 8px;" data-id="${doc.id}" onclick="resolveReport('${doc.id}')">✓ RESOLVE</button>
-              <button class="admin-action-btn danger" style="font-size:6px;padding:4px 8px;" onclick="banFromReport('${escHtml(d.targetUid)}','${escHtml(d.targetName||"")}')">BAN USER</button>
-              <button class="admin-action-btn ghost" style="font-size:6px;padding:4px 8px;" onclick="deleteReport('${doc.id}')">DELETE</button>
-            </div>`;
-          container.appendChild(div);
-        });
-      } catch (err) {
-        container.innerHTML = `<div style="color:#f55;font-size:12px;">Error: ${escHtml(err.message)}</div>`;
-      }
+    function updateAdminStats() {
+      const now = Date.now(), week = 7 * 24 * 60 * 60 * 1000;
+      const nc = adminAllUsers.filter(u => { const ca = u.createdAt; if (!ca) return false; const ms = typeof ca === "number" ? ca : ca.toMillis?.() ?? 0; return now - ms < week; }).length;
+      document.getElementById("stat-total").textContent = adminAllUsers.length;
+      document.getElementById("stat-banned").textContent = adminBannedIds.size;
+      document.getElementById("stat-admins").textContent = adminAllUsers.filter(u => ROLE_RANK[u.role] >= 2).length;
+      document.getElementById("stat-new").textContent = nc;
+      document.getElementById("admin-user-count").textContent = adminAllUsers.length + " users";
     }
-    async function resolveReport(id) {
-      await db.collection("reports").doc(id).update({ status: "resolved" });
-      showToast("MARKED RESOLVED"); loadReports();
-    }
-    async function deleteReport(id) {
-      await db.collection("reports").doc(id).delete();
-      showToast("REPORT DELETED"); loadReports();
-    }
-    async function banFromReport(uid, name) {
-      adminConfirm("Ban User", `Ban ${name} (${uid})?`, async () => {
-        await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid });
-        await writeAdminLog("ban", uid, name + " (from report)");
-        showToast("BANNED"); loadReports();
+    function getFilteredUsers() {
+      const q = (document.getElementById("admin-search")?.value || "").toLowerCase();
+      const rF = document.getElementById("admin-filter-role")?.value || "";
+      const sF = document.getElementById("admin-filter-status")?.value || "";
+      return adminAllUsers.filter(u => {
+        if (q && !`${u.displayName||""} ${u.email||""} ${u.uid||""} ${u.role||""}`.toLowerCase().includes(q)) return false;
+        if (rF && (u.role || "user") !== rF) return false;
+        if (sF === "banned" && !adminBannedIds.has(u.uid)) return false;
+        if (sF === "active" && adminBannedIds.has(u.uid)) return false;
+        return true;
       });
     }
-    async function clearReports() {
-      adminConfirm("Clear All Reports", "Delete all reports permanently?", async () => {
-        const snap = await db.collection("reports").get();
-        const batch = db.batch(); snap.forEach(d => batch.delete(d.ref)); await batch.commit();
-        showToast("REPORTS CLEARED"); loadReports();
+    function renderUserTable() {
+      const tbody = document.getElementById("users-table-body"), users = getFilteredUsers();
+      if (!users.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px">No users match filter.</td></tr>'; return; }
+      tbody.innerHTML = "";
+      users.forEach(user => {
+        const banned = adminBannedIds.has(user.uid), role = user.role || "user";
+        const lastSeen = user.lastSeen ? new Date(user.lastSeen.toMillis ? user.lastSeen.toMillis() : user.lastSeen).toLocaleString() : "—";
+        const joined = user.createdAt ? new Date(typeof user.createdAt === "number" ? user.createdAt : user.createdAt.toMillis?.() ?? 0).toLocaleDateString() : "—";
+        const av = user.photoURL ? `<img class="admin-user-avatar" src="${escHtml(user.photoURL)}" alt="">` : `<span class="admin-user-initials">${(user.displayName||"?")[0].toUpperCase()}</span>`;
+        const sel = adminSelUids.has(user.uid);
+        const tr = document.createElement("tr"); if (sel) tr.classList.add("selected");
+        tr.innerHTML = `<td class="check-col"><input type="checkbox" class="row-check" data-uid="${escHtml(user.uid)}" ${sel?"checked":""}></td><td><div class="admin-name-cell">${av}<span style="font-family:var(--font-pixel);font-size:8px">${escHtml(user.displayName||"Anonymous")}</span></div></td><td style="font-size:10px;font-family:var(--font-mono);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${escHtml(user.uid)}">${escHtml(user.uid.slice(0,14))}…</td><td style="font-size:11px">${escHtml(user.email||"—")}</td><td><span class="role-badge ${escHtml(role)}">${escHtml(role.toUpperCase())}</span></td><td style="font-size:11px;color:var(--muted)">${joined}</td><td style="font-size:11px;color:var(--muted)">${lastSeen}</td><td>${banned?'<span class="banned-badge">BANNED</span>':'<span style="font-size:11px;color:#5f5">● Active</span>'}</td><td><div class="action-btn-group">${banned?`<button class="unban-btn" data-uid="${escHtml(user.uid)}">UNBAN</button>`:`<button class="ban-btn" data-uid="${escHtml(user.uid)}">BAN</button>`}<button class="del-msgs-btn" data-uid="${escHtml(user.uid)}">DEL MSGS</button></div></td>`;
+        tr.addEventListener("click", e => { if (e.target.type === "checkbox" || e.target.tagName === "BUTTON") return; openDrawer(user.uid); });
+        tr.querySelector(".row-check").addEventListener("change", e => { if (e.target.checked) adminSelUids.add(user.uid); else adminSelUids.delete(user.uid); updateBulkBar(); tr.classList.toggle("selected", e.target.checked); });
+        const banBtn = tr.querySelector(".ban-btn, .unban-btn");
+        banBtn.addEventListener("click", async e => { e.stopPropagation(); const uid = e.target.dataset.uid;
+          if (banned) adminConfirm("Unban User", `Unban ${user.displayName||uid}?`, async () => { try { await db.collection("bannedUsers").doc(uid).delete(); writeAdminLog("unban",uid,user.displayName||uid); showToast("UNBANNED"); fetchAdminUsers(); } catch(err){ showToast("ERROR: "+err.message); } });
+          else adminConfirm("Ban User", `Ban ${user.displayName||uid}?`, async () => { try { await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid }); writeAdminLog("ban",uid,user.displayName||uid); showToast("BANNED"); fetchAdminUsers(); } catch(err){ showToast("ERROR: "+err.message); } });
+        });
+        tr.querySelector(".del-msgs-btn").addEventListener("click", async e => { e.stopPropagation(); const uid = e.target.dataset.uid;
+          adminConfirm("Delete Messages", `Delete ALL messages from ${user.displayName||uid}?`, async () => { try { const msgs = await db.collection("socialMessages").where("userId","==",uid).get(); if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; } const batch = db.batch(); msgs.forEach(d => batch.delete(d.ref)); await batch.commit(); writeAdminLog("delete",uid,msgs.size+" messages"); showToast(`DELETED ${msgs.size} MESSAGES`); } catch(err){ showToast("ERROR: "+err.message); } });
+        });
+        tbody.appendChild(tr);
       });
+      document.getElementById("select-all-check").onchange = e => { document.querySelectorAll(".row-check").forEach(c => { c.checked = e.target.checked; if (e.target.checked) adminSelUids.add(c.dataset.uid); else adminSelUids.delete(c.dataset.uid); c.closest("tr").classList.toggle("selected", e.target.checked); }); updateBulkBar(); };
     }
-    // Also show reports tab in mod panel
-    async function loadModReports() {
-      // re-use same function if mod section has a reports panel added
-    }
+    ["admin-search","admin-filter-role","admin-filter-status"].forEach(id => document.getElementById(id)?.addEventListener("input", renderUserTable));
 
-    /* =====================================================
-       OWNER PANEL — EXTRA FIXES
-    ===================================================== */
-    // Profile picture preview in drawer
-    function updatePfpPreview() {
-      const url = document.getElementById("df-photoURL").value.trim();
-      const preview = document.getElementById("df-pfp-preview");
-      preview.src = url || "";
-      preview.style.display = url ? "block" : "none";
-    }
+    function updateBulkBar() { const bar = document.getElementById("bulk-bar"); bar.classList.toggle("visible", adminSelUids.size > 0); document.getElementById("bulk-count").textContent = adminSelUids.size + " selected"; }
+    function clearBulkSel() { adminSelUids.clear(); document.querySelectorAll(".row-check").forEach(c => { c.checked = false; c.closest("tr").classList.remove("selected"); }); document.getElementById("select-all-check").checked = false; updateBulkBar(); }
+    async function adminBulkBan() { adminConfirm("Bulk Ban", `Ban ${adminSelUids.size} users?`, async () => { try { const batch = db.batch(); adminSelUids.forEach(uid => batch.set(db.collection("bannedUsers").doc(uid), { bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid })); await batch.commit(); clearBulkSel(); fetchAdminUsers(); showToast("BANNED"); } catch(err){ showToast("ERROR: "+err.message); } }); }
+    async function adminBulkUnban() { adminConfirm("Bulk Unban", `Unban ${adminSelUids.size} users?`, async () => { try { const batch = db.batch(); adminSelUids.forEach(uid => batch.delete(db.collection("bannedUsers").doc(uid))); await batch.commit(); clearBulkSel(); fetchAdminUsers(); showToast("UNBANNED"); } catch(err){ showToast("ERROR: "+err.message); } }); }
+    async function adminBulkDelMsgs() { adminConfirm("Bulk Delete", `Delete messages from ${adminSelUids.size} users?`, async () => { try { let total = 0; for (const uid of adminSelUids) { const msgs = await db.collection("socialMessages").where("userId","==",uid).get(); if (!msgs.empty) { const b = db.batch(); msgs.forEach(d => b.delete(d.ref)); await b.commit(); total += msgs.size; } } clearBulkSel(); showToast(`DELETED ${total} MESSAGES`); } catch(err){ showToast("ERROR: "+err.message); } }); }
 
-    // Password reset via Firebase email
-    async function sendPasswordReset() {
-      if (!drawerUid) return;
-      const user = adminAllUsers.find(u => u.uid === drawerUid);
-      const email = user?.email;
-      if (!email) { showToast("NO EMAIL ON FILE"); return; }
-      adminConfirm("Send Password Reset", `Send a password reset email to ${email}?`, async () => {
-        try {
-          await auth.sendPasswordResetEmail(email);
-          await writeAdminLog("edit", drawerUid, `Password reset email sent to ${email}`);
-          showToast("RESET EMAIL SENT");
-        } catch (err) { showToast("ERROR: " + err.message); }
-      });
+    function openDrawer(uid) {
+      drawerUid = uid; const user = adminAllUsers.find(u => u.uid === uid);
+      if (!user) { showToast("USER NOT FOUND"); return; }
+      populateDrawer(user); document.getElementById("user-detail-drawer").classList.add("open");
+      document.getElementById("user-detail-drawer").scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    function closeDrawer() { drawerUid = null; document.getElementById("user-detail-drawer").classList.remove("open"); }
+    function populateDrawer(user) {
+      const uid = user.uid, banned = adminBannedIds.has(uid), role = user.role || "user";
+      document.getElementById("drawer-name").textContent = user.displayName || "Anonymous";
+      document.getElementById("drawer-uid").textContent = uid;
+      document.getElementById("drawer-avatar").innerHTML = user.photoURL ? `<img class="admin-user-avatar" src="${escHtml(user.photoURL)}" style="width:44px;height:44px">` : `<span class="admin-user-initials" style="width:44px;height:44px;font-size:14px">${(user.displayName||"?")[0].toUpperCase()}</span>`;
+      document.getElementById("drawer-badges").innerHTML = `<span class="role-badge ${role}">${role.toUpperCase()}</span>&nbsp;` + (banned ? '<span class="banned-badge">BANNED</span>' : "");
+      document.getElementById("df-name").value = user.displayName || "";
+      document.getElementById("df-email").value = user.email || "";
+      document.getElementById("df-coins").value = user.coins ?? "";
+      document.getElementById("df-role").value = role;
+      const known = new Set(["uid","displayName","email","photoURL","role","coins","lastSeen","createdAt","providerId","lastCoinRefill"]);
+      renderCustomFields(Object.entries(user).filter(([k]) => !known.has(k)));
+      const banBtn = document.getElementById("drawer-ban-btn");
+      banBtn.textContent = banned ? "✅ UNBAN" : "🚫 BAN"; banBtn.className = banned ? "admin-action-btn success" : "admin-action-btn warn";
+      banBtn.onclick = () => {
+        const name = user.displayName || uid;
+        if (banned) adminConfirm("Unban", `Unban ${name}?`, async () => { try { await db.collection("bannedUsers").doc(uid).delete(); writeAdminLog("unban",uid,name); showToast("UNBANNED"); fetchAdminUsers(); } catch(err){ showToast("ERROR: "+err.message); } });
+        else adminConfirm("Ban", `Ban ${name}?`, async () => { try { await db.collection("bannedUsers").doc(uid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid }); writeAdminLog("ban",uid,name); showToast("BANNED"); fetchAdminUsers(); } catch(err){ showToast("ERROR: "+err.message); } });
+      };
+      document.getElementById("drawer-status").textContent = "";
+    }
+    function renderCustomFields(pairs) { const c = document.getElementById("custom-fields-list"); c.innerHTML = ""; pairs.forEach(([key,val]) => { const row = document.createElement("div"); row.className = "custom-field-row"; row.innerHTML = `<input type="text" value="${escHtml(String(key))}" class="cf-key" placeholder="field name"><input type="text" value="${escHtml(String(val))}" class="cf-val" placeholder="value"><button class="custom-field-remove">✕</button>`; row.querySelector(".custom-field-remove").onclick = () => row.remove(); c.appendChild(row); }); }
+    function addCustomField() { const c = document.getElementById("custom-fields-list"), row = document.createElement("div"); row.className = "custom-field-row"; row.innerHTML = `<input type="text" class="cf-key" placeholder="field name"><input type="text" class="cf-val" placeholder="value"><button class="custom-field-remove">✕</button>`; row.querySelector(".custom-field-remove").onclick = () => row.remove(); c.appendChild(row); }
 
-    /* =====================================================
-       FIXED: DRAWER SAVE — display name, pfp, ban, delete msgs
-    ===================================================== */
     document.getElementById("drawer-save-btn").addEventListener("click", async () => {
-      if (!drawerUid) return;
-      const statusEl = document.getElementById("drawer-status");
-      statusEl.textContent = "Saving...";
-
-      const newRole = document.getElementById("df-role").value;
-      const oldUser = adminAllUsers.find(u => u.uid === drawerUid);
-      const oldRole = oldUser?.role || "user";
-      if (newRole !== oldRole && !canDo("assign-admin")) {
-        showToast("ONLY OWNERS CAN CHANGE ROLES"); statusEl.textContent = ""; return;
-      }
-
-      const newName = document.getElementById("df-displayName").value.trim();
-      const newPfp = document.getElementById("df-photoURL").value.trim();
-
-      const updates = { role: newRole };
-      if (newName) updates.displayName = newName;
-      if (newPfp !== undefined) updates.photoURL = newPfp || null;
-
-      const coinsVal = document.getElementById("df-coins").value;
-      if (coinsVal !== "") updates.coins = Number(coinsVal);
-
-      // Custom fields
-      document.querySelectorAll(".custom-field-row").forEach(row => {
-        const k = row.querySelector(".cf-key").value.trim();
-        const v = row.querySelector(".cf-val").value.trim();
-        if (k) updates[k] = v;
-      });
-
-      try {
-        await db.collection("users").doc(drawerUid).update(updates);
-        await writeAdminLog("edit", drawerUid, `Updated: ${Object.keys(updates).join(", ")}`);
-        statusEl.textContent = "✓ Saved";
-        showToast("CHANGES SAVED");
-        setTimeout(() => { statusEl.textContent = ""; }, 2000);
-      } catch (err) {
-        statusEl.textContent = "Error: " + err.message;
-        showToast("SAVE FAILED");
-      }
+      if (!drawerUid) return; const statusEl = document.getElementById("drawer-status"); statusEl.textContent = "Saving...";
+      const newRole = document.getElementById("df-role").value, oldUser = adminAllUsers.find(u => u.uid === drawerUid), oldRole = oldUser?.role || "user";
+      if (newRole !== oldRole && !canDo("assign-admin")) { showToast("ONLY OWNERS CAN CHANGE ROLES"); statusEl.textContent = ""; return; }
+      const updates = { role: newRole, displayName: document.getElementById("df-name").value.trim() || undefined };
+      const cv = document.getElementById("df-coins").value; if (cv !== "") updates.coins = Number(cv);
+      document.querySelectorAll(".custom-field-row").forEach(row => { const k = row.querySelector(".cf-key").value.trim(), v = row.querySelector(".cf-val").value.trim(); if (k) updates[k] = v; });
+      try { await db.collection("users").doc(drawerUid).update(updates); writeAdminLog("edit",drawerUid,"Updated: "+Object.keys(updates).join(", ")); statusEl.textContent = "✓ Saved"; showToast("CHANGES SAVED"); setTimeout(() => statusEl.textContent = "", 2000); }
+      catch (err) { statusEl.textContent = "Error: " + err.message; showToast("SAVE FAILED"); }
     });
-
     document.getElementById("drawer-delmsg-btn").addEventListener("click", () => {
-      if (!drawerUid) { showToast("NO USER SELECTED"); return; }
+      if (!drawerUid) return; const user = adminAllUsers.find(u => u.uid === drawerUid);
+      adminConfirm("Delete Messages", `Delete ALL messages from ${user?.displayName||drawerUid}?`, async () => { try { const msgs = await db.collection("socialMessages").where("userId","==",drawerUid).get(); if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; } const batch = db.batch(); msgs.forEach(d => batch.delete(d.ref)); await batch.commit(); writeAdminLog("delete",drawerUid,msgs.size+" messages"); showToast(`DELETED ${msgs.size} MESSAGES`); } catch(err){ showToast("ERROR: "+err.message); } });
+    });
+    document.getElementById("drawer-delete-btn").addEventListener("click", () => {
+      if (!drawerUid || !canDo("delete-user")) { showToast("OWNERS ONLY"); return; }
       const user = adminAllUsers.find(u => u.uid === drawerUid);
-      adminConfirm("Delete Messages", `Delete ALL messages from ${user?.displayName || drawerUid}?`, async () => {
-        try {
-          const msgs = await db.collection("socialMessages").where("userId", "==", drawerUid).get();
-          if (msgs.empty) { showToast("NO MESSAGES FOUND"); return; }
-          const batch = db.batch(); msgs.forEach(d => batch.delete(d.ref)); await batch.commit();
-          await writeAdminLog("delete", drawerUid, `${msgs.size} messages deleted`);
-          showToast(`DELETED ${msgs.size} MESSAGES`);
-        } catch (err) { showToast("ERROR: " + err.message); }
-      });
+      adminConfirm("⚠ Delete User", `Delete ${user?.displayName||drawerUid} from Firestore?`, async () => { try { await db.collection("users").doc(drawerUid).delete(); await db.collection("bannedUsers").doc(drawerUid).delete(); writeAdminLog("delete",drawerUid,"User deleted"); closeDrawer(); showToast("USER DELETED"); } catch(err){ showToast("ERROR: "+err.message); } });
     });
 
-    // ── Roles tab ────────────────────────────────────────────────────────────
     async function renderRolesTab() {
-      const container = document.getElementById("roles-admin-list");
-      container.innerHTML = "<div style='color:var(--muted);font-size:12px;'>Loading...</div>";
+      const c = document.getElementById("roles-admin-list"); c.innerHTML = "<div style='color:var(--muted);font-size:12px'>Loading...</div>";
       const admins = adminAllUsers.filter(u => ROLE_RANK[u.role] >= 2);
-      if (!admins.length) { container.innerHTML = "<div style='color:var(--muted);font-size:12px;'>No admins assigned.</div>"; return; }
-      container.innerHTML = "";
-      admins.forEach(u => {
-        const div = document.createElement("div");
-        div.className = "wl-entry";
-        div.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span class="role-badge ${u.role}">${(u.role||"user").toUpperCase()}</span>
-            <span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(u.displayName||"Anonymous")}</span>
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">${escHtml(u.uid)}</span>
-          </div>
-          ${canDo("assign-admin") && u.uid !== currentUser.uid
-            ? `<button class="wl-remove" data-uid="${escHtml(u.uid)}">DEMOTE</button>` : ""}`;
-        if (canDo("assign-admin") && u.uid !== currentUser.uid) {
-          div.querySelector(".wl-remove").addEventListener("click", async e => {
-            adminConfirm("Demote Admin", `Remove admin role from ${u.displayName}?`, async () => {
-              await db.collection("users").doc(u.uid).update({ role: "user" });
-              await writeAdminLog("role", u.uid, `Demoted from ${u.role} to user`);
-              showToast("DEMOTED"); renderRolesTab();
-            });
-          });
-        }
-        container.appendChild(div);
+      if (!admins.length) { c.innerHTML = "<div style='color:var(--muted);font-size:12px'>No admins assigned.</div>"; return; }
+      c.innerHTML = "";
+      admins.forEach(u => { const div = document.createElement("div"); div.className = "wl-entry"; div.innerHTML = `<div style="display:flex;align-items:center;gap:10px"><span class="role-badge ${u.role}">${(u.role||"user").toUpperCase()}</span><span style="font-family:var(--font-pixel);font-size:8px">${escHtml(u.displayName||"Anonymous")}</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${escHtml(u.uid)}</span></div>${canDo("assign-admin")&&u.uid!==currentUser?.uid?`<button class="wl-remove" data-uid="${escHtml(u.uid)}">DEMOTE</button>`:""}`;
+        if (canDo("assign-admin") && u.uid !== currentUser?.uid) div.querySelector(".wl-remove").onclick = () => adminConfirm("Demote", `Demote ${u.displayName}?`, async () => { try { await db.collection("users").doc(u.uid).update({ role: "user" }); writeAdminLog("role",u.uid,"Demoted"); showToast("DEMOTED"); renderRolesTab(); } catch(err){ showToast("ERROR: "+err.message); } });
+        c.appendChild(div);
       });
     }
 
-    // ── Whitelist ────────────────────────────────────────────────────────────
-    async function addToWhitelist(uid, displayName) {
-      await db.collection("whitelist").doc(uid).set({ uid, displayName: displayName || "Unknown", addedAt: firebase.firestore.FieldValue.serverTimestamp(), addedBy: currentUser.uid });
-      await writeAdminLog("edit", uid, "Added to whitelist");
-      renderWhitelist();
-    }
+    async function addToWhitelist(uid, displayName) { await db.collection("whitelist").doc(uid).set({ uid, displayName: displayName || "Unknown", addedAt: firebase.firestore.FieldValue.serverTimestamp(), addedBy: currentUser.uid }); writeAdminLog("edit",uid,"Added to whitelist"); renderWhitelist(); }
     async function renderWhitelist() {
-      const container = document.getElementById("whitelist-list");
-      container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">Loading...</div>';
-      try {
-        const snap = await db.collection("whitelist").get();
-        if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No whitelisted users.</div>'; return; }
-        container.innerHTML = "";
-        snap.forEach(doc => {
-          const data = doc.data();
-          const entry = document.createElement("div");
-          entry.className = "wl-entry";
-          entry.innerHTML = `
-            <div><span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(data.displayName||"Unknown")}</span><span style="font-size:11px;color:var(--muted);margin-left:10px;">${escHtml(doc.id)}</span></div>
-            <button class="wl-remove" data-id="${escHtml(doc.id)}">REMOVE</button>`;
-          entry.querySelector(".wl-remove").addEventListener("click", async e => {
-            await db.collection("whitelist").doc(e.target.dataset.id).delete();
-            await writeAdminLog("edit", e.target.dataset.id, "Removed from whitelist");
-            showToast("REMOVED"); renderWhitelist();
-          });
-          container.appendChild(entry);
-        });
-      } catch (err) { container.innerHTML = `<div style="color:#f55;font-size:13px;">Error: ${escHtml(err.message)}</div>`; }
+      const c = document.getElementById("whitelist-list"); c.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0">Loading...</div>';
+      try { const snap = await db.collection("whitelist").get(); if (snap.empty) { c.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0">No whitelisted users.</div>'; return; } c.innerHTML = "";
+        snap.forEach(doc => { const data = doc.data(); const entry = document.createElement("div"); entry.className = "wl-entry"; entry.innerHTML = `<div><span style="font-family:var(--font-pixel);font-size:8px">${escHtml(data.displayName||"Unknown")}</span><span style="font-size:11px;color:var(--muted);margin-left:10px">${escHtml(doc.id)}</span></div><button class="wl-remove" data-id="${escHtml(doc.id)}">REMOVE</button>`; entry.querySelector(".wl-remove").addEventListener("click", async e => { try { await db.collection("whitelist").doc(e.target.dataset.id).delete(); writeAdminLog("edit",e.target.dataset.id,"Removed from whitelist"); showToast("REMOVED"); renderWhitelist(); } catch(err){ showToast("ERROR: "+err.message); } }); c.appendChild(entry); });
+      } catch (err) { c.innerHTML = `<div style="color:#f55;font-size:13px">Error: ${escHtml(err.message)}</div>`; }
     }
     document.getElementById("wl-add-btn").addEventListener("click", async () => {
-      const uid = document.getElementById("wl-uid-input").value.trim();
-      if (!uid) { showToast("ENTER A UID"); return; }
-      await addToWhitelist(uid, "Manual Entry");
-      document.getElementById("wl-uid-input").value = "";
-      showToast("ADDED TO WHITELIST");
+      const uid = document.getElementById("wl-uid-input").value.trim(); if (!uid) { showToast("ENTER A UID"); return; }
+      try { await addToWhitelist(uid, "Manual Entry"); document.getElementById("wl-uid-input").value = ""; showToast("ADDED TO WHITELIST"); } catch(err){ showToast("ERROR: "+err.message); }
     });
 
-    // ── Banned list (settings tab) ───────────────────────────────────────────
     async function renderBannedList() {
-      const container = document.getElementById("banned-list");
-      container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">Loading...</div>';
-      try {
-        const snap = await db.collection("bannedUsers").get();
-        if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No banned users.</div>'; return; }
-        container.innerHTML = "";
-        snap.forEach(doc => {
-          const user = adminAllUsers.find(u => u.uid === doc.id);
-          const entry = document.createElement("div");
-          entry.className = "wl-entry";
-          entry.style.borderColor = "#f55";
-          entry.innerHTML = `
-            <div><span class="banned-badge" style="margin-right:8px;">BANNED</span><span style="font-family:var(--font-pixel);font-size:8px;">${escHtml(user?.displayName||"")}</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--muted);margin-left:8px;">${escHtml(doc.id)}</span></div>
-            <button class="unban-btn" data-id="${escHtml(doc.id)}">UNBAN</button>`;
-          entry.querySelector(".unban-btn").addEventListener("click", async e => {
-            await db.collection("bannedUsers").doc(e.target.dataset.id).delete();
-            await writeAdminLog("unban", e.target.dataset.id, user?.displayName || e.target.dataset.id);
-            showToast("UNBANNED"); renderBannedList();
-          });
-          container.appendChild(entry);
-        });
-      } catch (err) { container.innerHTML = `<div style="color:#f55;font-size:13px;">Error: ${escHtml(err.message)}</div>`; }
+      const c = document.getElementById("banned-list"); c.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0">Loading...</div>';
+      try { const snap = await db.collection("bannedUsers").get(); if (snap.empty) { c.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px 0">No banned users.</div>'; return; } c.innerHTML = "";
+        snap.forEach(doc => { const user = adminAllUsers.find(u => u.uid === doc.id); const entry = document.createElement("div"); entry.className = "wl-entry"; entry.style.borderColor = "#f55"; entry.innerHTML = `<div><span class="banned-badge" style="margin-right:8px">BANNED</span><span style="font-family:var(--font-pixel);font-size:8px">${escHtml(user?.displayName||"")}</span><span style="font-size:11px;font-family:var(--font-mono);color:var(--muted);margin-left:8px">${escHtml(doc.id)}</span></div><button class="unban-btn" data-id="${escHtml(doc.id)}">UNBAN</button>`; entry.querySelector(".unban-btn").addEventListener("click", async e => { try { await db.collection("bannedUsers").doc(e.target.dataset.id).delete(); writeAdminLog("unban",e.target.dataset.id,"Unbanned"); showToast("UNBANNED"); renderBannedList(); } catch(err){ showToast("ERROR: "+err.message); } }); c.appendChild(entry); });
+      } catch (err) { c.innerHTML = `<div style="color:#f55;font-size:13px">Error: ${escHtml(err.message)}</div>`; }
     }
-
-    // ── Activity logs ────────────────────────────────────────────────────────
-    async function writeAdminLog(action, targetUid, detail) {
-      try {
-        await db.collection("adminLogs").add({
-          action, targetUid, detail,
-          adminUid: currentUser?.uid,
-          adminName: currentUser?.displayName || "admin",
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } catch (e) { /* non-critical */ }
+    async function adminNukeMsgs() {
+      if (!canDo("delete-user")) { showToast("OWNERS ONLY"); return; }
+      adminConfirm("⚠ DELETE ALL MESSAGES", "Permanently delete EVERY message in social chat?", async () => { try { const snap = await db.collection("socialMessages").get(); const docs = []; snap.forEach(d => docs.push(d.ref)); for (let i = 0; i < docs.length; i+=500) { const batch = db.batch(); docs.slice(i,i+500).forEach(r => batch.delete(r)); await batch.commit(); } writeAdminLog("delete","all",snap.size+" messages nuked"); showToast(`DELETED ${snap.size} MESSAGES`); } catch(err){ showToast("ERROR: "+err.message); } });
     }
     async function loadAdminLogs() {
-      const container = document.getElementById("admin-logs-list");
-      container.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:10px 0;">Loading...</div>';
+      const c = document.getElementById("admin-logs-list");
+      c.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:10px 0">Loading...</div>';
       try {
-        const snap = await db.collection("adminLogs").orderBy("timestamp", "desc").limit(100).get();
-        if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);font-size:12px;">No logs yet.</div>'; return; }
+        const snap = await db.collection("adminLogs").orderBy("timestamp","desc").limit(100).get();
+        if (snap.empty) { c.innerHTML = '<div style="color:var(--muted);font-size:12px">No logs yet.</div>'; return; }
         const q = (document.getElementById("log-search")?.value || "").toLowerCase();
-        container.innerHTML = "";
+        c.innerHTML = "";
+        const actionColors = { ban:"#f55", unban:"#5f5", delete:"#f80", edit:"#5af", role:"#d0f" };
+        const actionBgText = { ban:["#f55","#fff"], unban:["#5f5","#000"], delete:["#f80","#000"], edit:["#5af","#000"], role:["#d0f","#fff"] };
         snap.forEach(doc => {
           const d = doc.data();
-          const timeStr = d.timestamp ? new Date(d.timestamp.toMillis()).toLocaleString() : "—";
           if (q && !`${d.action} ${d.detail} ${d.targetUid} ${d.adminName}`.toLowerCase().includes(q)) return;
+          const t = d.timestamp ? new Date(d.timestamp.toMillis()).toLocaleString() : "—";
+          const relTime = d.timestamp ? getRelativeTime(d.timestamp.toMillis()) : "";
+          const action = (d.action || "?").toLowerCase();
+          const [bg, fg] = actionBgText[action] || ["var(--fg)","var(--bg)"];
+          const borderColor = actionColors[action] || "var(--border-col)";
           const entry = document.createElement("div");
           entry.className = "log-entry";
+          entry.style.borderLeftColor = borderColor;
           entry.innerHTML = `
-            <span class="log-action ${d.action}">${escHtml((d.action||"?").toUpperCase())}</span>
-            <span class="log-detail">${escHtml(d.detail||"")} <span style="color:var(--fg);">[${escHtml(d.targetUid||"")}]</span> by <em>${escHtml(d.adminName||"?")}</em></span>
-            <span class="log-time">${timeStr}</span>`;
-          container.appendChild(entry);
+            <div class="log-entry-header">
+              <span class="log-action" style="background:${bg};color:${fg}">${escHtml(action.toUpperCase())}</span>
+              <span class="log-target" title="${escHtml(d.targetUid||"")}">${escHtml(d.targetUid ? d.targetUid.slice(0,20)+"…" : "—")}</span>
+              <span class="log-time" title="${t}">${relTime || t}</span>
+            </div>
+            <div class="log-entry-body">
+              <span class="log-detail-text">${escHtml(d.detail || "")}</span>
+              <span class="log-by"> — by <em>${escHtml(d.adminName || "?")}</em></span>
+            </div>`;
+          c.appendChild(entry);
         });
-        if (!container.children.length) container.innerHTML = '<div style="color:var(--muted);font-size:12px;">No logs match filter.</div>';
+        if (!c.children.length) c.innerHTML = '<div style="color:var(--muted);font-size:12px">No logs match filter.</div>';
       } catch (err) {
-        container.innerHTML = `<div style="color:#f55;font-size:12px;">Error: ${escHtml(err.message)}</div>`;
+        c.innerHTML = `<div style="color:#f55;font-size:12px">Error: ${escHtml(err.message)}</div>`;
       }
     }
+    function getRelativeTime(ms) {
+      const diff = Date.now() - ms;
+      if (diff < 60000) return "just now";
+      if (diff < 3600000) return Math.floor(diff/60000) + "m ago";
+      if (diff < 86400000) return Math.floor(diff/3600000) + "h ago";
+      if (diff < 604800000) return Math.floor(diff/86400000) + "d ago";
+      return "";
+    }
     document.getElementById("log-search")?.addEventListener("input", loadAdminLogs);
-    async function clearAdminLogs() {
-      if (!canDo("delete-user")) { showToast("OWNERS ONLY"); return; }
-      adminConfirm("Clear Logs", "Delete all admin activity logs? This cannot be undone.", async () => {
-        const snap = await db.collection("adminLogs").get();
-        const batch = db.batch(); snap.forEach(d => batch.delete(d.ref)); await batch.commit();
-        showToast("LOGS CLEARED"); loadAdminLogs();
-      });
-    }
+    async function clearAdminLogs() { if (!canDo("delete-user")) { showToast("OWNERS ONLY"); return; } adminConfirm("Clear Logs", "Delete all admin activity logs?", async () => { try { const snap = await db.collection("adminLogs").get(); const batch = db.batch(); snap.forEach(d => batch.delete(d.ref)); await batch.commit(); showToast("LOGS CLEARED"); loadAdminLogs(); } catch(err){ showToast("ERROR: "+err.message); } }); }
 
-    // ── Maintenance mode ─────────────────────────────────────────────────────
-    async function setMaintenanceMode(enabled) {
-      if (!canDo("delete-user")) { showToast("OWNERS ONLY"); return; }
-      await db.collection("siteSettings").doc("maintenance").set({ enabled, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: currentUser.uid });
-      await writeAdminLog("edit", "site", `Maintenance mode ${enabled ? "ENABLED" : "DISABLED"}`);
-      showToast(`MAINTENANCE ${enabled ? "ENABLED" : "DISABLED"}`);
+    async function loadReports(containerId) {
+      const c = document.getElementById(containerId); if (!c) return;
+      c.innerHTML = '<div style="color:var(--muted);font-size:12px">Loading...</div>';
+      try { const snap = await db.collection("reports").orderBy("timestamp","desc").limit(100).get(); if (snap.empty) { c.innerHTML = '<div style="color:var(--muted);font-size:12px">No reports.</div>'; const rc = document.getElementById("reports-count"); if (rc) rc.textContent = "0 reports"; return; }
+        const rc = document.getElementById("reports-count"); if (rc) rc.textContent = snap.size + ` report${snap.size!==1?"s":""}`;
+        c.innerHTML = "";
+        snap.forEach(doc => { const d = doc.data(), t = d.timestamp ? new Date(d.timestamp.toMillis()).toLocaleString() : "—"; const div = document.createElement("div"); div.style.cssText = "border:var(--border);border-left:3px solid #f55;padding:10px 14px;margin-bottom:8px;background:var(--card-bg);font-family:var(--font-mono);font-size:11px"; div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><span style="font-family:var(--font-pixel);font-size:6px;padding:2px 6px;background:#f55;color:#fff">${escHtml(d.type?.toUpperCase()||"REPORT")}</span><span style="font-family:var(--font-pixel);font-size:8px">${escHtml(d.reason||"")}</span><span style="font-family:var(--font-pixel);font-size:6px;padding:2px 6px;background:${d.status==="resolved"?"#5f5":"#fa0"};color:#000;margin-left:auto">${d.status?.toUpperCase()||"PENDING"}</span></div><div><strong>Target:</strong> ${escHtml(d.targetName||"")} <span style="color:var(--muted);font-size:10px">(${escHtml(d.targetUid||"")})</span></div>${d.msgText?`<div style="margin-top:4px;color:var(--muted)">Message: "${escHtml(d.msgText.slice(0,100))}"</div>`:""} ${d.details?`<div style="margin-top:4px">Details: ${escHtml(d.details)}</div>`:""}<div style="color:var(--muted);font-size:10px;margin-top:4px">Reported by ${escHtml(d.reportedByName||"?")} · ${t}</div><div style="display:flex;gap:6px;margin-top:8px"><button class="admin-action-btn success" style="font-size:6px;padding:4px 8px">✓ RESOLVE</button><button class="admin-action-btn danger" style="font-size:6px;padding:4px 8px">BAN USER</button><button class="admin-action-btn ghost" style="font-size:6px;padding:4px 8px">DELETE</button></div>`;
+          const btns = div.querySelectorAll(".admin-action-btn");
+          btns[0].onclick = async () => { try { await db.collection("reports").doc(doc.id).update({status:"resolved"}); showToast("RESOLVED"); loadReports(containerId); } catch(err){ showToast("ERROR: "+err.message); } };
+          btns[1].onclick = () => adminConfirm("Ban User", `Ban ${d.targetName}?`, async () => { try { await db.collection("bannedUsers").doc(d.targetUid).set({ bannedAt: firebase.firestore.FieldValue.serverTimestamp(), bannedBy: currentUser.uid }); writeAdminLog("ban",d.targetUid,d.targetName+" (from report)"); showToast("BANNED"); loadReports(containerId); } catch(err){ showToast("ERROR: "+err.message); } });
+          btns[2].onclick = async () => { try { await db.collection("reports").doc(doc.id).delete(); showToast("REPORT DELETED"); loadReports(containerId); } catch(err){ showToast("ERROR: "+err.message); } };
+          c.appendChild(div);
+        });
+      } catch (err) { c.innerHTML = `<div style="color:#f55;font-size:12px">Error: ${escHtml(err.message)}</div>`; }
     }
+    async function clearAllReports() { if (!canDo("delete-user")) { showToast("OWNERS ONLY"); return; } adminConfirm("Clear All Reports","Delete all reports?",async()=>{ try{ const snap=await db.collection("reports").get(); const batch=db.batch(); snap.forEach(d=>batch.delete(d.ref)); await batch.commit(); showToast("REPORTS CLEARED"); loadReports("owner-reports-list"); }catch(err){showToast("ERROR: "+err.message);} }); }
 
-    // ── Nuke messages ────────────────────────────────────────────────────────
-    // ── Confirm modal ─────────────────────────────────────────────────────────
-    let _confirmCallback = null;
-    function adminConfirm(title, body, onConfirm) {
-      document.getElementById("confirm-title").textContent = title;
-      document.getElementById("confirm-body").textContent = body;
-      _confirmCallback = onConfirm;
-      document.getElementById("admin-confirm-modal").classList.add("open");
+    /* =====================================================
+       MOD PANEL
+    ===================================================== */
+    document.querySelectorAll("#mod-tabs .admin-tab").forEach(tab => tab.addEventListener("click", () => {
+      document.querySelectorAll("#mod-tabs .admin-tab").forEach(t => t.classList.remove("active")); tab.classList.add("active");
+      const panel = tab.dataset.modpanel;
+      document.getElementById("mod-subpanel-users").style.display = panel === "users" ? "block" : "none";
+      document.getElementById("mod-subpanel-reports").style.display = panel === "reports" ? "block" : "none";
+      if (panel === "reports") loadReports("mod-reports-list");
+    }));
+    async function loadModData() {
+      if (!currentUser) { showSection("home"); showToast("ACCESS DENIED"); return; }
+      try { const doc = await db.collection("users").doc(currentUser.uid).get(); const data = doc.data() || {}; const role = currentUser.uid === ADMIN_UID ? "owner" : (data.role || "user"); const wl = await db.collection("whitelist").doc(currentUser.uid).get(); if (role !== "owner" && role !== "admin" && !wl.exists) { showSection("home"); showToast("ACCESS DENIED"); return; } document.getElementById("mod-role-badge").textContent = role === "owner" ? "OWNER" : role === "admin" ? "ADMIN" : "MODERATOR"; } catch (_) { showSection("home"); showToast("ACCESS DENIED"); return; }
+      refreshModList();
     }
-    function closeAdminConfirm() {
-      document.getElementById("admin-confirm-modal").classList.remove("open");
-      _confirmCallback = null;
+    async function refreshModList() {
+      const tbody = document.getElementById("mod-users-body"), q = (document.getElementById("mod-search")?.value || "").toLowerCase();
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:14px">Loading...</td></tr>';
+      try { const [usersSnap, bannedSnap] = await Promise.all([db.collection("users").get(), db.collection("bannedUsers").get()]); const bannedIds = new Set(); bannedSnap.forEach(d => bannedIds.add(d.id)); let users = []; usersSnap.forEach(d => users.push({ uid: d.id, ...d.data() })); if (q) users = users.filter(u => `${u.displayName||""} ${u.uid||""}`.toLowerCase().includes(q)); document.getElementById("mod-user-count").textContent = users.length + " users"; tbody.innerHTML = "";
+        users.forEach(u => { const banned = bannedIds.has(u.uid); const av = u.photoURL ? `<img class="admin-user-avatar" src="${escHtml(u.photoURL)}" alt="">` : `<span class="admin-user-initials">${(u.displayName||"?")[0].toUpperCase()}</span>`; const tr = document.createElement("tr"); tr.innerHTML = `<td><div class="admin-name-cell">${av}<span style="font-family:var(--font-pixel);font-size:8px">${escHtml(u.displayName||"Anonymous")}</span></div></td><td style="font-size:10px;font-family:var(--font-mono);color:var(--muted)">${escHtml(u.uid?.slice(0,16)||"")}…</td><td>${banned?'<span class="banned-badge">BANNED</span>':'<span style="font-size:11px;color:#5f5">● Active</span>'}</td><td><div class="action-btn-group">${banned?`<button class="unban-btn" data-uid="${escHtml(u.uid)}">UNBAN</button>`:`<button class="ban-btn" data-uid="${escHtml(u.uid)}">BAN</button>`}</div></td>`; const btn = tr.querySelector(".ban-btn,.unban-btn"); btn.addEventListener("click", async e => { const uid = e.target.dataset.uid; if (banned) adminConfirm("Unban",`Unban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).delete();writeAdminLog("unban",uid,u.displayName||uid);showToast("UNBANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); else adminConfirm("Ban",`Ban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).set({bannedAt:firebase.firestore.FieldValue.serverTimestamp(),bannedBy:currentUser.uid});writeAdminLog("ban",uid,u.displayName||uid);showToast("BANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); }); tbody.appendChild(tr); });
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="4" style="color:#f55;padding:14px">Error: ${escHtml(err.message)}</td></tr>`; }
     }
-    document.getElementById("confirm-ok-btn").addEventListener("click", async () => {
-      const cb = _confirmCallback;   // save BEFORE closing (closing nulls it)
-      closeAdminConfirm();
-      if (cb) { try { await cb(); } catch (err) { showToast("ERROR: " + err.message); } }
-    });
-    document.getElementById("admin-confirm-modal").addEventListener("click", e => {
-      if (e.target === e.currentTarget) closeAdminConfirm();
-    });
+    document.getElementById("mod-refresh-btn").addEventListener("click", refreshModList);
+    document.getElementById("mod-search").addEventListener("input", refreshModList);
+
+
 
     /* =====================================================
        INIT
     ===================================================== */
-    /* =====================================================
-       AI TAB SWITCHER + FULLSCREEN
-    ===================================================== */
-    let aiFullscreen = false;
-    function toggleAiFullscreen() {
-      aiFullscreen = !aiFullscreen;
-      document.getElementById("home-section").classList.toggle("ai-fullscreen", aiFullscreen);
-      document.getElementById("ai-fullscreen-btn").textContent = aiFullscreen ? "⤡ EXIT" : "⤢ FULLSCREEN";
-    }
-
-    function switchAiTab(tab) {
-      const isChat = tab === "chat";
-      document.getElementById("ai-panel-chat").style.display = isChat ? "block" : "none";
-      document.getElementById("ai-panel-imagegen").style.display = isChat ? "none" : "block";
-      const chatTab = document.getElementById("ai-tab-chat");
-      const imageTab = document.getElementById("ai-tab-imagegen");
-      chatTab.style.borderBottomColor = isChat ? "var(--fg)" : "transparent";
-      chatTab.style.color = isChat ? "var(--fg)" : "var(--muted)";
-      imageTab.style.borderBottomColor = isChat ? "transparent" : "var(--fg)";
-      imageTab.style.color = isChat ? "var(--muted)" : "var(--fg)";
-      if (!isChat) updateImagegenCoinDisplay();
-    }
-
-    // ── Imagegen upload state ────────────────────────────────────────────────
-    let imagegenUploadB64 = null;
-    let imagegenUploadMime = "image/png";
-
-    function clearImagegenUpload() {
-      imagegenUploadB64 = null;
-      imagegenUploadMime = "image/png";
-      document.getElementById("imagegen-upload-preview").style.display = "none";
-      document.getElementById("imagegen-upload-thumb").src = "";
-      document.getElementById("imagegen-file-input").value = "";
-      document.getElementById("imagegen-input").placeholder = "A futuristic city at sunset, neon lights...";
-    }
-
-    document.getElementById("imagegen-upload-btn").addEventListener("click", () => {
-      document.getElementById("imagegen-file-input").click();
-    });
-
-    document.getElementById("imagegen-file-input").addEventListener("change", e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        const dataUrl = ev.target.result;
-        const base64 = dataUrl.split(",")[1];
-        imagegenUploadB64 = base64;
-        imagegenUploadMime = file.type || "image/png";
-        document.getElementById("imagegen-upload-thumb").src = dataUrl;
-        document.getElementById("imagegen-upload-label").textContent = `${file.name} — describe your edits below`;
-        document.getElementById("imagegen-upload-preview").style.display = "flex";
-        document.getElementById("imagegen-input").placeholder = "Make the sky purple, add a dragon in the background...";
-      };
-      reader.readAsDataURL(file);
-    });
-
     function init() {
       loadSettings();
       applyTheme(settings.theme || "dark");
