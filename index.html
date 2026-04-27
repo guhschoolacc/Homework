@@ -2448,7 +2448,8 @@
     .cp-tile{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:140px}
     .cp-tile-av{width:80px;height:80px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#5865f2;color:#ffffff;font-family:var(--font-pixel);font-size:24px;border:3px solid #4f545c;transition:border-color .2s;flex-shrink:0;position:relative}
     .cp-tile-av img{width:100%;height:100%;object-fit:cover}
-    .cp-tile-av.speaking{border-color:#43b581;box-shadow:0 0 0 3px rgba(67,181,129,.25)}
+    .cp-tile-av.speaking{border-color:#43b581;box-shadow:0 0 0 3px rgba(67,181,129,.25);animation:speakPulse 2s ease-in-out infinite}
+    @keyframes speakPulse{0%,100%{box-shadow:0 0 0 3px rgba(67,181,129,.15)}50%{box-shadow:0 0 0 5px rgba(67,181,129,.35)}}
     .cp-tile-av.is-muted{border-color:#ed4245}
     .cp-tile-av.ringing{border-color:#faa61a;animation:callPulse .9s infinite}
     .cp-tile-name{font-family:var(--font-mono);font-size:13px;color:#ffffff;text-align:center;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -5469,33 +5470,14 @@
       callDocId = null; incomingCallData = null;
     }
 
-    // ── Real speaking detection via Web Audio API ────────────────────────────
-    let audioContext = null;
-    let speakingInterval = null;
-
+    // ── Speaking detection removed — AudioContext breaks echo cancellation ───
+    // We use a simple pulse animation on the avatar instead
     function startSpeakingDetection() {
-      if (!localStream || !window.AudioContext) return;
-      try {
-        audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(localStream);
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 512;
-        analyser.smoothingTimeConstant = 0.4;
-        source.connect(analyser);
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        speakingInterval = setInterval(() => {
-          if (isMuted) return;
-          analyser.getByteFrequencyData(data);
-          const vol = data.reduce((a, b) => a + b, 0) / data.length;
-          const speaking = vol > 8;
-          setTileClass("me", speaking ? "speaking" : "");
-        }, 120);
-      } catch (_) {}
+      // Intentionally empty — do not use AudioContext on the mic stream
+      // as it destroys the browser's built-in echo cancellation reference
     }
-
     function stopSpeakingDetection() {
-      if (speakingInterval) { clearInterval(speakingInterval); speakingInterval = null; }
-      if (audioContext) { audioContext.close().catch(() => {}); audioContext = null; }
+      // nothing to clean up
     }
 
     // ── On connected ─────────────────────────────────────────────────────────
