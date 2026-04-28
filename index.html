@@ -2704,6 +2704,96 @@
     .conv-search-input{width:100%;font-family:var(--font-mono);font-size:12px;padding:8px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;margin-bottom:8px;box-sizing:border-box}
     .conv-search-match{background:rgba(255,215,0,.25);border-radius:2px}
 
+
+    /* ─── ANNOUNCEMENT BANNER ─── */
+    #announcement-banner{display:none;background:var(--accent);color:var(--accent-fg);padding:8px 16px;font-family:var(--font-mono);font-size:12px;text-align:center;position:relative;z-index:299;border-bottom:2px solid rgba(0,0,0,.2)}
+    #announcement-banner.show{display:block}
+    .ann-close{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:inherit;opacity:.7}
+    .ann-close:hover{opacity:1}
+
+    /* ─── GLOBAL SEARCH ─── */
+    #search-overlay{display:none;position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.7);align-items:flex-start;justify-content:center;padding-top:80px}
+    #search-overlay.open{display:flex}
+    .search-box{background:var(--modal-bg);border:var(--border);width:100%;max-width:600px;max-height:72vh;display:flex;flex-direction:column;overflow:hidden;animation:modalDrop .18s ease forwards}
+    .search-input-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:var(--border)}
+    .search-icon{font-size:18px;color:var(--muted)}
+    .search-main-input{flex:1;font-family:var(--font-mono);font-size:15px;background:none;border:none;outline:none;color:var(--fg)}
+    .search-kbd{font-family:var(--font-mono);font-size:10px;padding:2px 6px;border:1px solid var(--border-col);color:var(--muted);border-radius:3px}
+    .search-tabs{display:flex;border-bottom:var(--border);flex-shrink:0}
+    .search-tab{flex:1;font-family:var(--font-pixel);font-size:6px;padding:8px;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;letter-spacing:1px}
+    .search-tab.active{color:var(--fg);border-bottom-color:var(--fg)}
+    .search-results{overflow-y:auto;flex:1}
+    .search-result{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bg2);transition:background .1s}
+    .search-result:hover{background:var(--bg2)}
+    .search-result-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center}
+    .search-result-body{flex:1;min-width:0}
+    .search-result-title{font-family:var(--font-pixel);font-size:8px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .search-result-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .search-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+    .search-section-label{font-family:var(--font-pixel);font-size:7px;color:var(--muted);padding:8px 16px 4px;letter-spacing:1px}
+
+    /* ─── ACTIVITY FEED ─── */
+    #activity-section{max-width:680px;margin:0 auto}
+    .activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bg2);cursor:pointer;transition:background .1s}
+    .activity-item:hover{background:var(--bg2)}
+    .activity-av{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-fg);font-family:var(--font-pixel);font-size:10px}
+    .activity-av img{width:100%;height:100%;object-fit:cover}
+    .activity-body{flex:1;min-width:0}
+    .activity-text{font-family:var(--font-mono);font-size:12px;color:var(--fg);line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .activity-time{font-size:10px;color:var(--muted);white-space:nowrap;margin-top:2px}
+    .activity-type-badge{font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border:1px solid var(--border-col);color:var(--muted);flex-shrink:0;align-self:center}
+
+    /* Poll bubbles should be transparent so the poll card shows its own styling */
+    .social-msg-bubble:has(.poll-card),
+    .dm-msg-bubble:has(.poll-card){background:transparent !important;border-color:transparent !important;padding:0 !important}
+    .social-msg.own .social-msg-bubble:has(.poll-card),
+    .dm-msg.own .dm-msg-bubble:has(.poll-card){background:transparent !important}
+    .poll-card{border:var(--border);background:var(--modal-bg);padding:14px;min-width:220px;max-width:340px}
+    .poll-question{font-family:var(--font-pixel);font-size:8px;margin-bottom:10px;line-height:1.5;color:var(--fg)}
+    .poll-option{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border-col);background:var(--bg);cursor:pointer;margin-bottom:5px;position:relative;overflow:hidden;transition:border-color .1s}
+    .poll-option:hover{border-color:var(--accent)}
+    .poll-option.voted{border-color:var(--accent)}
+    .poll-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(91,159,255,.15);transition:width .4s ease;pointer-events:none}
+    .poll-option-text{font-family:var(--font-mono);font-size:12px;position:relative;z-index:1;flex:1;color:var(--fg)}
+    .poll-pct{font-family:var(--font-pixel);font-size:7px;color:var(--accent);position:relative;z-index:1}
+    .poll-footer{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border-col);padding-top:6px}
+    /* Poll bubbles — transparent since poll card has its own background */
+    .social-msg-bubble:has(.poll-card),.dm-msg-bubble:has(.poll-card){background:transparent!important;border:none!important;padding:0!important}
+    #poll-create-modal{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+    #poll-create-modal.open{display:flex}
+    .poll-create-box{background:var(--bg);border:var(--border);padding:0;max-width:420px;width:90%}
+
+    /* ─── @ MENTIONS ─── */
+    #mention-popup{display:none;position:fixed;z-index:900;background:var(--modal-bg);border:var(--border);min-width:200px;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px var(--shadow)}
+    #mention-popup.show{display:block}
+    .mention-item{padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--bg2)}
+    .mention-item:hover,.mention-item.selected{background:var(--bg2)}
+    .mention-item .m-av{width:22px;height:22px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-fg);font-size:9px}
+    .mention-item .m-av img{width:100%;height:100%;object-fit:cover}
+    .mention-highlight{background:rgba(91,159,255,.2);border-radius:3px;color:var(--accent);font-weight:bold;font-family:var(--font-pixel);font-size:.9em}
+
+    /* ─── FRIEND REQUESTS ─── */
+    .friend-btn{font-family:var(--font-pixel);font-size:6px;padding:5px 10px;border:1px solid var(--accent);background:none;color:var(--accent);cursor:pointer}
+    .friend-btn:hover{background:var(--accent);color:var(--accent-fg)}
+    .friend-btn.accept{border-color:#5f5;color:#5f5}
+    .friend-btn.accept:hover{background:#5f5;color:#000}
+    .friend-btn.friends{border-color:var(--muted);color:var(--muted);cursor:default}
+    .friend-btn.pending{border-color:var(--muted);color:var(--muted)}
+
+    /* ─── MSG SEARCH ─── */
+    #msg-search-overlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.6);align-items:center;justify-content:center}
+    #msg-search-overlay.open{display:flex}
+    .msg-search-box{background:var(--modal-bg);border:var(--border);width:100%;max-width:580px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;animation:modalDrop .18s ease forwards}
+    .msg-search-result{padding:10px 14px;border-bottom:1px solid var(--bg2);cursor:pointer;transition:background .1s}
+    .msg-search-result:hover{background:var(--bg2)}
+    .msg-search-author{font-family:var(--font-pixel);font-size:7px;color:var(--accent);margin-bottom:3px}
+    .msg-search-text{font-family:var(--font-mono);font-size:12px;color:var(--fg)}
+    .msg-search-time{font-size:10px;color:var(--muted);margin-top:2px}
+
+    /* ─── GROUP CALL INDICATOR ─── */
+    .group-call-active-bar{padding:6px 14px;background:rgba(67,181,129,.1);border-bottom:1px solid #43b581;font-family:var(--font-mono);font-size:11px;color:#43b581;display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .group-call-active-bar button{font-family:var(--font-pixel);font-size:6px;padding:4px 8px;background:#43b581;color:#000;border:none;cursor:pointer}
+
     /* ─── REACTIONS ─── */
     .msg-reactions-bar{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
     .reaction-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--border-col);background:var(--bg2);cursor:pointer;font-size:14px;border-radius:12px;font-family:var(--font-mono);font-size:11px;transition:all .1s;user-select:none;line-height:1}
@@ -2864,6 +2954,12 @@
 
 <body>
 
+  <!-- ─── ANNOUNCEMENT BANNER ─── -->
+  <div id="announcement-banner">
+    <span id="announcement-text"></span>
+    <button class="ann-close" onclick="dismissAnnouncement()">✕</button>
+  </div>
+
   <!-- ─── TOAST ─── -->
   <div class="toast" id="toast-el"></div>
 
@@ -2877,12 +2973,14 @@
       <button class="nav-btn" id="nav-social">◉ SOCIAL <span id="social-badge" class="notif-badge"
           style="display:none">0</span></button>
       <button class="nav-btn" id="nav-changelog">📋 LOG</button>
+      <button class="nav-btn" id="nav-activity">📡 FEED</button>
       <button class="nav-btn" id="nav-shared-ai">✦ SHARED AI</button>
       <button class="nav-btn" id="nav-other">◈ OTHER</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
       <button class="nav-btn" id="nav-owner" style="display:none;">👑 OWNER</button>
     </div>
     <div class="nav-right">
+      <button class="nav-icon-btn" id="search-nav-btn" title="Search (Ctrl+K)" onclick="openSearch()">🔍</button>
       <button class="nav-icon-btn" id="notif-bell-btn" title="Notifications">🔔<span id="notif-bell-count"></span></button>
       <button class="nav-icon-btn" id="nav-settings-btn" title="Settings">⚙</button>
       <button class="nav-icon-btn" id="nav-auth-btn" title="Login">👤</button>
@@ -3030,8 +3128,10 @@
           <button class="tool-btn" id="emoji-btn-social">😊 EMOJI</button>
           <button class="tool-btn" id="gif-btn">🎞 GIF</button>
           <button class="tool-btn" id="fav-gif-social-btn">★ FAVS</button>
+          <button class="tool-btn" id="poll-btn-social">📊 POLL</button>
           <button class="tool-btn" id="img-url-btn">🖼 IMAGE</button>
           <button class="tool-btn" id="dm-open-btn">✉ DMS</button>
+          <button class="tool-btn" id="msg-search-social-btn">🔍 SEARCH</button>
         </div>
       </div>
     </div>
@@ -3143,6 +3243,8 @@
               <button class="tool-btn" id="emoji-btn-dm">😊 EMOJI</button>
               <button class="tool-btn" id="dm-img-btn">🖼 IMAGE</button>
               <button class="tool-btn" id="dm-gif-btn">🎞 GIF</button>
+              <button class="tool-btn" id="poll-btn-dm">📊 POLL</button>
+              <button class="tool-btn" id="msg-search-btn">🔍 SEARCH</button>
             </div>
           </div>
         </div>
@@ -3400,6 +3502,17 @@
     </p>
   </section>
 
+  <section class="section" id="activity-section">
+    <div class="section-title">📡 RECENT ACTIVITY</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+      <button class="admin-action-btn ghost" onclick="loadActivityFeed()" style="font-size:7px">↺ REFRESH</button>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)" id="activity-subtitle">Live feed of site activity</span>
+    </div>
+    <div style="border:var(--border);background:var(--modal-bg)" id="activity-feed-list">
+      <div class="search-empty">Click refresh to load activity.</div>
+    </div>
+  </section>
+
   <section class="section" id="changelog-section">
     <div class="section-title">📋 CHANGELOG</div>
     <div class="changelog-entry">
@@ -3618,9 +3731,20 @@
     <div class="admin-panel" id="admin-panel-settings">
       <div style="display:grid;gap:14px;max-width:500px">
         <div style="border:var(--border);background:var(--bg2);padding:16px">
+          <div style="font-family:var(--font-pixel);font-size:8px;margin-bottom:10px">📢 ANNOUNCEMENT</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px">Post a banner message visible to all users at the top of the site.</div>
+          <textarea id="ann-input" style="width:100%;font-family:var(--font-mono);font-size:12px;padding:8px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;resize:vertical;min-height:60px;box-sizing:border-box" placeholder="Type your announcement..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="admin-action-btn" onclick="postAnnouncement()">📢 POST</button>
+            <button class="admin-action-btn ghost" onclick="clearAnnouncement()">✕ CLEAR</button>
+          </div>
+        </div>
+        <div style="border:var(--border);background:var(--bg2);padding:16px">
           <div style="font-family:var(--font-pixel);font-size:8px;margin-bottom:10px">BANNED USERS</div>
           <div id="banned-list"></div>
         </div>
+        </div>
+        <div style="display:grid;gap:14px;max-width:500px">
         <div style="border:1px solid #f55;background:var(--bg2);padding:16px">
           <div style="font-family:var(--font-pixel);font-size:8px;color:#f55;margin-bottom:10px">⚠ DANGER ZONE</div>
           <button class="admin-action-btn danger" onclick="adminNukeMsgs()">DELETE ALL SOCIAL MESSAGES</button>
@@ -3755,6 +3879,7 @@
     <div class="upc-stat"><span>Joined</span><span id="upc-joined">—</span></div>
     <div class="upc-actions">
       <button class="admin-action-btn" style="font-size:6px" id="upc-dm-btn">✉ DM</button>
+      <button class="friend-btn" id="upc-friend-btn">+ ADD FRIEND</button>
       <button class="admin-action-btn ghost" style="font-size:6px" id="upc-report-btn">🚩 REPORT</button>
     </div>
   </div>
@@ -3770,6 +3895,64 @@
     <div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No notifications yet.</div>
   </div>
 </div>
+
+
+<!-- GLOBAL SEARCH OVERLAY -->
+<div id="search-overlay">
+  <div class="search-box">
+    <div class="search-input-row">
+      <span class="search-icon">🔍</span>
+      <input class="search-main-input" id="search-main-input" placeholder="Search games, tools, users, messages..." autocomplete="off">
+      <span class="search-kbd">ESC</span>
+    </div>
+    <div class="search-tabs">
+      <button class="search-tab active" data-stab="all" onclick="switchSearchTab('all')">ALL</button>
+      <button class="search-tab" data-stab="games" onclick="switchSearchTab('games')">⬦ GAMES</button>
+      <button class="search-tab" data-stab="tools" onclick="switchSearchTab('tools')">⚙ TOOLS</button>
+      <button class="search-tab" data-stab="users" onclick="switchSearchTab('users')">👥 USERS</button>
+      <button class="search-tab" data-stab="messages" onclick="switchSearchTab('messages')">💬 MESSAGES</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty">Start typing to search...</div>
+    </div>
+  </div>
+</div>
+
+<!-- POLL CREATE MODAL -->
+<div id="poll-create-modal">
+  <div class="poll-create-box">
+    <div class="modal-hdr" style="font-size:8px">
+      <span>📊 CREATE POLL</span>
+      <button class="modal-close" onclick="closePollModal()">✕</button>
+    </div>
+    <div style="padding:14px">
+      <input class="settings-input" id="poll-question-input" placeholder="Ask a question..." style="margin-bottom:10px">
+      <div id="poll-options-list"></div>
+      <button class="admin-action-btn ghost" onclick="addPollOption()" style="font-size:6px;margin-bottom:12px;width:100%">+ ADD OPTION</button>
+      <div style="display:flex;gap:6px">
+        <button class="admin-action-btn" onclick="sendPoll()" style="flex:1">📊 SEND POLL</button>
+        <button class="admin-action-btn ghost" onclick="closePollModal()">CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGE SEARCH OVERLAY -->
+<div id="msg-search-overlay">
+  <div class="msg-search-box">
+    <div class="search-input-row">
+      <span class="search-icon">💬</span>
+      <input class="search-main-input" id="msg-search-input" placeholder="Search messages..." autocomplete="off">
+      <button class="modal-close" onclick="closeMsgSearch()">✕</button>
+    </div>
+    <div class="search-results" id="msg-search-results">
+      <div class="search-empty">Type to search chat history...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MENTION POPUP -->
+<div id="mention-popup"></div>
 
 <!-- REACTION PICKER POPUP -->
 <div id="reaction-picker-popup">
@@ -4074,6 +4257,7 @@
       "ai-tools": "nav-ai",
       "social": "nav-social",
       "changelog": "nav-changelog",
+      "activity": "nav-activity",
       "other": "nav-other",
       "shared-ai": "nav-shared-ai",
       "admin": "nav-owner",
@@ -4098,6 +4282,7 @@
     document.getElementById("nav-ai").addEventListener("click", () => showSection("home"));
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
     document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
+    document.getElementById("nav-activity").addEventListener("click", () => { showSection("activity"); loadActivityFeed(); });
     document.getElementById("nav-other").addEventListener("click", () => showSection("other"));
     document.getElementById("nav-shared-ai").addEventListener("click", () => { showSection("shared-ai"); loadSharedAiChat(); });
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
@@ -4140,6 +4325,8 @@
        PANIC BUTTON
     ===================================================== */
     document.addEventListener("keydown", e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); openSearch(); return; }
+      if (e.key === "Escape") { closeSearch(); closeMsgSearch(); document.getElementById("search-overlay").classList.remove("open"); }
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
       const key = settings.panicKey || "'";
       if (e.key === key) { window.location.href = settings.panicUrl || "https://google.com"; }
@@ -4832,6 +5019,7 @@
           }
         loadDmConversations();
         startIncomingCallListener();
+        startNotifListener();
         // Update lastSeen every 2 minutes while signed in
         if (window._lastSeenInterval) clearInterval(window._lastSeenInterval);
         window._lastSeenInterval = setInterval(async () => {
@@ -4977,22 +5165,39 @@
       if (msg.replyTo) {
         replyHTML = `<div class="reply-quote"><strong>${escHtml(msg.replyTo.displayName || "?")}:</strong> ${escHtml((msg.replyTo.text || "").substring(0, 60))}</div>`;
       }
-      let contentHTML = "";
-      if (msg.text) contentHTML += `<div>${escHtml(msg.text)}</div>`;
-      if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
-      if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
-      row.innerHTML = `
+      const actionsHTML = `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>`;
+      const reactionsHTML = `<div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, 'socialMessages')}<button class="react-add-btn" onclick="showReactionPicker(event,'socialMessages','${msg.id}')">+</button></div>`;
+
+      if (msg.type === 'poll') {
+        // Poll: render outside the bubble so it has its own background
+        const pollHTML = renderPollCard(msg, 'socialMessages');
+        row.innerHTML = `
+    ${avHTML}
+    <div class="social-msg-body">
+      <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
+      ${pollHTML || '<div style="color:var(--muted)">📊 Poll</div>'}
+      ${reactionsHTML}
+      <div class="social-msg-time">${time}</div>
+      ${actionsHTML}
+    </div>`;
+      } else {
+        let contentHTML = "";
+        if (msg.text) contentHTML += `<div>${escHtml(msg.text)}</div>`;
+        if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
+        if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
+        row.innerHTML = `
     ${avHTML}
     <div class="social-msg-body">
       <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
       <div class="social-msg-bubble">${replyHTML}${contentHTML}</div>
-      <div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, 'socialMessages')}<button class="react-add-btn" onclick="showReactionPicker(event,'socialMessages','${msg.id}')">+</button></div>
+      ${reactionsHTML}
       <div class="social-msg-time">${time}</div>
-      <div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>
+      ${actionsHTML}
     </div>`;
+      }
       row.querySelector(".reply-btn").addEventListener("click", () => setReplyingTo(msg));
       // Avatar click = show profile card (onclick already set in clickAttr above)
       // Report button is in msg-actions
@@ -5445,20 +5650,20 @@
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
       let contentHTML = "";
-      if (msg.text) contentHTML += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
-      if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
-      if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
-      const actionsHTML = isOwn && msg.text
+      const dmReactHTML = `<div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, dmCollPath)}<button class="react-add-btn" onclick="showReactionPicker(event,'${dmCollPath}','${msg.id}')">+</button></div>`;
+      const dmActHTML = isOwn && msg.text
         ? `<div class="msg-actions"><button class="msg-action-btn" onclick="editDmMessageInline('${msg.id}','${escHtml(dmCollPath)}')">✏</button><button class="msg-action-btn" onclick="deleteDmMessage('${msg.id}','${escHtml(dmCollPath)}')">🗑</button></div>`
         : `<div class="msg-actions"><button class="msg-report-btn" onclick="openReportModal({type:'message',msgId:'${msg.id}',targetUid:'${msg.senderId}',targetName:'${escHtml(conv.otherName||'')}',msgText:'${escHtml((msg.text||'').slice(0,60))}'})">🚩</button></div>`;
-      row.innerHTML = `
-    ${avHTML}
-    <div class="dm-msg-body">
-      <div class="dm-msg-bubble" id="dmbubble-${msg.id}">${contentHTML}</div>
-      <div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, dmCollPath)}<button class="react-add-btn" onclick="showReactionPicker(event,'${dmCollPath}','${msg.id}')">+</button></div>
-      <div class="dm-msg-time">${time}</div>
-      ${actionsHTML}
-    </div>`;
+
+      if (msg.type === 'poll') {
+        const pollHTML = renderPollCard(msg, dmCollPath);
+        row.innerHTML = `${avHTML}<div class="dm-msg-body">${pollHTML || '<div style="color:var(--muted)">📊 Poll</div>'}${dmReactHTML}<div class="dm-msg-time">${time}</div>${dmActHTML}</div>`;
+      } else {
+        if (msg.text) contentHTML += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
+        if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
+        if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
+        row.innerHTML = `${avHTML}<div class="dm-msg-body"><div class="dm-msg-bubble" id="dmbubble-${msg.id}">${contentHTML}</div>${dmReactHTML}<div class="dm-msg-time">${time}</div>${dmActHTML}</div>`;
+      }
       container.appendChild(row);
     }
 
@@ -5698,7 +5903,7 @@
       const memberCount = group.members?.length || 0;
       // Build header
       const hdr = document.getElementById("dm-chat-hdr");
-      hdr.innerHTML = `<span style="font-size:16px;margin-right:4px">👥</span><span id="dm-chat-hdr-name" style="flex:1;font-family:var(--font-pixel);font-size:9px">${escHtml(group.name)}</span><span style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">${memberCount}/10 members</span>${isOwner?`<button class="tool-btn" style="font-size:6px;margin-left:6px" onclick="openGroupSettings('${escHtml(group.id)}')">⚙ MANAGE</button>`:""}`;
+      hdr.innerHTML = `<span style="font-size:16px;margin-right:4px">👥</span><span id="dm-chat-hdr-name" style="flex:1;font-family:var(--font-pixel);font-size:9px">${escHtml(group.name)}</span><span style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">${memberCount}/10 members</span>${isOwner?`<button class="tool-btn" style="font-size:6px;margin-left:6px" onclick="openGroupSettings('${escHtml(group.id)}')">⚙ MANAGE</button>`:""}<button class="call-btn" onclick="startGroupCall('${escHtml(group.id)}','${escHtml(group.name)}')">📞 CALL</button>`;
       // Build members bar
       let membersBar = document.getElementById("group-members-bar");
       if (!membersBar) {
@@ -5766,10 +5971,15 @@
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
+      const grpCollPath2 = `groupChats/${activeGroupId}/messages`;
       let content = "";
-      if (msg.text) content += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
-      if (msg.gifUrl) content += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
-      if (msg.imageUrl) content += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
+      if (msg.type === 'poll') {
+        content = renderPollCard(msg, grpCollPath2) || '<div style="color:var(--muted)">📊 Poll</div>';
+      } else {
+        if (msg.text) content += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
+        if (msg.gifUrl) content += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
+        if (msg.imageUrl) content += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
+      }
       const isGroupOwner = group.ownerId === currentUser?.uid;
       const actionsHTML = isOwn && msg.text
         ? `<div class="msg-actions"><button class="msg-action-btn" onclick="editGrpMessageInline('${msg.id}','${escHtml(grpCollPath)}')">✏</button><button class="msg-action-btn" onclick="deleteDmMessage('${msg.id}','${escHtml(grpCollPath)}')">🗑</button>${isGroupOwner ? `<button class="pin-btn" onclick="pinMessage('${escHtml(activeGroupId)}','${msg.id}','${escHtml((msg.text||'').slice(0,80))}')">📌 PIN</button>` : ''}</div>`
@@ -7243,6 +7453,7 @@
           hideUserProfileCard();
           openReportModal({ type: 'user', targetUid: uid, targetName: u.displayName || 'Anonymous' });
         };
+        loadFriendButtonForCard(uid, u.displayName || 'Anonymous');
       } catch (err) {
         document.getElementById('upc-name').textContent = 'Error loading';
         document.getElementById('upc-status').textContent = err.message;
@@ -7397,8 +7608,492 @@
     document.getElementById('shared-chat-send').addEventListener('click', sendSharedAiMessage);
     document.getElementById('shared-chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSharedAiMessage(); } });
 
+    /* =====================================================
+       ANNOUNCEMENTS
+    ===================================================== */
+    function loadAnnouncement() {
+      db.collection('siteSettings').doc('announcement').get().then(doc => {
+        const data = doc.data();
+        if (data?.text && data?.active) {
+          const dismissed = localStorage.getItem('hw3_ann_dismissed');
+          if (dismissed !== data.text) showAnnouncement(data.text);
+        }
+      }).catch(() => {});
+    }
+    function showAnnouncement(text) {
+      document.getElementById('announcement-text').textContent = text;
+      document.getElementById('announcement-banner').classList.add('show');
+    }
+    function dismissAnnouncement() {
+      const text = document.getElementById('announcement-text').textContent;
+      localStorage.setItem('hw3_ann_dismissed', text);
+      document.getElementById('announcement-banner').classList.remove('show');
+    }
+    async function postAnnouncement() {
+      const text = document.getElementById('ann-input').value.trim();
+      if (!text) { showToast('ENTER ANNOUNCEMENT TEXT'); return; }
+      try {
+        await db.collection('siteSettings').doc('announcement').set({ text, active: true, postedAt: firebase.firestore.FieldValue.serverTimestamp(), postedBy: currentUser?.uid });
+        showToast('ANNOUNCEMENT POSTED');
+        showAnnouncement(text);
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    async function clearAnnouncement() {
+      try {
+        await db.collection('siteSettings').doc('announcement').set({ active: false });
+        document.getElementById('announcement-banner').classList.remove('show');
+        showToast('ANNOUNCEMENT CLEARED');
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    /* =====================================================
+       GLOBAL SEARCH
+    ===================================================== */
+    const GAMES_LIST = ['2048','BINGO','BLOCK BREAKER','BUBBLE SHOOTER','CASINO','CHESS','FLAPPY BIRD','GUH CLICKER','HANGMAN','JAMES CLICKER','MINES','SANDBOX','SNAKE','TIC TAC TOE','WORMSCAPE','MINECRAFT RIPOFF','3D SANDBOX'];
+    const GAMES_URLS = {'2048':'games/2048.html','BINGO':'games/bingo.html','BLOCK BREAKER':'games/block-breaker.html','BUBBLE SHOOTER':'games/bubble-shooter.html','CASINO':'games/casino.html','CHESS':'games/chess.html','FLAPPY BIRD':'games/flappy-bird.html','GUH CLICKER':'games/guh-clicker.html','HANGMAN':'games/hangman.html','JAMES CLICKER':'games/james-clicker.html','MINES':'games/mines.html','SANDBOX':'games/sandbox.html','SNAKE':'games/snake.html','TIC TAC TOE':'games/tictactoe.html','WORMSCAPE':'games/wormscape.html','MINECRAFT RIPOFF':'games/minecraft.html','3D SANDBOX':'games/sandbox3d.html'};
+    const TOOLS_LIST = ['BASE64','CALCULATOR','CLOCK','CONVERTER','DC','FL STUDIO','IMAGE CROPPER','IMAGE RESIZER','IP LOOKUP','JSON FORMATTER','LOCALSTORAGE VIEWER','NOTEPAD','QR GENERATOR','QR SCANNER','REGEX TESTER','SOUNDBOARD','TEXT TO SPEECH'];
+    const TOOLS_URLS = {'BASE64':'tools/base64-tool.html','CALCULATOR':'tools/calculator.html','CLOCK':'tools/clock.html','CONVERTER':'tools/converter.html','DC':'tools/dc.html','FL STUDIO':'tools/fl-studio.html','IMAGE CROPPER':'tools/image-cropper.html','IMAGE RESIZER':'tools/image-resizer.html','IP LOOKUP':'tools/ip-lookup.html','JSON FORMATTER':'tools/json-formatter.html','LOCALSTORAGE VIEWER':'tools/localstorage-viewer.html','NOTEPAD':'tools/notepad.html','QR GENERATOR':'tools/qr-generator.html','QR SCANNER':'tools/qr-scanner.html','REGEX TESTER':'tools/regex-tester.html','SOUNDBOARD':'tools/soundboard.html','TEXT TO SPEECH':'tools/text-to-speech.html'};
+    let _searchTab = 'all', _searchTimer = null;
+
+    function openSearch() {
+      document.getElementById('search-overlay').classList.add('open');
+      setTimeout(() => document.getElementById('search-main-input').focus(), 50);
+    }
+    function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); document.getElementById('search-main-input').value = ''; document.getElementById('search-results').innerHTML = '<div class="search-empty">Start typing to search...</div>'; }
+
+    document.getElementById('search-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSearch(); });
+    document.getElementById('search-main-input').addEventListener('input', e => {
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(() => runSearch(e.target.value.trim()), 200);
+    });
+
+    function switchSearchTab(tab) {
+      _searchTab = tab;
+      document.querySelectorAll('.search-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === tab));
+      runSearch(document.getElementById('search-main-input').value.trim());
+    }
+
+    async function runSearch(q) {
+      const res = document.getElementById('search-results');
+      if (!q) { res.innerHTML = '<div class="search-empty">Start typing to search...</div>'; return; }
+      const ql = q.toLowerCase();
+      res.innerHTML = '<div class="search-empty">Searching...</div>';
+      let html = '';
+      const showAll = _searchTab === 'all';
+
+      if (showAll || _searchTab === 'games') {
+        const games = GAMES_LIST.filter(g => g.toLowerCase().includes(ql));
+        if (games.length) {
+          html += `<div class="search-section-label">⬦ GAMES</div>`;
+          games.slice(0,5).forEach(g => { html += `<div class="search-result" onclick="openFullscreen('${GAMES_URLS[g]||''}','${g}');closeSearch()"><div class="search-result-icon">🎮</div><div class="search-result-body"><div class="search-result-title">${escHtml(g)}</div></div></div>`; });
+        }
+      }
+      if (showAll || _searchTab === 'tools') {
+        const tools = TOOLS_LIST.filter(t => t.toLowerCase().includes(ql));
+        if (tools.length) {
+          html += `<div class="search-section-label">⚙ TOOLS</div>`;
+          tools.slice(0,5).forEach(t => { html += `<div class="search-result" onclick="openFullscreen('${TOOLS_URLS[t]||''}','${t}');closeSearch()"><div class="search-result-icon">🔧</div><div class="search-result-body"><div class="search-result-title">${escHtml(t)}</div></div></div>`; });
+        }
+      }
+      if ((showAll || _searchTab === 'users') && currentUser) {
+        try {
+          const snap = await db.collection('users').where('displayName','>=',q).where('displayName','<=',q+'\uf8ff').limit(5).get();
+          if (!snap.empty) {
+            html += `<div class="search-section-label">👥 USERS</div>`;
+            snap.forEach(doc => {
+              const u = doc.data();
+              const av = u.photoURL ? `<img src="${escHtml(u.photoURL)}" style="width:100%;height:100%;object-fit:cover">` : (u.displayName||'?')[0];
+              html += `<div class="search-result" onclick="closeSearch();openDmModal();startDmWithUser({uid:'${escHtml(u.uid)}',displayName:'${escHtml(u.displayName||'')}',photoURL:'${escHtml(u.photoURL||'')}'})" ><div class="search-result-icon"><div style="width:28px;height:28px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-fg);font-size:11px;font-family:var(--font-pixel)">${av}</div></div><div class="search-result-body"><div class="search-result-title">${escHtml(u.displayName||'Anonymous')}</div><div class="search-result-sub">${escHtml(u.role||'user')}</div></div></div>`;
+            });
+          }
+        } catch (_) {}
+      }
+      if ((showAll || _searchTab === 'messages') && currentUser) {
+        try {
+          const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(200).get();
+          const msgs = []; snap.forEach(doc => msgs.push({id:doc.id,...doc.data()}));
+          const matched = msgs.filter(m => m.text && m.text.toLowerCase().includes(ql)).slice(0,6);
+          if (matched.length) {
+            html += `<div class="search-section-label">💬 MESSAGES</div>`;
+            matched.forEach(m => { html += `<div class="search-result" onclick="closeSearch();openSocialChat()"><div class="search-result-icon">💬</div><div class="search-result-body"><div class="search-result-title">${escHtml(m.displayName||'?')}</div><div class="search-result-sub">${escHtml((m.text||'').slice(0,80))}</div></div></div>`; });
+          }
+        } catch (_) {}
+      }
+      res.innerHTML = html || `<div class="search-empty">No results for "${escHtml(q)}"</div>`;
+    }
+
+    /* =====================================================
+       MESSAGE SEARCH (chat history)
+    ===================================================== */
+    let _msgSearchTimer = null;
+    function openMsgSearch() {
+      document.getElementById('msg-search-overlay').classList.add('open');
+      setTimeout(() => document.getElementById('msg-search-input').focus(), 50);
+    }
+    function closeMsgSearch() { document.getElementById('msg-search-overlay').classList.remove('open'); }
+    document.getElementById('msg-search-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeMsgSearch(); });
+    document.getElementById('msg-search-input').addEventListener('input', async e => {
+      clearTimeout(_msgSearchTimer);
+      const q = e.target.value.trim();
+      if (!q) { document.getElementById('msg-search-results').innerHTML = '<div class="search-empty">Type to search...</div>'; return; }
+      _msgSearchTimer = setTimeout(async () => {
+        const res = document.getElementById('msg-search-results');
+        res.innerHTML = '<div class="search-empty">Searching...</div>';
+        try {
+          const snap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(300).get();
+          const ql = q.toLowerCase();
+          let html = '';
+          snap.forEach(doc => {
+            const m = doc.data();
+            if (!m.text || !m.text.toLowerCase().includes(ql)) return;
+            const t = m.timestamp ? new Date(m.timestamp.toMillis()).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+            const hi = m.text.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), match => `<mark class="conv-search-match">${match}</mark>`);
+            html += `<div class="msg-search-result"><div class="msg-search-author">${escHtml(m.displayName||'?')}</div><div class="msg-search-text">${hi}</div><div class="msg-search-time">${t}</div></div>`;
+          });
+          res.innerHTML = html || `<div class="search-empty">No messages found for "${escHtml(q)}"</div>`;
+        } catch (err) { document.getElementById('msg-search-results').innerHTML = `<div class="search-empty" style="color:#f55">Error: ${escHtml(err.message)}</div>`; }
+      }, 300);
+    });
+    document.getElementById('msg-search-social-btn').addEventListener('click', openMsgSearch);
+    document.getElementById('msg-search-btn').addEventListener('click', openMsgSearch);
+
+    /* =====================================================
+       @ MENTIONS
+    ===================================================== */
+    let _mentionQuery = '', _mentionIndex = 0, _mentionUsers = [], _mentionInputEl = null, _mentionStart = 0;
+
+    async function fetchMentionUsers(q) {
+      if (!q) return [];
+      try {
+        const snap = await db.collection('users').where('displayName','>=',q).where('displayName','<=',q+'\uf8ff').limit(6).get();
+        return snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== currentUser?.uid);
+      } catch (_) { return []; }
+    }
+
+    function showMentionPopup(users, anchorEl) {
+      const popup = document.getElementById('mention-popup');
+      if (!users.length) { popup.classList.remove('show'); return; }
+      _mentionUsers = users; _mentionIndex = 0;
+      popup.innerHTML = '';
+      users.forEach((u, i) => {
+        const av = u.photoURL ? `<div class="m-av"><img src="${escHtml(u.photoURL)}" alt=""></div>` : `<div class="m-av">${(u.displayName||'?')[0]}</div>`;
+        const item = document.createElement('div');
+        item.className = 'mention-item' + (i === 0 ? ' selected' : '');
+        item.dataset.uid = u.uid;
+        item.innerHTML = `${av}<span>${escHtml(u.displayName||'Anonymous')}</span>`;
+        item.addEventListener('click', () => insertMention(u));
+        popup.appendChild(item);
+      });
+      const rect = anchorEl.getBoundingClientRect();
+      popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+      popup.style.left = rect.left + 'px';
+      popup.classList.add('show');
+    }
+
+    function hideMentionPopup() { document.getElementById('mention-popup').classList.remove('show'); _mentionUsers = []; }
+
+    function insertMention(user) {
+      if (!_mentionInputEl) return;
+      const val = _mentionInputEl.value;
+      const before = val.slice(0, _mentionStart);
+      const after = val.slice(_mentionInputEl.selectionStart);
+      _mentionInputEl.value = before + '@' + (user.displayName || user.uid) + ' ' + after;
+      _mentionInputEl.selectionStart = _mentionInputEl.selectionEnd = before.length + user.displayName.length + 2;
+      _mentionInputEl.focus();
+      hideMentionPopup();
+    }
+
+    function hookMentions(inputId) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      inp.addEventListener('input', async () => {
+        const val = inp.value, pos = inp.selectionStart;
+        const beforeCursor = val.slice(0, pos);
+        const match = beforeCursor.match(/@(\w*)$/);
+        if (match) {
+          _mentionInputEl = inp; _mentionStart = beforeCursor.lastIndexOf('@'); _mentionQuery = match[1];
+          const users = await fetchMentionUsers(match[1]);
+          showMentionPopup(users, inp);
+        } else { hideMentionPopup(); }
+      });
+      inp.addEventListener('keydown', e => {
+        const popup = document.getElementById('mention-popup');
+        if (!popup.classList.contains('show')) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); _mentionIndex = Math.min(_mentionIndex+1, _mentionUsers.length-1); updateMentionSelection(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); _mentionIndex = Math.max(_mentionIndex-1, 0); updateMentionSelection(); }
+        else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); if (_mentionUsers[_mentionIndex]) insertMention(_mentionUsers[_mentionIndex]); }
+        else if (e.key === 'Escape') hideMentionPopup();
+      });
+    }
+    function updateMentionSelection() {
+      document.querySelectorAll('#mention-popup .mention-item').forEach((el, i) => el.classList.toggle('selected', i === _mentionIndex));
+    }
+    document.addEventListener('click', e => { if (!document.getElementById('mention-popup').contains(e.target)) hideMentionPopup(); });
+
+    /* =====================================================
+       POLLS
+    ===================================================== */
+    let _pollTarget = null; // 'social' | 'dm' | 'group'
+    let _pollOptions = ['', ''];
+
+    function openPollModal(target) {
+      if (!currentUser) { showToast('SIGN IN FIRST'); return; }
+      _pollTarget = target; _pollOptions = ['', ''];
+      document.getElementById('poll-question-input').value = '';
+      renderPollOptions();
+      document.getElementById('poll-create-modal').classList.add('open');
+    }
+    function closePollModal() { document.getElementById('poll-create-modal').classList.remove('open'); }
+    document.getElementById('poll-create-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePollModal(); });
+
+    function renderPollOptions() {
+      const list = document.getElementById('poll-options-list');
+      list.innerHTML = '';
+      _pollOptions.forEach((opt, i) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:6px;margin-bottom:6px';
+        row.innerHTML = `<input class="settings-input" style="margin:0;flex:1" placeholder="Option ${i+1}" value="${escHtml(opt)}" oninput="_pollOptions[${i}]=this.value">${i>=2?`<button class="modal-close" onclick="removePollOption(${i})" style="font-size:14px">✕</button>`:''}`;
+        list.appendChild(row);
+      });
+    }
+    function addPollOption() { if (_pollOptions.length >= 8) { showToast('MAX 8 OPTIONS'); return; } _pollOptions.push(''); renderPollOptions(); }
+    function removePollOption(i) { _pollOptions.splice(i, 1); renderPollOptions(); }
+
+    async function sendPoll() {
+      const question = document.getElementById('poll-question-input').value.trim();
+      const opts = _pollOptions.map(o => o.trim()).filter(Boolean);
+      if (!question) { showToast('ENTER A QUESTION'); return; }
+      if (opts.length < 2) { showToast('ADD AT LEAST 2 OPTIONS'); return; }
+      const pollData = { type: 'poll', question, options: opts, votes: {}, createdBy: currentUser.uid, creatorName: currentUser.displayName || 'Anonymous', timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+      try {
+        if (_pollTarget === 'social') await db.collection('socialMessages').add({ ...pollData, userId: currentUser.uid, displayName: currentUser.displayName, photoURL: _sessionPhoto || currentUser.photoURL || null });
+        else if (_pollTarget === 'dm' && activeDmId) await db.collection('directMessages').doc(activeDmId).collection('messages').add({ ...pollData, senderId: currentUser.uid, senderName: currentUser.displayName });
+        else if (_pollTarget === 'group' && activeGroupId) { await db.collection('groupChats').doc(activeGroupId).collection('messages').add({ ...pollData, senderId: currentUser.uid, senderName: currentUser.displayName }); await db.collection('groupChats').doc(activeGroupId).update({ lastMsg: '📊 Poll: ' + question, lastMsgAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+        closePollModal(); showToast('POLL SENT');
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    const _pollListeners = {}; // track active poll listeners by msgId
+
+    function renderPollCard(msg, collPath) {
+      if (msg.type !== 'poll') return null;
+      const myVote = msg.votes?.[currentUser?.uid];
+      const totalVotes = Object.keys(msg.votes || {}).length;
+      let optsHtml = (msg.options || []).map((opt, i) => {
+        const voteCount = Object.values(msg.votes || {}).filter(v => v === i).length;
+        const pct = totalVotes ? Math.round(voteCount / totalVotes * 100) : 0;
+        const isMyVote = myVote === i;
+        return `<div class="poll-option${isMyVote?' voted':''}" onclick="castVote('${collPath}','${msg.id || ''}',${i})"><div class="poll-bar" style="width:${pct}%"></div><span class="poll-option-text">${escHtml(opt)}</span><span class="poll-pct">${pct}%</span></div>`;
+      }).join('');
+      // Start live listener for this poll if not already
+      if (msg.id && !_pollListeners[msg.id]) {
+        const parts = collPath.split('/');
+        const ref = parts.length === 1 ? db.collection(parts[0]).doc(msg.id) : db.collection(parts[0]).doc(parts[1]).collection(parts[2]).doc(msg.id);
+        _pollListeners[msg.id] = ref.onSnapshot(snap => {
+          if (!snap.exists) return;
+          const updated = { id: snap.id, ...snap.data() };
+          // Find and re-render this poll card in DOM
+          const row = document.querySelector(`[data-msg-id="${msg.id}"], [data-dm-msg-id="${msg.id}"], [data-grp-msg-id="${msg.id}"]`);
+          if (!row) { // row gone, clean up listener
+            _pollListeners[msg.id]();
+            delete _pollListeners[msg.id];
+            return;
+          }
+          const existingCard = row.querySelector('.poll-card');
+          if (existingCard) {
+            const newHTML = renderPollCard(updated, collPath);
+            if (newHTML) existingCard.outerHTML = newHTML;
+          }
+        });
+      }
+      return `<div class="poll-card" data-poll-id="${msg.id}"><div class="poll-question">📊 ${escHtml(msg.question||'')}</div>${optsHtml}<div class="poll-footer">${totalVotes} vote${totalVotes!==1?'s':''}</div></div>`;
+    }
+
+    async function castVote(collPath, msgId, optionIndex) {
+      if (!currentUser) { showToast('SIGN IN TO VOTE'); return; }
+      if (!msgId) { showToast('POLL ERROR — NO ID'); return; }
+      try {
+        const parts = collPath.split('/');
+        const ref = parts.length === 1 ? db.collection(parts[0]).doc(msgId) : db.collection(parts[0]).doc(parts[1]).collection(parts[2]).doc(msgId);
+        const upd = {}; upd[`votes.${currentUser.uid}`] = optionIndex;
+        await ref.update(upd);
+        // onSnapshot listener in renderPollCard handles the visual update automatically
+      } catch (err) { showToast('VOTE ERROR: ' + err.message); }
+    }
+
+    document.getElementById('poll-btn-social').addEventListener('click', () => openPollModal('social'));
+    document.getElementById('poll-btn-dm').addEventListener('click', () => { if (!activeDmId && !activeGroupId) { showToast('SELECT A CHAT FIRST'); return; } openPollModal(activeGroupId ? 'group' : 'dm'); });
+
+    /* =====================================================
+       FRIEND REQUESTS
+    ===================================================== */
+    async function getFriendStatus(targetUid) {
+      if (!currentUser || !targetUid) return 'none';
+      try {
+        const [sentDoc, recDoc, friendsDoc] = await Promise.all([
+          db.collection('friendRequests').doc(`${currentUser.uid}_${targetUid}`).get(),
+          db.collection('friendRequests').doc(`${targetUid}_${currentUser.uid}`).get(),
+          db.collection('friends').doc(currentUser.uid).get()
+        ]);
+        const friendsList = friendsDoc.data()?.list || [];
+        if (friendsList.includes(targetUid)) return 'friends';
+        if (sentDoc.exists) return 'sent';
+        if (recDoc.exists) return 'received';
+        return 'none';
+      } catch (_) { return 'none'; }
+    }
+
+    async function sendFriendRequest(targetUid, targetName) {
+      if (!currentUser) return;
+      try {
+        await db.collection('friendRequests').doc(`${currentUser.uid}_${targetUid}`).set({ from: currentUser.uid, fromName: currentUser.displayName || 'Anonymous', to: targetUid, toName: targetName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        // Notification for target
+        await db.collection('notifications').doc().set ? void 0 : void 0;
+        await db.collection('userNotifications').doc(targetUid).collection('notifs').add({ type: 'friend_request', fromUid: currentUser.uid, fromName: currentUser.displayName || 'Anonymous', fromPhoto: _sessionPhoto || currentUser.photoURL || null, text: `${currentUser.displayName||'Someone'} sent you a friend request`, ts: firebase.firestore.FieldValue.serverTimestamp(), read: false });
+        showToast('FRIEND REQUEST SENT');
+        addNotif('👋', 'Friend Request Sent', `You sent a request to ${targetName}`, null);
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    async function acceptFriendRequest(fromUid, fromName) {
+      if (!currentUser) return;
+      try {
+        // Add to both friends lists
+        const batch = db.batch();
+        batch.set(db.collection('friends').doc(currentUser.uid), { list: firebase.firestore.FieldValue.arrayUnion(fromUid) }, { merge: true });
+        batch.set(db.collection('friends').doc(fromUid), { list: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) }, { merge: true });
+        batch.delete(db.collection('friendRequests').doc(`${fromUid}_${currentUser.uid}`));
+        await batch.commit();
+        // Notify sender
+        await db.collection('userNotifications').doc(fromUid).collection('notifs').add({ type: 'friend_accepted', fromUid: currentUser.uid, fromName: currentUser.displayName || 'Anonymous', text: `${currentUser.displayName||'Someone'} accepted your friend request`, ts: firebase.firestore.FieldValue.serverTimestamp(), read: false });
+        showToast(`NOW FRIENDS WITH ${fromName.toUpperCase()}`);
+        addNotif('✅', 'Friend Request Accepted', `You are now friends with ${fromName}`, null);
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    // Add friend button to profile card
+    async function loadFriendButtonForCard(targetUid, targetName) {
+      const btn = document.getElementById('upc-friend-btn');
+      if (!btn) return;
+      const status = await getFriendStatus(targetUid);
+      if (status === 'friends') { btn.textContent = '✓ FRIENDS'; btn.className = 'friend-btn friends'; btn.onclick = null; }
+      else if (status === 'sent') { btn.textContent = '⏳ PENDING'; btn.className = 'friend-btn pending'; btn.onclick = null; }
+      else if (status === 'received') { btn.textContent = '✓ ACCEPT'; btn.className = 'friend-btn accept'; btn.onclick = () => { acceptFriendRequest(targetUid, targetName); btn.textContent = '✓ FRIENDS'; btn.className = 'friend-btn friends'; btn.onclick = null; }; }
+      else { btn.textContent = '+ ADD FRIEND'; btn.className = 'friend-btn'; btn.onclick = () => { sendFriendRequest(targetUid, targetName); btn.textContent = '⏳ PENDING'; btn.className = 'friend-btn pending'; btn.onclick = null; }; }
+    }
+
+    // Listen for incoming friend request notifications
+    function startNotifListener() {
+      if (!currentUser) return;
+      db.collection('userNotifications').doc(currentUser.uid).collection('notifs')
+        .where('read','==',false).onSnapshot(snap => {
+          snap.docChanges().forEach(async change => {
+            if (change.type !== 'added') return;
+            const n = change.doc.data();
+            const icon = n.type === 'friend_request' ? '👋' : n.type === 'friend_accepted' ? '✅' : '🔔';
+            addNotif(icon, n.type === 'friend_request' ? 'Friend Request' : n.type === 'friend_accepted' ? 'Friend Accepted' : 'Notification', n.text || '', null);
+            // Mark as read
+            change.doc.ref.update({ read: true }).catch(() => {});
+          });
+        }, () => {});
+    }
+
+    /* =====================================================
+       ACTIVITY FEED
+    ===================================================== */
+    async function loadActivityFeed() {
+      const list = document.getElementById('activity-feed-list');
+      list.innerHTML = '<div class="search-empty">Loading...</div>';
+      try {
+        const [msgsSnap, usersSnap] = await Promise.all([
+          db.collection('socialMessages').orderBy('timestamp','desc').limit(20).get(),
+          db.collection('users').orderBy('lastSeen','desc').limit(10).get()
+        ]);
+        let items = [];
+        msgsSnap.forEach(doc => {
+          const m = doc.data();
+          if (!m.timestamp) return;
+          items.push({ ts: m.timestamp.toMillis(), type: 'message', icon: '💬', name: m.displayName || 'Anonymous', photo: m.photoURL, text: m.type === 'poll' ? `📊 posted a poll: ${m.question}` : `said: "${(m.text||'').slice(0,60)}"` });
+        });
+        usersSnap.forEach(doc => {
+          const u = doc.data();
+          if (!u.lastSeen) return;
+          const ms = u.lastSeen.toMillis ? u.lastSeen.toMillis() : 0;
+          if (Date.now() - ms > 30 * 60 * 1000) return; // only show last 30 min
+          items.push({ ts: ms, type: 'online', icon: '🟢', name: u.displayName || 'Anonymous', photo: u.photoURL, text: 'is online' });
+        });
+        items.sort((a, b) => b.ts - a.ts);
+        if (!items.length) { list.innerHTML = '<div class="search-empty">No recent activity.</div>'; return; }
+        list.innerHTML = '';
+        items.slice(0, 30).forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'activity-item';
+          const av = item.photo ? `<div class="activity-av"><img src="${escHtml(item.photo)}" alt=""></div>` : `<div class="activity-av">${(item.name||'?')[0].toUpperCase()}</div>`;
+          const rel = getRelativeTime(item.ts) || new Date(item.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+          const badge = item.type === 'message' ? 'CHAT' : item.type === 'online' ? 'ONLINE' : item.type.toUpperCase();
+          div.innerHTML = `${av}<div class="activity-body"><div class="activity-text"><strong>${escHtml(item.name)}</strong> ${escHtml(item.text)}</div><div class="activity-time">${rel}</div></div><span class="activity-type-badge">${badge}</span>`;
+          if (item.type === 'message') div.addEventListener('click', () => openSocialChat());
+          list.appendChild(div);
+        });
+      } catch (err) { list.innerHTML = `<div class="search-empty" style="color:#f55">Error: ${escHtml(err.message)}</div>`; }
+    }
+
+    /* =====================================================
+       GROUP CALLS
+    ===================================================== */
+    async function startGroupCall(groupId, groupName) {
+      if (!currentUser) return;
+      // Store call signal in group doc for all members to see
+      try {
+        await db.collection('groupChats').doc(groupId).update({
+          activeCall: { callerUid: currentUser.uid, callerName: currentUser.displayName || 'Someone', callerPhoto: _sessionPhoto || currentUser.photoURL || null, startedAt: firebase.firestore.FieldValue.serverTimestamp() }
+        });
+        // Use existing DM call UI but mark as group
+        callDocId = 'groupcall_' + groupId;
+        showToast('STARTING GROUP CALL...');
+        // Trigger standard call flow - simplified to voice
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+        } catch (_) { showToast('MIC ACCESS DENIED'); return; }
+        peerConnection = new RTCPeerConnection(STUN_SERVERS);
+        localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+        peerConnection.ontrack = e => { document.getElementById('remote-audio').srcObject = e.streams[0]; };
+        peerConnection.onicecandidate = e => { if (e.candidate) db.collection('groupCalls').doc(groupId).collection('candidates_' + currentUser.uid).add(e.candidate.toJSON()); };
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        await db.collection('groupCalls').doc(groupId).set({ offer: { type: offer.type, sdp: offer.sdp }, callerUid: currentUser.uid, callerName: currentUser.displayName || 'Someone', status: 'calling', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showCallPanel(groupName, null, 'Group Call - Calling...');
+        activeCallConv = { otherId: null, otherName: groupName, otherPhoto: null };
+        callUnsub = db.collection('groupCalls').doc(groupId).onSnapshot(async snap => {
+          const data = snap.data();
+          if (!data) return;
+          if (data.status === 'ended') { endCall(true); return; }
+          if (data.answer && peerConnection?.signalingState === 'have-local-offer') {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            onCallConnected(groupName, null);
+          }
+        });
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    // Listen for group call invites
+    function listenGroupCallInvites(groupId) {
+      db.collection('groupCalls').doc(groupId).onSnapshot(snap => {
+        const data = snap.data();
+        if (!data || data.status !== 'calling' || data.callerUid === currentUser?.uid) return;
+        if (peerConnection) return;
+        const age = data.createdAt ? Date.now() - data.createdAt.toMillis() : 0;
+        if (age > 30000) return;
+        callDocId = 'groupcall_' + groupId;
+        incomingCallData = data;
+        showIncomingToast(data.callerName || 'Someone', data.callerPhoto || null);
+        document.getElementById('incoming-sub') && (document.getElementById('incoming-sub').textContent = 'Group Call');
+      }, () => {});
+    }
+
     init();
     startIncomingCallListener();
+    loadAnnouncement();
 
 
 
