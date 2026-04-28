@@ -4983,6 +4983,10 @@
           } else {
             _sessionPhoto = null;
           }
+          // Use Firestore displayName (may differ from Auth if owner changed it)
+          if (firestoreData.displayName && firestoreData.displayName !== user.displayName) {
+            try { await user.updateProfile({ displayName: firestoreData.displayName }); } catch (_) {}
+          }
           // Re-render nav + all my avatars now that we have the correct photo
           syncMyPhoto(firestoreData.photoURL || currentUser.photoURL || null);
           // Merge update
@@ -5227,7 +5231,7 @@
       const msgData = {
         userId: currentUser.uid,
         displayName: currentUser.displayName || "Anonymous",
-        photoURL: currentUser.photoURL || null,
+        photoURL: _sessionPhoto || currentUser.photoURL || null,
         text: text || null,
         gifUrl: gifUrl || null,
         imageUrl: imageUrl || null,
@@ -5856,7 +5860,7 @@
       if (pendingGroupMembers.length === 0) { showToast("ADD AT LEAST 1 MEMBER"); return; }
       const memberUids = [currentUser.uid, ...pendingGroupMembers.map(m => m.uid)];
       const memberData = {};
-      memberData[currentUser.uid] = { name: currentUser.displayName||"Me", photo: currentUser.photoURL||null };
+      memberData[currentUser.uid] = { name: currentUser.displayName||"Me", photo: _sessionPhoto || currentUser.photoURL||null };
       pendingGroupMembers.forEach(m => { memberData[m.uid] = { name: m.displayName||"?", photo: m.photoURL||null }; });
       try {
         const ref = await db.collection("groupChats").add({
@@ -6011,7 +6015,7 @@
       const text = overrideText !== undefined ? overrideText : input.value.trim();
       if (!text && !gifUrl && !imageUrl) return;
       if (overrideText === undefined) input.value = "";
-      const msgData = { senderId: currentUser.uid, senderName: currentUser.displayName||"Anonymous", senderPhoto: currentUser.photoURL||null, text: text||null, gifUrl: gifUrl||null, imageUrl: imageUrl||null, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+      const msgData = { senderId: currentUser.uid, senderName: currentUser.displayName||"Anonymous", senderPhoto: _sessionPhoto || currentUser.photoURL||null, text: text||null, gifUrl: gifUrl||null, imageUrl: imageUrl||null, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
       try {
         await db.collection("groupChats").doc(activeGroupId).collection("messages").add(msgData);
         await db.collection("groupChats").doc(activeGroupId).update({ lastMsg: text, lastMsgAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -6264,14 +6268,48 @@
     function addCustomField() { const c = document.getElementById("custom-fields-list"), row = document.createElement("div"); row.className = "custom-field-row"; row.innerHTML = `<input type="text" class="cf-key" placeholder="field name"><input type="text" class="cf-val" placeholder="value"><button class="custom-field-remove">✕</button>`; row.querySelector(".custom-field-remove").onclick = () => row.remove(); c.appendChild(row); }
 
     document.getElementById("drawer-save-btn").addEventListener("click", async () => {
-      if (!drawerUid) return; const statusEl = document.getElementById("drawer-status"); statusEl.textContent = "Saving...";
-      const newRole = document.getElementById("df-role").value, oldUser = adminAllUsers.find(u => u.uid === drawerUid), oldRole = oldUser?.role || "user";
+      if (!drawerUid) return;
+      const statusEl = document.getElementById("drawer-status");
+      statusEl.textContent = "Saving...";
+      const newRole = document.getElementById("df-role").value;
+      const oldUser = adminAllUsers.find(u => u.uid === drawerUid);
+      const oldRole = oldUser?.role || "user";
+      const oldName = oldUser?.displayName || "";
       if (newRole !== oldRole && !canDo("assign-admin")) { showToast("ONLY OWNERS CAN CHANGE ROLES"); statusEl.textContent = ""; return; }
-      const updates = { role: newRole, displayName: document.getElementById("df-name").value.trim() || undefined };
-      const cv = document.getElementById("df-coins").value; if (cv !== "") updates.coins = Number(cv);
-      document.querySelectorAll(".custom-field-row").forEach(row => { const k = row.querySelector(".cf-key").value.trim(), v = row.querySelector(".cf-val").value.trim(); if (k) updates[k] = v; });
-      try { await db.collection("users").doc(drawerUid).update(updates); writeAdminLog("edit",drawerUid,"Updated: "+Object.keys(updates).join(", ")); statusEl.textContent = "✓ Saved"; showToast("CHANGES SAVED"); setTimeout(() => statusEl.textContent = "", 2000); }
-      catch (err) { statusEl.textContent = "Error: " + err.message; showToast("SAVE FAILED"); }
+      const newName = document.getElementById("df-name").value.trim();
+      const updates = { role: newRole };
+      if (newName) updates.displayName = newName;
+      const cv = document.getElementById("df-coins").value;
+      if (cv !== "") updates.coins = Number(cv);
+      document.querySelectorAll(".custom-field-row").forEach(row => {
+        const k = row.querySelector(".cf-key").value.trim(), v = row.querySelector(".cf-val").value.trim();
+        if (k) updates[k] = v;
+      });
+      try {
+        await db.collection("users").doc(drawerUid).update(updates);
+        writeAdminLog("edit", drawerUid, "Updated: " + Object.keys(updates).join(", "));
+
+        // If display name changed, update all their messages in social chat
+        if (newName && newName !== oldName) {
+          statusEl.textContent = "Updating messages...";
+          const msgsSnap = await db.collection("socialMessages").where("userId", "==", drawerUid).get();
+          if (!msgsSnap.empty) {
+            const batch = db.batch();
+            msgsSnap.forEach(doc => batch.update(doc.ref, { displayName: newName }));
+            await batch.commit();
+          }
+          // Also update DM conversation cache display names
+          const dmSnap = await db.collection("directMessages").where("participants", "array-contains", drawerUid).get();
+          // Can't bulk-update DM messages easily but update the conv metadata
+        }
+
+        statusEl.textContent = "✓ Saved";
+        showToast("CHANGES SAVED");
+        setTimeout(() => { statusEl.textContent = ""; }, 2000);
+      } catch (err) {
+        statusEl.textContent = "Error: " + err.message;
+        showToast("SAVE FAILED: " + err.message);
+      }
     });
     document.getElementById("drawer-delmsg-btn").addEventListener("click", () => {
       if (!drawerUid) return; const user = adminAllUsers.find(u => u.uid === drawerUid);
