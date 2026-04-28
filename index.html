@@ -2628,6 +2628,82 @@
     .status-away{font-size:11px;color:#f9c74f}
     .status-offline{font-size:11px;color:#72767d}
 
+
+    /* ─── MESSAGE EDIT/DELETE ─── */
+    .msg-edit-input{width:100%;font-family:var(--font-mono);font-size:13px;padding:7px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;margin-top:4px;box-sizing:border-box}
+    .msg-edit-actions{display:flex;gap:4px;margin-top:4px}
+    .msg-edited-tag{font-size:9px;color:var(--muted);margin-left:4px;font-style:italic}
+
+    /* ─── TYPING INDICATOR ─── */
+    .typing-indicator{font-family:var(--font-mono);font-size:11px;color:var(--muted);padding:4px 14px;min-height:20px;flex-shrink:0;display:flex;align-items:center;gap:6px}
+    .typing-dots span{display:inline-block;width:5px;height:5px;background:var(--muted);border-radius:50%;animation:typingBounce .9s infinite;margin:0 1px}
+    .typing-dots span:nth-child(2){animation-delay:.2s}
+    .typing-dots span:nth-child(3){animation-delay:.4s}
+    @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+    /* ─── READ RECEIPTS ─── */
+    .dm-msg-read{font-size:10px;color:var(--accent);margin-top:1px;text-align:right}
+
+    /* ─── USER PROFILE CARD ─── */
+    #user-profile-card{display:none;position:fixed;z-index:950;background:var(--modal-bg);border:var(--border);padding:0;min-width:220px;box-shadow:0 8px 32px var(--shadow);animation:rqPop .15s ease forwards}
+    #user-profile-card.show{display:block}
+    .upc-header{background:var(--accent);padding:16px;display:flex;align-items:center;gap:12px}
+    .upc-av{width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2);font-family:var(--font-pixel);font-size:16px;flex-shrink:0}
+    .upc-av img{width:100%;height:100%;object-fit:cover}
+    .upc-name{font-family:var(--font-pixel);font-size:9px;color:#fff;margin-bottom:2px}
+    .upc-role{font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.7)}
+    .upc-body{padding:12px}
+    .upc-stat{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .upc-stat span:first-child{flex-shrink:0}
+    .upc-stat span:last-child{color:var(--fg);text-align:right;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .upc-online-row{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;margin-bottom:5px}
+    .upc-actions{display:flex;gap:6px;margin-top:10px}
+
+    /* ─── PIN MESSAGE ─── */
+    .pin-btn{font-family:var(--font-pixel);font-size:6px;padding:3px 7px;background:none;border:1px solid var(--border-col);color:var(--muted);cursor:pointer}
+    .pin-btn:hover{background:var(--fg);color:var(--bg)}
+    #pinned-bar{display:none;padding:7px 14px;border-bottom:var(--border);background:var(--bg2);font-family:var(--font-mono);font-size:11px;color:var(--muted);flex-shrink:0;align-items:center;gap:8px;cursor:pointer}
+    #pinned-bar.show{display:flex}
+    #pinned-bar:hover{background:var(--bg)}
+    .pinned-icon{font-size:13px}
+    .pinned-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)}
+
+    /* ─── NOTIFICATIONS CENTER ─── */
+    #notif-center{display:none;position:fixed;top:52px;right:8px;z-index:850;background:var(--modal-bg);border:var(--border);width:320px;max-height:480px;box-shadow:0 8px 32px var(--shadow);display:flex;flex-direction:column;animation:rqPop .15s ease forwards}
+    #notif-center.show{display:flex}
+    #notif-center:not(.show){display:none}
+    .notif-hdr{font-family:var(--font-pixel);font-size:8px;padding:11px 14px;border-bottom:var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+    .notif-list{overflow-y:auto;flex:1}
+    .notif-item{padding:10px 14px;border-bottom:1px solid var(--bg2);cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:background .1s}
+    .notif-item:hover{background:var(--bg2)}
+    .notif-item.unread{background:rgba(91,159,255,.06)}
+    .notif-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .notif-content{flex:1;min-width:0}
+    .notif-title{font-family:var(--font-pixel);font-size:7px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .notif-text{font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .notif-time{font-size:10px;color:var(--muted);white-space:nowrap;font-family:var(--font-mono)}
+    #notif-bell-btn{position:relative}
+    #notif-bell-count{position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;border-radius:50%;background:#f55;color:#fff;font-size:8px;font-family:var(--font-pixel);display:flex;align-items:center;justify-content:center;padding:0 2px;display:none}
+    #notif-bell-count.show{display:flex}
+
+    /* ─── USER STATUS ─── */
+    .status-badge{font-family:var(--font-mono);font-size:10px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+    .status-dot-indicator{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .status-dot-indicator.online{background:#23d18b}
+    .status-dot-indicator.busy{background:#f9c74f}
+    .status-dot-indicator.offline{background:#72767d}
+
+    /* ─── AI PERSONAS ─── */
+    .persona-btn{font-family:var(--font-pixel);font-size:6px;padding:7px 10px;border:var(--border);background:var(--bg);color:var(--muted);cursor:pointer;letter-spacing:1px;transition:all .1s}
+    .persona-btn:hover,.persona-btn.active{background:var(--fg);color:var(--bg)}
+
+    /* ─── SHARED AI CHAT ─── */
+    #shared-ai-section{max-width:680px;margin:0 auto}
+
+    /* ─── CONV SEARCH ─── */
+    .conv-search-input{width:100%;font-family:var(--font-mono);font-size:12px;padding:8px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;margin-bottom:8px;box-sizing:border-box}
+    .conv-search-match{background:rgba(255,215,0,.25);border-radius:2px}
+
     /* ─── REACTIONS ─── */
     .msg-reactions-bar{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
     .reaction-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--border-col);background:var(--bg2);cursor:pointer;font-size:14px;border-radius:12px;font-family:var(--font-mono);font-size:11px;transition:all .1s;user-select:none;line-height:1}
@@ -2801,11 +2877,13 @@
       <button class="nav-btn" id="nav-social">◉ SOCIAL <span id="social-badge" class="notif-badge"
           style="display:none">0</span></button>
       <button class="nav-btn" id="nav-changelog">📋 LOG</button>
+      <button class="nav-btn" id="nav-shared-ai">✦ SHARED AI</button>
       <button class="nav-btn" id="nav-other">◈ OTHER</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
       <button class="nav-btn" id="nav-owner" style="display:none;">👑 OWNER</button>
     </div>
     <div class="nav-right">
+      <button class="nav-icon-btn" id="notif-bell-btn" title="Notifications">🔔<span id="notif-bell-count"></span></button>
       <button class="nav-icon-btn" id="nav-settings-btn" title="Settings">⚙</button>
       <button class="nav-icon-btn" id="nav-auth-btn" title="Login">👤</button>
     </div>
@@ -2907,6 +2985,7 @@
           <span class="settings-label">PROFILE</span>
           <input class="settings-input" id="s-display-name" placeholder="Display name">
           <input class="settings-input" id="s-photo-url" placeholder="Profile photo URL">
+          <input class="settings-input" id="s-status-msg" placeholder="Status message (e.g. Playing Snake, AFK...)">
         </div>
         <button class="settings-save-btn" id="settings-save-btn">SAVE SETTINGS</button>
       </div>
@@ -2935,6 +3014,7 @@
         </div>
       </div>
       <div class="social-chat-messages" id="social-chat-messages"></div>
+      <div class="typing-indicator" id="social-typing-indicator"></div>
       <div class="social-input-area" style="flex-shrink:0;">
         <div class="reply-preview" id="reply-preview">
           <div class="reply-preview-inner">
@@ -3042,7 +3122,8 @@
         </div>
         <!-- Main chat area -->
         <div class="dm-chat-area" id="dm-chat-area">
-          <div class="dm-chat-hdr" id="dm-chat-hdr">
+          <div id="pinned-bar"></div>
+        <div class="dm-chat-hdr" id="dm-chat-hdr">
             <span id="dm-chat-hdr-name" style="color:var(--muted);">No conversation selected</span>
           </div>
           <div class="dm-messages" id="dm-messages">
@@ -3052,6 +3133,7 @@
               <div class="dm-empty-sub">Search for a username to start chatting</div>
             </div>
           </div>
+          <div class="typing-indicator" id="dm-typing-indicator"></div>
           <div class="dm-input-area" style="display:none;" id="dm-input-area">
             <div class="dm-input-row">
               <input class="dm-input" id="dm-input" placeholder="Message..." autocomplete="off">
@@ -3124,6 +3206,17 @@
         These AI features cost real money to run. Please don't spam — be considerate.
       </div>
 
+      <!-- AI Persona selector -->
+      <div id="persona-bar" style="display:flex;gap:4px;flex-wrap:wrap;padding:8px 0 4px;border-bottom:var(--border);margin-bottom:0">
+        <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);align-self:center;margin-right:4px">VEXIS:</span>
+        <button class="persona-btn active" data-persona="default">🤖 DEFAULT</button>
+        <button class="persona-btn" data-persona="chill">😎 CHILL</button>
+        <button class="persona-btn" data-persona="tutor">📚 TUTOR</button>
+        <button class="persona-btn" data-persona="roast">🔥 ROAST</button>
+        <button class="persona-btn" data-persona="formal">🎩 FORMAL</button>
+        <button class="persona-btn" data-persona="hype">🎉 HYPE</button>
+      </div>
+
       <!-- AI Mode Tabs -->
       <div class="ai-tab-bar">
         <button class="ai-tab-btn active" id="ai-tab-chat" onclick="switchAiTab('chat')">✦ CHAT</button>
@@ -3154,6 +3247,9 @@
           <div class="conv-panel-hdr">
             <span>CONVERSATION HISTORY</span>
             <button class="tool-btn" id="clear-all-btn">CLEAR ALL</button>
+          </div>
+          <div style="padding:8px 10px 0">
+            <input class="conv-search-input" id="conv-search-input" placeholder="Search conversations...">
           </div>
           <div class="conv-list" id="conv-list"></div>
         </div>
@@ -3194,6 +3290,24 @@
     </div><!-- end ai-panel-img -->
 
     </div><!-- end home-inner -->
+  </section>
+
+  <section class="section" id="shared-ai-section">
+    <div id="shared-ai-inner" style="max-width:680px;margin:0 auto">
+      <div class="home-header">
+        <h1 class="home-title">SHARED AI ✦</h1>
+        <p class="home-sub">Everyone talks to the same VEXIS. Public conversation.</p>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-messages" id="shared-chat-messages" style="height:400px"></div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <input class="chat-input" id="shared-chat-input" placeholder="Say something to VEXIS (everyone can see)..." autocomplete="off">
+            <button class="chat-send-btn" id="shared-chat-send">SEND</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="section" id="other-section">
@@ -3624,6 +3738,39 @@
   </div>
 </div>
 
+<!-- USER PROFILE CARD -->
+<div id="user-profile-card">
+  <div class="upc-header">
+    <div class="upc-av" id="upc-av"></div>
+    <div>
+      <div class="upc-name" id="upc-name">Unknown</div>
+      <div class="upc-role" id="upc-role">user</div>
+      <div class="status-badge" id="upc-status"><div class="status-dot-indicator offline"></div><span>Offline</span></div>
+    </div>
+  </div>
+  <div class="upc-body">
+    <div class="upc-online-row" id="upc-status">...</div>
+    <div class="upc-stat"><span>Status</span><span id="upc-custom-status">—</span></div>
+    <div class="upc-stat"><span>Role</span><span id="upc-role-stat">—</span></div>
+    <div class="upc-stat"><span>Joined</span><span id="upc-joined">—</span></div>
+    <div class="upc-actions">
+      <button class="admin-action-btn" style="font-size:6px" id="upc-dm-btn">✉ DM</button>
+      <button class="admin-action-btn ghost" style="font-size:6px" id="upc-report-btn">🚩 REPORT</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS CENTER -->
+<div id="notif-center">
+  <div class="notif-hdr">
+    <span>🔔 NOTIFICATIONS</span>
+    <button class="tool-btn" style="font-size:6px" onclick="clearAllNotifs()">CLEAR ALL</button>
+  </div>
+  <div class="notif-list" id="notif-list">
+    <div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No notifications yet.</div>
+  </div>
+</div>
+
 <!-- REACTION PICKER POPUP -->
 <div id="reaction-picker-popup">
   <button class="rq-btn" data-emoji="👍">👍</button>
@@ -3696,7 +3843,16 @@
     ===================================================== */
     const TENOR_KEY = "LIVDSRZULELA";
     const ADMIN_UID = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
-    const AI_SYSTEM = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`;
+    const AI_PERSONAS = {
+      default: `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`,
+      chill: `You are VEXIS on chill mode. Talk super casually, use lowercase a lot, keep things short and relaxed. Like texting a friend. Use slang naturally. Never overthink things.`,
+      tutor: `You are VEXIS in tutor mode. You are a patient, encouraging teacher. Break down complex topics step by step. Use examples and analogies. Check understanding. Celebrate when the user gets things right.`,
+      roast: `You are VEXIS in roast mode. You gently roast the user's questions while still actually answering them. Keep it playful and funny, never mean. Think friendly banter.`,
+      formal: `You are VEXIS in formal mode. Respond with professional, precise language. Use proper grammar. Structure responses clearly. Treat every question with the seriousness of a business consultant.`,
+      hype: `You are VEXIS in hype mode. You are EXTREMELY enthusiastic about everything. Use lots of energy, exclamation points, and hype up the user and their questions. Make them feel like a champion.`
+    };
+    let currentPersona = 'default';
+    const AI_SYSTEM = AI_PERSONAS.default;
 
     /* =====================================================
        FIREBASE INIT
@@ -3826,6 +3982,11 @@
         document.getElementById("settings-profile-section").style.display = "block";
         document.getElementById("s-display-name").value = currentUser.displayName || "";
         document.getElementById("s-photo-url").value = (currentUser.photoURL && !currentUser.photoURL.startsWith("data:")) ? currentUser.photoURL : "";
+        // Load status message
+        db.collection("users").doc(currentUser.uid).get().then(doc => {
+          const sEl = document.getElementById("s-status-msg");
+          if (sEl) sEl.value = doc.data()?.statusMsg || "";
+        }).catch(() => {});
         // Show current avatar preview
         const prev = null; // profile preview removed
 
@@ -3851,12 +4012,14 @@
         const dName = document.getElementById("s-display-name").value.trim();
         const urlInput = document.getElementById("s-photo-url");
         const finalPhoto = urlInput.value.trim() || null;
+        const statusMsg = document.getElementById("s-status-msg")?.value?.trim() || null;
         try {
           const authUpdate = { displayName: dName || null };
           if (finalPhoto && !finalPhoto.startsWith("data:")) authUpdate.photoURL = finalPhoto;
           await currentUser.updateProfile(authUpdate);
           const firestoreUpdate = { displayName: dName || "Anonymous" };
           if (finalPhoto !== null) firestoreUpdate.photoURL = finalPhoto;
+          if (statusMsg !== null) firestoreUpdate.statusMsg = statusMsg;
           await db.collection("users").doc(currentUser.uid).update(firestoreUpdate);
           syncMyPhoto(finalPhoto);
         } catch (err) { showToast("ERROR SAVING PROFILE: " + err.message); return; }
@@ -3912,6 +4075,7 @@
       "social": "nav-social",
       "changelog": "nav-changelog",
       "other": "nav-other",
+      "shared-ai": "nav-shared-ai",
       "admin": "nav-owner",
       "mod": "nav-mod"
     };
@@ -3935,6 +4099,7 @@
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
     document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
     document.getElementById("nav-other").addEventListener("click", () => showSection("other"));
+    document.getElementById("nav-shared-ai").addEventListener("click", () => { showSection("shared-ai"); loadSharedAiChat(); });
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
     document.getElementById("nav-auth-btn").addEventListener("click", () => {
       if (currentUser) { openProfileModal(); } else { openAuthModal(); }
@@ -4374,7 +4539,7 @@
     }
 
     async function callOpenAI(msgs) {
-      const systemPrompt = AI_SYSTEM;
+      const systemPrompt = AI_PERSONAS[currentPersona] || AI_PERSONAS.default;
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -4705,6 +4870,7 @@
 
     function listenSocialMessages() {
       if (socialUnsubscribe) { socialUnsubscribe(); socialUnsubscribe = null; }
+      listenTyping("socialMessages", "social-typing-indicator");
       const container = document.getElementById("social-chat-messages");
       container.innerHTML = "";
       const renderedIds = new Set();
@@ -4798,11 +4964,14 @@
       const row = document.createElement("div");
       row.className = "social-msg" + (isOwn ? " own" : "");
       row.dataset.msgId = msg.id;
+      row.dataset.origText = msg.text || '';
+      row.dataset.edited = msg.edited ? 'true' : 'false';
       let avHTML;
+      const clickAttr = isOwn ? ' data-my-avatar' : ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.userId)}',this)" style="cursor:pointer"`;
       if (msg.photoURL) {
-        avHTML = `<div class="social-msg-av"${isOwn?' data-my-avatar':' data-uid="'+escHtml(msg.userId)+'"'}><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
+        avHTML = `<div class="social-msg-av"${clickAttr}><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
       } else {
-        avHTML = `<div class="social-msg-av"${isOwn?' data-my-avatar':' data-uid="'+escHtml(msg.userId)+'"'}>${(msg.displayName || "?")[0].toUpperCase()}</div>`;
+        avHTML = `<div class="social-msg-av"${clickAttr}>${(msg.displayName || "?")[0].toUpperCase()}</div>`;
       }
       let replyHTML = "";
       if (msg.replyTo) {
@@ -4822,15 +4991,11 @@
       <div class="social-msg-bubble">${replyHTML}${contentHTML}</div>
       <div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, 'socialMessages')}<button class="react-add-btn" onclick="showReactionPicker(event,'socialMessages','${msg.id}')">+</button></div>
       <div class="social-msg-time">${time}</div>
-      <div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${!isOwn ? `<button class="msg-report-btn">🚩</button>` : ""}</div>
+      <div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>
     </div>`;
       row.querySelector(".reply-btn").addEventListener("click", () => setReplyingTo(msg));
-      // Avatar click = report user
-      const avEl = row.querySelector(".social-msg-av");
-      if (avEl) avEl.addEventListener("click", () => {
-        if (!currentUser || msg.userId === currentUser.uid) return;
-        openReportModal({type:"user", targetUid:msg.userId, targetName:msg.displayName||"?"});
-      });
+      // Avatar click = show profile card (onclick already set in clickAttr above)
+      // Report button is in msg-actions
       const rBtn = row.querySelector(".msg-report-btn");
       if (rBtn) rBtn.addEventListener("click", e => {
         e.stopPropagation();
@@ -4872,6 +5037,12 @@
     document.getElementById("chat-input").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } });
     document.getElementById("chat-send-btn").addEventListener("click", sendChatMessage);
 
+    // Typing in social chat
+    document.getElementById("social-input").addEventListener("input", () => {
+      setTyping("socialMessages", true);
+      if (_typingTimeout) clearTimeout(_typingTimeout);
+      _typingTimeout = setTimeout(() => setTyping("socialMessages", false), 4000);
+    });
     document.getElementById("social-send-btn").addEventListener("click", () => {
       const input = document.getElementById("social-input");
       const text = input.value.trim();
@@ -5079,6 +5250,7 @@
                 const senderName = msg.senderName || "Someone";
                 const preview = msg.text || (msg.gifUrl ? "sent a GIF" : "sent an image");
                 showBrowserNotif(`DM from ${senderName}`, preview);
+                addNotif("✉", `DM from ${senderName}`, preview, () => openDmModal());
               });
           });
         }, () => { }); // silent fail if no index yet
@@ -5204,6 +5376,9 @@
       msgContainer.innerHTML = "";
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
       listenDmMessages(conv.dmId, conv);
+      hookTypingInput("dm-input", `directMessages/${conv.dmId}/messages`, "dm-typing-indicator");
+      listenTyping(`directMessages/${conv.dmId}/messages`, "dm-typing-indicator");
+      markDmRead(conv.dmId);
     }
 
     function listenDmMessages(dmId, conv) {
@@ -5258,27 +5433,72 @@
       const row = document.createElement("div");
       row.className = "dm-msg" + (isOwn ? " own" : "");
       row.dataset.dmMsgId = msg.id;
+      row.dataset.origText = msg.text || '';
+      const dmCollPath = `directMessages/${activeDmId}/messages`;
       const avSrc = isOwn ? (_sessionPhoto || currentUser.photoURL || null) : (conv.otherPhoto || null);
       const avName = isOwn ? (currentUser.displayName || "Me") : (conv.otherName || "?");
+      const clickAttr = !isOwn ? ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.senderId)}',this)" style="cursor:pointer"` : ' data-my-avatar';
       const avHTML = avSrc
-        ? `<div class="dm-msg-av"${isOwn?' data-my-avatar':''}><img src="${escHtml(avSrc)}" alt=""></div>`
-        : `<div class="dm-msg-av"${isOwn?' data-my-avatar':''}>${avName[0].toUpperCase()}</div>`;
+        ? `<div class="dm-msg-av"${clickAttr}><img src="${escHtml(avSrc)}" alt=""></div>`
+        : `<div class="dm-msg-av"${clickAttr}>${avName[0].toUpperCase()}</div>`;
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
       let contentHTML = "";
-      if (msg.text) contentHTML += `<div>${escHtml(msg.text)}</div>`;
+      if (msg.text) contentHTML += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
       if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
       if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
-      const dmCollPath = `directMessages/${activeDmId}/messages`;
+      const actionsHTML = isOwn && msg.text
+        ? `<div class="msg-actions"><button class="msg-action-btn" onclick="editDmMessageInline('${msg.id}','${escHtml(dmCollPath)}')">✏</button><button class="msg-action-btn" onclick="deleteDmMessage('${msg.id}','${escHtml(dmCollPath)}')">🗑</button></div>`
+        : `<div class="msg-actions"><button class="msg-report-btn" onclick="openReportModal({type:'message',msgId:'${msg.id}',targetUid:'${msg.senderId}',targetName:'${escHtml(conv.otherName||'')}',msgText:'${escHtml((msg.text||'').slice(0,60))}'})">🚩</button></div>`;
       row.innerHTML = `
     ${avHTML}
     <div class="dm-msg-body">
-      <div class="dm-msg-bubble">${contentHTML}</div>
+      <div class="dm-msg-bubble" id="dmbubble-${msg.id}">${contentHTML}</div>
       <div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, dmCollPath)}<button class="react-add-btn" onclick="showReactionPicker(event,'${dmCollPath}','${msg.id}')">+</button></div>
       <div class="dm-msg-time">${time}</div>
+      ${actionsHTML}
     </div>`;
       container.appendChild(row);
+    }
+
+    function editDmMessageInline(msgId, collPath) {
+      const row = document.querySelector(`[data-dm-msg-id="${msgId}"]`);
+      if (!row) return;
+      const oldText = row.dataset.origText || '';
+      const bubble = document.getElementById('dmbubble-' + msgId);
+      if (!bubble) return;
+      bubble.innerHTML = `<input class="msg-edit-input" value="${escHtml(oldText)}"><div class="msg-edit-actions"><button class="tool-btn" onclick="saveDmEditInline('${msgId}','${escHtml(collPath)}')">SAVE</button><button class="tool-btn" onclick="cancelDmEdit('${msgId}')">CANCEL</button></div>`;
+      const inp = bubble.querySelector('.msg-edit-input');
+      if (inp) { inp.focus(); inp.selectionStart = inp.selectionEnd = inp.value.length; }
+    }
+    async function saveDmEditInline(msgId, collPath) {
+      const row = document.querySelector(`[data-dm-msg-id="${msgId}"], [data-grp-msg-id="${msgId}"]`);
+      if (!row) return;
+      const bubble = document.getElementById('dmbubble-' + msgId) || document.getElementById('grpbubble-' + msgId);
+      const inp = bubble?.querySelector('.msg-edit-input');
+      if (!inp) return;
+      const newText = inp.value.trim(); if (!newText) return;
+      try {
+        const parts = collPath.split('/');
+        await db.collection(parts[0]).doc(parts[1]).collection(parts[2]).doc(msgId).update({ text: newText, edited: true });
+        row.dataset.origText = newText;
+        if (bubble) bubble.innerHTML = `<div>${escHtml(newText)}<span class="msg-edited-tag">(edited)</span></div>`;
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    function cancelDmEdit(msgId) {
+      const row = document.querySelector(`[data-dm-msg-id="${msgId}"]`);
+      if (!row) return;
+      const bubble = document.getElementById('dmbubble-' + msgId);
+      if (bubble) bubble.innerHTML = `<div>${escHtml(row.dataset.origText || '')}</div>`;
+    }
+    async function deleteDmMessage(msgId, collPath) {
+      if (!confirm('Delete this message?')) return;
+      try {
+        const parts = collPath.split('/');
+        await db.collection(parts[0]).doc(parts[1]).collection(parts[2]).doc(msgId).delete();
+        document.querySelector(`[data-dm-msg-id="${msgId}"]`)?.remove();
+      } catch (err) { showToast('ERROR: ' + err.message); }
     }
 
     async function sendDmMessage(overrideText, gifUrl, imageUrl) {
@@ -5499,6 +5719,8 @@
       document.getElementById("dm-messages").innerHTML = "";
       if (groupUnsubscribe) { groupUnsubscribe(); groupUnsubscribe = null; }
       if (dmUnsubscribe) { dmUnsubscribe(); dmUnsubscribe = null; }
+      if (group.pinnedMsg) showPinnedBar(group.pinnedMsg.text, group.id);
+      else { const pb = document.getElementById("pinned-bar"); if (pb) pb.classList.remove("show"); }
       listenGroupMessages(group.id, group);
       // Update sidebar active state
       document.querySelectorAll("#group-conv-list .dm-conv-item").forEach(el => el.classList.toggle("active", el.dataset.gid === group.id));
@@ -5529,22 +5751,51 @@
     function renderGroupMessage(msg, group) {
       const container = document.getElementById("dm-messages");
       if (document.querySelector(`[data-grp-msg-id="${msg.id}"]`)) return;
-      const isOwn = msg.senderId === currentUser.uid;
+      const isOwn = msg.senderId === currentUser?.uid;
+      const grpCollPath = `groupChats/${activeGroupId}/messages`;
       const row = document.createElement("div");
       row.className = "dm-msg" + (isOwn ? " own" : "");
       row.dataset.grpMsgId = msg.id;
-      const av = msg.senderPhoto ? `<div class="dm-msg-av"><img src="${escHtml(msg.senderPhoto)}" alt=""></div>` : `<div class="dm-msg-av">${(msg.senderName||"?")[0].toUpperCase()}</div>`;
-      const time = msg.timestamp ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) : "";
+      row.dataset.origText = msg.text || '';
+      const avSrc = isOwn ? (_sessionPhoto || currentUser.photoURL || null) : ((group.memberData||{})[msg.senderId]?.photo || null);
+      const avName = isOwn ? (currentUser.displayName || "Me") : (msg.senderName || "?");
+      const clickAttr = !isOwn ? ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.senderId)}',this)" style="cursor:pointer"` : ' data-my-avatar';
+      const avHTML = avSrc
+        ? `<div class="dm-msg-av"${clickAttr}><img src="${escHtml(avSrc)}" alt=""></div>`
+        : `<div class="dm-msg-av"${clickAttr}>${avName[0].toUpperCase()}</div>`;
+      const time = msg.timestamp
+        ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "";
       let content = "";
-      if (msg.text) content += `<div>${escHtml(msg.text)}</div>`;
+      if (msg.text) content += `<div>${escHtml(msg.text)}${msg.edited ? '<span class="msg-edited-tag">(edited)</span>' : ''}</div>`;
       if (msg.gifUrl) content += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
       if (msg.imageUrl) content += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
-      const grpCollPath = `groupChats/${activeGroupId}/messages`;
-      row.innerHTML = `${av}<div class="dm-msg-body">${!isOwn?`<div style="font-family:var(--font-pixel);font-size:6px;color:var(--muted);margin-bottom:2px">${escHtml(msg.senderName||"?")}</div>`:""}<div class="dm-msg-bubble">${content}</div><div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, grpCollPath)}<button class="react-add-btn" onclick="showReactionPicker(event,'${grpCollPath}','${msg.id}')">+</button></div><div class="dm-msg-time">${time}</div></div>`;
+      const isGroupOwner = group.ownerId === currentUser?.uid;
+      const actionsHTML = isOwn && msg.text
+        ? `<div class="msg-actions"><button class="msg-action-btn" onclick="editGrpMessageInline('${msg.id}','${escHtml(grpCollPath)}')">✏</button><button class="msg-action-btn" onclick="deleteDmMessage('${msg.id}','${escHtml(grpCollPath)}')">🗑</button>${isGroupOwner ? `<button class="pin-btn" onclick="pinMessage('${escHtml(activeGroupId)}','${msg.id}','${escHtml((msg.text||'').slice(0,80))}')">📌 PIN</button>` : ''}</div>`
+        : `<div class="msg-actions">${isGroupOwner ? `<button class="msg-action-btn" onclick="deleteDmMessage('${msg.id}','${escHtml(grpCollPath)}')">🗑</button>` : ''}<button class="msg-report-btn" onclick="openReportModal({type:'message',msgId:'${msg.id}',targetUid:'${msg.senderId}',targetName:'${escHtml(msg.senderName||'')}',msgText:'${escHtml((msg.text||'').slice(0,60))}'})">🚩</button></div>`;
+      row.innerHTML = `${avHTML}<div class="dm-msg-body">${!isOwn ? `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--muted);margin-bottom:2px">${escHtml(msg.senderName||"?")}</div>` : ""}<div class="dm-msg-bubble" id="grpbubble-${msg.id}">${content}</div><div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, grpCollPath)}<button class="react-add-btn" onclick="showReactionPicker(event,'${grpCollPath}','${msg.id}')">+</button></div><div class="dm-msg-time">${time}</div>${actionsHTML}</div>`;
       container.appendChild(row);
     }
 
-    async function sendGroupMessage(overrideText, gifUrl, imageUrl) {
+    function editGrpMessageInline(msgId, collPath) {
+      const row = document.querySelector(`[data-grp-msg-id="${msgId}"]`);
+      if (!row) return;
+      const oldText = row.dataset.origText || '';
+      const bubble = document.getElementById('grpbubble-' + msgId);
+      if (!bubble) return;
+      bubble.innerHTML = `<input class="msg-edit-input" value="${escHtml(oldText)}"><div class="msg-edit-actions"><button class="tool-btn" onclick="saveDmEditInline('${msgId}','${escHtml(collPath)}')">SAVE</button><button class="tool-btn" onclick="cancelGrpEdit('${msgId}')">CANCEL</button></div>`;
+      const inp = bubble.querySelector('.msg-edit-input');
+      if (inp) { inp.focus(); inp.selectionStart = inp.selectionEnd = inp.value.length; }
+    }
+    function cancelGrpEdit(msgId) {
+      const row = document.querySelector(`[data-grp-msg-id="${msgId}"]`);
+      if (!row) return;
+      const bubble = document.getElementById('grpbubble-' + msgId);
+      if (bubble) bubble.innerHTML = `<div>${escHtml(row.dataset.origText || '')}</div>`;
+    }
+
+        async function sendGroupMessage(overrideText, gifUrl, imageUrl) {
       if (!currentUser || !activeGroupId) return;
       const input = document.getElementById("dm-input");
       const text = overrideText !== undefined ? overrideText : input.value.trim();
@@ -5589,6 +5840,14 @@
 
     // ── Wire up send for group vs DM ─────────────────────────────────────
     // Override the dm-send-btn to handle both DM and group
+    // Typing indicator wiring for DM (called after opening a DM conv)
+    document.getElementById("dm-input").addEventListener("input", () => {
+      if (!activeDmId && !activeGroupId) return;
+      const path = activeGroupId ? `groupChats/${activeGroupId}/messages` : `directMessages/${activeDmId}/messages`;
+      setTyping(path, true);
+      if (_typingTimeout) clearTimeout(_typingTimeout);
+      _typingTimeout = setTimeout(() => setTyping(path, false), 4000);
+    });
     document.getElementById("dm-send-btn").removeEventListener("click", sendDmMessage);
     document.getElementById("dm-send-btn").addEventListener("click", () => { if (activeGroupId) sendGroupMessage(); else sendDmMessage(); });
     document.getElementById("dm-input").removeEventListener("keydown", () => {});
@@ -5932,7 +6191,7 @@
       const tbody = document.getElementById("mod-users-body"), q = (document.getElementById("mod-search")?.value || "").toLowerCase();
       tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:14px">Loading...</td></tr>';
       try { const [usersSnap, bannedSnap] = await Promise.all([db.collection("users").get(), db.collection("bannedUsers").get()]); const bannedIds = new Set(); bannedSnap.forEach(d => bannedIds.add(d.id)); let users = []; usersSnap.forEach(d => users.push({ uid: d.id, ...d.data() })); if (q) users = users.filter(u => `${u.displayName||""} ${u.uid||""}`.toLowerCase().includes(q)); document.getElementById("mod-user-count").textContent = users.length + " users"; tbody.innerHTML = "";
-        users.forEach(u => { const banned = bannedIds.has(u.uid); const av = u.photoURL ? `<img class="admin-user-avatar" src="${escHtml(u.photoURL)}" alt="">` : `<span class="admin-user-initials">${(u.displayName||"?")[0].toUpperCase()}</span>`; const tr = document.createElement("tr"); tr.innerHTML = `<td><div class="admin-name-cell">${av}<span style="font-family:var(--font-pixel);font-size:8px">${escHtml(u.displayName||"Anonymous")}</span></div></td><td style="font-size:10px;font-family:var(--font-mono);color:var(--muted)">${escHtml(u.uid?.slice(0,16)||"")}…</td><td>${banned?'<span class="banned-badge">BANNED</span>':getActivityStatus(user.lastSeen)}</td><td><div class="action-btn-group">${banned?`<button class="unban-btn" data-uid="${escHtml(u.uid)}">UNBAN</button>`:`<button class="ban-btn" data-uid="${escHtml(u.uid)}">BAN</button>`}</div></td>`; const btn = tr.querySelector(".ban-btn,.unban-btn"); btn.addEventListener("click", async e => { const uid = e.target.dataset.uid; if (banned) adminConfirm("Unban",`Unban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).delete();writeAdminLog("unban",uid,u.displayName||uid);showToast("UNBANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); else adminConfirm("Ban",`Ban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).set({bannedAt:firebase.firestore.FieldValue.serverTimestamp(),bannedBy:currentUser.uid});writeAdminLog("ban",uid,u.displayName||uid);showToast("BANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); }); tbody.appendChild(tr); });
+        users.forEach(u => { const banned = bannedIds.has(u.uid); const av = u.photoURL ? `<img class="admin-user-avatar" src="${escHtml(u.photoURL)}" alt="">` : `<span class="admin-user-initials">${(u.displayName||"?")[0].toUpperCase()}</span>`; const tr = document.createElement("tr"); tr.innerHTML = `<td><div class="admin-name-cell">${av}<span style="font-family:var(--font-pixel);font-size:8px">${escHtml(u.displayName||"Anonymous")}</span></div></td><td style="font-size:10px;font-family:var(--font-mono);color:var(--muted)">${escHtml(u.uid?.slice(0,16)||"")}…</td><td>${banned?'<span class="banned-badge">BANNED</span>':getActivityStatus(u.lastSeen)}</td><td><div class="action-btn-group">${banned?`<button class="unban-btn" data-uid="${escHtml(u.uid)}">UNBAN</button>`:`<button class="ban-btn" data-uid="${escHtml(u.uid)}">BAN</button>`}</div></td>`; const btn = tr.querySelector(".ban-btn,.unban-btn"); btn.addEventListener("click", async e => { const uid = e.target.dataset.uid; if (banned) adminConfirm("Unban",`Unban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).delete();writeAdminLog("unban",uid,u.displayName||uid);showToast("UNBANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); else adminConfirm("Ban",`Ban ${u.displayName||uid}?`,async()=>{ try{await db.collection("bannedUsers").doc(uid).set({bannedAt:firebase.firestore.FieldValue.serverTimestamp(),bannedBy:currentUser.uid});writeAdminLog("ban",uid,u.displayName||uid);showToast("BANNED");refreshModList();}catch(err){showToast("ERROR: "+err.message);} }); }); tbody.appendChild(tr); });
       } catch (err) { tbody.innerHTML = `<tr><td colspan="4" style="color:#f55;padding:14px">Error: ${escHtml(err.message)}</td></tr>`; }
     }
     document.getElementById("mod-refresh-btn").addEventListener("click", refreshModList);
@@ -6754,6 +7013,389 @@
       const saved = loadCustomThemeVars();
       if (saved) injectCustomThemeStyle(buildCustomThemeCSS(saved));
     })();
+
+    /* =====================================================
+       AI PERSONAS WIRING
+    ===================================================== */
+    document.querySelectorAll('.persona-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPersona = btn.dataset.persona;
+        newConversation();
+        showToast('PERSONA: ' + btn.textContent.trim().toUpperCase());
+      });
+    });
+
+    /* =====================================================
+       CONVERSATION SEARCH
+    ===================================================== */
+    document.getElementById('conv-search-input').addEventListener('input', e => {
+      const q = e.target.value.trim().toLowerCase();
+      const convs = getConvs();
+      const keys = Object.keys(convs).sort((a, b) => Number(b) - Number(a));
+      const convList = document.getElementById('conv-list');
+      convList.innerHTML = '';
+      const filtered = keys.filter(id => {
+        if (!q) return true;
+        const conv = convs[id];
+        const title = (conv.title || '').toLowerCase();
+        const msgs = (conv.messages || []).map(m => {
+          if (typeof m.content === 'string') return m.content.toLowerCase();
+          if (Array.isArray(m.content)) return m.content.filter(c => c.type === 'text').map(c => c.text).join(' ').toLowerCase();
+          return '';
+        }).join(' ');
+        return title.includes(q) || msgs.includes(q);
+      });
+      if (!filtered.length) { convList.innerHTML = '<div class="conv-empty">No results.</div>'; return; }
+      filtered.forEach(id => {
+        const conv = convs[id];
+        const isAct = id === currentConvId;
+        const date = new Date(Number(id)).toLocaleDateString();
+        let title = conv.title || 'Untitled';
+        if (q && title.toLowerCase().includes(q)) title = title.replace(new RegExp(q, 'gi'), m => `<mark class="conv-search-match">${m}</mark>`);
+        const item = document.createElement('div');
+        item.className = 'conv-item' + (isAct ? ' conv-active' : '');
+        item.innerHTML = `<span class="conv-title-text">${title}</span><span class="conv-meta"><span class="conv-date">${date}</span><button class="conv-del-btn" data-id="${id}">✕</button></span>`;
+        item.addEventListener('click', () => loadConversation(id));
+        item.querySelector('.conv-del-btn').addEventListener('click', ev => { ev.stopPropagation(); deleteConv(id); });
+        convList.appendChild(item);
+      });
+    });
+
+    /* =====================================================
+       MESSAGE EDIT / DELETE
+    ===================================================== */
+    async function editSocialMessage(msgId, oldText) {
+      const row = document.querySelector(`[data-msg-id="${msgId}"]`);
+      if (!row) return;
+      row.dataset.origText = oldText;
+      const bubble = row.querySelector('.social-msg-bubble');
+      bubble.innerHTML = `<input class="msg-edit-input" value="${escHtml(oldText)}"><div class="msg-edit-actions"><button class="tool-btn" onclick="saveEditSocial('${msgId}')">SAVE</button><button class="tool-btn" onclick="cancelEditSocial('${msgId}')">CANCEL</button></div>`;
+      const inp = bubble.querySelector('.msg-edit-input');
+      if (inp) { inp.focus(); inp.selectionStart = inp.selectionEnd = inp.value.length; }
+    }
+    async function saveEditSocial(msgId) {
+      // Find input within the message row (not by global ID to avoid stale refs)
+      const row = document.querySelector(`[data-msg-id="${msgId}"]`);
+      if (!row) return;
+      const inp = row.querySelector('.msg-edit-input');
+      if (!inp) return;
+      const newText = inp.value.trim();
+      if (!newText) return;
+      try {
+        await db.collection('socialMessages').doc(msgId).update({ text: newText, edited: true });
+        // Update bubble immediately so it doesn't flicker back
+        const bubble = row.querySelector('.social-msg-bubble');
+        if (bubble) bubble.innerHTML = `<div>${escHtml(newText)}</div><span class="msg-edited-tag">(edited)</span>`;
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    function cancelEditSocial(msgId) {
+      const row = document.querySelector(`[data-msg-id="${msgId}"]`);
+      if (!row) return;
+      // Re-render just the bubble from the stored original text
+      const origText = row.dataset.origText || '';
+      const bubble = row.querySelector('.social-msg-bubble');
+      if (bubble) bubble.innerHTML = `<div>${escHtml(origText)}</div>` + (row.dataset.edited === 'true' ? '<span class="msg-edited-tag">(edited)</span>' : '');
+    }
+    async function deleteSocialMessage(msgId) {
+      if (!confirm('Delete this message?')) return;
+      try { await db.collection('socialMessages').doc(msgId).delete(); document.querySelector(`[data-msg-id="${msgId}"]`)?.remove(); }
+      catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    async function editDmMessage(msgId, dmId, oldText) {
+      const row = document.querySelector(`[data-dm-msg-id="${msgId}"]`);
+      if (!row) return;
+      const bubble = row.querySelector('.dm-msg-bubble');
+      bubble.innerHTML = `<input class="msg-edit-input" value="${escHtml(oldText)}" id="dmedit-${msgId}"><div class="msg-edit-actions"><button class="tool-btn" onclick="saveDmEdit('${msgId}','${dmId}')">SAVE</button><button class="tool-btn" onclick="document.querySelector('[data-dm-msg-id=\\'${msgId}\\']').querySelector('.dm-msg-bubble').innerHTML='${escHtml(oldText)}'">CANCEL</button></div>`;
+      document.getElementById('dmedit-' + msgId)?.focus();
+    }
+    async function saveDmEdit(msgId, dmId) {
+      const inp = document.getElementById('dmedit-' + msgId);
+      if (!inp) return;
+      const newText = inp.value.trim(); if (!newText) return;
+      try {
+        const parts = dmId.split('/');
+        const ref = parts.length === 3 ? db.collection(parts[0]).doc(parts[1]).collection(parts[2]).doc(msgId) : db.collection(parts[0]).doc(parts[1]).collection('messages').doc(msgId);
+        await ref.update({ text: newText, edited: true });
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    /* =====================================================
+       TYPING INDICATORS
+    ===================================================== */
+    let _typingTimeout = null;
+    let _typingUnsub = null;
+
+    function setTyping(collPath, isTyping) {
+      if (!currentUser) return;
+      const ref = db.collection('typing').doc(collPath.replace(/\//g, '_'));
+      if (isTyping) {
+        ref.set({ [currentUser.uid]: { name: currentUser.displayName || 'Someone', ts: firebase.firestore.FieldValue.serverTimestamp() } }, { merge: true });
+      } else {
+        const upd = {}; upd[currentUser.uid] = firebase.firestore.FieldValue.delete();
+        ref.update(upd).catch(() => {});
+      }
+    }
+
+    function listenTyping(collPath, indicatorId) {
+      if (_typingUnsub) { _typingUnsub(); _typingUnsub = null; }
+      const ref = db.collection('typing').doc(collPath.replace(/\//g, '_'));
+      _typingUnsub = ref.onSnapshot(snap => {
+        const data = snap.data() || {};
+        const others = Object.entries(data).filter(([uid]) => uid !== currentUser?.uid)
+          .filter(([, v]) => v && v.ts && (Date.now() - (v.ts.toMillis?.() ?? 0)) < 8000)
+          .map(([, v]) => v.name);
+        const el = document.getElementById(indicatorId);
+        if (!el) return;
+        if (!others.length) { el.innerHTML = ''; return; }
+        const names = others.slice(0, 3).join(', ');
+        el.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div> <span>${escHtml(names)} ${others.length === 1 ? 'is' : 'are'} typing...</span>`;
+      }, () => {});
+    }
+
+    function hookTypingInput(inputId, collPath, indicatorId) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      inp.addEventListener('input', () => {
+        setTyping(collPath, true);
+        if (_typingTimeout) clearTimeout(_typingTimeout);
+        _typingTimeout = setTimeout(() => setTyping(collPath, false), 4000);
+      });
+    }
+
+    /* =====================================================
+       READ RECEIPTS (DM only)
+    ===================================================== */
+    async function markDmRead(dmId) {
+      if (!currentUser || !dmId) return;
+      try {
+        await db.collection('directMessages').doc(dmId).set({ [`readBy.${currentUser.uid}`]: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } catch (_) {}
+    }
+
+    /* =====================================================
+       USER PROFILE CARD
+    ===================================================== */
+    let _upcUnsub = null;
+    async function showUserProfileCard(uid, anchorEl) {
+      if (!uid || uid === currentUser?.uid) return;
+      const card = document.getElementById('user-profile-card');
+      if (card.classList.contains('show') && card.dataset.uid === uid) { hideUserProfileCard(); return; }
+      card.dataset.uid = uid;
+      // Position near anchor
+      const rect = anchorEl.getBoundingClientRect();
+      const cardW = 230;
+      let left = rect.right + 8;
+      if (left + cardW > window.innerWidth) left = rect.left - cardW - 8;
+      let top = rect.top;
+      if (top + 220 > window.innerHeight) top = window.innerHeight - 230;
+      card.style.top = Math.max(60, top) + 'px';
+      card.style.left = Math.max(4, left) + 'px';
+      card.style.right = 'auto';
+      card.classList.add('show');
+      // Show loading state
+      document.getElementById('upc-name').textContent = 'Loading...';
+      document.getElementById('upc-role').textContent = '';
+      document.getElementById('upc-joined').textContent = '—';
+      document.getElementById('upc-custom-status').textContent = '—';
+      document.getElementById('upc-status').innerHTML = '...';
+      document.getElementById('upc-av').innerHTML = '?';
+      try {
+        const doc = await db.collection('users').doc(uid).get();
+        const u = doc.data() || {};
+        // Avatar
+        const avEl = document.getElementById('upc-av');
+        avEl.innerHTML = u.photoURL ? `<img src="${escHtml(u.photoURL)}" alt="">` : (u.displayName || '?')[0].toUpperCase();
+        // Name & role
+        document.getElementById('upc-name').textContent = u.displayName || 'Anonymous';
+        document.getElementById('upc-role').textContent = (u.role || 'user').toUpperCase();
+        const roleStat = document.getElementById('upc-role-stat');
+        if (roleStat) roleStat.textContent = (u.role || 'user').toUpperCase();
+        // Joined date
+        const joined = u.createdAt ? new Date(typeof u.createdAt === 'number' ? u.createdAt : u.createdAt.toMillis?.() ?? 0).toLocaleDateString() : '—';
+        document.getElementById('upc-joined').textContent = joined;
+        // Custom status
+        document.getElementById('upc-custom-status').textContent = u.statusMsg || '(no status set)';
+        // Online status with dot
+        const statusEl = document.getElementById('upc-status');
+        if (!u.lastSeen) {
+          statusEl.innerHTML = '<div class="status-dot-indicator offline" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#72767d;margin-right:5px"></div>Never seen';
+        } else {
+          const ms = u.lastSeen.toMillis ? u.lastSeen.toMillis() : 0;
+          const diff = Date.now() - ms;
+          if (diff < 5 * 60 * 1000) {
+            statusEl.innerHTML = '<div style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#23d18b;margin-right:5px"></div><span style="color:#23d18b">Online</span>';
+          } else if (diff < 30 * 60 * 1000) {
+            statusEl.innerHTML = '<div style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f9c74f;margin-right:5px"></div><span style="color:#f9c74f">Away</span>';
+          } else {
+            const lastSeenStr = new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            statusEl.innerHTML = `<div style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#72767d;margin-right:5px"></div><span style="color:#72767d">Last seen ${lastSeenStr}</span>`;
+          }
+        }
+        // Wire buttons
+        document.getElementById('upc-dm-btn').onclick = () => {
+          hideUserProfileCard();
+          openDmModal();
+          startDmWithUser({ uid, displayName: u.displayName || 'Anonymous', photoURL: u.photoURL || null });
+        };
+        document.getElementById('upc-report-btn').onclick = () => {
+          hideUserProfileCard();
+          openReportModal({ type: 'user', targetUid: uid, targetName: u.displayName || 'Anonymous' });
+        };
+      } catch (err) {
+        document.getElementById('upc-name').textContent = 'Error loading';
+        document.getElementById('upc-status').textContent = err.message;
+      }
+    }
+    function hideUserProfileCard() { document.getElementById('user-profile-card').classList.remove('show'); }
+    document.addEventListener('click', e => {
+      const card = document.getElementById('user-profile-card');
+      if (card.classList.contains('show') && !card.contains(e.target) && !e.target.closest('[data-uid-click]')) {
+        hideUserProfileCard();
+      }
+    });
+
+    /* =====================================================
+       PINNED MESSAGES (group chat)
+    ===================================================== */
+    async function pinMessage(groupId, msgId, text) {
+      try {
+        await db.collection('groupChats').doc(groupId).update({ pinnedMsg: { msgId, text: text.slice(0, 100), pinnedAt: firebase.firestore.FieldValue.serverTimestamp() } });
+        showToast('MESSAGE PINNED');
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    async function unpinMessage(groupId) {
+      try {
+        await db.collection('groupChats').doc(groupId).update({ pinnedMsg: firebase.firestore.FieldValue.delete() });
+        document.getElementById('pinned-bar')?.classList.remove('show');
+        showToast('UNPINNED');
+      } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+    function showPinnedBar(text, groupId) {
+      let bar = document.getElementById('pinned-bar');
+      if (!bar) return;
+      bar.innerHTML = `<span class="pinned-icon">📌</span><span class="pinned-text">${escHtml(text)}</span><button class="tool-btn" style="font-size:6px;flex-shrink:0" onclick="unpinMessage('${escHtml(groupId)}')">UNPIN</button>`;
+      bar.classList.add('show');
+    }
+
+    /* =====================================================
+       NOTIFICATIONS CENTER
+    ===================================================== */
+    let _notifList = [];
+    let _unreadNotifs = 0;
+
+    function addNotif(icon, title, text, onClick) {
+      const n = { icon, title, text, onClick, ts: Date.now(), read: false };
+      _notifList.unshift(n);
+      if (_notifList.length > 50) _notifList = _notifList.slice(0, 50);
+      _unreadNotifs++;
+      updateNotifBadge();
+      renderNotifList();
+    }
+
+    function updateNotifBadge() {
+      const el = document.getElementById('notif-bell-count');
+      if (_unreadNotifs > 0) { el.textContent = _unreadNotifs > 9 ? '9+' : _unreadNotifs; el.classList.add('show'); }
+      else { el.classList.remove('show'); }
+    }
+
+    function renderNotifList() {
+      const list = document.getElementById('notif-list');
+      if (!_notifList.length) { list.innerHTML = '<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No notifications yet.</div>'; return; }
+      list.innerHTML = '';
+      _notifList.forEach((n, i) => {
+        const item = document.createElement('div');
+        item.className = 'notif-item' + (n.read ? '' : ' unread');
+        const timeStr = getRelativeTime(n.ts) || new Date(n.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        item.innerHTML = `<div class="notif-icon">${n.icon}</div><div class="notif-content"><div class="notif-title">${escHtml(n.title)}</div><div class="notif-text">${escHtml(n.text)}</div></div><div class="notif-time">${timeStr}</div>`;
+        item.addEventListener('click', () => { _notifList[i].read = true; renderNotifList(); if (n.onClick) n.onClick(); });
+        list.appendChild(item);
+      });
+    }
+
+    function clearAllNotifs() { _notifList = []; _unreadNotifs = 0; updateNotifBadge(); renderNotifList(); }
+
+    // Bell button toggle
+    document.getElementById('notif-bell-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      const nc = document.getElementById('notif-center');
+      const isOpen = nc.classList.contains('show');
+      nc.classList.toggle('show', !isOpen);
+      if (!isOpen) { _unreadNotifs = 0; updateNotifBadge(); _notifList.forEach(n => n.read = true); renderNotifList(); }
+    });
+    document.addEventListener('click', e => {
+      const nc = document.getElementById('notif-center');
+      if (nc.classList.contains('show') && !nc.contains(e.target) && e.target.id !== 'notif-bell-btn') nc.classList.remove('show');
+    });
+
+    /* =====================================================
+       USER STATUS
+    ===================================================== */
+    async function saveUserStatus(statusMsg) {
+      if (!currentUser) return;
+      try { await db.collection('users').doc(currentUser.uid).update({ statusMsg }); } catch (_) {}
+    }
+
+    /* =====================================================
+       SHARED AI CHAT
+    ===================================================== */
+    let sharedAiUnsubscribe = null;
+    let sharedAiLoaded = false;
+
+    async function loadSharedAiChat() {
+      if (sharedAiLoaded) return;
+      sharedAiLoaded = true;
+      const container = document.getElementById('shared-chat-messages');
+      container.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">Loading...</div>';
+      sharedAiUnsubscribe = db.collection('sharedAiMessages').orderBy('timestamp','asc').limitToLast(60)
+        .onSnapshot(snap => {
+          container.innerHTML = '';
+          if (snap.empty) { container.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">No messages yet. Start the conversation!</div>'; return; }
+          snap.forEach(doc => renderSharedAiMsg({ id: doc.id, ...doc.data() }));
+          setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+        }, () => {});
+    }
+
+    function renderSharedAiMsg(msg) {
+      const container = document.getElementById('shared-chat-messages');
+      if (document.querySelector(`[data-shared-id="${msg.id}"]`)) return;
+      const isUser = msg.role === 'user';
+      const isAi = msg.role === 'assistant';
+      const row = document.createElement('div');
+      row.className = 'msg-row' + (isUser ? ' user-row' : '');
+      row.dataset.sharedId = msg.id;
+      let avHTML;
+      if (isAi) avHTML = '<div class="msg-avatar ai-av">V</div>';
+      else if (msg.photoURL) avHTML = `<div class="msg-avatar user-av-pic"><img src="${escHtml(msg.photoURL)}" alt=""></div>`;
+      else avHTML = `<div class="msg-avatar user-av-txt">${(msg.displayName || 'U')[0].toUpperCase()}</div>`;
+      const who = isAi ? 'VEXIS' : (msg.displayName || 'Anonymous');
+      row.innerHTML = `${avHTML}<div class="msg-body"><div style="font-family:var(--font-pixel);font-size:6px;color:var(--muted);margin-bottom:2px">${escHtml(who)}</div><div class="msg-bubble">${escHtml(msg.text || '')}</div></div>`;
+      container.appendChild(row);
+    }
+
+    async function sendSharedAiMessage() {
+      if (!currentUser) { showToast('SIGN IN TO PARTICIPATE'); return; }
+      const input = document.getElementById('shared-chat-input');
+      const text = input.value.trim(); if (!text) return;
+      input.value = ''; input.disabled = true;
+      // Save user message
+      await db.collection('sharedAiMessages').add({ role: 'user', text, userId: currentUser.uid, displayName: currentUser.displayName || 'Anonymous', photoURL: _sessionPhoto || currentUser.photoURL || null, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+      addNotif('✦', 'Shared AI', `You: ${text.slice(0,40)}`, () => showSection('shared-ai'));
+      try {
+        // Get last 10 messages for context
+        const histSnap = await db.collection('sharedAiMessages').orderBy('timestamp','desc').limit(10).get();
+        const history = [];
+        histSnap.forEach(doc => history.unshift({ role: doc.data().role, content: doc.data().text }));
+        const reply = await callOpenAI(history);
+        await db.collection('sharedAiMessages').add({ role: 'assistant', text: reply, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        addNotif('✦', 'VEXIS replied', reply.slice(0, 50), () => showSection('shared-ai'));
+      } catch (err) { showToast('AI ERROR: ' + err.message); }
+      input.disabled = false; input.focus();
+    }
+
+    document.getElementById('shared-chat-send').addEventListener('click', sendSharedAiMessage);
+    document.getElementById('shared-chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSharedAiMessage(); } });
 
     init();
     startIncomingCallListener();
