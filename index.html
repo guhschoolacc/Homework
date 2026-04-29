@@ -2705,49 +2705,6 @@
     .conv-search-match{background:rgba(255,215,0,.25);border-radius:2px}
 
 
-
-    /* ─── COMMAND PALETTE ─── */
-    #cmd-palette{display:none;position:fixed;inset:0;z-index:960;background:rgba(0,0,0,.75);align-items:flex-start;justify-content:center;padding-top:100px}
-    #cmd-palette.open{display:flex}
-    .cmd-box{background:var(--modal-bg);border:var(--border);width:100%;max-width:580px;overflow:hidden;animation:modalDrop .15s ease forwards}
-    .cmd-input-row{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:var(--border)}
-    .cmd-input{flex:1;font-family:var(--font-mono);font-size:15px;background:none;border:none;outline:none;color:var(--fg)}
-    .cmd-results{max-height:380px;overflow-y:auto}
-    .cmd-item{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bg2);transition:background .08s}
-    .cmd-item:hover,.cmd-item.cmd-selected{background:var(--bg2)}
-    .cmd-item-icon{font-size:16px;width:24px;text-align:center;flex-shrink:0}
-    .cmd-item-body{flex:1;min-width:0}
-    .cmd-item-label{font-family:var(--font-pixel);font-size:8px;margin-bottom:2px}
-    .cmd-item-sub{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
-    .cmd-item-kbd{font-family:var(--font-mono);font-size:10px;padding:2px 6px;border:1px solid var(--border-col);color:var(--muted);flex-shrink:0;border-radius:3px}
-    .cmd-section{font-family:var(--font-pixel);font-size:6px;color:var(--muted);padding:8px 16px 4px;letter-spacing:1px}
-
-    /* ─── SITE STATS ─── */
-    #stats-section{max-width:780px;margin:0 auto}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-    .stat-card{border:var(--border);background:var(--card-bg);padding:18px 16px}
-    .stat-card-val{font-family:var(--font-pixel);font-size:20px;margin-bottom:6px}
-    .stat-card-label{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
-    .stat-card-sub{font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-top:4px}
-    .stats-section-title{font-family:var(--font-pixel);font-size:9px;margin:20px 0 12px;padding-bottom:8px;border-bottom:var(--border);letter-spacing:2px}
-
-    /* ─── FRIEND ACTIVITY ─── */
-    .friend-activity-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bg2)}
-    .fa-av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-fg);font-family:var(--font-pixel);font-size:11px;position:relative}
-    .fa-av img{width:100%;height:100%;object-fit:cover}
-    .fa-status-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid var(--modal-bg)}
-    .fa-body{flex:1;min-width:0}
-    .fa-name{font-family:var(--font-pixel);font-size:8px;margin-bottom:2px}
-    .fa-activity{font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .fa-time{font-size:10px;color:var(--muted);white-space:nowrap}
-
-    /* ─── AI MEMORY ─── */
-    .memory-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bg2);font-family:var(--font-mono);font-size:12px}
-    .memory-item button{background:none;border:none;color:#f55;cursor:pointer;font-size:12px;flex-shrink:0}
-    #ai-memory-panel{display:none;border:var(--border);background:var(--modal-bg);margin-top:8px}
-    #ai-memory-panel.show{display:block}
-    .memory-hdr{font-family:var(--font-pixel);font-size:7px;padding:8px 12px;border-bottom:var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg2)}
-
     /* ─── ANNOUNCEMENT BANNER ─── */
     #announcement-banner{display:none;background:var(--accent);color:var(--accent-fg);padding:8px 16px;font-family:var(--font-mono);font-size:12px;text-align:center;position:relative;z-index:299;border-bottom:2px solid rgba(0,0,0,.2)}
     #announcement-banner.show{display:block}
@@ -3017,7 +2974,6 @@
           style="display:none">0</span></button>
       <button class="nav-btn" id="nav-changelog">📋 LOG</button>
       <button class="nav-btn" id="nav-activity">📡 FEED</button>
-      <button class="nav-btn" id="nav-stats">📊 STATS</button>
       <button class="nav-btn" id="nav-shared-ai">✦ SHARED AI</button>
       <button class="nav-btn" id="nav-other">◈ OTHER</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
@@ -3025,7 +2981,6 @@
     </div>
     <div class="nav-right">
       <button class="nav-icon-btn" id="search-nav-btn" title="Search (Ctrl+K)" onclick="openSearch()">🔍</button>
-      <button class="nav-icon-btn" id="cmd-nav-btn" title="Command Palette (Ctrl+Shift+P)" onclick="openCmdPalette()">⌘</button>
       <button class="nav-icon-btn" id="notif-bell-btn" title="Notifications">🔔<span id="notif-bell-count"></span></button>
       <button class="nav-icon-btn" id="nav-settings-btn" title="Settings">⚙</button>
       <button class="nav-icon-btn" id="nav-auth-btn" title="Login">👤</button>
@@ -3385,24 +3340,10 @@
               <button class="tool-btn" id="attach-img-btn">📷 IMAGE</button>
               <button class="tool-btn" id="new-conv-btn">+ NEW</button>
               <button class="tool-btn" id="history-btn">📁 HISTORY</button>
-              <button class="tool-btn" id="memory-btn">🧠 MEMORY</button>
               <input type="file" id="image-upload-input" accept="image/*">
             </div>
           </div>
         </div>
-        <!-- AI Memory Panel -->
-        <div id="ai-memory-panel">
-          <div class="memory-hdr">
-            <span>🧠 VEXIS MEMORY</span>
-            <button class="tool-btn" style="font-size:6px" onclick="clearAllMemory()">CLEAR ALL</button>
-          </div>
-          <div id="memory-list"></div>
-          <div style="padding:8px;border-top:var(--border);display:flex;gap:6px">
-            <input class="settings-input" id="memory-manual-input" placeholder="Add a memory manually..." style="margin:0;flex:1;font-size:12px">
-            <button class="tool-btn" onclick="addMemoryManual()">+ ADD</button>
-          </div>
-        </div>
-
         <!-- Inline conversation history panel -->
         <div class="conv-panel" id="home-conv-panel" style="display:none;margin-top:14px;">
           <div class="conv-panel-hdr">
@@ -3469,23 +3410,6 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="section" id="stats-section">
-    <div class="section-title">📊 SITE STATISTICS</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="admin-action-btn ghost" onclick="loadSiteStats()" style="font-size:7px">↺ REFRESH</button>
-    </div>
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-users">—</div><div class="stat-card-label">TOTAL USERS</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-msgs">—</div><div class="stat-card-label">MESSAGES SENT</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-online">—</div><div class="stat-card-label">ONLINE NOW</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-groups">—</div><div class="stat-card-label">GROUP CHATS</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-dms">—</div><div class="stat-card-label">DM CONVOS</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-shared">—</div><div class="stat-card-label">SHARED AI MSGS</div></div>
-    </div>
-    <div class="stats-section-title">TOP ACTIVITY</div>
-    <div id="stats-top-users" style="border:var(--border);background:var(--modal-bg)"></div>
   </section>
 
   <section class="section" id="other-section">
@@ -3571,14 +3495,6 @@
     <div class="big-btn-row">
       <button class="big-btn" id="open-social-chat-btn">💬 COMMUNITY CHAT</button>
       <button class="big-btn" id="open-dm-btn-social">✉ DIRECT MESSAGES</button>
-      <button class="big-btn" id="open-friend-activity-btn">👥 FRIEND ACTIVITY</button>
-    </div>
-    <div id="friend-activity-panel" style="display:none;border:var(--border);background:var(--modal-bg);margin-bottom:16px">
-      <div style="font-family:var(--font-pixel);font-size:8px;padding:10px 14px;border-bottom:var(--border);background:var(--bg2);display:flex;justify-content:space-between;align-items:center">
-        <span>👥 FRIEND ACTIVITY</span>
-        <button class="modal-close" onclick="document.getElementById('friend-activity-panel').style.display='none'">✕</button>
-      </div>
-      <div id="friend-activity-list"><div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">Loading...</div></div>
     </div>
     <p style="font-size:13px;color:var(--muted);line-height:1.8;">
       Chat with other homewrk 3.0 users in real time.<br>
@@ -3981,18 +3897,6 @@
 </div>
 
 
-<!-- COMMAND PALETTE -->
-<div id="cmd-palette">
-  <div class="cmd-box">
-    <div class="cmd-input-row">
-      <span style="font-family:var(--font-pixel);font-size:9px;color:var(--accent)">⌘</span>
-      <input class="cmd-input" id="cmd-input" placeholder="Type a command...">
-      <span class="cmd-item-kbd">ESC</span>
-    </div>
-    <div class="cmd-results" id="cmd-results"></div>
-  </div>
-</div>
-
 <!-- GLOBAL SEARCH OVERLAY -->
 <div id="search-overlay">
   <div class="search-box">
@@ -4115,7 +4019,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     /* =====================================================
        CONFIGURATION
@@ -4146,7 +4049,201 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
+
+    /* =====================================================
+       NGROK FIRESTORE SHIM
+       Replace NGROK_URL with your active ngrok tunnel URL.
+       Your backend should implement the REST routes described
+       in each method below.
+    ===================================================== */
+    const NGROK_URL = "https://craftwork-trout-swoosh.ngrok-free.dev"; // ← SET THIS
+
+    // ── FieldValue sentinels ─────────────────────────────
+    const _FV = {
+      serverTimestamp: () => ({ __fv: 'serverTimestamp' }),
+      increment: (n)    => ({ __fv: 'increment', value: n }),
+      arrayUnion: (...v) => ({ __fv: 'arrayUnion', values: v }),
+      arrayRemove: (...v)=> ({ __fv: 'arrayRemove', values: v }),
+      delete:     ()    => ({ __fv: 'delete' }),
+    };
+    // Patch firebase.firestore namespace so existing FieldValue calls work
+    if (!firebase.firestore) firebase.firestore = {};
+    firebase.firestore.FieldValue = _FV;
+
+    // ── Auth token helper ────────────────────────────────
+    async function _getToken() {
+      if (auth.currentUser) {
+        try { return await auth.currentUser.getIdToken(); } catch (_) {}
+      }
+      return null;
+    }
+
+    // ── Core fetch helper ────────────────────────────────
+    async function _fsReq(method, path, body) {
+      const token = await _getToken();
+      const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const opts = { method, headers };
+      if (body !== undefined) opts.body = JSON.stringify(body);
+      const res = await fetch(NGROK_URL + '/firestore' + path, opts);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Firestore shim [${method} ${path}]: ${res.status} ${text}`);
+      }
+      return res.json();
+    }
+
+    // ── DocumentSnapshot wrapper ─────────────────────────
+    function _docSnap(id, raw) {
+      return {
+        id,
+        exists: raw !== null && raw !== undefined,
+        data: () => (raw || null),
+        get: (field) => raw ? raw[field] : undefined,
+      };
+    }
+
+    // ── QuerySnapshot wrapper ────────────────────────────
+    function _querySnap(docsArr) {
+      const docs = docsArr.map(d => _docSnap(d.id, d.data));
+      return {
+        docs,
+        empty: docs.length === 0,
+        size: docs.length,
+        forEach: (fn) => docs.forEach(fn),
+      };
+    }
+
+    // ── Query builder (supports where / orderBy / limit) ─
+    function _makeQuery(collPath, constraints = []) {
+      const q = {
+        _path: collPath,
+        _constraints: constraints,
+
+        where(field, op, value) {
+          return _makeQuery(collPath, [...constraints, { type: 'where', field, op, value }]);
+        },
+        orderBy(field, dir = 'asc') {
+          return _makeQuery(collPath, [...constraints, { type: 'orderBy', field, dir }]);
+        },
+        limit(n) {
+          return _makeQuery(collPath, [...constraints, { type: 'limit', value: n }]);
+        },
+        async get() {
+          const res = await _fsReq('POST', collPath + '/_query', { constraints });
+          return _querySnap(res.docs || []);
+        },
+        onSnapshot(onNext, onError) {
+          let lastJson = '';
+          const poll = async () => {
+            try {
+              const res = await _fsReq('POST', collPath + '/_query', { constraints });
+              const j = JSON.stringify(res.docs);
+              if (j !== lastJson) { lastJson = j; onNext(_querySnap(res.docs || [])); }
+            } catch (e) { if (onError) onError(e); }
+          };
+          poll();
+          const timer = setInterval(poll, 3000);
+          return () => clearInterval(timer); // unsubscribe
+        },
+      };
+      return q;
+    }
+
+    // ── DocumentRef ──────────────────────────────────────
+    function _docRef(path) {
+      return {
+        id: path.split('/').pop(),
+        _path: path,
+
+        collection(name) { return _collRef(path + '/' + name); },
+
+        async get() {
+          const res = await _fsReq('GET', '/' + path);
+          return _docSnap(res.id || path.split('/').pop(), res.data);
+        },
+        async set(data, opts = {}) {
+          await _fsReq('PUT', '/' + path, { data, merge: opts.merge || false });
+        },
+        async update(data) {
+          await _fsReq('PATCH', '/' + path, { data });
+        },
+        async delete() {
+          await _fsReq('DELETE', '/' + path);
+        },
+        onSnapshot(onNext, onError) {
+          let lastJson = '';
+          const poll = async () => {
+            try {
+              const res = await _fsReq('GET', '/' + path);
+              const j = JSON.stringify(res.data);
+              if (j !== lastJson) { lastJson = j; onNext(_docSnap(res.id || path.split('/').pop(), res.data)); }
+            } catch (e) { if (onError) onError(e); }
+          };
+          poll();
+          const timer = setInterval(poll, 3000);
+          return () => clearInterval(timer);
+        },
+      };
+    }
+
+    // ── CollectionRef ────────────────────────────────────
+    function _collRef(collPath) {
+      const basePath = '/' + collPath;
+      return {
+        _path: basePath,
+
+        doc(id) {
+          if (!id) id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+          return _docRef(collPath + '/' + id);
+        },
+        async add(data) {
+          const res = await _fsReq('POST', basePath, { data });
+          return _docRef(collPath + '/' + res.id);
+        },
+        async get() {
+          const res = await _fsReq('POST', basePath + '/_query', { constraints: [] });
+          return _querySnap(res.docs || []);
+        },
+        where(field, op, value) {
+          return _makeQuery(basePath, [{ type: 'where', field, op, value }]);
+        },
+        orderBy(field, dir = 'asc') {
+          return _makeQuery(basePath, [{ type: 'orderBy', field, dir }]);
+        },
+        limit(n) {
+          return _makeQuery(basePath, [{ type: 'limit', value: n }]);
+        },
+        onSnapshot(onNext, onError) {
+          return _makeQuery(basePath, []).onSnapshot(onNext, onError);
+        },
+      };
+    }
+
+    // ── Batch ────────────────────────────────────────────
+    function _batch() {
+      const ops = [];
+      return {
+        set(docRef, data, opts = {}) {
+          ops.push({ op: 'set', path: docRef._path, data, merge: opts.merge || false });
+        },
+        update(docRef, data) {
+          ops.push({ op: 'update', path: docRef._path, data });
+        },
+        delete(docRef) {
+          ops.push({ op: 'delete', path: docRef._path });
+        },
+        async commit() {
+          await _fsReq('POST', '/_batch', { ops });
+        },
+      };
+    }
+
+    // ── Main db object (mirrors firebase.firestore()) ────
+    const db = {
+      collection: (name) => _collRef(name),
+      batch: _batch,
+    };
 
     /* =====================================================
        STATE
@@ -4354,7 +4451,6 @@
       "social": "nav-social",
       "changelog": "nav-changelog",
       "activity": "nav-activity",
-      "stats": "nav-stats",
       "other": "nav-other",
       "shared-ai": "nav-shared-ai",
       "admin": "nav-owner",
@@ -4380,7 +4476,6 @@
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
     document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
     document.getElementById("nav-activity").addEventListener("click", () => { showSection("activity"); loadActivityFeed(); });
-    document.getElementById("nav-stats").addEventListener("click", () => { showSection("stats"); loadSiteStats(); });
     document.getElementById("nav-other").addEventListener("click", () => showSection("other"));
     document.getElementById("nav-shared-ai").addEventListener("click", () => { showSection("shared-ai"); loadSharedAiChat(); });
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
@@ -4424,7 +4519,6 @@
     ===================================================== */
     document.addEventListener("keydown", e => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); openSearch(); return; }
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "P") { e.preventDefault(); openCmdPalette(); return; }
       if (e.key === "Escape") { closeSearch(); closeMsgSearch(); document.getElementById("search-overlay").classList.remove("open"); }
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
       const key = settings.panicKey || "'";
@@ -5082,10 +5176,6 @@
           } else {
             _sessionPhoto = null;
           }
-          // Use Firestore displayName (may differ from Auth if owner changed it)
-          if (firestoreData.displayName && firestoreData.displayName !== user.displayName) {
-            try { await user.updateProfile({ displayName: firestoreData.displayName }); } catch (_) {}
-          }
           // Re-render nav + all my avatars now that we have the correct photo
           syncMyPhoto(firestoreData.photoURL || currentUser.photoURL || null);
           // Merge update
@@ -5330,7 +5420,7 @@
       const msgData = {
         userId: currentUser.uid,
         displayName: currentUser.displayName || "Anonymous",
-        photoURL: _sessionPhoto || currentUser.photoURL || null,
+        photoURL: currentUser.photoURL || null,
         text: text || null,
         gifUrl: gifUrl || null,
         imageUrl: imageUrl || null,
@@ -5611,49 +5701,34 @@
       });
     }
 
-    let _dmSearchTimer = null;
-    async function searchDmUsers(query) {
+    async function searchDmUsers() {
       if (!currentUser) return;
-      if (query === undefined) query = document.getElementById("dm-search-input").value.trim();
+      const query = document.getElementById("dm-search-input").value.trim();
+      if (!query) return;
       const results = document.getElementById("dm-search-results");
-      if (!query) { results.classList.remove("show"); return; }
       results.innerHTML = '<div style="padding:8px 10px;font-size:12px;color:var(--muted);">Searching...</div>';
       results.classList.add("show");
       try {
-        // Get all users and do client-side fuzzy match for better results
-        const snap = await db.collection("users").limit(60).get();
-        const ql = query.toLowerCase();
-        const allUsers = [];
-        snap.forEach(doc => { const u = doc.data(); if (u.uid !== currentUser.uid) allUsers.push(u); });
-        // Score by how well the name matches
-        const scored = allUsers
-          .map(u => {
-            const name = (u.displayName || "").toLowerCase();
-            let score = 0;
-            if (name === ql) score = 100;
-            else if (name.startsWith(ql)) score = 80;
-            else if (name.includes(ql)) score = 60;
-            else {
-              // fuzzy: count matching chars in sequence
-              let qi = 0;
-              for (let i = 0; i < name.length && qi < ql.length; i++) { if (name[i] === ql[qi]) qi++; }
-              if (qi === ql.length) score = 30;
-            }
-            return { u, score };
-          })
-          .filter(x => x.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 8);
+        // Prefix search by displayName
+        const snap = await db.collection("users")
+          .where("displayName", ">=", query)
+          .where("displayName", "<=", query + "\uf8ff")
+          .limit(8)
+          .get();
         results.innerHTML = "";
-        if (!scored.length) { results.innerHTML = '<div style="padding:8px 10px;font-size:12px;color:var(--muted);">No users found.</div>'; return; }
-        scored.forEach(({ u: user }) => {
+        if (snap.empty) {
+          results.innerHTML = '<div style="padding:8px 10px;font-size:12px;color:var(--muted);">No users found.</div>';
+          return;
+        }
+        snap.forEach(doc => {
+          const user = doc.data();
+          if (user.uid === currentUser.uid) return; // skip self
           const item = document.createElement("div");
           item.className = "dm-user-result";
           const avHTML = user.photoURL
             ? `<div class="dm-user-av"><img src="${escHtml(user.photoURL)}" alt=""></div>`
             : `<div class="dm-user-av">${(user.displayName || "?")[0].toUpperCase()}</div>`;
-          const statusDot = getActivityStatus(user.lastSeen).includes("Online") ? '<span style="color:#23d18b;font-size:9px">●</span>' : '';
-          item.innerHTML = `${avHTML}<span>${escHtml(user.displayName || "Anonymous")}</span>${statusDot}`;
+          item.innerHTML = `${avHTML}<span>${escHtml(user.displayName || "Anonymous")}</span>`;
           item.addEventListener("click", () => {
             results.classList.remove("show");
             document.getElementById("dm-search-input").value = "";
@@ -5858,11 +5933,9 @@
       }
     }
 
-    document.getElementById("dm-search-btn").addEventListener("click", () => searchDmUsers());
-    document.getElementById("dm-search-input").addEventListener("keydown", e => { if (e.key === "Enter") searchDmUsers(); });
-    document.getElementById("dm-search-input").addEventListener("input", e => {
-      clearTimeout(_dmSearchTimer);
-      _dmSearchTimer = setTimeout(() => searchDmUsers(e.target.value.trim()), 250);
+    document.getElementById("dm-search-btn").addEventListener("click", searchDmUsers);
+    document.getElementById("dm-search-input").addEventListener("keydown", e => {
+      if (e.key === "Enter") searchDmUsers();
     });
     document.getElementById("dm-send-btn").addEventListener("click", () => sendDmMessage());
     document.getElementById("dm-input").addEventListener("keydown", e => {
@@ -5918,10 +5991,6 @@
     function closeGroupCreateModal() { document.getElementById("group-create-modal").classList.remove("open"); }
     document.getElementById("group-create-modal").addEventListener("click", e => { if (e.target === e.currentTarget) closeGroupCreateModal(); });
     document.getElementById("group-member-search").addEventListener("keydown", e => { if (e.key === "Enter") searchGroupMembers(); });
-    document.getElementById("group-member-search").addEventListener("input", e => {
-      clearTimeout(_grpSearchTimer);
-      _grpSearchTimer = setTimeout(() => searchGroupMembers(e.target.value.trim()), 250);
-    });
 
     async function searchGroupMembers() {
       const query = document.getElementById("group-member-search").value.trim();
@@ -5980,7 +6049,7 @@
       if (pendingGroupMembers.length === 0) { showToast("ADD AT LEAST 1 MEMBER"); return; }
       const memberUids = [currentUser.uid, ...pendingGroupMembers.map(m => m.uid)];
       const memberData = {};
-      memberData[currentUser.uid] = { name: currentUser.displayName||"Me", photo: _sessionPhoto || currentUser.photoURL||null };
+      memberData[currentUser.uid] = { name: currentUser.displayName||"Me", photo: currentUser.photoURL||null };
       pendingGroupMembers.forEach(m => { memberData[m.uid] = { name: m.displayName||"?", photo: m.photoURL||null }; });
       try {
         const ref = await db.collection("groupChats").add({
@@ -6051,7 +6120,6 @@
       if (group.pinnedMsg) showPinnedBar(group.pinnedMsg.text, group.id);
       else { const pb = document.getElementById("pinned-bar"); if (pb) pb.classList.remove("show"); }
       listenGroupMessages(group.id, group);
-      listenGroupCallInvites(group.id);
       // Update sidebar active state
       document.querySelectorAll("#group-conv-list .dm-conv-item").forEach(el => el.classList.toggle("active", el.dataset.gid === group.id));
     }
@@ -6136,7 +6204,7 @@
       const text = overrideText !== undefined ? overrideText : input.value.trim();
       if (!text && !gifUrl && !imageUrl) return;
       if (overrideText === undefined) input.value = "";
-      const msgData = { senderId: currentUser.uid, senderName: currentUser.displayName||"Anonymous", senderPhoto: _sessionPhoto || currentUser.photoURL||null, text: text||null, gifUrl: gifUrl||null, imageUrl: imageUrl||null, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+      const msgData = { senderId: currentUser.uid, senderName: currentUser.displayName||"Anonymous", senderPhoto: currentUser.photoURL||null, text: text||null, gifUrl: gifUrl||null, imageUrl: imageUrl||null, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
       try {
         await db.collection("groupChats").doc(activeGroupId).collection("messages").add(msgData);
         await db.collection("groupChats").doc(activeGroupId).update({ lastMsg: text, lastMsgAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -6389,48 +6457,14 @@
     function addCustomField() { const c = document.getElementById("custom-fields-list"), row = document.createElement("div"); row.className = "custom-field-row"; row.innerHTML = `<input type="text" class="cf-key" placeholder="field name"><input type="text" class="cf-val" placeholder="value"><button class="custom-field-remove">✕</button>`; row.querySelector(".custom-field-remove").onclick = () => row.remove(); c.appendChild(row); }
 
     document.getElementById("drawer-save-btn").addEventListener("click", async () => {
-      if (!drawerUid) return;
-      const statusEl = document.getElementById("drawer-status");
-      statusEl.textContent = "Saving...";
-      const newRole = document.getElementById("df-role").value;
-      const oldUser = adminAllUsers.find(u => u.uid === drawerUid);
-      const oldRole = oldUser?.role || "user";
-      const oldName = oldUser?.displayName || "";
+      if (!drawerUid) return; const statusEl = document.getElementById("drawer-status"); statusEl.textContent = "Saving...";
+      const newRole = document.getElementById("df-role").value, oldUser = adminAllUsers.find(u => u.uid === drawerUid), oldRole = oldUser?.role || "user";
       if (newRole !== oldRole && !canDo("assign-admin")) { showToast("ONLY OWNERS CAN CHANGE ROLES"); statusEl.textContent = ""; return; }
-      const newName = document.getElementById("df-name").value.trim();
-      const updates = { role: newRole };
-      if (newName) updates.displayName = newName;
-      const cv = document.getElementById("df-coins").value;
-      if (cv !== "") updates.coins = Number(cv);
-      document.querySelectorAll(".custom-field-row").forEach(row => {
-        const k = row.querySelector(".cf-key").value.trim(), v = row.querySelector(".cf-val").value.trim();
-        if (k) updates[k] = v;
-      });
-      try {
-        await db.collection("users").doc(drawerUid).update(updates);
-        writeAdminLog("edit", drawerUid, "Updated: " + Object.keys(updates).join(", "));
-
-        // If display name changed, update all their messages in social chat
-        if (newName && newName !== oldName) {
-          statusEl.textContent = "Updating messages...";
-          const msgsSnap = await db.collection("socialMessages").where("userId", "==", drawerUid).get();
-          if (!msgsSnap.empty) {
-            const batch = db.batch();
-            msgsSnap.forEach(doc => batch.update(doc.ref, { displayName: newName }));
-            await batch.commit();
-          }
-          // Also update DM conversation cache display names
-          const dmSnap = await db.collection("directMessages").where("participants", "array-contains", drawerUid).get();
-          // Can't bulk-update DM messages easily but update the conv metadata
-        }
-
-        statusEl.textContent = "✓ Saved";
-        showToast("CHANGES SAVED");
-        setTimeout(() => { statusEl.textContent = ""; }, 2000);
-      } catch (err) {
-        statusEl.textContent = "Error: " + err.message;
-        showToast("SAVE FAILED: " + err.message);
-      }
+      const updates = { role: newRole, displayName: document.getElementById("df-name").value.trim() || undefined };
+      const cv = document.getElementById("df-coins").value; if (cv !== "") updates.coins = Number(cv);
+      document.querySelectorAll(".custom-field-row").forEach(row => { const k = row.querySelector(".cf-key").value.trim(), v = row.querySelector(".cf-val").value.trim(); if (k) updates[k] = v; });
+      try { await db.collection("users").doc(drawerUid).update(updates); writeAdminLog("edit",drawerUid,"Updated: "+Object.keys(updates).join(", ")); statusEl.textContent = "✓ Saved"; showToast("CHANGES SAVED"); setTimeout(() => statusEl.textContent = "", 2000); }
+      catch (err) { statusEl.textContent = "Error: " + err.message; showToast("SAVE FAILED"); }
     });
     document.getElementById("drawer-delmsg-btn").addEventListener("click", () => {
       if (!drawerUid) return; const user = adminAllUsers.find(u => u.uid === drawerUid);
@@ -6705,8 +6739,6 @@
         });
       } catch (err) { showToast("MIC ACCESS DENIED"); await db.collection("calls").doc(callDocId).update({ status: "declined" }); return; }
       isCallerRole = false;
-      const isGroupCall = callDocId && callDocId.startsWith('grp_');
-      const groupId = isGroupCall ? callDocId.replace('grp_', '') : null;
 
       peerConnection = new RTCPeerConnection(STUN_SERVERS);
       localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
@@ -8204,320 +8236,53 @@
     ===================================================== */
     async function startGroupCall(groupId, groupName) {
       if (!currentUser) return;
-      if (peerConnection) { maximizeCall(); return; }
+      // Store call signal in group doc for all members to see
       try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
-      } catch (_) { showToast('MIC ACCESS DENIED'); return; }
-      isCallerRole = true;
-      callDocId = 'grp_' + groupId;
-      peerConnection = new RTCPeerConnection(STUN_SERVERS);
-      localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
-      peerConnection.ontrack = e => { document.getElementById('remote-audio').srcObject = e.streams[0]; };
-      peerConnection.onicecandidate = e => {
-        if (e.candidate) db.collection('groupCalls').doc(groupId).collection('ic_' + currentUser.uid).add(e.candidate.toJSON());
-      };
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      await db.collection('groupCalls').doc(groupId).set({
-        offer: { type: offer.type, sdp: offer.sdp },
-        callerUid: currentUser.uid,
-        callerName: currentUser.displayName || 'Someone',
-        callerPhoto: _sessionPhoto || currentUser.photoURL || null,
-        groupName,
-        status: 'calling',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      activeCallConv = { otherId: null, otherName: groupName, otherPhoto: null };
-      showCallPanel(groupName, null, 'Calling...');
-      callUnsub = db.collection('groupCalls').doc(groupId).onSnapshot(async snap => {
-        const data = snap.data(); if (!data) return;
-        if (data.status === 'ended' || data.status === 'declined') { endCall(true); return; }
-        if (data.answer && peerConnection?.signalingState === 'have-local-offer') {
-          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-          onCallConnected(groupName, null);
-        }
-      });
-      // Listen for callee ICE candidates
-      db.collection('groupCalls').doc(groupId).collection('ic_callee').onSnapshot(snap => {
-        snap.docChanges().forEach(async c => {
-          if (c.type === 'added' && peerConnection) try { await peerConnection.addIceCandidate(new RTCIceCandidate(c.doc.data())); } catch (_) {}
+        await db.collection('groupChats').doc(groupId).update({
+          activeCall: { callerUid: currentUser.uid, callerName: currentUser.displayName || 'Someone', callerPhoto: _sessionPhoto || currentUser.photoURL || null, startedAt: firebase.firestore.FieldValue.serverTimestamp() }
         });
-      });
+        // Use existing DM call UI but mark as group
+        callDocId = 'groupcall_' + groupId;
+        showToast('STARTING GROUP CALL...');
+        // Trigger standard call flow - simplified to voice
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+        } catch (_) { showToast('MIC ACCESS DENIED'); return; }
+        peerConnection = new RTCPeerConnection(STUN_SERVERS);
+        localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+        peerConnection.ontrack = e => { document.getElementById('remote-audio').srcObject = e.streams[0]; };
+        peerConnection.onicecandidate = e => { if (e.candidate) db.collection('groupCalls').doc(groupId).collection('candidates_' + currentUser.uid).add(e.candidate.toJSON()); };
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        await db.collection('groupCalls').doc(groupId).set({ offer: { type: offer.type, sdp: offer.sdp }, callerUid: currentUser.uid, callerName: currentUser.displayName || 'Someone', status: 'calling', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showCallPanel(groupName, null, 'Group Call - Calling...');
+        activeCallConv = { otherId: null, otherName: groupName, otherPhoto: null };
+        callUnsub = db.collection('groupCalls').doc(groupId).onSnapshot(async snap => {
+          const data = snap.data();
+          if (!data) return;
+          if (data.status === 'ended') { endCall(true); return; }
+          if (data.answer && peerConnection?.signalingState === 'have-local-offer') {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            onCallConnected(groupName, null);
+          }
+        });
+      } catch (err) { showToast('ERROR: ' + err.message); }
     }
 
-        function listenGroupCallInvites(groupId) {
+    // Listen for group call invites
+    function listenGroupCallInvites(groupId) {
       db.collection('groupCalls').doc(groupId).onSnapshot(snap => {
         const data = snap.data();
         if (!data || data.status !== 'calling' || data.callerUid === currentUser?.uid) return;
         if (peerConnection) return;
         const age = data.createdAt ? Date.now() - data.createdAt.toMillis() : 0;
         if (age > 30000) return;
-        callDocId = 'grp_' + groupId;
-        incomingCallData = { ...data };
-        activeCallConv = { otherId: data.callerUid, otherName: data.groupName || data.callerName, otherPhoto: data.callerPhoto };
-        showIncomingToast((data.callerName || 'Someone') + ' — ' + (data.groupName || 'Group'), data.callerPhoto || null);
+        callDocId = 'groupcall_' + groupId;
+        incomingCallData = data;
+        showIncomingToast(data.callerName || 'Someone', data.callerPhoto || null);
+        document.getElementById('incoming-sub') && (document.getElementById('incoming-sub').textContent = 'Group Call');
       }, () => {});
     }
-
-    /* =====================================================
-       AI MEMORY SYSTEM
-    ===================================================== */
-    function getMemoryKey() { return currentUser ? `hw3_memory_${currentUser.uid}` : null; }
-    function loadMemories() {
-      const k = getMemoryKey(); if (!k) return [];
-      try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (_) { return []; }
-    }
-    function saveMemories(mems) {
-      const k = getMemoryKey(); if (!k) return;
-      try { localStorage.setItem(k, JSON.stringify(mems.slice(0, 50))); } catch (_) {}
-    }
-    function addMemory(text) {
-      if (!text || !currentUser) return;
-      const mems = loadMemories();
-      // Avoid duplicates
-      if (mems.some(m => m.text.toLowerCase() === text.toLowerCase())) return;
-      mems.unshift({ text, ts: Date.now() });
-      saveMemories(mems);
-      renderMemoryPanel();
-    }
-    function deleteMemory(idx) {
-      const mems = loadMemories(); mems.splice(idx, 1); saveMemories(mems); renderMemoryPanel();
-    }
-    function clearAllMemory() {
-      if (!confirm('Clear all memories?')) return;
-      saveMemories([]); renderMemoryPanel(); showToast('MEMORY CLEARED');
-    }
-    function addMemoryManual() {
-      const inp = document.getElementById('memory-manual-input');
-      const text = inp?.value.trim(); if (!text) return;
-      addMemory(text); inp.value = ''; showToast('MEMORY ADDED');
-    }
-    function renderMemoryPanel() {
-      const list = document.getElementById('memory-list');
-      const mems = loadMemories();
-      if (!mems.length) { list.innerHTML = '<div style="padding:12px;text-align:center;font-size:12px;color:var(--muted)">No memories yet. VEXIS will learn as you chat.</div>'; return; }
-      list.innerHTML = '';
-      mems.forEach((m, i) => {
-        const div = document.createElement('div'); div.className = 'memory-item';
-        const date = new Date(m.ts).toLocaleDateString();
-        div.innerHTML = `<span style="flex:1">${escHtml(m.text)}</span><span style="font-size:9px;color:var(--muted);flex-shrink:0;margin-right:6px">${date}</span><button onclick="deleteMemory(${i})" title="Delete">✕</button>`;
-        list.appendChild(div);
-      });
-    }
-    function getMemoryPrompt() {
-      const mems = loadMemories();
-      if (!mems.length) return '';
-      return '\n\nYou have the following memories about this user (from past conversations):\n' + mems.slice(0, 15).map(m => `- ${m.text}`).join('\n') + '\nUse these naturally to personalize your responses.';
-    }
-    // Auto-extract memories from AI responses
-    function extractMemoriesFromConversation(userText, aiReply) {
-      if (!userText || !aiReply) return;
-      // Simple pattern matching for facts the user shares
-      const patterns = [
-        /\bmy name is (\w+)/i, /\bi('m| am) (\d+) years? old/i,
-        /\bi (like|love|enjoy|prefer) ([^.!?]+)/i, /\bi ('m|am) (?:a |an )?([^.!?,]+)/i,
-        /\bi (hate|dislike|don't like) ([^.!?]+)/i, /\bmy favorite ([^.!?]+) is ([^.!?]+)/i,
-        /\bi (?:work|study|go) (?:at|in|to) ([^.!?]+)/i
-      ];
-      for (const pat of patterns) {
-        const m = userText.match(pat);
-        if (m) { addMemory(userText.slice(0, 80).trim()); break; }
-      }
-    }
-
-    document.getElementById('memory-btn').addEventListener('click', () => {
-      const panel = document.getElementById('ai-memory-panel');
-      const isOpen = panel.classList.contains('show');
-      panel.classList.toggle('show', !isOpen);
-      if (!isOpen) renderMemoryPanel();
-    });
-
-    // Patch callOpenAI to include memory
-    const _origCallOpenAI = callOpenAI;
-    callOpenAI = async function(msgs) {
-      const memPrompt = getMemoryPrompt();
-      const systemPrompt = (AI_PERSONAS[currentPersona] || AI_PERSONAS.default) + memPrompt;
-      const resp = await fetch("/api/chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: msgs, system: systemPrompt })
-      });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.error || "Request failed");
-      // Try to extract memory from last user message
-      const lastUser = [...msgs].reverse().find(m => m.role === 'user');
-      if (lastUser) {
-        const txt = typeof lastUser.content === 'string' ? lastUser.content : (lastUser.content.find?.(c => c.type === 'text')?.text || '');
-        extractMemoriesFromConversation(txt, data.reply);
-      }
-      return data.reply;
-    };
-
-    /* =====================================================
-       FRIEND ACTIVITY
-    ===================================================== */
-    document.getElementById('open-friend-activity-btn').addEventListener('click', async () => {
-      const panel = document.getElementById('friend-activity-panel');
-      panel.style.display = 'block';
-      await loadFriendActivity();
-    });
-
-    async function loadFriendActivity() {
-      if (!currentUser) return;
-      const list = document.getElementById('friend-activity-list');
-      list.innerHTML = '<div style="padding:12px;text-align:center;font-size:12px;color:var(--muted)">Loading...</div>';
-      try {
-        const friendsDoc = await db.collection('friends').doc(currentUser.uid).get();
-        const friendIds = friendsDoc.data()?.list || [];
-        if (!friendIds.length) {
-          list.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">No friends yet. Add friends from their profile card.</div>';
-          return;
-        }
-        // Fetch friend profiles
-        const chunks = []; for (let i = 0; i < friendIds.length; i += 10) chunks.push(friendIds.slice(i, i+10));
-        const friends = [];
-        for (const chunk of chunks) {
-          const snap = await db.collection('users').where('uid','in',chunk).get();
-          snap.forEach(doc => friends.push(doc.data()));
-        }
-        friends.sort((a, b) => (b.lastSeen?.toMillis?.()??0) - (a.lastSeen?.toMillis?.()??0));
-        list.innerHTML = '';
-        if (!friends.length) { list.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">Couldn\'t load friends.</div>'; return; }
-        friends.forEach(f => {
-          const ms = f.lastSeen?.toMillis?.() ?? 0;
-          const diff = Date.now() - ms;
-          const isOnline = diff < 5*60*1000, isAway = diff < 30*60*1000;
-          const dotColor = isOnline ? '#23d18b' : isAway ? '#f9c74f' : '#72767d';
-          const statusText = isOnline ? 'Online' : isAway ? 'Away' : 'Offline';
-          const activity = f.statusMsg ? `"${f.statusMsg}"` : statusText;
-          const rel = ms ? (getRelativeTime(ms) || new Date(ms).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})) : 'Never';
-          const av = f.photoURL ? `<img src="${escHtml(f.photoURL)}" alt="">` : (f.displayName||'?')[0].toUpperCase();
-          const div = document.createElement('div'); div.className = 'friend-activity-item';
-          div.innerHTML = `<div class="fa-av">${av}<div class="fa-status-dot" style="background:${dotColor}"></div></div><div class="fa-body"><div class="fa-name">${escHtml(f.displayName||'Anonymous')}</div><div class="fa-activity">${escHtml(activity)}</div></div><div class="fa-time">${rel}</div>`;
-          div.addEventListener('click', () => showUserProfileCard(f.uid, div));
-          list.appendChild(div);
-        });
-      } catch (err) { list.innerHTML = `<div style="padding:12px;font-size:12px;color:#f55">Error: ${escHtml(err.message)}</div>`; }
-    }
-
-    /* =====================================================
-       SITE STATISTICS
-    ===================================================== */
-    async function loadSiteStats() {
-      // Fetch all collections in parallel
-      try {
-        document.getElementById('stat-s-users').textContent = '...';
-        const [usersSnap, msgsSnap, groupsSnap, dmsSnap, sharedSnap] = await Promise.all([
-          db.collection('users').get(),
-          db.collection('socialMessages').get(),
-          db.collection('groupChats').get(),
-          db.collection('directMessages').get(),
-          db.collection('sharedAiMessages').get()
-        ]);
-        const now = Date.now();
-        const onlineCount = (() => {
-          let c = 0;
-          usersSnap.forEach(doc => {
-            const d = doc.data();
-            const ms = d.lastSeen?.toMillis?.() ?? 0;
-            if (now - ms < 5*60*1000) c++;
-          });
-          return c;
-        })();
-        document.getElementById('stat-s-users').textContent = usersSnap.size;
-        document.getElementById('stat-s-msgs').textContent = msgsSnap.size;
-        document.getElementById('stat-s-online').textContent = onlineCount;
-        document.getElementById('stat-s-groups').textContent = groupsSnap.size;
-        document.getElementById('stat-s-dms').textContent = dmsSnap.size;
-        document.getElementById('stat-s-shared').textContent = sharedSnap.size;
-        // Top users by message count
-        const msgsByUser = {};
-        msgsSnap.forEach(doc => {
-          const d = doc.data();
-          if (!d.userId) return;
-          if (!msgsByUser[d.userId]) msgsByUser[d.userId] = { name: d.displayName||'?', photo: d.photoURL, count: 0 };
-          msgsByUser[d.userId].count++;
-        });
-        const topUsers = Object.values(msgsByUser).sort((a,b) => b.count - a.count).slice(0,5);
-        const topEl = document.getElementById('stats-top-users');
-        topEl.innerHTML = '';
-        topUsers.forEach((u, i) => {
-          const av = u.photo ? `<img src="${escHtml(u.photo)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:var(--border)">` : `<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:flex;align-items:center;justify-content:center;font-family:var(--font-pixel);font-size:10px;flex-shrink:0">${(u.name||'?')[0]}</div>`;
-          const div = document.createElement('div');
-          div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bg2)';
-          div.innerHTML = `<span style="font-family:var(--font-pixel);font-size:10px;color:var(--muted);width:16px">#${i+1}</span>${av}<span style="font-family:var(--font-mono);font-size:13px;flex:1">${escHtml(u.name)}</span><span style="font-family:var(--font-pixel);font-size:8px;color:var(--accent)">${u.count} msgs</span>`;
-          topEl.appendChild(div);
-        });
-      } catch (err) { showToast('STATS ERROR: ' + err.message); }
-    }
-
-    /* =====================================================
-       COMMAND PALETTE
-    ===================================================== */
-    const CMD_COMMANDS = [
-      { icon:'🏠', label:'Go Home', sub:'Open AI chat', kbd:'', action:()=>showSection('home') },
-      { icon:'⬦', label:'Games', sub:'Browse all games', kbd:'', action:()=>showSection('games') },
-      { icon:'⚙', label:'Tools', sub:'Browse all tools', kbd:'', action:()=>showSection('tools') },
-      { icon:'◉', label:'Social', sub:'Community chat', kbd:'', action:()=>showSection('social') },
-      { icon:'✦', label:'Shared AI', sub:'Public AI chat room', kbd:'', action:()=>{ showSection('shared-ai'); loadSharedAiChat(); } },
-      { icon:'📡', label:'Activity Feed', sub:'Recent site activity', kbd:'', action:()=>{ showSection('activity'); loadActivityFeed(); } },
-      { icon:'📊', label:'Site Statistics', sub:'Usage stats', kbd:'', action:()=>{ showSection('stats'); loadSiteStats(); } },
-      { icon:'🔍', label:'Search', sub:'Global search', kbd:'Ctrl+K', action:()=>{ closeCmdPalette(); openSearch(); } },
-      { icon:'🔔', label:'Notifications', sub:'View notifications', kbd:'', action:()=>document.getElementById('notif-bell-btn').click() },
-      { icon:'⚙', label:'Settings', sub:'Open settings panel', kbd:'', action:()=>openSettings() },
-      { icon:'✦', label:'New Chat', sub:'Start a new AI conversation', kbd:'', action:()=>newConversation() },
-      { icon:'🧠', label:'AI Memory', sub:'View/edit VEXIS memory', kbd:'', action:()=>{ showSection('home'); document.getElementById('ai-memory-panel').classList.add('show'); renderMemoryPanel(); } },
-      { icon:'💬', label:'Community Chat', sub:'Open social chat', kbd:'', action:()=>openSocialChat() },
-      { icon:'✉', label:'Direct Messages', sub:'Open DMs', kbd:'', action:()=>openDmModal() },
-      { icon:'📋', label:'Changelog', sub:'View site updates', kbd:'', action:()=>showSection('changelog') },
-      { icon:'👤', label:'Profile / Login', sub:'Account settings', kbd:'', action:()=>{ if(currentUser) openProfileModal(); else openAuthModal(); } },
-      { icon:'🎮', label:'Random Game', sub:'Open a random game', kbd:'', action:()=>{ const g = Object.values(GAMES_URLS); openFullscreen(g[Math.floor(Math.random()*g.length)],'Random'); closeCmdPalette(); } },
-    ];
-    let _cmdIdx = 0, _cmdFiltered = [...CMD_COMMANDS];
-
-    function openCmdPalette() {
-      document.getElementById('cmd-palette').classList.add('open');
-      document.getElementById('cmd-input').value = '';
-      _cmdFiltered = [...CMD_COMMANDS]; _cmdIdx = 0;
-      renderCmdResults();
-      setTimeout(() => document.getElementById('cmd-input').focus(), 30);
-    }
-    function closeCmdPalette() { document.getElementById('cmd-palette').classList.remove('open'); }
-
-    function renderCmdResults(query) {
-      const results = document.getElementById('cmd-results');
-      _cmdFiltered = query
-        ? CMD_COMMANDS.filter(c => c.label.toLowerCase().includes(query.toLowerCase()) || c.sub.toLowerCase().includes(query.toLowerCase()))
-        : CMD_COMMANDS;
-      // Add games/tools to results when searching
-      if (query) {
-        GAMES_LIST.filter(g => g.toLowerCase().includes(query.toLowerCase())).slice(0,4).forEach(g => {
-          _cmdFiltered.push({ icon:'🎮', label:g, sub:'Game', action:()=>{ openFullscreen(GAMES_URLS[g],g); closeCmdPalette(); } });
-        });
-        TOOLS_LIST.filter(t => t.toLowerCase().includes(query.toLowerCase())).slice(0,4).forEach(t => {
-          _cmdFiltered.push({ icon:'🔧', label:t, sub:'Tool', action:()=>{ openFullscreen(TOOLS_URLS[t],t); closeCmdPalette(); } });
-        });
-      }
-      _cmdIdx = 0;
-      results.innerHTML = _cmdFiltered.length ? _cmdFiltered.map((c, i) => `<div class="cmd-item${i===0?' cmd-selected':''}" data-idx="${i}"><div class="cmd-item-icon">${c.icon}</div><div class="cmd-item-body"><div class="cmd-item-label">${escHtml(c.label)}</div><div class="cmd-item-sub">${escHtml(c.sub)}</div></div>${c.kbd?`<span class="cmd-item-kbd">${c.kbd}</span>`:''}</div>`).join('')
-        : '<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">No commands found.</div>';
-      results.querySelectorAll('.cmd-item').forEach(el => {
-        el.addEventListener('click', () => { const i = parseInt(el.dataset.idx); if (_cmdFiltered[i]) { closeCmdPalette(); _cmdFiltered[i].action(); } });
-        el.addEventListener('mouseenter', () => { _cmdIdx = parseInt(el.dataset.idx); updateCmdSelection(); });
-      });
-    }
-    function updateCmdSelection() {
-      document.querySelectorAll('.cmd-item').forEach((el,i) => el.classList.toggle('cmd-selected', i === _cmdIdx));
-      document.querySelectorAll('.cmd-item')[_cmdIdx]?.scrollIntoView({ block:'nearest' });
-    }
-
-    document.getElementById('cmd-palette').addEventListener('click', e => { if (e.target === e.currentTarget) closeCmdPalette(); });
-    document.getElementById('cmd-input').addEventListener('input', e => renderCmdResults(e.target.value.trim()));
-    document.getElementById('cmd-input').addEventListener('keydown', e => {
-      if (e.key === 'ArrowDown') { e.preventDefault(); _cmdIdx = Math.min(_cmdIdx+1, _cmdFiltered.length-1); updateCmdSelection(); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); _cmdIdx = Math.max(_cmdIdx-1, 0); updateCmdSelection(); }
-      else if (e.key === 'Enter') { e.preventDefault(); if (_cmdFiltered[_cmdIdx]) { closeCmdPalette(); _cmdFiltered[_cmdIdx].action(); } }
-      else if (e.key === 'Escape') closeCmdPalette();
-    });
 
     init();
     startIncomingCallListener();
