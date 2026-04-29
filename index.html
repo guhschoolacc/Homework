@@ -3033,6 +3033,111 @@
       letter-spacing: 1px;
     }
     .ad-why-wrap p { color: var(--fg); opacity: 0.8; }
+
+    /* ─── SUPPORT BUTTON ─── */
+    .nav-btn-support {
+      background: var(--accent) !important;
+      color: var(--accent-fg) !important;
+      border-color: var(--accent) !important;
+      margin-left: 6px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      position: relative;
+      box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(0,0,0,0.3);
+      animation: supportPulse 2.5s ease-in-out infinite;
+    }
+    .nav-btn-support:hover, .nav-btn-support.active {
+      filter: brightness(1.15);
+      background: var(--accent) !important;
+      color: var(--accent-fg) !important;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 0 0 2px var(--accent), 0 0 8px rgba(0,0,0,0.2); }
+      50% { box-shadow: 0 0 0 3px var(--accent), 0 0 18px var(--accent); }
+    }
+
+    /* ─── SUPPORT SECTION ─── */
+    #support-section {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .support-hero {
+      border: var(--border);
+      background: var(--bg2);
+      padding: 28px 24px 24px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .support-hero-emoji {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .support-hero-title {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .support-hero-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--fg);
+      opacity: 0.85;
+    }
+    .support-card {
+      border: var(--border);
+      background: var(--bg2);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .support-card-title {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .support-card p {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--fg);
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+    .support-card p:last-child { margin-bottom: 0; }
+    .cashapp-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 12px 22px;
+      background: #00C853;
+      color: #fff;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-decoration: none;
+      border: 2px solid #00C853;
+      cursor: pointer;
+      transition: filter .15s, transform .1s;
+    }
+    .cashapp-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .cashapp-tag {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: bold;
+      color: #00C853;
+      display: block;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 
@@ -3063,6 +3168,7 @@
       <button class="nav-btn" id="nav-other">◈ OTHER</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
       <button class="nav-btn" id="nav-owner" style="display:none;">👑 OWNER</button>
+      <button class="nav-btn nav-btn-support" id="nav-support">💸 SUPPORT</button>
     </div>
     <div class="nav-right">
       <button class="nav-icon-btn" id="search-nav-btn" title="Search (Ctrl+K)" onclick="openSearch()">🔍</button>
@@ -3568,20 +3674,6 @@
     </div>
   </section>
 
-  <!-- Ad break between Games and Tools -->
-  <div class="section" id="games-tools-ad" style="padding-top:0;padding-bottom:0;border:none;background:none;">
-    <div class="ad-unit-wrap" style="max-width:728px;margin:0 auto 0;">
-      <span class="ad-unit-label">◈ Advertisement</span>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-8536521314495863"
-           data-ad-slot="auto"
-           data-ad-format="horizontal"
-           data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div>
-
   <section class="section" id="tools-section">
     <div class="section-title">⚙ TOOLS</div>
     <div class="items-grid" id="tools-grid">
@@ -3655,28 +3747,6 @@
   <section class="section" id="changelog-section">
     <div class="section-title">📋 CHANGELOG</div>
 
-    <!-- Why ads explanation -->
-    <div class="ad-why-wrap">
-      <span class="ad-why-title">💸 WHY ADS?</span>
-      <p>
-        Real talk — I'm broke. Running the AI backend, the server, and keeping this site alive costs real money.
-        Ads help cover that. They're not tracking you weirdly, I'm not selling your soul — I just need to keep the lights on.
-        If you find this site useful, leaving ads unblocked genuinely helps. Thanks for real. 🙏
-      </p>
-    </div>
-
-    <!-- Ad unit -->
-    <div class="ad-unit-wrap">
-      <span class="ad-unit-label">◈ Advertisement</span>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-8536521314495863"
-           data-ad-slot="auto"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-
     <div class="changelog-entry">
       <div class="changelog-entry-hdr"><span>v3.2 — homewrk 3.0 update</span><span>2026</span></div>
       <div class="changelog-entry-body">
@@ -3717,6 +3787,45 @@
           <li>Panic button, tab masking, settings panel</li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <!-- ─── SUPPORT SECTION ─── -->
+  <section class="section" id="support-section">
+    <div id="support-section-inner">
+
+      <div class="support-hero">
+        <span class="support-hero-emoji">💸</span>
+        <span class="support-hero-title">SUPPORT HOMEWRK</span>
+        <p class="support-hero-text">
+          I'm hella broke and this site costs actual money to keep alive.<br><br>
+          The AI (VEXIS) runs on a paid API. The server costs money every month.
+          I built all of this for free for people to use and I don't regret it, but it adds up fast and I'm
+          a regular person with a regular budget trying to keep it running.<br><br>
+          If you use this site and want to help me keep it up, even a dollar or two means a lot.        </p>
+      </div>
+
+      <div class="support-card">
+        <span class="support-card-title">💰 WHAT YOUR SUPPORT COVERS</span>
+        <p>⚡ AI API costs — every message to VEXIS costs money per token</p>
+        <p>🖥 Server hosting — keeps the site and backend online 24/7</p>
+        <p>🌐 Possible domain in the future</p>
+      </div>
+
+      <div class="support-card">
+        <span class="support-card-title">📱 SEND VIA CASHAPP</span>
+        <p>If you want to throw a few bucks my way, CashApp is the easiest way:</p>
+        <span class="cashapp-tag">$guhangelz</span>
+        <p style="opacity:0.55;font-size:11px;">Any amount is appreciated. $1, $2, whatever. It all adds up.</p>
+        <a class="cashapp-btn" href="https://cash.app/$guhangelz" target="_blank" rel="noopener">
+          💚 OPEN CASHAPP → $guhangelz
+        </a>
+      </div>
+
+      <div class="support-card" style="opacity:0.7;font-size:11px;font-family:var(--font-mono);line-height:1.8;text-align:center;">
+        No account? No worries. You can also just use the site, tell a friend about it.
+      </div>
+
     </div>
   </section>
 
@@ -4436,7 +4545,8 @@
       "other": "nav-other",
       "shared-ai": "nav-shared-ai",
       "admin": "nav-owner",
-      "mod": "nav-mod"
+      "mod": "nav-mod",
+      "support": "nav-support"
     };
     function showSection(name) {
       currentSection = name;
@@ -4467,6 +4577,7 @@
     });
     document.getElementById("nav-mod").addEventListener("click", () => showSection("mod"));
     document.getElementById("nav-owner").addEventListener("click", () => showSection("admin"));
+    document.getElementById("nav-support").addEventListener("click", () => showSection("support"));
 
     /* =====================================================
        TOAST
