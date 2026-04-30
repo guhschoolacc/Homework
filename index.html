@@ -3274,7 +3274,21 @@
         <div class="settings-section" id="settings-profile-section" style="display:none;">
           <span class="settings-label">PROFILE</span>
           <input class="settings-input" id="s-display-name" placeholder="Display name">
-          <input class="settings-input" id="s-photo-url" placeholder="Profile photo URL">
+
+          <!-- Avatar upload UI -->
+          <div id="s-avatar-wrap" style="display:flex;align-items:center;gap:14px;margin:10px 0 6px;">
+            <div id="s-avatar-preview" style="width:52px;height:52px;border-radius:50%;border:var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--font-pixel);font-size:14px;overflow:hidden;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+              <label id="s-upload-label" style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:var(--border);background:var(--bg2);color:var(--fg);font-family:var(--font-pixel);font-size:7px;letter-spacing:1px;cursor:pointer;transition:background .1s,color .1s;" onmouseenter="this.style.background='var(--fg)';this.style.color='var(--bg)'" onmouseleave="this.style.background='var(--bg2)';this.style.color='var(--fg)'">
+                📁 UPLOAD PHOTO
+                <input type="file" id="s-avatar-file" accept="image/*" style="display:none;">
+              </label>
+              <span id="s-upload-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"></span>
+            </div>
+          </div>
+          <!-- Fallback URL input -->
+          <input class="settings-input" id="s-photo-url" placeholder="Or paste image URL instead" style="margin-top:4px;">
+
           <input class="settings-input" id="s-status-msg" placeholder="Status message (e.g. Playing Snake, AFK...)">
         </div>
         <button class="settings-save-btn" id="settings-save-btn">SAVE SETTINGS</button>
@@ -3799,7 +3813,7 @@
         <span class="support-hero-title">SUPPORT HOMEWRK</span>
         <p class="support-hero-text">
           I'm hella broke and this site costs actual money to keep alive.<br><br>
-          The AI (VEXIS) runs on a paid API. The server costs money every month.
+          The AI (VEXIS) runs on a paid API and i have to pay for every generation.
           I built all of this for free for people to use and I don't regret it, but it adds up fast and I'm
           a regular person with a regular budget trying to keep it running.<br><br>
           If you use this site and want to help me keep it up, even a dollar or two means a lot.        </p>
@@ -3823,7 +3837,7 @@
       </div>
 
       <div class="support-card" style="opacity:0.7;font-size:11px;font-family:var(--font-mono);line-height:1.8;text-align:center;">
-        No account? No worries. You can also just use the site, tell a friend about it.
+        No account? No worries. You can also just use the site, tell a friend about it, or leave ads unblocked — all of that genuinely helps too. Thanks for being here. ✦
       </div>
 
     </div>
@@ -4303,6 +4317,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script>
     /* =====================================================
        CONFIGURATION
@@ -4334,6 +4349,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     /* =====================================================
        STATE
@@ -4448,18 +4464,58 @@
         document.getElementById("settings-profile-section").style.display = "block";
         document.getElementById("s-display-name").value = currentUser.displayName || "";
         document.getElementById("s-photo-url").value = (currentUser.photoURL && !currentUser.photoURL.startsWith("data:")) ? currentUser.photoURL : "";
+        document.getElementById("s-upload-status").textContent = "";
+        // Show current avatar in preview
+        const prevEl = document.getElementById("s-avatar-preview");
+        const curPhoto = _sessionPhoto || currentUser.photoURL || null;
+        if (prevEl) {
+          if (curPhoto) {
+            prevEl.innerHTML = `<img src="${curPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+          } else {
+            prevEl.textContent = (currentUser.displayName || "U")[0].toUpperCase();
+          }
+        }
+        // Clear any pending file selection
+        document.getElementById("s-avatar-file").value = "";
         // Load status message
         db.collection("users").doc(currentUser.uid).get().then(doc => {
           const sEl = document.getElementById("s-status-msg");
           if (sEl) sEl.value = doc.data()?.statusMsg || "";
         }).catch(() => {});
-        // Show current avatar preview
-        const prev = null; // profile preview removed
-
       } else {
         document.getElementById("settings-profile-section").style.display = "none";
       }
       openModal("settings-modal");
+    }
+
+    // File input: show preview immediately when a file is chosen
+    document.getElementById("s-avatar-file").addEventListener("change", function() {
+      const file = this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        document.getElementById("s-upload-status").textContent = "⚠ File too large (max 5MB)";
+        this.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prevEl = document.getElementById("s-avatar-preview");
+        if (prevEl) prevEl.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+        document.getElementById("s-upload-status").textContent = "✓ Ready to upload — hit Save";
+        document.getElementById("s-photo-url").value = ""; // clear URL field if file chosen
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Upload avatar file to Firebase Storage, return download URL
+    async function uploadAvatarFile(file) {
+      const ext = file.name.split(".").pop() || "jpg";
+      const ref = storage.ref(`users/${currentUser.uid}/avatar.${ext}`);
+      document.getElementById("s-upload-status").textContent = "⏳ Uploading...";
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      document.getElementById("s-upload-status").textContent = "✓ Uploaded!";
+      return url;
     }
 
     document.getElementById("settings-save-btn").addEventListener("click", async () => {
@@ -4476,19 +4532,32 @@
       // Save profile if logged in
       if (currentUser) {
         const dName = document.getElementById("s-display-name").value.trim();
-        const urlInput = document.getElementById("s-photo-url");
-        const finalPhoto = urlInput.value.trim() || null;
         const statusMsg = document.getElementById("s-status-msg")?.value?.trim() || null;
+        const fileInput = document.getElementById("s-avatar-file");
+        const urlInput = document.getElementById("s-photo-url");
+        let finalPhoto = urlInput.value.trim() || null;
+
         try {
+          // If a file was selected, upload it and use that URL
+          if (fileInput.files && fileInput.files[0]) {
+            finalPhoto = await uploadAvatarFile(fileInput.files[0]);
+          }
+
           const authUpdate = { displayName: dName || null };
           if (finalPhoto && !finalPhoto.startsWith("data:")) authUpdate.photoURL = finalPhoto;
           await currentUser.updateProfile(authUpdate);
+
           const firestoreUpdate = { displayName: dName || "Anonymous" };
           if (finalPhoto !== null) firestoreUpdate.photoURL = finalPhoto;
           if (statusMsg !== null) firestoreUpdate.statusMsg = statusMsg;
           await db.collection("users").doc(currentUser.uid).update(firestoreUpdate);
+
           syncMyPhoto(finalPhoto);
-        } catch (err) { showToast("ERROR SAVING PROFILE: " + err.message); return; }
+        } catch (err) {
+          document.getElementById("s-upload-status").textContent = "✕ Error: " + err.message;
+          showToast("ERROR SAVING PROFILE: " + err.message);
+          return;
+        }
       }
 
       closeModal("settings-modal");
@@ -7210,17 +7279,50 @@
     function syncMyPhoto(newPhoto) {
       // For base64 photos store in session; for URLs Firebase Auth handles persistence
       _sessionPhoto = newPhoto && newPhoto.startsWith("data:") ? newPhoto : null;
-      // Update every avatar marked as mine
+      const photo = newPhoto || null;
+      const initial = (currentUser?.displayName || "U")[0].toUpperCase();
+
+      // Update every avatar marked as mine (AI chat, DM chat, social chat messages)
       document.querySelectorAll("[data-my-avatar]").forEach(el => {
-        const photo = newPhoto || null;
-        const initial = (currentUser?.displayName || "U")[0].toUpperCase();
         if (photo) {
-          el.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`;
+          el.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
           el.style.padding = "0";
         } else {
+          el.innerHTML = '';
           el.textContent = initial;
         }
       });
+
+      // Update drawer avatar
+      const drawerAv = document.getElementById("drawer-avatar");
+      if (drawerAv) {
+        if (photo) {
+          drawerAv.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          drawerAv.textContent = initial;
+        }
+      }
+
+      // Update voice bar avatar
+      const vbAv = document.getElementById("vb-avatar");
+      if (vbAv) {
+        if (photo) {
+          vbAv.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          vbAv.textContent = initial;
+        }
+      }
+
+      // Update settings preview if panel is open
+      const settingsPrev = document.getElementById("s-avatar-preview");
+      if (settingsPrev) {
+        if (photo) {
+          settingsPrev.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          settingsPrev.textContent = initial;
+        }
+      }
+
       updateNavUser();
     }
 
