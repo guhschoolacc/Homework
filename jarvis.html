@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S.</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Courier New', monospace; user-select: none; }
+  #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  #three-canvas { display: block; touch-action: none; }
+  #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+
+  /* API KEY MODAL */
+  #api-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #api-panel {
+    border: 1px solid #ff8c0055; padding: 36px 40px; max-width: 480px; width: 90%;
+    background: rgba(6,2,0,0.98); box-shadow: 0 0 80px #ff8c0018; position: relative;
+  }
+  .api-corner { position: absolute; width: 14px; height: 14px; border-color: #ff8c00; border-style: solid; opacity: 0.5; }
+  .api-corner.tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .api-corner.tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .api-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+  .api-corner.br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  #api-panel h2 { font-size: 11px; letter-spacing: 0.5em; color: #ff8c00; text-transform: uppercase; margin-bottom: 6px; }
+  #api-panel p { font-size: 10px; letter-spacing: 0.2em; color: #553300; text-transform: uppercase; margin-bottom: 24px; line-height: 1.7; }
+  #api-key-input {
+    width: 100%; background: rgba(10,4,0,0.9); border: 1px solid #ff8c0044; border-radius: 2px;
+    color: #ffcc88; font-family: 'Courier New',monospace; font-size: 12px; letter-spacing: 0.08em;
+    padding: 10px 14px; outline: none; margin-bottom: 14px; caret-color: #ff8c00;
+    transition: border-color 0.3s;
+  }
+  #api-key-input:focus { border-color: #ff8c0088; }
+  #api-key-input::placeholder { color: #332200; }
+  #api-submit {
+    width: 100%; background: rgba(255,140,0,0.08); border: 1px solid #ff8c0066; border-radius: 2px;
+    color: #ff8c00; font-family: 'Courier New',monospace; font-size: 10px; letter-spacing: 0.35em;
+    padding: 11px; cursor: pointer; text-transform: uppercase; transition: background 0.2s, box-shadow 0.2s;
+  }
+  #api-submit:hover { background: rgba(255,140,0,0.15); box-shadow: 0 0 14px #ff8c0033; }
+  #api-error { font-size: 9px; letter-spacing: 0.25em; color: #ff4400; text-transform: uppercase; margin-top: 10px; min-height: 14px; }
+
+  /* MAIN UI */
+  #boot-text { position: fixed; bottom: 22%; left: 50%; transform: translateX(-50%); text-align: center; color: #ff8c00; font-size: clamp(10px,1.4vw,15px); letter-spacing: 0.2em; text-transform: uppercase; opacity: 0; transition: opacity 0.5s; z-index: 20; pointer-events: none; text-shadow: 0 0 12px #ff8c0088; max-width: 600px; line-height: 1.8; }
+  #jarvis-name { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; z-index: 20; opacity: 0; transition: opacity 1s; }
+  #jarvis-name .title { font-size: clamp(28px,5vw,60px); font-weight: 100; letter-spacing: 0.5em; color: #ff8c00; text-shadow: 0 0 30px #ff8c00aa, 0 0 60px #ff8c0044; line-height: 1; }
+  #jarvis-name .subtitle { font-size: clamp(8px,1.1vw,13px); letter-spacing: 0.35em; color: #995500; margin-top: 8px; text-shadow: 0 0 10px #ff8c0066; }
+  #status-bar { position: fixed; bottom: 17%; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; z-index: 20; opacity: 0; transition: opacity 0.8s; pointer-events: none; }
+  #mic-indicator { width: 10px; height: 10px; border-radius: 50%; background: #ff8c00; box-shadow: 0 0 8px #ff8c00; animation: micPulse 2s infinite; }
+  #mic-indicator.speaking { background: #ff4500; box-shadow: 0 0 12px #ff4500; animation: micPulseFast 0.5s infinite; }
+  #mic-indicator.listening { background: #ffcc00; box-shadow: 0 0 10px #ffcc00; animation: micPulse 1s infinite; }
+  #mic-indicator.muted { background: #333; box-shadow: none; animation: none; }
+  @keyframes micPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  @keyframes micPulseFast { 0%,100%{opacity:1;transform:scale(1.2)} 50%{opacity:0.7;transform:scale(0.9)} }
+  #status-text { font-size: clamp(9px,1.1vw,12px); letter-spacing: 0.25em; color: #994400; text-transform: uppercase; text-shadow: 0 0 8px #ff8c0044; }
+  #response-box { position: fixed; bottom: 25%; left: 50%; transform: translateX(-50%); max-width: min(680px,85vw); text-align: center; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 0.6s; }
+  #response-text { font-size: clamp(11px,1.5vw,15px); letter-spacing: 0.08em; color: #ffcc88; line-height: 1.7; text-shadow: 0 0 15px #ff8c0055; }
+  #user-query { font-size: clamp(9px,1.1vw,12px); letter-spacing: 0.2em; color: #884400; margin-bottom: 8px; text-transform: uppercase; }
+  .corner { position: fixed; width: 50px; height: 50px; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 1s; }
+  .corner svg { width: 100%; height: 100%; }
+  .corner.tl { top: 20px; left: 20px; } .corner.tr { top: 20px; right: 20px; transform: scaleX(-1); }
+  .corner.bl { bottom: 20px; left: 20px; transform: scaleY(-1); } .corner.br { bottom: 20px; right: 20px; transform: scale(-1,-1); }
+  #scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg,transparent,#ff8c0044,#ff8c00aa,#ff8c0044,transparent); z-index: 15; opacity: 0; pointer-events: none; animation: scanDown 8s linear infinite; }
+  @keyframes scanDown { 0%{top:-2px;opacity:0} 5%{opacity:1} 95%{opacity:0.3} 100%{top:100%;opacity:0} }
+  #sys-info { position: fixed; top: 22px; left: 50%; transform: translateX(-50%); font-size: clamp(7px,0.9vw,10px); letter-spacing: 0.3em; color: #442200; text-align: center; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 1s; text-transform: uppercase; }
+  #waveform { position: fixed; bottom: 30%; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 3px; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 0.4s; height: 30px; }
+  .wave-bar { width: 3px; background: linear-gradient(to top,#ff8c00,#ffcc44); border-radius: 2px; height: 4px; transition: height 0.1s; box-shadow: 0 0 4px #ff8c0088; }
+  #hint { position: fixed; top: 8%; left: 50%; transform: translateX(-50%); font-size: clamp(8px,0.9vw,11px); letter-spacing: 0.3em; color: #442200; text-align: center; z-index: 20; pointer-events: none; opacity: 0; transition: opacity 1s; text-transform: uppercase; white-space: nowrap; }
+
+  /* CHAT BAR */
+  #chat-bar { position: fixed; bottom: 5%; left: 50%; transform: translateX(-50%); width: min(760px,94vw); display: flex; align-items: center; gap: 6px; z-index: 30; opacity: 0; transition: opacity 0.8s; pointer-events: none; }
+  #chat-bar.visible { opacity: 1; pointer-events: all; }
+  #chat-input { flex: 1; background: rgba(20,8,0,0.75); border: 1px solid #ff8c0044; border-radius: 2px; color: #ffcc88; font-family: 'Courier New',monospace; font-size: clamp(10px,1.3vw,13px); letter-spacing: 0.12em; padding: 9px 14px; outline: none; transition: border-color 0.3s,box-shadow 0.3s; user-select: text; caret-color: #ff8c00; }
+  #chat-input::placeholder { color: #553300; letter-spacing: 0.18em; font-size: clamp(9px,1.1vw,11px); text-transform: uppercase; }
+  #chat-input:focus { border-color: #ff8c0088; box-shadow: 0 0 12px #ff8c0022,inset 0 0 8px #ff8c0008; }
+  .bar-btn { background: rgba(20,8,0,0.8); border: 1px solid #ff8c0055; border-radius: 2px; color: #ff8c00; font-family: 'Courier New',monospace; font-size: clamp(9px,1vw,11px); letter-spacing: 0.2em; padding: 9px 11px; cursor: pointer; text-transform: uppercase; transition: background 0.2s,box-shadow 0.2s,border-color 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; user-select: none; flex-shrink: 0; }
+  .bar-btn:hover { background: rgba(255,140,0,0.1); border-color: #ff8c00aa; box-shadow: 0 0 10px #ff8c0033; }
+  .bar-btn:active { background: rgba(255,140,0,0.2); }
+  .bar-btn.active { border-color: #ff8c00; box-shadow: 0 0 10px #ff8c0055; color: #ffcc44; }
+  .bar-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: #443300; transition: background 0.3s,box-shadow 0.3s; flex-shrink: 0; }
+  .bar-btn.active .dot { background: #ff8c00; box-shadow: 0 0 6px #ff8c00; }
+  .bar-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  /* IMAGE PANEL */
+  #image-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
+  #image-overlay.visible { opacity: 1; pointer-events: all; }
+  #image-panel { max-width: min(580px,90vw); width: 100%; transform: scale(0.93) translateY(10px); transition: transform 0.35s; }
+  #image-overlay.visible #image-panel { transform: scale(1) translateY(0); }
+  #image-border { border: 1px solid #ff8c0055; padding: 18px; background: rgba(6,2,0,0.97); box-shadow: 0 0 80px #ff8c0018, inset 0 0 40px #ff8c0006; position: relative; }
+  .img-corner { position: absolute; width: 16px; height: 16px; border-color: #ff8c00; border-style: solid; opacity: 0.6; }
+  .img-corner.tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; } .img-corner.tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .img-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; } .img-corner.br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  #image-header { font-size: 9px; letter-spacing: 0.45em; color: #553300; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  #image-header span { color: #331800; }
+  #image-loading { display: none; flex-direction: column; align-items: center; gap: 18px; padding: 44px 20px; }
+  #image-loading.show { display: flex; }
+  #img-spinner { width: 36px; height: 36px; border: 1px solid #2a1000; border-top-color: #ff8c00; border-radius: 50%; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #img-spinner-text { font-size: 9px; letter-spacing: 0.45em; color: #553300; text-transform: uppercase; }
+  #image-content { display: none; }
+  #image-content.show { display: block; }
+  #generated-image { width: 100%; display: block; border: 1px solid #ff8c0018; filter: brightness(0.95) saturate(0.88); }
+  #image-caption { font-size: clamp(8px,1vw,10px); letter-spacing: 0.2em; color: #663300; text-transform: uppercase; margin-top: 12px; text-align: center; line-height: 1.6; }
+  #image-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+  #image-footer-label { font-size: 8px; letter-spacing: 0.35em; color: #281200; text-transform: uppercase; }
+  #image-close { background: transparent; border: 1px solid #ff8c0033; border-radius: 2px; color: #773300; font-family: 'Courier New',monospace; font-size: 9px; letter-spacing: 0.3em; padding: 6px 16px; cursor: pointer; text-transform: uppercase; transition: background 0.2s,color 0.2s,border-color 0.2s; }
+  #image-close:hover { background: rgba(255,140,0,0.1); color: #ff8c00; border-color: #ff8c0066; }
+</style>
+</head>
+<body>
+
+<!-- API Key Modal -->
+<div id="api-modal">
+  <div id="api-panel">
+    <div class="api-corner tl"></div><div class="api-corner tr"></div>
+    <div class="api-corner bl"></div><div class="api-corner br"></div>
+    <h2>J.A.R.V.I.S. · Authentication Required</h2>
+    <p>Enter your OpenAI API key to initialize the intelligence core.<br>Key is stored in memory only — never saved.</p>
+    <input id="api-key-input" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false"/>
+    <button id="api-submit">INITIALIZE SYSTEM</button>
+    <div id="api-error"></div>
+  </div>
+</div>
+
+<div id="canvas-container"><canvas id="three-canvas"></canvas></div>
+
+<div id="overlay">
+  <div id="scan-line"></div>
+  <div id="sys-info">JUST A RATHER VERY INTELLIGENT SYSTEM &nbsp;|&nbsp; V7.0.3 &nbsp;|&nbsp; STARK INDUSTRIES</div>
+  <div id="hint">TYPE OR SAY "HEY JARVIS" &nbsp;·&nbsp; "GENERATE IMAGE OF..." FOR VISUALS</div>
+  <div id="jarvis-name">
+    <div class="title">J.A.R.V.I.S.</div>
+    <div class="subtitle">JUST A RATHER VERY INTELLIGENT SYSTEM</div>
+  </div>
+  <div class="corner tl"><svg viewBox="0 0 50 50" fill="none"><path d="M2 48L2 2L48 2" stroke="#ff8c00" stroke-width="1.5" opacity="0.5"/><circle cx="2" cy="2" r="2" fill="#ff8c00" opacity="0.8"/></svg></div>
+  <div class="corner tr"><svg viewBox="0 0 50 50" fill="none"><path d="M2 48L2 2L48 2" stroke="#ff8c00" stroke-width="1.5" opacity="0.5"/><circle cx="2" cy="2" r="2" fill="#ff8c00" opacity="0.8"/></svg></div>
+  <div class="corner bl"><svg viewBox="0 0 50 50" fill="none"><path d="M2 48L2 2L48 2" stroke="#ff8c00" stroke-width="1.5" opacity="0.5"/><circle cx="2" cy="2" r="2" fill="#ff8c00" opacity="0.8"/></svg></div>
+  <div class="corner br"><svg viewBox="0 0 50 50" fill="none"><path d="M2 48L2 2L48 2" stroke="#ff8c00" stroke-width="1.5" opacity="0.5"/><circle cx="2" cy="2" r="2" fill="#ff8c00" opacity="0.8"/></svg></div>
+  <div id="waveform"></div>
+  <div id="boot-text"></div>
+  <div id="response-box"><div id="user-query"></div><div id="response-text"></div></div>
+  <div id="status-bar"><div id="mic-indicator" class="muted"></div><div id="status-text">ONLINE · READY</div></div>
+</div>
+
+<!-- Image Panel -->
+<div id="image-overlay">
+  <div id="image-panel">
+    <div id="image-border">
+      <div class="img-corner tl"></div><div class="img-corner tr"></div>
+      <div class="img-corner bl"></div><div class="img-corner br"></div>
+      <div id="image-header">
+        <span>HOLOGRAPHIC RENDER · STARK INDUSTRIES</span>
+        <span id="image-ts"></span>
+      </div>
+      <div id="image-loading"><div id="img-spinner"></div><div id="img-spinner-text">RENDERING VISUAL...</div></div>
+      <div id="image-content">
+        <img id="generated-image" src="" alt="Generated visual"/>
+        <div id="image-caption"></div>
+      </div>
+      <div id="image-footer">
+        <span id="image-footer-label">DALL·E 3 · CLASSIFIED</span>
+        <button id="image-close">DISMISS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Bar -->
+<div id="chat-bar">
+  <button id="voice-toggle-btn" class="bar-btn" title="Toggle voice"><span class="dot"></span>VOICE</button>
+  <input id="chat-input" type="text" placeholder="Ask J.A.R.V.I.S. · or: generate image of..." autocomplete="off" spellcheck="false"/>
+  <button id="img-btn" class="bar-btn" title="Generate image">IMG</button>
+  <button id="send-btn" class="bar-btn">SEND</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ===================== API KEY GATE =====================
+let OPENAI_KEY = '';
+
+const apiModal   = document.getElementById('api-modal');
+const apiKeyInput= document.getElementById('api-key-input');
+const apiSubmit  = document.getElementById('api-submit');
+const apiError   = document.getElementById('api-error');
+
+apiSubmit.addEventListener('click', async () => {
+  const key = apiKeyInput.value.trim();
+  if (!key.startsWith('sk-')) { apiError.textContent = 'KEY FORMAT INVALID — MUST START WITH sk-'; return; }
+  apiError.textContent = 'VERIFYING...';
+  apiSubmit.disabled = true;
+  // quick test call
+  try {
+    const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: 'Bearer ' + key } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    OPENAI_KEY = key;
+    apiModal.style.transition = 'opacity 0.5s';
+    apiModal.style.opacity = '0';
+    setTimeout(() => { apiModal.style.display = 'none'; startApp(); }, 500);
+  } catch(e) {
+    apiError.textContent = 'AUTHENTICATION FAILED · CHECK KEY AND TRY AGAIN';
+    apiSubmit.disabled = false;
+  }
+});
+apiKeyInput.addEventListener('keydown', e => { if (e.key === 'Enter') apiSubmit.click(); });
+
+// ===================== STATE =====================
+const state = {
+  booting:true, speaking:false, voiceEnabled:false, awaitingCommand:false,
+  energy:0, targetEnergy:0, rotX:0, rotY:0, targetRotX:0, targetRotY:0,
+  mouseDown:false, lastMX:0, lastMY:0, recognitionActive:false, bootDone:false
+};
+let conversationHistory = [];
+let processing = false;
+
+// ===================== IMAGE INTENT =====================
+const IMAGE_RE = /\b(generate|create|make|draw|render|paint|design|produce|imagine|show me)\b[\s\S]{0,40}?\b(image|picture|photo|illustration|artwork|art|painting|drawing|render|visual|portrait|scene|landscape)\b/i;
+const IMAGE_PREFIX_RE = /^(please\s+)?(generate|create|make|draw|render|paint|design|show me)\s+(an?\s+)?(image|picture|photo|illustration|artwork|art|painting|drawing|render|visual|portrait|scene|landscape)?\s*(of\s+)?/i;
+
+function isImageRequest(t) { return IMAGE_RE.test(t) || /^(draw|paint|sketch|render)\s+\w/i.test(t); }
+function extractImagePrompt(t) { const s = t.replace(IMAGE_PREFIX_RE,'').trim(); return s.length>3?s:t; }
+
+// ===================== OPENAI API CALLS =====================
+async function callJarvis(userMessage) {
+  conversationHistory.push({ role:'user', content:userMessage });
+  if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+OPENAI_KEY },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role:'system', content:'You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), Tony Stark\'s AI assistant. Respond in character: intelligent, precise, slightly formal but with dry wit. Keep responses concise — 1-3 sentences unless a detailed answer is genuinely needed. Address the user as "sir" or "ma\'am" occasionally. Never break character.' },
+          ...conversationHistory
+        ],
+        max_tokens: 300,
+        temperature: 0.85
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      conversationHistory.pop();
+      return `I encountered an error, sir: ${err.error?.message || 'HTTP ' + res.status}`;
+    }
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || "I appear to have lost my train of thought, sir.";
+    conversationHistory.push({ role:'assistant', content:reply });
+    return reply;
+  } catch(e) {
+    conversationHistory.pop();
+    return "Network disruption detected. Unable to reach the intelligence core, sir.";
+  }
+}
+
+async function callImageGen(prompt) {
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+OPENAI_KEY },
+    body: JSON.stringify({ model:'dall-e-3', prompt, n:1, size:'1024x1024', quality:'standard', response_format:'url' })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error?.message || 'HTTP ' + res.status);
+  }
+  const data = await res.json();
+  return { url: data.data[0].url };
+}
+
+// ===================== IMAGE PANEL =====================
+const imageOverlay  = document.getElementById('image-overlay');
+const imageLoading  = document.getElementById('image-loading');
+const imageContent  = document.getElementById('image-content');
+const generatedImage= document.getElementById('generated-image');
+const imageCaption  = document.getElementById('image-caption');
+const imageTs       = document.getElementById('image-ts');
+const imageClose    = document.getElementById('image-close');
+
+function openImagePanel() { imageTs.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); imageLoading.classList.add('show'); imageContent.classList.remove('show'); imageOverlay.classList.add('visible'); }
+function setImageResult(url,caption) { generatedImage.src=url; imageCaption.textContent=caption?caption.slice(0,110).toUpperCase():''; imageLoading.classList.remove('show'); imageContent.classList.add('show'); }
+function closeImagePanel() { imageOverlay.classList.remove('visible'); setTimeout(()=>{ generatedImage.src=''; imageCaption.textContent=''; },400); }
+imageClose.addEventListener('click', closeImagePanel);
+imageOverlay.addEventListener('mousedown', e=>{ if(e.target===imageOverlay) closeImagePanel(); });
+
+// ===================== PROCESS COMMAND =====================
+async function processCommand(text) {
+  if (isImageRequest(text)) {
+    const prompt = extractImagePrompt(text);
+    openImagePanel();
+    state.targetEnergy = 0.65;
+    const [imageResult, verbal] = await Promise.allSettled([
+      callImageGen(prompt),
+      callJarvis(`The user requested a visual render of: "${prompt}". Acknowledge in 1-2 sentences, in character as JARVIS, that you are or have rendered it.`)
+    ]);
+    if (imageResult.status === 'fulfilled') {
+      setImageResult(imageResult.value.url, prompt);
+      return verbal.status==='fulfilled' ? verbal.value : `Rendering complete, sir. Visual of "${prompt}" is now displayed.`;
+    } else {
+      closeImagePanel();
+      return `Rendering systems encountered an error, sir. ${imageResult.reason?.message || 'The visual could not be produced.'}`;
+    }
+  }
+  return await callJarvis(text);
+}
+
+// ===================== WAVEFORM =====================
+const waveEl = document.getElementById('waveform');
+for(let i=0;i<18;i++){const b=document.createElement('div');b.className='wave-bar';waveEl.appendChild(b);}
+const waveBars = waveEl.querySelectorAll('.wave-bar');
+function animateWave(on){ waveEl.style.opacity=on?'1':'0'; if(!on){waveBars.forEach(b=>b.style.height='4px');return;} waveBars.forEach(b=>{b.style.height=(4+Math.random()*20)+'px';}); }
+setInterval(()=>{ if(state.speaking) animateWave(true); },90);
+
+// ===================== THREE.JS =====================
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+renderer.setClearColor(0x000000,1);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45,1,0.1,100);
+camera.position.set(0,0,5);
+function resize(){const W=window.innerWidth,H=window.innerHeight;renderer.setSize(W,H);camera.aspect=W/H;camera.updateProjectionMatrix();}
+resize(); window.addEventListener('resize',resize);
+
+const OC=0xff8c00,OD=0x552200,AC=0xffaa33;
+const cg=new THREE.Group(); scene.add(cg);
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(12,8,6),new THREE.MeshBasicMaterial({color:0x080300,side:THREE.BackSide})));
+cg.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.72,1),new THREE.MeshBasicMaterial({color:0x110500,transparent:true,opacity:0.9})));
+const cwm=new THREE.MeshBasicMaterial({color:OC,wireframe:true,transparent:true,opacity:0.35});
+cg.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.73,1),cwm));
+const glowM=new THREE.MeshBasicMaterial({color:OC,transparent:true,opacity:0.07});
+cg.add(new THREE.Mesh(new THREE.SphereGeometry(0.45,12,8),glowM));
+function mkRing(i,o,s,c,op,t){const m=new THREE.Mesh(new THREE.RingGeometry(i,o,s),new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide,transparent:true,opacity:op}));if(t)m.rotation.x=t;return m;}
+const rings=[];
+[[0.88,0.96,64,OC,0.5,0,'y',0.008],[1.05,1.10,48,OD,0.6,Math.PI/4,'z',-0.012],[1.20,1.24,48,0x331100,0.7,Math.PI*0.7,'x',0.006],[1.38,1.40,64,OC,0.2,Math.PI/6,'y',-0.004]]
+.forEach(([a,b,s,c,o,t,ax,sp])=>{const m=mkRing(a,b,s,c,o,t);cg.add(m);rings.push({mesh:m,speed:sp,axis:ax});});
+const hx=new THREE.Group();
+for(let i=0;i<6;i++){const pts=[];for(let j=0;j<=6;j++){const a=(j/6)*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*(0.5+i*0.12),Math.sin(a)*(0.5+i*0.12),0));}const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:OC,transparent:true,opacity:0.06-i*0.008}));l.rotation.z=i*Math.PI/6;hx.add(l);}
+cg.add(hx);
+const ag=new THREE.Group();
+[[0.1,1.3,1.55,OC,0.4],[2.0,3.8,1.55,OC,0.3],[4.2,5.5,1.55,OC,0.25],[0.5,1.1,1.65,AC,0.15],[3.3,4.5,1.65,AC,0.12]]
+.forEach(([sa,ea,r,c,o])=>{const pts=[];for(let i=0;i<=32;i++){const a=sa+(ea-sa)*(i/32);pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r,0));}const arc=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:c,transparent:true,opacity:o}));arc.rotation.x=Math.PI/2;ag.add(arc);});
+cg.add(ag);
+const PC=120,pp=new Float32Array(PC*3),ps=[];
+for(let i=0;i<PC;i++){const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=1.6+Math.random()*1.2;pp[i*3]=r*Math.sin(ph)*Math.cos(th);pp[i*3+1]=r*Math.sin(ph)*Math.sin(th);pp[i*3+2]=r*Math.cos(ph);ps.push({theta:th,phi:ph,r,speed:(Math.random()-0.5)*0.003,drift:(Math.random()-0.5)*0.001});}
+const pgeo=new THREE.BufferGeometry();pgeo.setAttribute('position',new THREE.BufferAttribute(pp,3));
+const pmat=new THREE.PointsMaterial({color:OC,size:0.025,transparent:true,opacity:0.55,sizeAttenuation:true});
+cg.add(new THREE.Points(pgeo,pmat));
+const BP=200,bp=new Float32Array(BP*3),bt=new Float32Array(BP*3);
+const bgeo=new THREE.BufferGeometry();bgeo.setAttribute('position',new THREE.BufferAttribute(bp,3));
+const bmat=new THREE.PointsMaterial({color:OC,size:0.03,transparent:true,opacity:0,sizeAttenuation:true});
+scene.add(new THREE.Points(bgeo,bmat));
+for(let i=0;i<BP;i++){const r=4+Math.random()*3,t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1);bp[i*3]=r*Math.sin(p)*Math.cos(t);bp[i*3+1]=r*Math.sin(p)*Math.sin(t);bp[i*3+2]=r*Math.cos(p);const tr=0.5+Math.random()*1.5,tt=Math.random()*Math.PI*2,tp=Math.acos(2*Math.random()-1);bt[i*3]=tr*Math.sin(tp)*Math.cos(tt);bt[i*3+1]=tr*Math.sin(tp)*Math.sin(tt);bt[i*3+2]=tr*Math.cos(tp);}
+bgeo.attributes.position.needsUpdate=true;
+cg.scale.set(0,0,0);
+const pl=new THREE.PointLight(OC,1.5,8);pl.position.set(0,0,3);scene.add(pl);
+
+const clk=new THREE.Clock();let bp2=0,bph=0;
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=clk.getDelta(),t=clk.getElapsedTime();
+  state.energy+=(state.targetEnergy-state.energy)*0.05;
+  state.rotX+=(state.targetRotX-state.rotX)*0.06;state.rotY+=(state.targetRotY-state.rotY)*0.06;
+  if(state.booting){
+    bp2+=dt*0.4;bmat.opacity=Math.min(bp2,1)*0.8;
+    for(let i=0;i<BP;i++){bp[i*3]+=(bt[i*3]-bp[i*3])*0.04;bp[i*3+1]+=(bt[i*3+1]-bp[i*3+1])*0.04;bp[i*3+2]+=(bt[i*3+2]-bp[i*3+2])*0.04;}
+    bgeo.attributes.position.needsUpdate=true;
+    if(bp2>0.3&&bph===0)bph=1;
+    if(bph>=1){const s=Math.min((bp2-0.3)*2,1),e=s<0.5?2*s*s:-1+(4-2*s)*s;cg.scale.set(e,e,e);if(s>=1){bph=2;state.booting=false;onBootComplete();}}
+  } else {if(bmat.opacity>0){bmat.opacity-=dt*1.5;if(bmat.opacity<0)bmat.opacity=0;}}
+  cg.rotation.y=t*0.15+state.rotY;cg.rotation.x=Math.sin(t*0.3)*0.04+state.rotX;
+  rings.forEach(r=>{const sp=r.speed*(1+state.energy*2);if(r.axis==='y')r.mesh.rotation.y+=sp;else if(r.axis==='z')r.mesh.rotation.z+=sp;else r.mesh.rotation.x+=sp;});
+  ag.rotation.y+=0.005*(1+state.energy*3);ag.rotation.x+=0.002;hx.rotation.z+=0.003;
+  for(let i=0;i<PC;i++){ps[i].theta+=ps[i].speed;ps[i].phi+=ps[i].drift;const{r,theta,phi}=ps[i];pp[i*3]=r*Math.sin(phi)*Math.cos(theta);pp[i*3+1]=r*Math.sin(phi)*Math.sin(theta);pp[i*3+2]=r*Math.cos(phi);}
+  pgeo.attributes.position.needsUpdate=true;
+  const ep=Math.sin(t*(2+state.energy*4))*0.5+0.5;
+  glowM.opacity=0.05+state.energy*0.2+ep*0.05;cwm.opacity=0.25+state.energy*0.4+ep*0.1;
+  pmat.opacity=0.4+state.energy*0.4;pl.intensity=1+state.energy*3+ep*0.5;
+  if(!state.booting){const b=1+Math.sin(t*0.7)*0.012;cg.scale.set(b,b,b);}
+  renderer.render(scene,camera);
+}
+animate();
+
+// ===================== UI REFS =====================
+const bootTextEl=document.getElementById('boot-text'),statusBar=document.getElementById('status-bar'),
+  corners=document.querySelectorAll('.corner'),jarvisName=document.getElementById('jarvis-name'),
+  sysInfo=document.getElementById('sys-info'),hintEl=document.getElementById('hint'),
+  responseBox=document.getElementById('response-box'),responseText=document.getElementById('response-text'),
+  userQuery=document.getElementById('user-query'),statusText=document.getElementById('status-text'),
+  micIndicator=document.getElementById('mic-indicator'),chatBar=document.getElementById('chat-bar'),
+  chatInput=document.getElementById('chat-input'),sendBtn=document.getElementById('send-btn'),
+  imgBtn=document.getElementById('img-btn'),voiceToggleBtn=document.getElementById('voice-toggle-btn');
+
+// ===================== BOOT =====================
+const bootLines=['INITIALIZING CORE SYSTEMS...','LOADING NEURAL INTERFACE v7.0.3...','CALIBRATING HOLOGRAPHIC MATRIX...','QUANTUM ENCRYPTION ACTIVE...','RENDERING ENGINE ONLINE...','ALL SYSTEMS NOMINAL.'];
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function runBoot(){
+  bootTextEl.style.opacity='1';
+  for(const l of bootLines){bootTextEl.textContent=l;await sleep(600);}
+  bootTextEl.style.opacity='0';await sleep(400);
+}
+function onBootComplete(){
+  corners.forEach(c=>c.style.opacity='1');jarvisName.style.opacity='1';
+  statusBar.style.opacity='1';sysInfo.style.opacity='1';hintEl.style.opacity='1';
+  chatBar.classList.add('visible');state.bootDone=true;
+  setTimeout(()=>speak("Good day. All systems are fully operational. How may I assist you, sir?"),800);
+}
+
+function startApp() {
+  setTimeout(()=>runBoot(),400);
+}
+
+// ===================== HELPERS =====================
+function showResponse(q,t){
+  userQuery.textContent=q?'> '+q.toUpperCase():'';userQuery.style.display=q?'block':'none';
+  responseText.textContent=t;responseBox.style.opacity='1';
+  clearTimeout(responseBox._t);
+  responseBox._t=setTimeout(()=>{responseBox.style.opacity='0';},Math.max(4000,t.length*55));
+}
+function setStatus(text,cls){ statusText.textContent=text; micIndicator.className=cls||'muted'; }
+function setInputsDisabled(on){ chatInput.disabled=on;sendBtn.disabled=on;imgBtn.disabled=on; }
+
+// ===================== TTS =====================
+let ttsKeepalive=null;
+function startKeepalive(){ stopKeepalive(); ttsKeepalive=setInterval(()=>{ if(window.speechSynthesis.speaking){window.speechSynthesis.pause();window.speechSynthesis.resume();} },10000); }
+function stopKeepalive(){ clearInterval(ttsKeepalive);ttsKeepalive=null; }
+
+function speak(text,cb){
+  if(!('speechSynthesis' in window)){if(cb)cb();return;}
+  window.speechSynthesis.cancel();
+  state.speaking=true;state.targetEnergy=0.7;
+  setStatus('RESPONDING...','speaking');animateWave(true);startKeepalive();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.88;u.pitch=0.85;u.volume=0.95;
+  function doSpeak(){
+    const vv=window.speechSynthesis.getVoices();if(vv.length===0){setTimeout(doSpeak,150);return;}
+    const pref=['Google UK English Male','Microsoft George','Daniel'];
+    let cv=null;for(const p of pref){const f=vv.find(v=>v.name.includes(p));if(f){cv=f;break;}}
+    if(!cv)cv=vv.find(v=>v.lang==='en-GB')||vv.find(v=>v.lang.startsWith('en'))||vv[0];
+    if(cv)u.voice=cv;window.speechSynthesis.speak(u);
+  }
+  u.onend=u.onerror=()=>{
+    state.speaking=false;state.targetEnergy=0.1;animateWave(false);stopKeepalive();
+    if(state.voiceEnabled){setStatus('SAY "HEY JARVIS"','');state.awaitingCommand=false;startWakeWord();}
+    else setStatus('ONLINE · READY','muted');
+    if(cb)cb();
+  };
+  doSpeak();
+}
+if('speechSynthesis' in window){
+  window.speechSynthesis.getVoices();
+  window.addEventListener('voiceschanged',()=>window.speechSynthesis.getVoices());
+}
+
+// ===================== CHAT =====================
+async function handleChat(forceText){
+  if(processing)return;
+  const text=(forceText||chatInput.value).trim();if(!text)return;
+  if(!forceText)chatInput.value='';
+  processing=true;setInputsDisabled(true);
+  state.targetEnergy=0.35;showResponse(text,'...');setStatus('PROCESSING...','speaking');
+  const resp=await processCommand(text);
+  showResponse(text,resp);speak(resp);
+  processing=false;setInputsDisabled(false);chatInput.focus();
+}
+
+sendBtn.addEventListener('click',()=>handleChat());
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleChat();e.stopPropagation();});
+chatInput.addEventListener('mousedown',e=>e.stopPropagation());
+chatInput.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+
+imgBtn.addEventListener('click',()=>{
+  const txt=chatInput.value.trim();
+  if(txt){const wrapped=isImageRequest(txt)?txt:'generate an image of '+txt;chatInput.value='';handleChat(wrapped);}
+  else{chatInput.placeholder='Describe the image to render...';chatInput.focus();}
+});
+
+// ===================== VOICE =====================
+let rec=null,rTimer=null;
+function initRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return false;
+  rec=new SR();rec.continuous=false;rec.interimResults=false;rec.lang='en-US';rec.maxAlternatives=1;
+  rec.onstart=()=>{state.recognitionActive=true;setStatus('LISTENING...','listening');state.targetEnergy=0.15;};
+  rec.onresult=async e=>{
+    const tr=e.results[0][0].transcript.toLowerCase().trim();state.recognitionActive=false;
+    if(!state.awaitingCommand){
+      if(tr.includes('hey jarvis')||tr.includes('jarvis')){
+        state.awaitingCommand=true;state.targetEnergy=0.5;setStatus('AWAITING COMMAND...','speaking');
+        speak("Yes? I'm listening.",()=>startCmd());
+      } else {clearTimeout(rTimer);rTimer=setTimeout(startWakeWord,200);}
+    } else {
+      state.awaitingCommand=false;state.targetEnergy=0.4;setStatus('PROCESSING...','speaking');showResponse(tr,'...');
+      const resp=await processCommand(tr);showResponse(tr,resp);speak(resp);
+    }
+  };
+  rec.onerror=e=>{
+    state.recognitionActive=false;
+    if(e.error==='no-speech'||e.error==='aborted'){if(state.voiceEnabled&&!state.speaking){clearTimeout(rTimer);rTimer=setTimeout(()=>state.awaitingCommand?startCmd():startWakeWord(),200);}return;}
+    setStatus('MIC ERROR · RETRYING','muted');clearTimeout(rTimer);rTimer=setTimeout(()=>{if(state.voiceEnabled)startWakeWord();},2000);
+  };
+  rec.onend=()=>{state.recognitionActive=false;if(state.voiceEnabled&&!state.speaking&&state.bootDone){clearTimeout(rTimer);rTimer=setTimeout(()=>state.awaitingCommand?startCmd():startWakeWord(),300);}};
+  return true;
+}
+function startWakeWord(){if(!state.voiceEnabled||state.speaking||!rec)return;try{if(state.recognitionActive)rec.abort();setTimeout(()=>{try{rec.start();}catch(e){}},100);}catch(e){}}
+function startCmd(){if(!state.voiceEnabled||state.speaking||!rec)return;try{if(state.recognitionActive)rec.abort();setTimeout(()=>{try{rec.start();}catch(e){}},100);}catch(e){}}
+function stopRec(){state.awaitingCommand=false;clearTimeout(rTimer);if(rec){try{rec.abort();}catch(e){}}state.recognitionActive=false;setStatus('ONLINE · READY','muted');state.targetEnergy=0.05;}
+
+voiceToggleBtn.addEventListener('click',()=>{
+  if(!state.bootDone)return;
+  if(!state.voiceEnabled){
+    if(!rec&&!initRec()){showResponse(null,"Voice recognition unavailable. Please use Chrome or Edge.");return;}
+    state.voiceEnabled=true;voiceToggleBtn.classList.add('active');setStatus('SAY "HEY JARVIS"','');
+    speak("Voice activation enabled. Say Hey Jarvis to begin.",()=>startWakeWord());
+  } else {state.voiceEnabled=false;voiceToggleBtn.classList.remove('active');stopRec();speak("Voice activation disabled.");}
+});
+
+// ===================== MOUSE / TOUCH =====================
+canvas.addEventListener('mousedown',e=>{state.mouseDown=true;state.lastMX=e.clientX;state.lastMY=e.clientY;});
+window.addEventListener('mouseup',()=>state.mouseDown=false);
+window.addEventListener('mousemove',e=>{if(!state.mouseDown)return;state.targetRotY+=(e.clientX-state.lastMX)*0.008;state.targetRotX+=(e.clientY-state.lastMY)*0.008;state.targetRotX=Math.max(-0.8,Math.min(0.8,state.targetRotX));state.lastMX=e.clientX;state.lastMY=e.clientY;});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();state.lastMX=e.touches[0].clientX;state.lastMY=e.touches[0].clientY;},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();state.targetRotY+=(e.touches[0].clientX-state.lastMX)*0.008;state.targetRotX+=(e.touches[0].clientY-state.lastMY)*0.008;state.targetRotX=Math.max(-0.8,Math.min(0.8,state.targetRotX));state.lastMX=e.touches[0].clientX;state.lastMY=e.touches[0].clientY;},{passive:false});
+setInterval(()=>{if(!state.mouseDown){state.targetRotX*=0.97;state.targetRotY*=0.995;}},50);
+document.addEventListener('contextmenu',e=>e.preventDefault());
+
+})();
+</script>
+</body>
+</html>
