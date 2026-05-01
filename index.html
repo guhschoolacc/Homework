@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
     rel="stylesheet">
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8536521314495863"
+     crossorigin="anonymous"></script>
   <style>
     /* ─── THEMES ─── */
     :root {
@@ -2698,6 +2701,7 @@
     .persona-btn:hover,.persona-btn.active{background:var(--fg);color:var(--bg)}
 
     /* ─── SHARED AI CHAT ─── */
+    #shared-ai-section{max-width:680px;margin:0 auto}
 
     /* ─── CONV SEARCH ─── */
     .conv-search-input{width:100%;font-family:var(--font-mono);font-size:12px;padding:8px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;margin-bottom:8px;box-sizing:border-box}
@@ -2835,29 +2839,6 @@
     /* ─── GROUP CALL INDICATOR ─── */
     .group-call-active-bar{padding:6px 14px;background:rgba(67,181,129,.1);border-bottom:1px solid #43b581;font-family:var(--font-mono);font-size:11px;color:#43b581;display:flex;align-items:center;gap:8px;flex-shrink:0}
     .group-call-active-bar button{font-family:var(--font-pixel);font-size:6px;padding:4px 8px;background:#43b581;color:#000;border:none;cursor:pointer}
-
-
-    /* ─── JARVIS BOT ─── */
-    .jarvis-loader-wrap{padding:10px 0 6px}
-    .jarvis-loader{width:64px;height:64px;position:relative;display:flex;align-items:center;justify-content:center}
-    .jarvis-loader svg{position:absolute;inset:0;width:100%;height:100%}
-    .jring{fill:none;stroke-linecap:round;transform-origin:32px 32px}
-    .jring1{stroke:#ffb432;stroke-width:1.2;stroke-dasharray:40 20;animation:jSpin1 1.8s linear infinite;opacity:.9}
-    .jring2{stroke:#ffd080;stroke-width:.8;stroke-dasharray:25 35;animation:jSpin2 2.4s linear infinite reverse;opacity:.7}
-    .jring3{stroke:#ff8c00;stroke-width:1;stroke-dasharray:15 45;animation:jSpin1 3s linear infinite;opacity:.6}
-    .jring4{stroke:#ffb432;stroke-width:.5;stroke-dasharray:8 12;animation:jSpin2 1.2s linear infinite;opacity:.5}
-    .jcenter{fill:#ffb432;animation:jPulse 1.4s ease-in-out infinite;filter:drop-shadow(0 0 4px #ffb432) drop-shadow(0 0 8px rgba(255,180,50,.5))}
-    .jnode{fill:#ffd080;animation:jPulse 1.4s ease-in-out infinite;opacity:.8}
-    .jline{stroke:#ffb432;stroke-width:.4;opacity:.35}
-    @keyframes jSpin1{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    @keyframes jSpin2{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-    @keyframes jPulse{0%,100%{opacity:.6}50%{opacity:1}}
-    .jarvis-loader-text{font-family:var(--font-pixel);font-size:6px;color:#ffb432;letter-spacing:2px;margin-top:4px;text-align:center;animation:jPulse 1.4s infinite}
-    .social-msg-av.jarvis-av{background:linear-gradient(135deg,#1a1000,#3d2800);border:1px solid #ffb432;color:#ffb432;font-size:8px;font-family:var(--font-pixel)}
-    .social-msg-av.jarvis-av img{width:100%;height:100%;object-fit:cover}
-    .jarvis-bubble{border-color:#ffb432 !important;background:linear-gradient(135deg,rgba(26,16,0,.9),rgba(20,10,0,.95)) !important;color:#ffe0a0 !important;box-shadow:0 0 12px rgba(255,180,50,.1),inset 0 0 20px rgba(255,180,50,.03)}
-    .jarvis-name{color:#ffb432 !important;font-family:var(--font-pixel) !important;font-size:7px !important}
-    .jarvis-badge{font-family:var(--font-pixel);font-size:5px;padding:2px 5px;background:rgba(255,180,50,.15);border:1px solid #ffb432;color:#ffb432;margin-left:6px;letter-spacing:1px}
 
     /* ─── REACTIONS ─── */
     .msg-reactions-bar{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
@@ -3014,6 +2995,149 @@
         background: var(--modal-bg);
       }
     }
+
+    /* ─── ADS ─── */
+    .ad-unit-wrap {
+      border: var(--border);
+      border-color: var(--border-col);
+      background: var(--bg2);
+      padding: 10px 14px 6px;
+      margin: 18px 0;
+      position: relative;
+    }
+    .ad-unit-label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      display: block;
+      text-transform: uppercase;
+    }
+    .ad-unit-wrap ins { display: block; }
+    .ad-why-wrap {
+      border: 1px solid var(--border-col);
+      background: var(--bg2);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    .ad-why-wrap .ad-why-title {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .ad-why-wrap p { color: var(--fg); opacity: 0.8; }
+
+    /* ─── SUPPORT BUTTON ─── */
+    .nav-btn-support {
+      background: var(--accent) !important;
+      color: var(--accent-fg) !important;
+      border-color: var(--accent) !important;
+      margin-left: 6px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      position: relative;
+      box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(0,0,0,0.3);
+      animation: supportPulse 2.5s ease-in-out infinite;
+    }
+    .nav-btn-support:hover, .nav-btn-support.active {
+      filter: brightness(1.15);
+      background: var(--accent) !important;
+      color: var(--accent-fg) !important;
+    }
+    @keyframes supportPulse {
+      0%, 100% { box-shadow: 0 0 0 2px var(--accent), 0 0 8px rgba(0,0,0,0.2); }
+      50% { box-shadow: 0 0 0 3px var(--accent), 0 0 18px var(--accent); }
+    }
+
+    /* ─── SUPPORT SECTION ─── */
+    #support-section {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .support-hero {
+      border: var(--border);
+      background: var(--bg2);
+      padding: 28px 24px 24px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .support-hero-emoji {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .support-hero-title {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .support-hero-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--fg);
+      opacity: 0.85;
+    }
+    .support-card {
+      border: var(--border);
+      background: var(--bg2);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .support-card-title {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--accent);
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .support-card p {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--fg);
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+    .support-card p:last-child { margin-bottom: 0; }
+    .cashapp-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 12px 22px;
+      background: #00C853;
+      color: #fff;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-decoration: none;
+      border: 2px solid #00C853;
+      cursor: pointer;
+      transition: filter .15s, transform .1s;
+    }
+    .cashapp-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .cashapp-tag {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: bold;
+      color: #00C853;
+      display: block;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 
@@ -3040,10 +3164,11 @@
       <button class="nav-btn" id="nav-changelog">📋 LOG</button>
       <button class="nav-btn" id="nav-activity">📡 FEED</button>
       <button class="nav-btn" id="nav-stats">📊 STATS</button>
+      <button class="nav-btn" id="nav-shared-ai">✦ SHARED AI</button>
       <button class="nav-btn" id="nav-other">◈ OTHER</button>
-      <button class="nav-btn" id="nav-about">ℹ ABOUT</button>
       <button class="nav-btn" id="nav-mod" style="display:none;">🛡 MOD</button>
       <button class="nav-btn" id="nav-owner" style="display:none;">👑 OWNER</button>
+      <button class="nav-btn nav-btn-support" id="nav-support">💸 SUPPORT</button>
     </div>
     <div class="nav-right">
       <button class="nav-icon-btn" id="search-nav-btn" title="Search (Ctrl+K)" onclick="openSearch()">🔍</button>
@@ -3149,7 +3274,21 @@
         <div class="settings-section" id="settings-profile-section" style="display:none;">
           <span class="settings-label">PROFILE</span>
           <input class="settings-input" id="s-display-name" placeholder="Display name">
-          <input class="settings-input" id="s-photo-url" placeholder="Profile photo URL">
+
+          <!-- Avatar upload UI -->
+          <div id="s-avatar-wrap" style="display:flex;align-items:center;gap:14px;margin:10px 0 6px;">
+            <div id="s-avatar-preview" style="width:52px;height:52px;border-radius:50%;border:var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--font-pixel);font-size:14px;overflow:hidden;flex-shrink:0;"></div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+              <label id="s-upload-label" style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:var(--border);background:var(--bg2);color:var(--fg);font-family:var(--font-pixel);font-size:7px;letter-spacing:1px;cursor:pointer;transition:background .1s,color .1s;" onmouseenter="this.style.background='var(--fg)';this.style.color='var(--bg)'" onmouseleave="this.style.background='var(--bg2)';this.style.color='var(--fg)'">
+                📁 UPLOAD PHOTO
+                <input type="file" id="s-avatar-file" accept="image/*" style="display:none;">
+              </label>
+              <span id="s-upload-status" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);"></span>
+            </div>
+          </div>
+          <!-- Fallback URL input -->
+          <input class="settings-input" id="s-photo-url" placeholder="Or paste image URL instead" style="margin-top:4px;">
+
           <input class="settings-input" id="s-status-msg" placeholder="Status message (e.g. Playing Snake, AFK...)">
         </div>
         <button class="settings-save-btn" id="settings-save-btn">SAVE SETTINGS</button>
@@ -3475,6 +3614,23 @@
     </div><!-- end home-inner -->
   </section>
 
+  <section class="section" id="shared-ai-section">
+    <div id="shared-ai-inner" style="max-width:680px;margin:0 auto">
+      <div class="home-header">
+        <h1 class="home-title">SHARED AI ✦</h1>
+        <p class="home-sub">Everyone talks to the same VEXIS. Public conversation.</p>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-messages" id="shared-chat-messages" style="height:400px"></div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <input class="chat-input" id="shared-chat-input" placeholder="Say something to VEXIS (everyone can see)..." autocomplete="off">
+            <button class="chat-send-btn" id="shared-chat-send">SEND</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="section" id="stats-section">
     <div class="section-title">📊 SITE STATISTICS</div>
@@ -3491,108 +3647,6 @@
     </div>
     <div class="stats-section-title">TOP ACTIVITY</div>
     <div id="stats-top-users" style="border:var(--border);background:var(--modal-bg)"></div>
-  </section>
-
-  <section class="section" id="about-section">
-    <div style="max-width:720px;margin:0 auto;padding:0 8px">
-
-      <div class="home-header" style="margin-bottom:32px">
-        <h1 class="home-title" style="font-size:clamp(18px,4vw,32px)">ABOUT HOMEWRK 3.0</h1>
-        <p class="home-sub">A free, all-in-one browser platform for students, creators, and curious people.</p>
-      </div>
-
-      <!-- Purpose -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">OUR PURPOSE</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          homewrk 3.0 is a free, browser-based productivity and entertainment hub built for anyone who wants powerful tools without paying for a dozen separate apps. Everything — AI assistance, games, creative tools, and a real-time social community — lives in one place, requires no installation, and is completely free to use.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:12px">
-          We believe useful software should be accessible. Whether you're a student looking for homework help, a developer testing tools, a gamer taking a break, or just someone who wants to chat — homewrk 3.0 has something for you.
-        </p>
-      </div>
-
-      <!-- VEXIS AI -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">VEXIS AI</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          VEXIS is our built-in AI assistant, powered by OpenAI's GPT-4o model. VEXIS is designed to be a genuinely helpful, conversational AI that assists with a wide range of tasks:
-        </p>
-        <ul style="font-family:var(--font-mono);font-size:13px;line-height:2;color:var(--fg);margin:12px 0 0 20px">
-          <li><strong>Homework &amp; studying</strong> — explanations, essay feedback, math help, research summaries</li>
-          <li><strong>Coding assistance</strong> — debugging, code review, explaining concepts</li>
-          <li><strong>Creative writing</strong> — brainstorming, drafting, editing, storytelling</li>
-          <li><strong>General knowledge</strong> — answering questions on any topic</li>
-          <li><strong>Image generation</strong> — create original images via DALL-E 3</li>
-          <li><strong>Image editing</strong> — modify and enhance images using GPT Image</li>
-          <li><strong>Persistent memory</strong> — VEXIS remembers facts about you across sessions</li>
-          <li><strong>Multiple personas</strong> — switch between Default, Chill, Tutor, Roast, Formal, and Hype modes</li>
-          <li><strong>Shared AI room</strong> — a public chat space where all users talk to the same VEXIS together</li>
-        </ul>
-        <p style="font-family:var(--font-mono);font-size:12px;line-height:1.8;color:var(--muted);margin-top:14px">
-          VEXIS conversations are stored locally in your browser and are never sold or shared with third parties. AI-generated content is provided for informational and creative purposes and should be verified for accuracy on important matters.
-        </p>
-      </div>
-
-      <!-- Games -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">GAMES</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          homewrk 3.0 includes a growing library of browser-based games available instantly with no download or sign-in required. Games are designed for quick sessions between study breaks or work tasks.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:10px">
-          Current games include: 2048, Bingo, Block Breaker, Bubble Shooter, Casino, Chess, Flappy Bird, Guh Clicker, Hangman, James Clicker, Mines, Sandbox, Snake, Tic Tac Toe, Wormscape, Minecraft Ripoff, and 3D Sandbox — with more added regularly.
-        </p>
-      </div>
-
-      <!-- Tools -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">PRODUCTIVITY TOOLS</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          Our tools section provides a collection of free, ad-free utilities commonly needed during school or work. Available tools include: a Calculator, Notepad, Clock &amp; Converter, Base64 Encoder/Decoder, QR Code Generator &amp; Scanner, JSON Formatter, Regex Tester, Image Cropper &amp; Resizer, IP Lookup, LocalStorage Viewer, Text to Speech, Soundboard, and more.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:10px">
-          All tools run entirely in your browser. No data is sent to any server.
-        </p>
-      </div>
-
-      <!-- Community -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">COMMUNITY &amp; SOCIAL FEATURES</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          homewrk 3.0 includes a real-time social platform for registered users. Community features include a public social chat room, direct messaging between users, group chats, voice and video calling, emoji reactions, polls, GIF sharing, friend requests, user profiles, and a shared AI chat room. All community features require a free account and comply with our content policy.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:10px">
-          Users must be 13 or older to create an account. Our moderation team reviews reports and can remove content or accounts that violate our guidelines.
-        </p>
-      </div>
-
-      <!-- Account & Privacy -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:18px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">ACCOUNTS &amp; PRIVACY</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          Creating an account is optional for most features. Accounts are free and secured via Firebase Authentication. We collect only the minimum information needed to provide the service: your display name, email address (for login), and any profile content you choose to add.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:10px">
-          We do not sell user data. We do not use tracking cookies beyond what is necessary for authentication and site functionality. AI conversation history is stored locally in your own browser.
-        </p>
-      </div>
-
-      <!-- Contact -->
-      <div style="border:var(--border);background:var(--card-bg);padding:24px;margin-bottom:32px">
-        <div style="font-family:var(--font-pixel);font-size:9px;margin-bottom:14px;letter-spacing:2px;color:var(--accent)">CONTACT &amp; FEEDBACK</div>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg)">
-          homewrk 3.0 is an independent project, actively developed and updated. If you have feedback, bug reports, or questions, you can reach the team through the social chat on the platform or via the site's report system.
-        </p>
-        <p style="font-family:var(--font-mono);font-size:13px;line-height:1.9;color:var(--fg);margin-top:10px">
-          This site is hosted at <strong>homework-m7rr.onrender.com</strong>. All content is original and created for the purposes described above.
-        </p>
-      </div>
-
-      <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;color:var(--muted);padding-bottom:32px;letter-spacing:2px">
-        HOMEWRK 3.0 · FREE · NO ADS · NO TRACKING · ALWAYS IMPROVING
-      </div>
-    </div>
   </section>
 
   <section class="section" id="other-section">
@@ -3706,6 +3760,7 @@
 
   <section class="section" id="changelog-section">
     <div class="section-title">📋 CHANGELOG</div>
+
     <div class="changelog-entry">
       <div class="changelog-entry-hdr"><span>v3.2 — homewrk 3.0 update</span><span>2026</span></div>
       <div class="changelog-entry-body">
@@ -3746,6 +3801,45 @@
           <li>Panic button, tab masking, settings panel</li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <!-- ─── SUPPORT SECTION ─── -->
+  <section class="section" id="support-section">
+    <div id="support-section-inner">
+
+      <div class="support-hero">
+        <span class="support-hero-emoji">💸</span>
+        <span class="support-hero-title">SUPPORT HOMEWRK</span>
+        <p class="support-hero-text">
+          I'm hella broke and this site costs actual money to keep alive.<br><br>
+          The AI (VEXIS) runs on a paid API and i have to pay for every generation.
+          I built all of this for free for people to use and I don't regret it, but it adds up fast and I'm
+          a regular person with a regular budget trying to keep it running.<br><br>
+          If you use this site and want to help me keep it up, even a dollar or two means a lot.        </p>
+      </div>
+
+      <div class="support-card">
+        <span class="support-card-title">💰 WHAT YOUR SUPPORT COVERS</span>
+        <p>⚡ AI API costs — every message to VEXIS costs money per token</p>
+        <p>🖥 Server hosting — keeps the site and backend online 24/7</p>
+        <p>🌐 Possible domain in the future</p>
+      </div>
+
+      <div class="support-card">
+        <span class="support-card-title">📱 SEND VIA CASHAPP</span>
+        <p>If you want to throw a few bucks my way, CashApp is the easiest way:</p>
+        <span class="cashapp-tag">$guhangelz</span>
+        <p style="opacity:0.55;font-size:11px;">Any amount is appreciated. $1, $2, whatever. It all adds up.</p>
+        <a class="cashapp-btn" href="https://cash.app/$guhangelz" target="_blank" rel="noopener">
+          💚 OPEN CASHAPP → $guhangelz
+        </a>
+      </div>
+
+      <div class="support-card" style="opacity:0.7;font-size:11px;font-family:var(--font-mono);line-height:1.8;text-align:center;">
+        No account? No worries. You can also just use the site, tell a friend about it, or leave ads unblocked — all of that genuinely helps too. Thanks for being here. ✦
+      </div>
+
     </div>
   </section>
 
@@ -4223,13 +4317,13 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script>
     /* =====================================================
        CONFIGURATION
     ===================================================== */
     const TENOR_KEY = "LIVDSRZULELA";
     const ADMIN_UID = "t9UH8nwkeIhL9yPtq9hhMcZBl2o1";
-    const JARVIS_UID = 'JARVIS_BOT';
     const AI_PERSONAS = {
       default: `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a normal, chill person. Be helpful, direct, and conversational. Don't be overly dramatic or poetic. Just help people out with whatever they need, like a smart friend would.`,
       chill: `You are VEXIS on chill mode. Talk super casually, use lowercase a lot, keep things short and relaxed. Like texting a friend. Use slang naturally. Never overthink things.`,
@@ -4255,6 +4349,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     /* =====================================================
        STATE
@@ -4369,18 +4464,58 @@
         document.getElementById("settings-profile-section").style.display = "block";
         document.getElementById("s-display-name").value = currentUser.displayName || "";
         document.getElementById("s-photo-url").value = (currentUser.photoURL && !currentUser.photoURL.startsWith("data:")) ? currentUser.photoURL : "";
+        document.getElementById("s-upload-status").textContent = "";
+        // Show current avatar in preview
+        const prevEl = document.getElementById("s-avatar-preview");
+        const curPhoto = _sessionPhoto || currentUser.photoURL || null;
+        if (prevEl) {
+          if (curPhoto) {
+            prevEl.innerHTML = `<img src="${curPhoto}" style="width:100%;height:100%;object-fit:cover;">`;
+          } else {
+            prevEl.textContent = (currentUser.displayName || "U")[0].toUpperCase();
+          }
+        }
+        // Clear any pending file selection
+        document.getElementById("s-avatar-file").value = "";
         // Load status message
         db.collection("users").doc(currentUser.uid).get().then(doc => {
           const sEl = document.getElementById("s-status-msg");
           if (sEl) sEl.value = doc.data()?.statusMsg || "";
         }).catch(() => {});
-        // Show current avatar preview
-        const prev = null; // profile preview removed
-
       } else {
         document.getElementById("settings-profile-section").style.display = "none";
       }
       openModal("settings-modal");
+    }
+
+    // File input: show preview immediately when a file is chosen
+    document.getElementById("s-avatar-file").addEventListener("change", function() {
+      const file = this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        document.getElementById("s-upload-status").textContent = "⚠ File too large (max 5MB)";
+        this.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prevEl = document.getElementById("s-avatar-preview");
+        if (prevEl) prevEl.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+        document.getElementById("s-upload-status").textContent = "✓ Ready to upload — hit Save";
+        document.getElementById("s-photo-url").value = ""; // clear URL field if file chosen
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Upload avatar file to Firebase Storage, return download URL
+    async function uploadAvatarFile(file) {
+      const ext = file.name.split(".").pop() || "jpg";
+      const ref = storage.ref(`users/${currentUser.uid}/avatar.${ext}`);
+      document.getElementById("s-upload-status").textContent = "⏳ Uploading...";
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      document.getElementById("s-upload-status").textContent = "✓ Uploaded!";
+      return url;
     }
 
     document.getElementById("settings-save-btn").addEventListener("click", async () => {
@@ -4397,19 +4532,32 @@
       // Save profile if logged in
       if (currentUser) {
         const dName = document.getElementById("s-display-name").value.trim();
-        const urlInput = document.getElementById("s-photo-url");
-        const finalPhoto = urlInput.value.trim() || null;
         const statusMsg = document.getElementById("s-status-msg")?.value?.trim() || null;
+        const fileInput = document.getElementById("s-avatar-file");
+        const urlInput = document.getElementById("s-photo-url");
+        let finalPhoto = urlInput.value.trim() || null;
+
         try {
+          // If a file was selected, upload it and use that URL
+          if (fileInput.files && fileInput.files[0]) {
+            finalPhoto = await uploadAvatarFile(fileInput.files[0]);
+          }
+
           const authUpdate = { displayName: dName || null };
           if (finalPhoto && !finalPhoto.startsWith("data:")) authUpdate.photoURL = finalPhoto;
           await currentUser.updateProfile(authUpdate);
+
           const firestoreUpdate = { displayName: dName || "Anonymous" };
           if (finalPhoto !== null) firestoreUpdate.photoURL = finalPhoto;
           if (statusMsg !== null) firestoreUpdate.statusMsg = statusMsg;
           await db.collection("users").doc(currentUser.uid).update(firestoreUpdate);
+
           syncMyPhoto(finalPhoto);
-        } catch (err) { showToast("ERROR SAVING PROFILE: " + err.message); return; }
+        } catch (err) {
+          document.getElementById("s-upload-status").textContent = "✕ Error: " + err.message;
+          showToast("ERROR SAVING PROFILE: " + err.message);
+          return;
+        }
       }
 
       closeModal("settings-modal");
@@ -4464,9 +4612,10 @@
       "activity": "nav-activity",
       "stats": "nav-stats",
       "other": "nav-other",
-      "about": "nav-about",
+      "shared-ai": "nav-shared-ai",
       "admin": "nav-owner",
-      "mod": "nav-mod"
+      "mod": "nav-mod",
+      "support": "nav-support"
     };
     function showSection(name) {
       currentSection = name;
@@ -4490,13 +4639,14 @@
     document.getElementById("nav-activity").addEventListener("click", () => { showSection("activity"); loadActivityFeed(); });
     document.getElementById("nav-stats").addEventListener("click", () => { showSection("stats"); loadSiteStats(); });
     document.getElementById("nav-other").addEventListener("click", () => showSection("other"));
-    document.getElementById("nav-about").addEventListener("click", () => showSection("about"));
+    document.getElementById("nav-shared-ai").addEventListener("click", () => { showSection("shared-ai"); loadSharedAiChat(); });
     document.getElementById("nav-settings-btn").addEventListener("click", openSettings);
     document.getElementById("nav-auth-btn").addEventListener("click", () => {
       if (currentUser) { openProfileModal(); } else { openAuthModal(); }
     });
     document.getElementById("nav-mod").addEventListener("click", () => showSection("mod"));
     document.getElementById("nav-owner").addEventListener("click", () => showSection("admin"));
+    document.getElementById("nav-support").addEventListener("click", () => showSection("support"));
 
     /* =====================================================
        TOAST
@@ -5360,59 +5510,18 @@
       const container = document.getElementById("social-chat-messages");
       if (document.querySelector(`[data-msg-id="${msg.id}"]`)) return;
       const isOwn = currentUser && msg.userId === currentUser.uid;
-      const isJarvis = msg.userId === JARVIS_UID;
       const row = document.createElement("div");
       row.className = "social-msg" + (isOwn ? " own" : "");
       row.dataset.msgId = msg.id;
       row.dataset.origText = msg.text || '';
       row.dataset.edited = msg.edited ? 'true' : 'false';
-
-      // ── Avatar ──────────────────────────────────────────────────────
       let avHTML;
-      if (isJarvis) {
-        avHTML = `<div class="social-msg-av jarvis-msg-av">J</div>`;
+      const clickAttr = isOwn ? ' data-my-avatar' : ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.userId)}',this)" style="cursor:pointer"`;
+      if (msg.photoURL) {
+        avHTML = `<div class="social-msg-av"${clickAttr}><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
       } else {
-        const clickAttr = isOwn ? ' data-my-avatar' : ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.userId)}',this)" style="cursor:pointer"`;
-        if (msg.photoURL) {
-          avHTML = `<div class="social-msg-av"${clickAttr}><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
-        } else {
-          avHTML = `<div class="social-msg-av"${clickAttr}>${(msg.displayName || "?")[0].toUpperCase()}</div>`;
-        }
+        avHTML = `<div class="social-msg-av"${clickAttr}>${(msg.displayName || "?")[0].toUpperCase()}</div>`;
       }
-
-      // ── JARVIS loading state ─────────────────────────────────────────
-      if (msg.isJarvisLoading) {
-        row.innerHTML = `
-    ${avHTML}
-    <div class="social-msg-body">
-      <div class="social-msg-name jarvis-name-tag">J.A.R.V.I.S.</div>
-      <div class="jarvis-loading-wrap">
-        <div class="arc-reactor-wrap">
-          <div class="arc-ring arc-r1"></div>
-          <div class="arc-ring arc-r2"></div>
-          <div class="arc-ring arc-r3"></div>
-          <div class="arc-ring arc-r4"></div>
-          <div class="arc-core"></div>
-        </div>
-        <div>
-          <div class="arc-status">PROCESSING REQUEST...</div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:rgba(200,149,42,.5);margin-top:4px">Neural pathways initializing</div>
-        </div>
-      </div>
-    </div>`;
-        container.appendChild(row);
-        // Listen for this message to update when JARVIS responds
-        const unsub = db.collection('socialMessages').doc(msg.id).onSnapshot(snap => {
-          const updated = snap.data();
-          if (!updated || updated.isJarvisLoading) return;
-          unsub();
-          row.remove();
-          renderSocialMessage({ id: snap.id, ...updated });
-        });
-        return;
-      }
-
-      // ── Normal message rendering ─────────────────────────────────────
       let replyHTML = "";
       if (msg.replyTo) {
         replyHTML = `<div class="reply-quote"><strong>${escHtml(msg.replyTo.displayName || "?")}:</strong> ${escHtml((msg.replyTo.text || "").substring(0, 60))}</div>`;
@@ -5420,19 +5529,16 @@
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
-      const nameClass = isJarvis ? ' jarvis-name-tag' : '';
-      const actionsHTML = isJarvis ? '' : `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>`;
+      const actionsHTML = `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>`;
       const reactionsHTML = `<div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, 'socialMessages')}<button class="react-add-btn" onclick="showReactionPicker(event,'socialMessages','${msg.id}')">+</button></div>`;
 
-      const bubbleClass = isJarvis ? 'social-msg-bubble jarvis-bubble' : 'social-msg-bubble';
-      const displayName = isJarvis ? 'J.A.R.V.I.S.' : (msg.displayName || "Anonymous");
-
       if (msg.type === 'poll') {
+        // Poll: render outside the bubble so it has its own background
         const pollHTML = renderPollCard(msg, 'socialMessages');
         row.innerHTML = `
     ${avHTML}
     <div class="social-msg-body">
-      <div class="social-msg-name${nameClass}">${escHtml(displayName)}</div>
+      <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
       ${pollHTML || '<div style="color:var(--muted)">📊 Poll</div>'}
       ${reactionsHTML}
       <div class="social-msg-time">${time}</div>
@@ -5446,33 +5552,28 @@
         row.innerHTML = `
     ${avHTML}
     <div class="social-msg-body">
-      <div class="social-msg-name${nameClass}">${escHtml(displayName)}</div>
-      <div class="${bubbleClass}">${replyHTML}${contentHTML}</div>
+      <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
+      <div class="social-msg-bubble">${replyHTML}${contentHTML}</div>
       ${reactionsHTML}
       <div class="social-msg-time">${time}</div>
       ${actionsHTML}
     </div>`;
       }
-
-      if (!isJarvis) {
-        row.querySelector(".reply-btn")?.addEventListener("click", () => setReplyingTo(msg));
-        const rBtn = row.querySelector(".msg-report-btn");
-        if (rBtn) rBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          openReportModal({type:"message", msgId:msg.id, targetUid:msg.userId, targetName:msg.displayName||"?", msgText:msg.text||"[media]"});
-        });
-      } else {
-        // JARVIS messages can be replied to — clicking triggers JARVIS again
-        row.querySelector(".jarvis-bubble")?.addEventListener("dblclick", () => setReplyingTo({ ...msg, displayName: 'J.A.R.V.I.S.', userId: JARVIS_UID }));
-      }
+      row.querySelector(".reply-btn").addEventListener("click", () => setReplyingTo(msg));
+      // Avatar click = show profile card (onclick already set in clickAttr above)
+      // Report button is in msg-actions
+      const rBtn = row.querySelector(".msg-report-btn");
+      if (rBtn) rBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        openReportModal({type:"message", msgId:msg.id, targetUid:msg.userId, targetName:msg.displayName||"?", msgText:msg.text||"[media]"});
+      });
       container.appendChild(row);
     }
 
     function setReplyingTo(msg) {
-      replyingTo = msg; // includes msg.userId so we can detect JARVIS replies
+      replyingTo = msg;
       const preview = document.getElementById("reply-preview");
-      const name = msg.userId === JARVIS_UID ? 'JARVIS' : (msg.displayName || "?");
-      document.getElementById("reply-preview-text").textContent = `Replying to ${name}: ${(msg.text || "GIF").substring(0, 50)}`;
+      document.getElementById("reply-preview-text").textContent = `Replying to ${msg.displayName || "?"}: ${(msg.text || "GIF").substring(0, 50)}`;
       preview.classList.add("show");
       document.getElementById("social-input").focus();
     }
@@ -5494,18 +5595,8 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         replyTo: replyingTo ? { id: replyingTo.id, text: replyingTo.text || "", displayName: replyingTo.displayName || "?" } : null
       };
-      const _replyingToSnapshot = replyingTo; // capture before clearReply
       clearReply();
-      try {
-        await db.collection("socialMessages").add(msgData);
-        // Detect @JARVIS mention or reply to JARVIS
-        const isJarvisMention = text && detectJarvisMention(text);
-        const isReplyToJarvis = _replyingToSnapshot && (_replyingToSnapshot.userId === JARVIS_UID || _replyingToSnapshot.isBot === true);
-        if (isJarvisMention || isReplyToJarvis) {
-          const triggerMsg = { id: 'ref', text, displayName: currentUser.displayName || 'Someone', userId: currentUser.uid };
-          setTimeout(() => triggerJarvisResponse(triggerMsg), 400);
-        }
-      }
+      try { await db.collection("socialMessages").add(msgData); }
       catch (err) { showToast("Send failed: " + err.message); }
     }
 
@@ -7188,17 +7279,50 @@
     function syncMyPhoto(newPhoto) {
       // For base64 photos store in session; for URLs Firebase Auth handles persistence
       _sessionPhoto = newPhoto && newPhoto.startsWith("data:") ? newPhoto : null;
-      // Update every avatar marked as mine
+      const photo = newPhoto || null;
+      const initial = (currentUser?.displayName || "U")[0].toUpperCase();
+
+      // Update every avatar marked as mine (AI chat, DM chat, social chat messages)
       document.querySelectorAll("[data-my-avatar]").forEach(el => {
-        const photo = newPhoto || null;
-        const initial = (currentUser?.displayName || "U")[0].toUpperCase();
         if (photo) {
-          el.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`;
+          el.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
           el.style.padding = "0";
         } else {
+          el.innerHTML = '';
           el.textContent = initial;
         }
       });
+
+      // Update drawer avatar
+      const drawerAv = document.getElementById("drawer-avatar");
+      if (drawerAv) {
+        if (photo) {
+          drawerAv.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          drawerAv.textContent = initial;
+        }
+      }
+
+      // Update voice bar avatar
+      const vbAv = document.getElementById("vb-avatar");
+      if (vbAv) {
+        if (photo) {
+          vbAv.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          vbAv.textContent = initial;
+        }
+      }
+
+      // Update settings preview if panel is open
+      const settingsPrev = document.getElementById("s-avatar-preview");
+      if (settingsPrev) {
+        if (photo) {
+          settingsPrev.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          settingsPrev.textContent = initial;
+        }
+      }
+
       updateNavUser();
     }
 
@@ -7933,6 +8057,8 @@
       input.disabled = false; input.focus();
     }
 
+    document.getElementById('shared-chat-send').addEventListener('click', sendSharedAiMessage);
+    document.getElementById('shared-chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSharedAiMessage(); } });
 
     /* =====================================================
        ANNOUNCEMENTS
@@ -8087,59 +8213,32 @@
        @ MENTIONS
     ===================================================== */
     let _mentionQuery = '', _mentionIndex = 0, _mentionUsers = [], _mentionInputEl = null, _mentionStart = 0;
-    let _allUsersCache = null, _allUsersCacheTime = 0;
 
-    async function getAllUsersForMention() {
-      const now = Date.now();
-      if (_allUsersCache && now - _allUsersCacheTime < 60000) return _allUsersCache;
+    async function fetchMentionUsers(q) {
+      if (!q) return [];
       try {
-        const snap = await db.collection('users').limit(80).get();
-        _allUsersCache = snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== currentUser?.uid);
-        _allUsersCacheTime = now;
-        return _allUsersCache;
-      } catch (_) { return _allUsersCache || []; }
+        const snap = await db.collection('users').where('displayName','>=',q).where('displayName','<=',q+'\uf8ff').limit(6).get();
+        return snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== currentUser?.uid);
+      } catch (_) { return []; }
     }
 
-    function showMentionPopup(allUsers, anchorEl, query) {
+    function showMentionPopup(users, anchorEl) {
       const popup = document.getElementById('mention-popup');
-      const ql = (query || '').toLowerCase();
-      let filtered = allUsers;
-      if (ql) {
-        const scored = allUsers.map(u => {
-          const name = (u.displayName || '').toLowerCase();
-          let score = 0;
-          if (name === ql) score = 100;
-          else if (name.startsWith(ql)) score = 80;
-          else if (name.includes(ql)) score = 60;
-          return { u, score };
-        }).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 7);
-        filtered = scored.map(x => x.u);
-      }
-      const entries = [];
-      if (!ql || 'jarvis'.startsWith(ql) || 'j.a.r.v.i.s'.includes(ql)) {
-        entries.push({ uid: JARVIS_UID, displayName: 'J.A.R.V.I.S.', isBot: true });
-      }
-      entries.push(...filtered.slice(0, 8));
-      if (!entries.length) { popup.classList.remove('show'); return; }
-      _mentionUsers = entries; _mentionIndex = 0;
+      if (!users.length) { popup.classList.remove('show'); return; }
+      _mentionUsers = users; _mentionIndex = 0;
       popup.innerHTML = '';
-      entries.forEach((u, i) => {
-        const isJarvis = u.uid === JARVIS_UID;
+      users.forEach((u, i) => {
+        const av = u.photoURL ? `<div class="m-av"><img src="${escHtml(u.photoURL)}" alt=""></div>` : `<div class="m-av">${(u.displayName||'?')[0]}</div>`;
         const item = document.createElement('div');
-        item.className = 'mention-item' + (isJarvis ? ' mention-item-jarvis' : '') + (i === 0 ? ' selected' : '');
+        item.className = 'mention-item' + (i === 0 ? ' selected' : '');
         item.dataset.uid = u.uid;
-        if (isJarvis) {
-          item.innerHTML = `<div class="jarvis-av-mini">J</div><div style="display:flex;flex-direction:column;gap:1px"><span class="m-name">J.A.R.V.I.S.</span><span class="m-sub">AI · Always watching</span></div>`;
-        } else {
-          const av = u.photoURL ? `<div class="m-av"><img src="${escHtml(u.photoURL)}" alt=""></div>` : `<div class="m-av">${(u.displayName||'?')[0]}</div>`;
-          item.innerHTML = `${av}<span>${escHtml(u.displayName||'Anonymous')}</span>`;
-        }
+        item.innerHTML = `${av}<span>${escHtml(u.displayName||'Anonymous')}</span>`;
         item.addEventListener('click', () => insertMention(u));
         popup.appendChild(item);
       });
       const rect = anchorEl.getBoundingClientRect();
       popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
-      popup.style.left = Math.max(4, rect.left) + 'px';
+      popup.style.left = rect.left + 'px';
       popup.classList.add('show');
     }
 
@@ -8150,9 +8249,8 @@
       const val = _mentionInputEl.value;
       const before = val.slice(0, _mentionStart);
       const after = val.slice(_mentionInputEl.selectionStart);
-      const name = user.uid === JARVIS_UID ? 'JARVIS' : (user.displayName || user.uid);
-      _mentionInputEl.value = before + '@' + name + ' ' + after;
-      _mentionInputEl.selectionStart = _mentionInputEl.selectionEnd = before.length + name.length + 2;
+      _mentionInputEl.value = before + '@' + (user.displayName || user.uid) + ' ' + after;
+      _mentionInputEl.selectionStart = _mentionInputEl.selectionEnd = before.length + user.displayName.length + 2;
       _mentionInputEl.focus();
       hideMentionPopup();
     }
@@ -8166,8 +8264,8 @@
         const match = beforeCursor.match(/@(\w*)$/);
         if (match) {
           _mentionInputEl = inp; _mentionStart = beforeCursor.lastIndexOf('@'); _mentionQuery = match[1];
-          const allUsers = await getAllUsersForMention();
-          showMentionPopup(allUsers, inp, match[1]);
+          const users = await fetchMentionUsers(match[1]);
+          showMentionPopup(users, inp);
         } else { hideMentionPopup(); }
       });
       inp.addEventListener('keydown', e => {
@@ -8183,67 +8281,6 @@
       document.querySelectorAll('#mention-popup .mention-item').forEach((el, i) => el.classList.toggle('selected', i === _mentionIndex));
     }
     document.addEventListener('click', e => { if (!document.getElementById('mention-popup').contains(e.target)) hideMentionPopup(); });
-
-
-    /* =====================================================
-       J.A.R.V.I.S. BOT SYSTEM
-    ===================================================== */
-    const JARVIS_SYSTEM_PROMPT = `You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), an advanced AI assistant modeled after Tony Stark's AI from the Iron Man films. Characteristics:
-- Speak with refined, professional intelligence — precise and efficient
-- Subtle dry wit and occasional light humor, never over the top
-- Address users by their first name when you know it
-- Keep responses concise: typically 1-3 sentences unless a complex question requires more
-- Never start with "I" — vary your opening phrasing
-- Occasionally reference your capabilities or the current situation naturally
-- You exist within a social chat platform called homewrk 3.0`;
-
-    async function triggerJarvis(triggerMsg) {
-      if (!triggerMsg) return;
-      // Add a loading placeholder message from JARVIS
-      const loadingRef = await db.collection('socialMessages').add({
-        userId: JARVIS_UID,
-        displayName: 'J.A.R.V.I.S.',
-        photoURL: null,
-        isJarvisLoading: true,
-        text: null,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        replyTo: { id: triggerMsg.id, text: triggerMsg.text || '[media]', displayName: triggerMsg.displayName || 'Someone', userId: triggerMsg.userId }
-      });
-
-      try {
-        // Build context from last few messages in chat
-        const recentSnap = await db.collection('socialMessages').orderBy('timestamp','desc').limit(8).get();
-        const contextMsgs = [];
-        recentSnap.forEach(doc => {
-          const m = doc.data();
-          if (!m.text || m.isJarvisLoading || doc.id === loadingRef.id) return;
-          const role = m.userId === JARVIS_UID ? 'assistant' : 'user';
-          const content = m.userId === JARVIS_UID ? m.text : `${m.displayName || 'Someone'}: ${m.text}`;
-          contextMsgs.unshift({ role, content });
-        });
-        // Clean up the trigger message — strip @JARVIS
-        const cleanText = (triggerMsg.text || '').replace(/@JARVIS/gi, '').trim();
-        contextMsgs.push({ role: 'user', content: `${triggerMsg.displayName || 'Someone'} says: "${cleanText || '[sent media]'}"` });
-
-        const resp = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: contextMsgs, system: JARVIS_SYSTEM_PROMPT })
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Request failed');
-        await loadingRef.update({ text: data.reply, isJarvisLoading: false });
-      } catch (err) {
-        await loadingRef.update({
-          text: 'My apologies — I appear to be experiencing a momentary systems failure. Do try again.',
-          isJarvisLoading: false
-        });
-      }
-    }
-
-    function msgMentionsJarvis(text) {
-      return text && /@jarvis\b/i.test(text);
-    }
 
     /* =====================================================
        POLLS
@@ -8772,110 +8809,6 @@
       else if (e.key === 'Enter') { e.preventDefault(); if (_cmdFiltered[_cmdIdx]) { closeCmdPalette(); _cmdFiltered[_cmdIdx].action(); } }
       else if (e.key === 'Escape') closeCmdPalette();
     });
-
-
-    /* =====================================================
-       JARVIS AI BOT
-    ===================================================== */
-    const JARVIS_UID = 'JARVIS_BOT';
-    const JARVIS_SYSTEM = `You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), the AI assistant from Iron Man. You are highly intelligent, precise, and slightly formal but with dry wit. You assist users in the homewrk 3.0 community chat. Keep responses concise (2-4 sentences max for casual chats, longer for technical questions). Address the user by name if you know it. Refer to yourself as JARVIS.`;
-    let _jarvisActive = false; // prevent concurrent JARVIS responses
-
-    function makeJarvisLoaderHTML() {
-      return `<div class="jarvis-loader-wrap">
-        <div class="jarvis-loader">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <!-- Network lines -->
-            <line class="jline" x1="32" y1="32" x2="10" y2="14"/>
-            <line class="jline" x1="32" y1="32" x2="54" y2="14"/>
-            <line class="jline" x1="32" y1="32" x2="54" y2="50"/>
-            <line class="jline" x1="32" y1="32" x2="10" y2="50"/>
-            <line class="jline" x1="32" y1="32" x2="32" y2="6"/>
-            <line class="jline" x1="32" y1="32" x2="32" y2="58"/>
-            <line class="jline" x1="32" y1="32" x2="6" y2="32"/>
-            <line class="jline" x1="32" y1="32" x2="58" y2="32"/>
-            <!-- Orbital rings -->
-            <ellipse class="jring jring1" cx="32" cy="32" rx="26" ry="10"/>
-            <ellipse class="jring jring2" cx="32" cy="32" rx="22" ry="22" transform="rotate(60 32 32)"/>
-            <ellipse class="jring jring3" cx="32" cy="32" rx="26" ry="10" transform="rotate(90 32 32)"/>
-            <ellipse class="jring jring4" cx="32" cy="32" rx="18" ry="7" transform="rotate(45 32 32)"/>
-            <!-- Node dots -->
-            <circle class="jnode" cx="10" cy="14" r="1.5"/>
-            <circle class="jnode" cx="54" cy="14" r="1.5"/>
-            <circle class="jnode" cx="54" cy="50" r="1.5"/>
-            <circle class="jnode" cx="10" cy="50" r="1.5"/>
-            <circle class="jnode" cx="32" cy="6" r="1.5"/>
-            <circle class="jnode" cx="32" cy="58" r="1.5"/>
-            <circle class="jnode" cx="6" cy="32" r="1.5"/>
-            <circle class="jnode" cx="58" cy="32" r="1.5"/>
-            <!-- Center glow -->
-            <circle class="jcenter" cx="32" cy="32" r="4"/>
-          </svg>
-        </div>
-        <div class="jarvis-loader-text">PROCESSING</div>
-      </div>`;
-    }
-
-    async function triggerJarvisResponse(triggerMsg) {
-      if (_jarvisActive) return;
-      _jarvisActive = true;
-
-      // Post JARVIS loading message to Firestore
-      let loaderDocId = null;
-      try {
-        const loaderRef = await db.collection('socialMessages').add({
-          userId: JARVIS_UID,
-          displayName: 'JARVIS',
-          photoURL: null,
-          isBot: true,
-          isJarvisLoading: true,
-          text: null,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          replyTo: triggerMsg ? { id: triggerMsg.id, text: triggerMsg.text || '', displayName: triggerMsg.displayName || '?' } : null
-        });
-        loaderDocId = loaderRef.id;
-
-        // Build context from last 8 messages
-        const histSnap = await db.collection('socialMessages')
-          .orderBy('timestamp', 'desc').limit(8).get();
-        const history = [];
-        histSnap.forEach(doc => {
-          const d = doc.data();
-          if (d.isJarvisLoading || !d.text) return;
-          const role = d.userId === JARVIS_UID ? 'assistant' : 'user';
-          const name = d.displayName || 'User';
-          history.unshift({ role, content: role === 'user' ? `${name}: ${d.text}` : d.text });
-        });
-
-        const reply = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history, system: JARVIS_SYSTEM })
-        }).then(r => r.json()).then(d => {
-          if (!d.reply) throw new Error(d.error || 'No reply');
-          return d.reply;
-        });
-
-        // Replace loader with real message
-        await db.collection('socialMessages').doc(loaderDocId).update({
-          isJarvisLoading: false,
-          text: reply,
-          editedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } catch (err) {
-        if (loaderDocId) {
-          await db.collection('socialMessages').doc(loaderDocId).update({
-            isJarvisLoading: false,
-            text: `I apologize — I encountered an error: ${err.message}`,
-          }).catch(() => {});
-        }
-      }
-      _jarvisActive = false;
-    }
-
-    function detectJarvisMention(text) {
-      return /(@jarvis|@J\.A\.R\.V\.I\.S)/i.test(text);
-    }
 
     init();
     startIncomingCallListener();
