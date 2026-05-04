@@ -3525,6 +3525,17 @@
         <button class="persona-btn" data-persona="hype">🎉 HYPE</button>
       </div>
 
+      <!-- Model selector bar -->
+      <div id="model-bar" style="display:flex;gap:4px;flex-wrap:wrap;padding:6px 0 4px;border-bottom:var(--border);margin-bottom:0;align-items:center;">
+        <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);align-self:center;margin-right:4px">CHAT MODEL:</span>
+        <button class="persona-btn active" data-chat-model="gpt-4" id="cmodel-gpt4">GPT-4</button>
+        <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);align-self:center;margin-left:10px;margin-right:4px">IMG MODEL:</span>
+        <button class="persona-btn active" data-img-model="dall-e-3" id="imodel-dalle3">DALL-E 3</button>
+        <button class="persona-btn" data-img-model="gpt-image-1" id="imodel-gptimg1">GPT-IMAGE-1</button>
+        <button class="persona-btn" data-img-model="gpt-image-1.5" id="imodel-gptimg15">GPT-IMAGE-1.5</button>
+        <button class="persona-btn" data-img-model="pollinations" id="imodel-poll">FREE (Pollinations)</button>
+      </div>
+
       <!-- AI Mode Tabs -->
       <div class="ai-tab-bar">
         <button class="ai-tab-btn active" id="ai-tab-chat" onclick="switchAiTab('chat')">✦ CHAT</button>
@@ -3605,7 +3616,7 @@
             <button class="imagegen-size-btn" data-quality="hd">HD</button>
             <button class="tool-btn" id="img-upload-btn" style="margin-left:auto;font-size:7px">📎 EDIT IMAGE</button>
             <input type="file" id="img-file-input" accept="image/*" style="display:none">
-            <span style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px">Generate with DALL-E 3 · Edit with GPT Image 1</span>
+            <span id="imggen-model-note" style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px">Model: DALL-E 3 (change in model bar above)</span>
           </div>
         </div>
       </div>
@@ -4855,6 +4866,34 @@
     const COINS_PER_DAY = 5;
     let imagegenSize = "1024x1024", imagegenQuality = "standard";
     let imgUploadB64 = null, imgUploadMime = "image/png";
+    let selectedChatModel = "gpt-4";
+    let selectedImgModel = "dall-e-3";
+
+    // Model bar wiring
+    document.querySelectorAll("[data-chat-model]").forEach(b => {
+      b.addEventListener("click", () => {
+        document.querySelectorAll("[data-chat-model]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        selectedChatModel = b.dataset.chatModel;
+      });
+    });
+    document.querySelectorAll("[data-img-model]").forEach(b => {
+      b.addEventListener("click", () => {
+        document.querySelectorAll("[data-img-model]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        selectedImgModel = b.dataset.imgModel;
+        const note = document.getElementById("imggen-model-note");
+        if (note) {
+          const names = { "dall-e-3": "DALL-E 3", "gpt-image-1": "GPT-IMAGE-1", "gpt-image-1.5": "GPT-IMAGE-1.5", "pollinations": "Free / Pollinations (no API cost)" };
+          note.textContent = "Model: " + (names[selectedImgModel] || selectedImgModel) + (selectedImgModel === "pollinations" ? " — unlimited free" : " (change in model bar above)");
+        }
+        // Show/hide quality selector — Pollinations doesn't use it
+        const qualityBtns = document.querySelectorAll(".imagegen-size-btn[data-quality]");
+        qualityBtns.forEach(qb => qb.style.display = selectedImgModel === "pollinations" ? "none" : "");
+        const qLabel = document.querySelector(".imagegen-opts span[style*='margin-left:10px']");
+        if (qLabel) qLabel.style.display = selectedImgModel === "pollinations" ? "none" : "";
+      });
+    });
 
     document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(b => b.addEventListener("click", () => {
       document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(x => x.classList.remove("active"));
@@ -4921,27 +4960,64 @@
     async function generateImage() {
       const prompt = document.getElementById("imagegen-input2").value.trim();
       if (!prompt) return;
-      if (!currentUser) { showToast("SIGN IN TO GENERATE IMAGES"); return; }
-      const coins = await getUserCoins();
-      if (coins <= 0) { showToast("NO COINS LEFT — COME BACK TOMORROW"); return; }
+
+      // Pollinations is free — skip coin check
+      const usesPollinations = selectedImgModel === "pollinations";
+      if (!usesPollinations) {
+        if (!currentUser) { showToast("SIGN IN TO GENERATE IMAGES"); return; }
+        const coins = await getUserCoins();
+        if (coins <= 0) { showToast("NO COINS LEFT — COME BACK TOMORROW"); return; }
+      }
+
       const btn = document.getElementById("imagegen-btn2"); btn.disabled = true; btn.textContent = "...";
       const output = document.getElementById("imagegen-output2");
       const loadDiv = document.createElement("div");
       loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
-      loadDiv.textContent = imgUploadB64 ? "EDITING WITH GPT IMAGE 1..." : "GENERATING WITH DALL-E 3...";
+
+      if (usesPollinations) {
+        loadDiv.textContent = "GENERATING VIA POLLINATIONS (FREE)...";
+        output.insertBefore(loadDiv, output.firstChild);
+        try {
+          const [w, h] = imagegenSize.split("x").map(Number);
+          const safeW = Math.min(w, 1024), safeH = Math.min(h, 1024);
+          const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${safeW}&height=${safeH}&nologo=true&seed=${Math.floor(Math.random()*999999)}`;
+          const resp = await fetch(url, { headers: { Accept: "image/jpeg,image/png,image/webp,*/*" } });
+          if (!resp.ok) throw new Error(`Pollinations HTTP ${resp.status}`);
+          const blob = await resp.blob();
+          if (!blob.type.startsWith("image/")) throw new Error("API did not return an image.");
+          const imageUrl = URL.createObjectURL(blob);
+          if (output.contains(loadDiv)) output.removeChild(loadDiv);
+          const wrapper = document.createElement("div"); wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
+          const img = document.createElement("img"); img.style.cssText = "max-width:100%;border:var(--border);display:block;"; img.alt = prompt; img.src = imageUrl;
+          const lbl = document.createElement("div"); lbl.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;"; lbl.textContent = prompt;
+          const dl = document.createElement("a"); dl.href = imageUrl; dl.download = "vexis-gen.png"; dl.target = "_blank";
+          dl.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;"; dl.textContent = "↓ DOWNLOAD";
+          wrapper.appendChild(img); wrapper.appendChild(lbl); wrapper.appendChild(dl);
+          output.insertBefore(wrapper, output.firstChild);
+        } catch (err) {
+          if (output.contains(loadDiv)) output.removeChild(loadDiv);
+          const errDiv = document.createElement("div"); errDiv.style.cssText = "padding:12px;color:#f55;font-family:var(--font-pixel);font-size:7px;text-align:center;border:1px solid #f55;";
+          errDiv.textContent = "ERROR: " + (err.message || "Failed"); output.insertBefore(errDiv, output.firstChild);
+        }
+        btn.disabled = false; btn.textContent = "GENERATE";
+        return;
+      }
+
+      // Paid OpenAI models
+      loadDiv.textContent = imgUploadB64 ? "EDITING WITH GPT IMAGE 1..." : `GENERATING WITH ${selectedImgModel.toUpperCase()}...`;
       output.insertBefore(loadDiv, output.firstChild);
       await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-1) });
       await refreshCoinDisplay();
       try {
         let resultUrl = null, resultB64 = null, revisedPrompt = prompt;
         if (imgUploadB64) {
-          const res = await fetch("/api/imageedit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, imageBase64: imgUploadB64, mimeType: imgUploadMime, size: imagegenSize }) });
+          const res = await fetch("/api/imageedit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, imageBase64: imgUploadB64, mimeType: imgUploadMime, size: imagegenSize, model: selectedImgModel }) });
           const data = await res.json(); if (!res.ok) throw new Error(data.error || "Edit failed");
           resultB64 = data.b64; resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
         } else {
-          const res = await fetch("/api/imagegen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality }) });
-          const data = await res.json(); if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
-          resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
+          const res = await fetch("/api/imagegen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality, model: selectedImgModel }) });
+          const data = await res.json(); if (!res.ok || (!data.url && !data.b64)) throw new Error(data.error || "Generation failed");
+          resultUrl = data.url; resultB64 = data.b64; revisedPrompt = data.revised_prompt || prompt;
         }
         if (output.contains(loadDiv)) output.removeChild(loadDiv);
         const wrapper = document.createElement("div"); wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
@@ -5045,6 +5121,21 @@
       if (!text && !attachedB64) return;
       if (!currentConvId) currentConvId = String(Date.now());
 
+      // ── IMAGE GENERATION TRIGGER ───────────────────────────────────────────
+      const imgTriggerMatch = text.match(/generate\s+(?:an?\s+)?image\s+(?:with|of|showing|that|depicting)?\s*[:\-]?\s*(.+)/i);
+      if (imgTriggerMatch && !attachedB64) {
+        const imgPrompt = imgTriggerMatch[1].trim();
+        chatInput.value = "";
+        // Switch to image tab and pre-fill prompt
+        switchAiTab("img");
+        const imgInput = document.getElementById("imagegen-input2");
+        if (imgInput) { imgInput.value = imgPrompt; imgInput.focus(); }
+        // Show a helpful chat message too
+        appendBotMsg(`🎨 Switching to Image Gen with your prompt: "${imgPrompt}"\nHit GENERATE to create it!`, fmtTime(), false);
+        return;
+      }
+      // ──────────────────────────────────────────────────────────────────────
+
       const ts = fmtTime();
       const imgUrl = attachedB64 ? ("data:" + attachedMime + ";base64," + attachedB64) : null;
       appendUserMsg(text, imgUrl, ts, false);
@@ -5087,7 +5178,7 @@
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: msgs, system: systemPrompt })
+        body: JSON.stringify({ messages: msgs, system: systemPrompt, model: selectedChatModel })
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "Request failed with status " + resp.status);
