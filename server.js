@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname)));
 
 // ── POST /api/imagegen ───────────────────────────────────────────────────────
 app.post("/api/imagegen", async (req, res) => {
-  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
+  const { prompt, size = "1024x1024", quality = "standard", model = "dall-e-3" } = req.body;
 
   if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
     return res.status(400).json({ error: "prompt is required." });
@@ -45,20 +45,31 @@ app.post("/api/imagegen", async (req, res) => {
   const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
   const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
 
+  // gpt-image-1 and gpt-image-1.5 return b64_json, dall-e-3 returns url
+  const useGptImage = model === "gpt-image-1" || model === "gpt-image-1.5";
+  const safeModel = useGptImage ? model : "dall-e-3";
+
   try {
-    const response = await openai.images.generate({
-      model: "dall-e-3",
+    const genParams = {
+      model: safeModel,
       prompt: prompt.trim(),
       n: 1,
       size: safeSize,
-      quality,
-    });
+    };
+    if (!useGptImage) genParams.quality = quality;
 
-    const imageUrl = response.data[0].url;
-    const revisedPrompt = response.data[0].revised_prompt || prompt;
-    return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
+    const response = await openai.images.generate(genParams);
+
+    if (useGptImage) {
+      const b64 = response.data[0].b64_json;
+      return res.json({ b64, revised_prompt: prompt });
+    } else {
+      const imageUrl = response.data[0].url;
+      const revisedPrompt = response.data[0].revised_prompt || prompt;
+      return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
+    }
   } catch (err) {
-    console.error("DALL-E error:", err.message);
+    console.error("Image gen error:", err.message);
     const status = err.status || 500;
     return res.status(status).json({ error: err.message || "Image generation failed." });
   }
@@ -100,15 +111,18 @@ app.post("/api/imageedit", async (req, res) => {
 
 // ── POST /api/chat ────────────────────────────────────────────────────────────
 app.post("/api/chat", async (req, res) => {
-  const { messages } = req.body;
+  const { messages, model } = req.body;
 
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: "messages array is required." });
   }
 
+  // Only allow gpt-4o for now; ignore any other model sent
+  const safeModel = "gpt-4o";
+
   try {
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-4o",
+      model: safeModel,
       max_tokens: 1024,
       messages: [{ role: "system", content: AI_SYSTEM }, ...messages],
     });
