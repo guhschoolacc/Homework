@@ -3528,7 +3528,7 @@
       <!-- Model selector bar -->
       <div id="model-bar" style="display:flex;gap:4px;flex-wrap:wrap;padding:6px 0 4px;border-bottom:var(--border);margin-bottom:0;align-items:center;">
         <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);align-self:center;margin-right:4px">CHAT MODEL:</span>
-        <button class="persona-btn active" data-chat-model="gpt-4" id="cmodel-gpt4">GPT-4</button>
+        <button class="persona-btn active" data-chat-model="gpt-4o" id="cmodel-gpt4o">GPT-4o</button>
         <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);align-self:center;margin-left:10px;margin-right:4px">IMG MODEL:</span>
         <button class="persona-btn active" data-img-model="dall-e-3" id="imodel-dalle3">DALL-E 3</button>
         <button class="persona-btn" data-img-model="gpt-image-1" id="imodel-gptimg1">GPT-IMAGE-1</button>
@@ -4866,7 +4866,7 @@
     const COINS_PER_DAY = 5;
     let imagegenSize = "1024x1024", imagegenQuality = "standard";
     let imgUploadB64 = null, imgUploadMime = "image/png";
-    let selectedChatModel = "gpt-4";
+    let selectedChatModel = "gpt-4o";
     let selectedImgModel = "dall-e-3";
 
     // Model bar wiring
