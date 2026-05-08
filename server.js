@@ -3,19 +3,6 @@ import express from "express";
 import OpenAI, { toFile } from "openai";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-
-// Bare server is optional — if the package is missing on the host, the rest of the app still works
-let bareServer = null;
-try {
-  const { createBareServer } = require("@tomphttp/bare-server-node");
-  bareServer = createBareServer("/bare/");
-  console.log("✅  Bare server loaded");
-} catch (e) {
-  console.warn("⚠️  Bare server not available (UV proxy disabled):", e.message);
-}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -32,7 +19,7 @@ const AI_SYSTEM = `You are VEXIS, an AI assistant on homewrk 3.0. Talk like a no
 
 const JARVIS_SYSTEM = `You are J.A.R.V.I.S. (Just A Rather Very Intelligent System), Tony Stark's AI assistant from Iron Man. Speak with a refined British butler tone — calm, precise, occasionally dry wit. Keep all responses concise: 1–3 sentences unless detail is essential. Occasionally address the user as "sir" or "ma'am". Stay in character always. Answer real-world questions accurately while maintaining the JARVIS persona.`;
 
-// ── CSP must come FIRST, before static serving ───────────────────────────────
+// ── CSP ───────────────────────────────────────────────────────────────────────
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy",
     "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
@@ -45,103 +32,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Bare server (UV proxy backend) ───────────────────────────────────────────
-app.use((req, res, next) => {
-  if (bareServer && bareServer.shouldRoute(req)) {
-    bareServer.routeRequest(req, res);
-  } else {
-    next();
-  }
-});
-
-// ── UV static files ───────────────────────────────────────────────────────────
-app.get("/uv/uv.config.js", (req, res) => {
-  res.setHeader("Content-Type", "application/javascript");
-  res.send(`self.__uv$config = {
-  prefix: '/service/',
-  encodeUrl: Ultraviolet.codec.xor.encode,
-  decodeUrl: Ultraviolet.codec.xor.decode,
-  handler: '/uv/uv.handler.js',
-  client: '/uv/uv.client.js',
-  bundle: '/uv/uv.bundle.js',
-  config: '/uv/uv.config.js',
-  sw: '/uv/uv.sw.js',
-};`);
-});
-
-app.get("/uv/uv.sw.js", (req, res, next) => {
-  res.setHeader("Service-Worker-Allowed", "/");
-  next();
-});
-
-app.use("/uv/", express.static(path.join(__dirname, "node_modules/@titaniumnetwork-dev/ultraviolet/dist")));
-
-// ── Middleware ────────────────────────────────────────────────────────────────
+// ── Middleware + static ───────────────────────────────────────────────────────
 app.use(express.json({ limit: "25mb" }));
+// public/ first so index.html is served at /, then root for games/, apps/, images/, etc.
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname)));
-
-// ── POST /api/imagegen ───────────────────────────────────────────────────────
-app.post("/api/imagegen", async (req, res) => {
-  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
-
-  if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
-    return res.status(400).json({ error: "prompt is required." });
-  }
-
-  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
-  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
-
-  try {
-    const response = await openai.images.generate({
-      model: "gpt-image-1",
-      prompt: prompt.trim(),
-      n: 1,
-      size: safeSize,
-      quality,
-    });
-
-    const imageUrl = response.data[0].url;
-    const revisedPrompt = response.data[0].revised_prompt || prompt;
-    return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
-  } catch (err) {
-    console.error("DALL-E error:", err.message);
-    const status = err.status || 500;
-    return res.status(status).json({ error: err.message || "Image generation failed." });
-  }
-});
-
-// ── POST /api/imageedit ──────────────────────────────────────────────────────
-app.post("/api/imageedit", async (req, res) => {
-  const { prompt, imageBase64, mimeType = "image/png", size = "1024x1024" } = req.body;
-
-  if (!prompt || !imageBase64) {
-    return res.status(400).json({ error: "prompt and imageBase64 are required." });
-  }
-
-  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
-  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
-
-  try {
-    const imageBuffer = Buffer.from(imageBase64, "base64");
-    const imageFile = await toFile(imageBuffer, "image.png", { type: mimeType });
-
-    const response = await openai.images.edit({
-      model: "gpt-image-1",
-      image: imageFile,
-      prompt: prompt.trim(),
-      n: 1,
-      size: safeSize,
-    });
-
-    const b64 = response.data[0].b64_json;
-    const url = response.data[0].url || null;
-    return res.json({ b64_json: b64, url });
-  } catch (err) {
-    console.error("Image edit error:", err.message);
-    const status = err.status || 500;
-    return res.status(status).json({ error: err.message || "Image edit failed." });
-  }
-});
 
 // ── GET /api/pollinations ─────────────────────────────────────────────────────
 app.get("/api/pollinations", async (req, res) => {
@@ -175,6 +70,67 @@ app.get("/api/pollinations", async (req, res) => {
   }
 });
 
+// ── POST /api/imagegen ────────────────────────────────────────────────────────
+app.post("/api/imagegen", async (req, res) => {
+  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
+
+  if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
+    return res.status(400).json({ error: "prompt is required." });
+  }
+
+  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
+  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
+
+  try {
+    const response = await openai.images.generate({
+      model: "gpt-image-1",
+      prompt: prompt.trim(),
+      n: 1,
+      size: safeSize,
+      quality,
+    });
+
+    const imageUrl = response.data[0].url;
+    const revisedPrompt = response.data[0].revised_prompt || prompt;
+    return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
+  } catch (err) {
+    console.error("Image gen error:", err.message);
+    return res.status(err.status || 500).json({ error: err.message || "Image generation failed." });
+  }
+});
+
+// ── POST /api/imageedit ───────────────────────────────────────────────────────
+app.post("/api/imageedit", async (req, res) => {
+  const { prompt, imageBase64, mimeType = "image/png", size = "1024x1024" } = req.body;
+
+  if (!prompt || !imageBase64) {
+    return res.status(400).json({ error: "prompt and imageBase64 are required." });
+  }
+
+  const allowedSizes = ["1024x1024", "1792x1024", "1024x1792"];
+  const safeSize = allowedSizes.includes(size) ? size : "1024x1024";
+
+  try {
+    const imageBuffer = Buffer.from(imageBase64, "base64");
+    const imageFile = await toFile(imageBuffer, "image.png", { type: mimeType });
+
+    const response = await openai.images.edit({
+      model: "gpt-image-1",
+      image: imageFile,
+      prompt: prompt.trim(),
+      n: 1,
+      size: safeSize,
+    });
+
+    const b64 = response.data[0].b64_json;
+    const url = response.data[0].url || null;
+    return res.json({ b64_json: b64, url });
+  } catch (err) {
+    console.error("Image edit error:", err.message);
+    return res.status(err.status || 500).json({ error: err.message || "Image edit failed." });
+  }
+});
+
 // ── POST /api/chat ────────────────────────────────────────────────────────────
 app.post("/api/chat", async (req, res) => {
   const { messages } = req.body;
@@ -190,12 +146,10 @@ app.post("/api/chat", async (req, res) => {
       messages: [{ role: "system", content: AI_SYSTEM }, ...messages],
     });
 
-    const reply = completion.choices[0].message.content;
-    return res.json({ reply });
+    return res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
     console.error("OpenAI error:", err.message);
-    const status = err.status || 500;
-    return res.status(status).json({ error: err.message || "OpenAI request failed." });
+    return res.status(err.status || 500).json({ error: err.message || "OpenAI request failed." });
   }
 });
 
@@ -214,25 +168,14 @@ app.post("/api/jarvis", async (req, res) => {
       messages: [{ role: "system", content: JARVIS_SYSTEM }, ...messages],
     });
 
-    const reply = completion.choices[0].message.content;
-    return res.json({ reply });
+    return res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
-    console.error("Jarvis endpoint error:", err.message);
-    const status = err.status || 500;
-    return res.status(status).json({ error: err.message || "Request failed." });
+    console.error("Jarvis error:", err.message);
+    return res.status(err.status || 500).json({ error: err.message || "Request failed." });
   }
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-const httpServer = app.listen(PORT, () => {
-  console.log(`✅  homewrk backend running at http://localhost:${PORT}`);
-});
-
-// Handle WebSocket upgrades for UV bare server
-httpServer.on("upgrade", (req, socket, head) => {
-  if (bareServer && bareServer.shouldRoute(req)) {
-    bareServer.routeUpgrade(req, socket, head);
-  } else {
-    socket.destroy();
-  }
+app.listen(PORT, () => {
+  console.log(`✅  homewrk backend running on port ${PORT}`);
 });
