@@ -4399,6 +4399,11 @@
           </div>
         </div>
 
+        <a href="http://launch-deck.net" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:24px;padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;color:rgba(255,255,255,0.75);font-family:var(--vx-font,system-ui,sans-serif);font-size:13px;text-decoration:none;letter-spacing:0.3px;transition:background 0.15s,border-color 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.11)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Launch Deck
+        </a>
+
         <div id="newtab-shortcuts-row" class="newtab-shortcuts"></div>
       </div>
 
@@ -4598,15 +4603,12 @@
           class="ic">🧱</span>BLOCK BREAKER</div>
       <div class="item-card" data-url="games/bubble-shooter.html" data-label="BUBBLE SHOOTER"><span
           class="ic">🫧</span>BUBBLE SHOOTER</div>
-      <div class="item-card" data-url="games/casino.html" data-label="CASINO"><span class="ic">🎰</span>CASINO</div>
       <div class="item-card" data-url="games/chess.html" data-label="CHESS"><span class="ic">♟</span>CHESS</div>
       <div class="item-card" data-url="games/flappy-bird.html" data-label="FLAPPY BIRD"><span class="ic">🐦</span>FLAPPY
         BIRD</div>
       <div class="item-card" data-url="games/guh-clicker.html" data-label="GUH CLICKER"><span class="ic">👆</span>GUH
         CLICKER</div>
       <div class="item-card" data-url="games/hangman.html" data-label="HANGMAN"><span class="ic">🪢</span>HANGMAN</div>
-      <div class="item-card" data-url="games/james-clicker.html" data-label="JAMES CLICKER"><span
-          class="ic">🖱</span>JAMES CLICKER</div>
       <div class="item-card" data-url="games/mines.html" data-label="MINES"><span class="ic">💣</span>MINES</div>
       <div class="item-card" data-url="games/sandbox.html" data-label="SANDBOX"><span class="ic">🏖</span>SANDBOX</div>
       <div class="item-card" data-url="games/snake.html" data-label="SNAKE"><span class="ic">🐍</span>SNAKE</div>
@@ -4615,7 +4617,6 @@
       <div class="item-card" data-url="games/wormscape.html" data-label="WORMSCAPE"><span class="ic">🪱</span>WORMSCAPE
       </div>
       <div class="item-card" data-url="games/minecraft.html" data-label="MINECRAFT RIPOFF"><span class="ic">⛏</span>MINECRAFT RIPOFF</div>
-      <div class="item-card" data-url="games/sandbox3d.html" data-label="3D SANDBOX"><span class="ic">🌐</span>3D SANDBOX</div>
     </div>
   </section>
 
@@ -4629,7 +4630,6 @@
       <div class="item-card" data-url="tools/clock.html" data-label="CLOCK"><span class="ic">⏰</span>CLOCK</div>
       <div class="item-card" data-url="tools/converter.html" data-label="CONVERTER"><span class="ic">🔄</span>CONVERTER
       </div>
-      <div class="item-card" data-url="tools/dc.html" data-label="DC"><span class="ic">⚡</span>DC</div>
       <div class="item-card" data-url="tools/fl-studio.html" data-label="FL STUDIO"><span class="ic">🎵</span>FL STUDIO
       </div>
       <div class="item-card" data-url="tools/image-cropper.html" data-label="IMAGE CROPPER"><span
@@ -9237,10 +9237,10 @@
     /* =====================================================
        GLOBAL SEARCH
     ===================================================== */
-    const GAMES_LIST = ['2048','BINGO','BLOCK BREAKER','BUBBLE SHOOTER','CASINO','CHESS','FLAPPY BIRD','GUH CLICKER','HANGMAN','JAMES CLICKER','MINES','SANDBOX','SNAKE','TIC TAC TOE','WORMSCAPE','MINECRAFT RIPOFF','3D SANDBOX'];
-    const GAMES_URLS = {'2048':'games/2048.html','BINGO':'games/bingo.html','BLOCK BREAKER':'games/block-breaker.html','BUBBLE SHOOTER':'games/bubble-shooter.html','CASINO':'games/casino.html','CHESS':'games/chess.html','FLAPPY BIRD':'games/flappy-bird.html','GUH CLICKER':'games/guh-clicker.html','HANGMAN':'games/hangman.html','JAMES CLICKER':'games/james-clicker.html','MINES':'games/mines.html','SANDBOX':'games/sandbox.html','SNAKE':'games/snake.html','TIC TAC TOE':'games/tictactoe.html','WORMSCAPE':'games/wormscape.html','MINECRAFT RIPOFF':'games/minecraft.html','3D SANDBOX':'games/sandbox3d.html'};
-    const TOOLS_LIST = ['BASE64','CALCULATOR','CLOCK','CONVERTER','DC','FL STUDIO','IMAGE CROPPER','IMAGE RESIZER','IP LOOKUP','JSON FORMATTER','LOCALSTORAGE VIEWER','NOTEPAD','QR GENERATOR','QR SCANNER','REGEX TESTER','SOUNDBOARD','TEXT TO SPEECH'];
-    const TOOLS_URLS = {'BASE64':'tools/base64-tool.html','CALCULATOR':'tools/calculator.html','CLOCK':'tools/clock.html','CONVERTER':'tools/converter.html','DC':'tools/dc.html','FL STUDIO':'tools/fl-studio.html','IMAGE CROPPER':'tools/image-cropper.html','IMAGE RESIZER':'tools/image-resizer.html','IP LOOKUP':'tools/ip-lookup.html','JSON FORMATTER':'tools/json-formatter.html','LOCALSTORAGE VIEWER':'tools/localstorage-viewer.html','NOTEPAD':'tools/notepad.html','QR GENERATOR':'tools/qr-generator.html','QR SCANNER':'tools/qr-scanner.html','REGEX TESTER':'tools/regex-tester.html','SOUNDBOARD':'tools/soundboard.html','TEXT TO SPEECH':'tools/text-to-speech.html'};
+    const GAMES_LIST = ['2048','BINGO','BLOCK BREAKER','BUBBLE SHOOTER','CHESS','FLAPPY BIRD','GUH CLICKER','HANGMAN','MINES','SANDBOX','SNAKE','TIC TAC TOE','WORMSCAPE','MINECRAFT RIPOFF'];
+    const GAMES_URLS = {'2048':'games/2048.html','BINGO':'games/bingo.html','BLOCK BREAKER':'games/block-breaker.html','BUBBLE SHOOTER':'games/bubble-shooter.html','CHESS':'games/chess.html','FLAPPY BIRD':'games/flappy-bird.html','GUH CLICKER':'games/guh-clicker.html','HANGMAN':'games/hangman.html','MINES':'games/mines.html','SANDBOX':'games/sandbox.html','SNAKE':'games/snake.html','TIC TAC TOE':'games/tictactoe.html','WORMSCAPE':'games/wormscape.html','MINECRAFT RIPOFF':'games/minecraft.html'};
+    const TOOLS_LIST = ['BASE64','CALCULATOR','CLOCK','CONVERTER','FL STUDIO','IMAGE CROPPER','IMAGE RESIZER','IP LOOKUP','JSON FORMATTER','LOCALSTORAGE VIEWER','NOTEPAD','QR GENERATOR','QR SCANNER','REGEX TESTER','SOUNDBOARD','TEXT TO SPEECH'];
+    const TOOLS_URLS = {'BASE64':'tools/base64-tool.html','CALCULATOR':'tools/calculator.html','CLOCK':'tools/clock.html','CONVERTER':'tools/converter.html','FL STUDIO':'tools/fl-studio.html','IMAGE CROPPER':'tools/image-cropper.html','IMAGE RESIZER':'tools/image-resizer.html','IP LOOKUP':'tools/ip-lookup.html','JSON FORMATTER':'tools/json-formatter.html','LOCALSTORAGE VIEWER':'tools/localstorage-viewer.html','NOTEPAD':'tools/notepad.html','QR GENERATOR':'tools/qr-generator.html','QR SCANNER':'tools/qr-scanner.html','REGEX TESTER':'tools/regex-tester.html','SOUNDBOARD':'tools/soundboard.html','TEXT TO SPEECH':'tools/text-to-speech.html'};
     let _searchTab = 'all', _searchTimer = null;
 
     function openSearch() {
@@ -10507,6 +10507,8 @@
 
     /* ── init ── */
     vxRenderTabs();
+    showSection('home');
+    showHomeNewTab();
     vxSyncBar();
 
     /* =====================================================
