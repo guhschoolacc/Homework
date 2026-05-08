@@ -6,12 +6,20 @@ import { fileURLToPath } from "url";
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
-const { createBareServer } = require("@tomphttp/bare-server-node");
+
+// Bare server is optional — if the package is missing on the host, the rest of the app still works
+let bareServer = null;
+try {
+  const { createBareServer } = require("@tomphttp/bare-server-node");
+  bareServer = createBareServer("/bare/");
+  console.log("✅  Bare server loaded");
+} catch (e) {
+  console.warn("⚠️  Bare server not available (UV proxy disabled):", e.message);
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 10000;
-const bareServer = createBareServer("/bare/");
 
 if (!process.env.OPENAI_API_KEY) {
   console.error("ERROR: OPENAI_API_KEY is not set in your .env file.");
@@ -39,7 +47,7 @@ app.use((req, res, next) => {
 
 // ── Bare server (UV proxy backend) ───────────────────────────────────────────
 app.use((req, res, next) => {
-  if (bareServer.shouldRoute(req)) {
+  if (bareServer && bareServer.shouldRoute(req)) {
     bareServer.routeRequest(req, res);
   } else {
     next();
@@ -47,7 +55,6 @@ app.use((req, res, next) => {
 });
 
 // ── UV static files ───────────────────────────────────────────────────────────
-// Custom config pointing to /uv/ paths
 app.get("/uv/uv.config.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
   res.send(`self.__uv$config = {
@@ -62,7 +69,6 @@ app.get("/uv/uv.config.js", (req, res) => {
 };`);
 });
 
-// Allow SW to control the entire origin
 app.get("/uv/uv.sw.js", (req, res, next) => {
   res.setHeader("Service-Worker-Allowed", "/");
   next();
@@ -87,7 +93,7 @@ app.post("/api/imagegen", async (req, res) => {
 
   try {
     const response = await openai.images.generate({
-      model: "gpt-image-1.5",
+      model: "gpt-image-1",
       prompt: prompt.trim(),
       n: 1,
       size: safeSize,
@@ -127,10 +133,9 @@ app.post("/api/imageedit", async (req, res) => {
       size: safeSize,
     });
 
-    // gpt-image-1 returns b64_json
     const b64 = response.data[0].b64_json;
     const url = response.data[0].url || null;
-    return res.json({ b64_json: b64, url });                // ← was missing
+    return res.json({ b64_json: b64, url });
   } catch (err) {
     console.error("Image edit error:", err.message);
     const status = err.status || 500;
@@ -139,7 +144,6 @@ app.post("/api/imageedit", async (req, res) => {
 });
 
 // ── GET /api/pollinations ─────────────────────────────────────────────────────
-// Proxies Pollinations image requests server-side to avoid browser rate limits
 app.get("/api/pollinations", async (req, res) => {
   const { prompt, model = "flux", width = "1024", height = "1024", seed } = req.query;
   if (!prompt) return res.status(400).json({ error: "prompt is required." });
@@ -226,7 +230,7 @@ const httpServer = app.listen(PORT, () => {
 
 // Handle WebSocket upgrades for UV bare server
 httpServer.on("upgrade", (req, socket, head) => {
-  if (bareServer.shouldRoute(req)) {
+  if (bareServer && bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
   } else {
     socket.destroy();
