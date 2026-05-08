@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>homewrk 3.0</title>
+  <title>vexis</title>
   <link rel="icon" id="tab-favicon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
     rel="stylesheet">
@@ -324,8 +324,11 @@
     [data-theme="blood"] .btn-primary{box-shadow:0 0 20px rgba(200,0,0,.5)}
 
     /* DEEP SPACE */
-    [data-theme="space"]{--bg:#000008;--fg:#c0d8ff;--bg2:#050510;--border-col:#101830;--accent:#4488ff;--accent-fg:#fff;--nav-bg:#020208;--modal-bg:#050510;--input-bg:#000008;--card-bg:#050510;--msg-user-bg:#4488ff;--msg-user-fg:#fff;--msg-ai-bg:#050510;--msg-ai-fg:#c0d8ff;--social-msg-bg:#050510;--social-msg-own-bg:#4488ff;--social-msg-own-fg:#fff;--shadow:rgba(68,136,255,.2);--muted:#203050}
+    [data-theme="space"]{--bg:rgba(0,0,12,0.6);--fg:#c0d8ff;--bg2:rgba(5,5,20,0.65);--border-col:#101830;--accent:#4488ff;--accent-fg:#fff;--nav-bg:rgba(2,2,14,0.82);--modal-bg:rgba(5,5,20,0.9);--input-bg:rgba(0,0,12,0.65);--card-bg:rgba(5,5,20,0.6);--msg-user-bg:#4488ff;--msg-user-fg:#fff;--msg-ai-bg:rgba(5,5,20,0.75);--msg-ai-fg:#c0d8ff;--social-msg-bg:rgba(5,5,20,0.75);--social-msg-own-bg:#4488ff;--social-msg-own-fg:#fff;--shadow:rgba(68,136,255,.2);--muted:#3a5070}
     [data-theme="space"] body{background:#000008;background-image:none}
+    [data-theme="space"] nav,[data-theme="space"] .section{position:relative;z-index:1}
+    [data-theme="space"] .section{background:transparent !important;}
+    [data-theme="space"] nav{background:rgba(2,2,14,0.82) !important;backdrop-filter:blur(14px);}
     [data-theme="space"] .home-title{text-shadow:0 0 20px #4488ff,0 0 40px rgba(68,136,255,.5)}
 
     /* NEON */
@@ -1020,7 +1023,7 @@
     /* ─── TOAST ─── */
     .toast {
       position: fixed;
-      top: 60px;
+      top: 90px;
       right: 16px;
       background: var(--fg);
       color: var(--bg);
@@ -2244,143 +2247,140 @@
     }
 
     /* ─── ADMIN SECTION ─── */
-    #admin-section {
-      max-width: 960px;
-      margin: 0 auto;
-    }
+    #admin-section { max-width: none; margin: 0; padding: 0 32px 32px; }
+    #mod-section { padding: 28px 32px; }
 
     .admin-tabs {
       display: flex;
-      gap: 0;
-      border-bottom: var(--border);
-      margin-bottom: 20px;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-col);
+      margin-bottom: 24px;
+      padding-bottom: 0;
     }
 
     .admin-tab {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      padding: 10px 16px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 13px;
+      font-weight: 400;
+      padding: 8px 16px;
       border: none;
       background: none;
       color: var(--muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s;
     }
 
     .admin-tab.active {
       color: var(--fg);
-      border-bottom-color: var(--fg);
+      border-bottom-color: var(--accent);
     }
 
-    .admin-panel {
-      display: none;
-    }
+    .admin-tab:hover:not(.active) { color: var(--fg); }
 
-    .admin-panel.active {
-      display: block;
-    }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
 
     .user-table {
       width: 100%;
       border-collapse: collapse;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .user-table th,
     .user-table td {
-      border: 1px solid var(--border-col);
-      padding: 10px 12px;
-      font-family: var(--font-mono);
-      font-size: 12px;
+      border-bottom: 1px solid var(--border-col);
+      padding: 11px 14px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 13px;
       text-align: left;
       vertical-align: middle;
     }
 
     .user-table th {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      background: var(--fg);
-      color: var(--bg);
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--bg2);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
-    .user-table tr:hover td {
-      background: var(--bg2);
-    }
+    .user-table tr:hover td { background: var(--bg2); }
 
     .ban-btn {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      padding: 4px 8px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 12px;
+      padding: 4px 10px;
       background: none;
-      border: var(--border);
+      border: 1px solid rgba(255,80,80,0.4);
+      border-radius: 6px;
       color: #f55;
       cursor: pointer;
+      transition: background 0.1s, color 0.1s;
     }
-
-    .ban-btn:hover {
-      background: #f55;
-      color: #fff;
-    }
+    .ban-btn:hover { background: #f55; color: #fff; border-color: #f55; }
 
     .unban-btn {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      padding: 4px 8px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 12px;
+      padding: 4px 10px;
       background: none;
-      border: var(--border);
-      color: #5f5;
+      border: 1px solid rgba(80,220,80,0.4);
+      border-radius: 6px;
+      color: #5d5;
       cursor: pointer;
+      transition: background 0.1s, color 0.1s;
     }
-
-    .unban-btn:hover {
-      background: #5f5;
-      color: #000;
-    }
+    .unban-btn:hover { background: #5d5; color: #000; border-color: #5d5; }
 
     .del-msgs-btn {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      padding: 4px 8px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 12px;
+      padding: 4px 10px;
       background: none;
-      border: 1px solid #f55;
-      color: #f55;
+      border: 1px solid rgba(255,80,80,0.3);
+      border-radius: 6px;
+      color: #f88;
       cursor: pointer;
+      transition: background 0.1s;
     }
+    .del-msgs-btn:hover { background: rgba(255,80,80,0.15); }
 
-    .del-msgs-btn:hover {
-      background: #f55;
-      color: #fff;
-    }
-
-    .whitelist-input-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    .whitelist-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
 
     .whitelist-input {
       flex: 1;
-      font-family: var(--font-mono);
+      font-family: var(--vx-font, system-ui, sans-serif);
       font-size: 13px;
-      padding: 8px 12px;
-      border: var(--border);
+      padding: 9px 12px;
+      border: 1px solid var(--border-col);
+      border-radius: 8px;
       background: var(--input-bg);
       color: var(--fg);
       outline: none;
     }
+    .whitelist-input:focus { border-color: var(--accent); }
 
     .admin-action-btn {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      padding: 8px 14px;
-      background: var(--fg);
-      color: var(--bg);
-      border: var(--border);
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 13px;
+      font-weight: 400;
+      padding: 8px 16px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
+      transition: opacity 0.15s;
     }
-
-    .admin-action-btn:hover {
-      opacity: .8;
-    }
+    .admin-action-btn:hover { opacity: 0.85; }
+    .admin-action-btn.ghost { background: var(--bg2); color: var(--fg); border: 1px solid var(--border-col); }
+    .admin-action-btn.warn { background: #e06020; }
+    .admin-action-btn.danger { background: #c03030; }
+    .admin-action-btn.success { background: #209040; }
 
     .wl-entry {
       display: flex;
@@ -2488,37 +2488,41 @@
     #admin-confirm-modal{display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
     #admin-confirm-modal.open{display:flex}
     .admin-confirm-box{background:var(--bg);border:var(--border);padding:24px;max-width:400px;width:90%}
-    .admin-confirm-box h3{font-family:var(--font-pixel);font-size:9px;margin:0 0 12px}
-    .admin-confirm-box p{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin:0 0 20px;line-height:1.6}
+    .admin-confirm-box h3{font-family:var(--vx-font,system-ui);font-size:16px;font-weight:400;margin:0 0 12px}
+    .admin-confirm-box p{font-family:var(--vx-font,system-ui);font-size:13px;color:var(--muted);margin:0 0 20px;line-height:1.6}
     .admin-confirm-btns{display:flex;gap:8px;justify-content:flex-end}
     /* drawer */
-    #user-detail-drawer{display:none;border:var(--border);background:var(--bg2);padding:20px;margin-bottom:20px;position:relative}
+    #user-detail-drawer{display:none;border:1px solid var(--border-col);border-radius:12px;background:var(--card-bg);padding:20px;margin-bottom:20px;position:relative}
     #user-detail-drawer.open{display:block}
-    .drawer-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+    .drawer-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
     .drawer-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
-    .drawer-name{font-family:var(--font-pixel);font-size:11px}
-    .drawer-uid{font-family:var(--font-mono);font-size:10px;color:var(--muted);word-break:break-all}
+    .drawer-name{font-family:var(--vx-font,system-ui);font-size:16px;font-weight:400}
+    .drawer-uid{font-family:monospace;font-size:11px;color:var(--muted);word-break:break-all}
     .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
     @media(max-width:600px){.drawer-grid{grid-template-columns:1fr}}
-    .drawer-field{display:flex;flex-direction:column;gap:4px}
-    .drawer-field label{font-family:var(--font-pixel);font-size:7px;color:var(--muted)}
-    .drawer-field input,.drawer-field select{font-family:var(--font-mono);font-size:12px;padding:6px 10px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;width:100%}
-    .drawer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    .drawer-section-title{font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin:14px 0 8px;letter-spacing:1px}
+    .drawer-field{display:flex;flex-direction:column;gap:5px}
+    .drawer-field label{font-family:var(--vx-font,system-ui);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px}
+    .drawer-field input,.drawer-field select{font-family:var(--vx-font,system-ui);font-size:13px;padding:8px 10px;border:1px solid var(--border-col);border-radius:7px;background:var(--input-bg);color:var(--fg);outline:none;width:100%;box-sizing:border-box}
+    .drawer-field input:focus,.drawer-field select:focus{border-color:var(--accent)}
+    .drawer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .drawer-section-title{font-family:var(--vx-font,system-ui);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin:14px 0 8px}
     .custom-fields-list{display:flex;flex-direction:column;gap:6px}
     .custom-field-row{display:flex;gap:6px;align-items:center}
-    .custom-field-row input{font-family:var(--font-mono);font-size:12px;padding:5px 8px;border:var(--border);background:var(--input-bg);color:var(--fg);outline:none;flex:1}
-    .custom-field-remove{background:none;border:none;color:#f55;cursor:pointer;font-size:14px;padding:0 4px}
+    .custom-field-row input{font-family:var(--vx-font,system-ui);font-size:13px;padding:6px 10px;border:1px solid var(--border-col);border-radius:7px;background:var(--input-bg);color:var(--fg);outline:none;flex:1}
+    .custom-field-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px;transition:color 0.1s}
+    .custom-field-remove:hover{color:#f55}
     /* mod panel / owner panel extras */
-    .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
-    .admin-stat-card{border:var(--border);background:var(--bg2);padding:12px 14px}
-    .admin-stat-val{font-family:var(--font-pixel);font-size:14px;margin-bottom:4px}
-    .admin-stat-label{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
-    #bulk-bar{display:none;background:var(--fg);color:var(--bg);padding:8px 14px;margin-bottom:10px;font-family:var(--font-pixel);font-size:7px;align-items:center;gap:10px}
+    .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+    .admin-stat-card{border:1px solid var(--border-col);border-radius:10px;background:var(--card-bg);padding:14px 16px}
+    .admin-stat-val{font-family:var(--vx-font,system-ui);font-size:22px;font-weight:300;margin-bottom:4px}
+    .admin-stat-label{font-family:var(--vx-font,system-ui);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
+    #bulk-bar{display:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;margin-bottom:12px;font-family:var(--vx-font,system-ui);font-size:13px;align-items:center;gap:10px}
     #bulk-bar.visible{display:flex}
-    .bulk-bar-btn{font-family:var(--font-pixel);font-size:6px;padding:5px 10px;border:1px solid var(--bg);background:none;color:var(--bg);cursor:pointer}
-    .bulk-bar-btn:hover{background:var(--bg);color:var(--fg)}
-    .bulk-bar-btn.danger{border-color:#f55;color:#f55}.bulk-bar-btn.danger:hover{background:#f55;color:#fff}
+    .admin-search{font-family:var(--vx-font,system-ui);font-size:13px;padding:8px 12px;border:1px solid var(--border-col);border-radius:8px;background:var(--input-bg);color:var(--fg);outline:none;min-width:220px}
+    .admin-search:focus{border-color:var(--accent)}
+    .bulk-bar-btn{font-family:var(--vx-font,system-ui);font-size:12px;padding:5px 12px;border:1px solid rgba(255,255,255,0.4);border-radius:6px;background:none;color:#fff;cursor:pointer;transition:background 0.1s}
+    .bulk-bar-btn:hover{background:rgba(255,255,255,0.15)}
+    .bulk-bar-btn.danger{border-color:#f88;color:#f88}.bulk-bar-btn.danger:hover{background:rgba(255,80,80,0.2)}
     .rt-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5f5;margin-right:6px;animation:pdot 2s infinite}
     @keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
     .msg-report-btn{font-family:var(--font-pixel);font-size:6px;padding:3px 7px;background:none;border:1px solid #f55;color:#f55;cursor:pointer}
@@ -3138,10 +3142,798 @@
       margin: 8px 0 4px;
       letter-spacing: 1px;
     }
+
+    /* ═══════════════════════════════════════════════════════
+       VEXIS BROWSER — THEME-AWARE UI
+    ═══════════════════════════════════════════════════════ */
+
+    /* User-selectable font variable */
+    :root { --vx-font: 'Segoe UI', system-ui, sans-serif; }
+
+    /* Only add padding for the chrome — themes control everything else */
+    body { padding-top: 110px !important; background-image: none !important; }
+
+    /* ─── FULL-WIDTH LAYOUT — remove all centering/boxing ─── */
+    #home-section { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+    #stats-section { max-width: none !important; margin: 0 !important; }
+    #shared-ai-section { max-width: none !important; margin: 0 !important; }
+    #activity-section { max-width: none !important; margin: 0 !important; }
+
+    /* ─── PAGE HEADER ─── */
+    .vx-page-hdr { padding: 28px 32px 20px; border-bottom: 1px solid var(--border-col); margin-bottom: 24px; }
+    .vx-page-title { font-family: var(--vx-font, system-ui, sans-serif); font-size: 22px; font-weight: 300; color: var(--fg); }
+    .vx-page-sub { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: var(--vx-font, system-ui, sans-serif); }
+
+    /* ─── SOCIAL HUB ─── */
+    .social-hub-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border-col); border: 1px solid var(--border-col); border-radius: 12px; overflow: hidden; margin: 0 32px 28px; }
+    .social-hub-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: var(--card-bg); cursor: pointer; transition: background 0.12s; }
+    .social-hub-card:hover { background: var(--bg2); }
+    .social-hub-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--border-col); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+    .social-hub-info { flex: 1; min-width: 0; }
+    .social-hub-title { font-family: var(--vx-font, system-ui, sans-serif); font-size: 15px; font-weight: 400; color: var(--fg); }
+    .social-hub-desc { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: var(--vx-font, system-ui, sans-serif); }
+    .social-hub-chevron { color: var(--muted); flex-shrink: 0; }
+    .social-hub-card:hover .social-hub-chevron { color: var(--fg); }
+    .social-hint { font-size: 12px; color: var(--muted); padding: 0 32px 24px; font-family: var(--vx-font, system-ui, sans-serif); }
+    #friend-activity-panel { margin: 0 32px 24px; border: 1px solid var(--border-col); border-radius: 12px; overflow: hidden; background: var(--card-bg); }
+    .vx-panel-hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-col); background: var(--bg2); }
+    .vx-panel-title { font-family: var(--vx-font, system-ui, sans-serif); font-size: 13px; font-weight: 500; color: var(--fg); }
+    .vx-panel-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0; line-height: 1; }
+    .vx-panel-close:hover { color: var(--fg); }
+
+    /* ─── APPS SECTION ─── */
+    #apps-section .items-grid { padding: 24px 32px; }
+    .app-web-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 12px; background: var(--card-bg); border: 1px solid var(--border-col); border-radius: 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; text-align: center; }
+    .app-web-card:hover { border-color: var(--accent); background: var(--bg2); }
+    .app-web-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: var(--bg2); border: 1px solid var(--border-col); }
+    .app-web-name { font-family: var(--vx-font, system-ui, sans-serif); font-size: 12px; color: var(--fg); font-weight: 500; }
+    .app-web-desc { font-size: 11px; color: var(--muted); font-family: var(--vx-font, system-ui, sans-serif); }
+    .apps-web-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 24px 32px; }
+
+    /* ─── PROFILE BUTTON ─── */
+    #nav-auth-btn { border-radius: 50% !important; overflow: hidden !important; padding: 0 !important; }
+    #nav-auth-btn img { width: 100% !important; height: 100% !important; border-radius: 0 !important; border: none !important; object-fit: cover !important; }
+
+    /* ─── ANIMATED THEMES — FIXES ─── */
+    /* Aurora & Lava: body::before is z-index:0, sections cover it — make sections transparent */
+    [data-theme="aurora"] .section,
+    [data-theme="lava"] .section { background: transparent !important; }
+    /* Boost aurora gradient visibility */
+    [data-theme="aurora"] body::before {
+      background: linear-gradient(135deg, rgba(0,229,204,.22) 0%, rgba(120,0,220,.2) 33%, rgba(0,120,255,.22) 66%, rgba(0,229,204,.18) 100%) !important;
+      background-size: 400% 400% !important;
+      animation: gradShift 5s ease infinite !important;
+    }
+    /* Boost lava gradient visibility */
+    [data-theme="lava"] body::before {
+      background: linear-gradient(135deg, rgba(220,40,0,.3) 0%, rgba(255,110,0,.22) 25%, rgba(180,0,0,.35) 50%, rgba(255,70,0,.22) 75%, rgba(220,40,0,.3) 100%) !important;
+      background-size: 400% 400% !important;
+      animation: lavaFlow 4s ease infinite !important;
+    }
+    /* Cyberpunk — was missing animation entirely */
+    [data-theme="cyberpunk"] body::before {
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(240,230,20,.05) 2px, rgba(240,230,20,.05) 4px) !important;
+      animation: scanlines 0.06s steps(1) infinite !important;
+    }
+    /* Toxic — was missing animation */
+    [data-theme="toxic"] body::before {
+      background: repeating-linear-gradient(0deg, rgba(128,255,0,.07) 0px, rgba(128,255,0,.07) 1px, transparent 1px, transparent 4px) !important;
+      animation: scanlines 0.08s steps(1) infinite !important;
+    }
+    /* Matrix — boost scanline opacity */
+    [data-theme="matrix"] body::before {
+      background: repeating-linear-gradient(0deg, rgba(0,255,65,.08) 0px, rgba(0,255,65,.08) 1px, transparent 1px, transparent 3px) !important;
+    }
+
+    /* ─── NOTIFICATION CENTER ─── */
+    #notif-center { top: 110px !important; right: 8px !important; border-radius: 12px !important; border: 1px solid var(--border-col) !important; background: var(--modal-bg) !important; max-height: min(480px, calc(100vh - 130px)) !important; }
+    .notif-hdr { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; font-weight: 400 !important; letter-spacing: 0 !important; }
+    .notif-title { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; }
+    .notif-text { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; }
+
+    /* ─── BROWSER PAGE MENU ─── */
+    #vx-page-menu { position: fixed; top: 110px; right: 8px; background: var(--modal-bg); border: 1px solid var(--border-col); border-radius: 10px; padding: 6px; z-index: 999999; min-width: 200px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+    .vx-pm-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--fg); font-family: var(--vx-font, system-ui, sans-serif); transition: background 0.1s; }
+    .vx-pm-item:hover { background: var(--bg2); }
+    .vx-pm-item svg { flex-shrink: 0; color: var(--muted); }
+    .vx-pm-sep { height: 1px; background: var(--border-col); margin: 4px 0; }
+
+    /* ─── QUICKBAR ─── */
+    #vexis-quickbar {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      gap: 2px;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border-col);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    #vexis-quickbar::-webkit-scrollbar { display: none; }
+    .vexis-qb-btn {
+      height: 22px;
+      padding: 0 10px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      cursor: pointer;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.1s, color 0.1s;
+    }
+    .vexis-qb-btn:hover { background: var(--bg2); color: var(--fg); }
+    #vqb-ai { color: var(--accent); font-weight: 500; }
+    #vqb-ai:hover { background: var(--bg2); }
+    .vexis-qb-sep { width: 1px; height: 14px; background: var(--border-col); margin: 0 4px; flex-shrink: 0; }
+
+    /* ─── VEXIS BROWSER CHROME (uses theme vars) ─── */
+    #vexis-chrome {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999999;
+      background: var(--nav-bg);
+      user-select: none;
+    }
+    #vexis-tab-strip {
+      height: 38px;
+      display: flex;
+      align-items: flex-end;
+      padding: 5px 6px 0;
+      gap: 2px;
+      background: var(--bg);
+      overflow-x: hidden;
+      border-bottom: 1px solid var(--border-col);
+    }
+    #vexis-tabs-container {
+      display: flex;
+      gap: 2px;
+      flex: 1;
+      overflow-x: auto;
+      align-items: flex-end;
+      scrollbar-width: none;
+      min-width: 0;
+    }
+    #vexis-tabs-container::-webkit-scrollbar { display: none; }
+    .vexis-tab {
+      height: 30px;
+      min-width: 120px;
+      max-width: 220px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 6px 0 10px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.12s, color 0.12s;
+      position: relative;
+    }
+    .vexis-tab.active {
+      background: var(--nav-bg);
+      color: var(--fg);
+      box-shadow: inset 0 2px 0 var(--accent);
+    }
+    .vexis-tab:not(.active):hover { background: var(--bg2); color: var(--fg); }
+    .vexis-tab-favicon { font-size: 11px; flex-shrink: 0; opacity: 0.8; }
+    .vexis-tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .vexis-tab-close {
+      width: 18px; height: 18px;
+      border-radius: 50%; border: none; background: none;
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding: 0; font-size: 14px; line-height: 1;
+    }
+    .vexis-tab-close:hover { background: var(--bg2); color: var(--fg); }
+    #vexis-new-tab-btn {
+      width: 26px; height: 26px;
+      border: none; background: none;
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; flex-shrink: 0; margin-bottom: 2px;
+      font-size: 17px; line-height: 1; transition: background 0.1s, color 0.1s;
+    }
+    #vexis-new-tab-btn:hover { background: var(--bg2); color: var(--fg); }
+
+    /* Browser nav bar */
+    #vexis-nav-bar {
+      height: 42px;
+      display: flex; align-items: center;
+      padding: 0 8px; gap: 4px;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border-col);
+    }
+    #vexis-nav-controls, #vexis-nav-right { display: flex; gap: 2px; }
+    #vexis-nav-controls { margin-right: 4px; }
+    #vexis-nav-right { margin-left: 4px; }
+    .vexis-ctrl-btn {
+      width: 28px; height: 28px;
+      border: none; background: none;
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; flex-shrink: 0; position: relative;
+      transition: background 0.1s, color 0.1s; font-size: 15px;
+    }
+    .vexis-ctrl-btn:hover { background: var(--bg2); color: var(--fg); }
+    .vexis-ctrl-btn:disabled { opacity: 0.2; cursor: default; }
+    .vexis-ctrl-btn:disabled:hover { background: none; }
+    #vexis-address-wrap {
+      flex: 1;
+      display: flex; align-items: center;
+      background: var(--input-bg);
+      border-radius: 999px;
+      padding: 0 14px; height: 28px; gap: 8px;
+      border: 1px solid var(--border-col);
+      transition: border-color 0.15s; cursor: text;
+    }
+    #vexis-address-wrap:focus-within { border-color: var(--accent); }
+    #vexis-address-bar {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--fg);
+      font-size: 13px; font-family: var(--vx-font, system-ui, sans-serif); min-width: 0;
+    }
+    #vexis-address-bar::placeholder { color: var(--muted); }
+    .vb-notif-badge {
+      position: absolute; top: 2px; right: 2px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); font-size: 0;
+    }
+
+    /* Hide original nav bar */
+    nav { display: none !important; }
+
+    /* ─── SECTIONS ─── */
+    .section { min-height: calc(100vh - 110px); padding: 0; background: var(--bg); }
+
+    /* ─── SECTION TITLE ─── */
+    .section-title {
+      font-family: var(--vx-font, system-ui, sans-serif) !important;
+      font-size: 22px !important; font-weight: 300 !important;
+      letter-spacing: -0.3px !important; color: var(--fg) !important;
+      padding: 28px 32px 20px !important; border-bottom: 1px solid var(--border-col) !important; margin-bottom: 0 !important;
+      border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 24px !important;
+    }
+
+    /* ─── ITEMS GRID ─── */
+    .items-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)) !important;
+      gap: 10px !important;
+      padding: 24px 32px !important;
+    }
+
+    /* ─── ITEM CARDS ─── */
+    .item-card {
+      background: var(--card-bg) !important; border: 1px solid var(--border-col) !important;
+      border-radius: 12px !important; padding: 18px 14px 14px !important;
+      cursor: pointer !important; display: flex !important; flex-direction: column !important;
+      align-items: flex-start !important; gap: 9px !important;
+      transition: background 0.13s, border-color 0.13s !important;
+      font-family: var(--vx-font, system-ui, sans-serif) !important;
+      font-size: 13px !important; color: var(--fg) !important;
+      font-weight: 400 !important; letter-spacing: 0 !important; text-transform: none !important;
+    }
+    .item-card:hover { background: var(--bg2) !important; border-color: var(--accent) !important; }
+    .item-card .ic { font-size: 20px !important; }
+
+    /* ─── HOME / AI ─── */
+    .home-title { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 28px !important; font-weight: 300 !important; letter-spacing: -0.5px !important; }
+    .home-sub { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 14px !important; }
+    .home-actions { gap: 8px !important; }
+
+    /* ─── CHAT ─── */
+    .chat-wrap { border: 1px solid var(--border-col) !important; border-radius: 12px !important; overflow: hidden !important; background: var(--bg2) !important; }
+    .msg-bubble { border: none !important; border-radius: 10px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 14px !important; line-height: 1.6 !important; background: var(--bg2) !important; color: var(--fg) !important; }
+    .msg-row.user-row .msg-bubble { background: var(--msg-user-bg) !important; color: var(--msg-user-fg) !important; }
+    .msg-avatar { border: none !important; border-radius: 50% !important; }
+    .msg-time { font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .chat-input { background: var(--input-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 8px !important; color: var(--fg) !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 14px !important; }
+    .chat-send-btn { background: var(--accent) !important; color: var(--accent-fg) !important; border: none !important; border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; font-weight: 500 !important; letter-spacing: 0 !important; padding: 0 16px !important; }
+    .chat-send-btn:hover { opacity: 0.85 !important; }
+    .chat-input-area { border-top: 1px solid var(--border-col) !important; background: var(--bg2) !important; }
+    .chat-input-row { padding: 10px !important; }
+    .chat-tools-row { padding: 0 10px 10px !important; gap: 6px !important; }
+    .chat-messages { background: var(--bg2) !important; }
+
+    /* ─── TOOL BUTTONS ─── */
+    .tool-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 6px !important; padding: 5px 10px !important; border: 1px solid var(--border-col) !important; background: var(--bg2) !important; color: var(--fg) !important; text-transform: none !important; }
+    .tool-btn:hover { border-color: var(--accent) !important; }
+
+    /* ─── PERSONA BUTTONS ─── */
+    .persona-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 20px !important; padding: 5px 12px !important; border: 1px solid var(--border-col) !important; background: transparent !important; color: var(--muted) !important; text-transform: none !important; }
+    .persona-btn.active, .persona-btn:hover { background: var(--bg2) !important; color: var(--fg) !important; border-color: var(--accent) !important; }
+    #persona-bar { border-bottom: 1px solid var(--border-col) !important; }
+
+    /* ─── AI TABS ─── */
+    .ai-tab-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; border-radius: 8px 8px 0 0 !important; padding: 8px 16px !important; border: 1px solid var(--border-col) !important; border-bottom: none !important; background: transparent !important; color: var(--muted) !important; text-transform: none !important; }
+    .ai-tab-btn.active { background: var(--bg2) !important; color: var(--fg) !important; }
+    .ai-tab-bar { border-bottom: 1px solid var(--border-col) !important; background: var(--bg) !important; padding: 0 !important; }
+    .ai-fs-btn2 { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 6px !important; padding: 6px 12px !important; border: 1px solid var(--border-col) !important; background: transparent !important; color: var(--muted) !important; }
+
+    /* ─── PRIMARY/SECONDARY BUTTONS ─── */
+    .btn-primary { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; font-weight: 500 !important; letter-spacing: 0 !important; border-radius: 8px !important; padding: 9px 20px !important; background: var(--accent) !important; color: var(--accent-fg) !important; border: none !important; text-transform: none !important; }
+    .btn-primary:hover { opacity: 0.85 !important; }
+    .btn-secondary { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; border-radius: 8px !important; padding: 9px 20px !important; background: var(--bg2) !important; color: var(--fg) !important; border: 1px solid var(--border-col) !important; text-transform: none !important; }
+    .btn-secondary:hover { border-color: var(--accent) !important; }
+
+    /* ─── MODALS ─── */
+    .modal-overlay { background: rgba(0,0,0,0.75) !important; backdrop-filter: blur(5px); }
+    .modal-box { background: var(--modal-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 14px !important; }
+    .modal-hdr { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 15px !important; font-weight: 400 !important; letter-spacing: 0 !important; border-bottom: 1px solid var(--border-col) !important; padding: 15px 18px !important; color: var(--fg) !important; }
+    .modal-close { background: var(--bg2) !important; border: none !important; border-radius: 6px !important; color: var(--muted) !important; font-size: 14px !important; }
+    .modal-close:hover { color: var(--fg) !important; }
+    .modal-body { padding: 16px 18px !important; }
+    /* fullscreen modals must start below the chrome */
+    #dm-modal, #social-chat-modal { top: 110px !important; height: calc(100vh - 110px) !important; bottom: 0 !important; }
+    #dm-modal .modal-box, #social-chat-modal .modal-box { height: 100% !important; max-height: 100% !important; }
+
+    /* ─── SETTINGS ─── */
+    .settings-input { background: var(--input-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 8px !important; color: var(--fg) !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .settings-label { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 10px !important; letter-spacing: 0.6px !important; color: var(--muted) !important; text-transform: uppercase !important; }
+    .settings-row { gap: 6px !important; flex-wrap: wrap !important; }
+    .theme-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 8px !important; padding: 7px 12px !important; border: 1px solid var(--border-col) !important; background: var(--bg2) !important; color: var(--fg) !important; text-transform: none !important; cursor: pointer !important; }
+    .theme-btn:hover, .theme-btn.vx-active { border-color: var(--accent) !important; background: var(--input-bg) !important; }
+    .font-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 8px !important; padding: 7px 12px !important; border: 1px solid var(--border-col) !important; background: var(--bg2) !important; color: var(--fg) !important; cursor: pointer !important; }
+    .font-btn:hover, .font-btn.vx-active { border-color: var(--accent) !important; background: var(--input-bg) !important; }
+
+    /* ─── FULLSCREEN PROXY (fills viewport below chrome) ─── */
+    #fullscreen-overlay { top: 110px !important; z-index: 99998 !important; height: calc(100vh - 110px) !important; width: 100% !important; }
+    .fullscreen-bar { display: none !important; }
+    #fullscreen-frame { height: 100% !important; width: 100% !important; border: none !important; }
+
+    /* ─── TOAST ─── */
+    .toast { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; border-radius: 8px !important; background: var(--modal-bg) !important; border: 1px solid var(--border-col) !important; color: var(--fg) !important; box-shadow: 0 4px 20px var(--shadow) !important; top: 90px !important; }
+
+    /* ─── SOCIAL SECTION ─── */
+    .big-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 14px !important; font-weight: 400 !important; letter-spacing: 0 !important; border-radius: 10px !important; padding: 14px 22px !important; background: var(--card-bg) !important; color: var(--fg) !important; border: 1px solid var(--border-col) !important; text-transform: none !important; }
+    .big-btn:hover { border-color: var(--accent) !important; }
+    .social-msg { border: none !important; }
+    .social-msg-bubble { border-radius: 10px !important; border: none !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; }
+    .social-input { border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .social-send-btn { border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; letter-spacing: 0 !important; font-size: 13px !important; }
+
+    /* ─── CHANGELOG ─── */
+    .changelog-entry { border: 1px solid var(--border-col) !important; border-radius: 10px !important; background: var(--card-bg) !important; margin-bottom: 10px !important; }
+    .changelog-entry-hdr { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 14px !important; font-weight: 400 !important; letter-spacing: 0 !important; padding: 12px 16px !important; border-bottom: 1px solid var(--border-col) !important; border-radius: 10px 10px 0 0 !important; color: var(--fg) !important; }
+    .changelog-entry-body { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; padding: 12px 16px !important; color: var(--muted) !important; line-height: 1.8 !important; }
+
+    /* ─── STATS ─── */
+    .stats-grid { gap: 10px !important; }
+    .stat-card { background: var(--card-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 12px !important; padding: 20px 16px !important; }
+    .stat-card-val { font-family: var(--vx-font, system-ui, sans-serif) !important; font-weight: 200 !important; font-size: 32px !important; color: var(--fg) !important; }
+    .stat-card-label { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 11px !important; letter-spacing: 0.3px !important; color: var(--muted) !important; margin-top: 4px !important; }
+
+    /* ─── IMAGE GEN ─── */
+    .imagegen-input { background: var(--input-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 8px !important; color: var(--fg) !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .imagegen-btn { background: var(--accent) !important; color: var(--accent-fg) !important; border: none !important; border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-weight: 500 !important; letter-spacing: 0 !important; }
+    .imagegen-size-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; border-radius: 6px !important; border: 1px solid var(--border-col) !important; background: transparent !important; color: var(--muted) !important; }
+    .imagegen-size-btn.active { background: var(--bg2) !important; color: var(--fg) !important; border-color: var(--accent) !important; }
+
+    /* ─── ANNOUNCEMENT BANNER ─── */
+    #announcement-banner { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; }
+
+    /* ─── ADMIN / MOD ─── */
+    .admin-action-btn { font-family: var(--vx-font, system-ui, sans-serif) !important; border-radius: 8px !important; letter-spacing: 0 !important; font-size: 13px !important; }
+
+    /* ─── CONV/MEMORY PANELS ─── */
+    .conv-panel { border: 1px solid var(--border-col) !important; border-radius: 10px !important; overflow: hidden !important; }
+    .conv-panel-hdr { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; padding: 10px 14px !important; background: var(--bg2) !important; border-bottom: 1px solid var(--border-col) !important; }
+    .conv-item { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; }
+    .conv-search-input { border-radius: 6px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .memory-hdr { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 12px !important; letter-spacing: 0 !important; }
+
+    /* ─── SEARCH OVERLAY ─── */
+    .search-bar-inner { border-radius: 10px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .search-result-item { border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; }
+
+    /* ─── NOTIF PANEL ─── */
+    .notif-panel { background: var(--modal-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 12px !important; }
+    .notif-item { font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; }
+
+    /* ─── SUPPORT ─── */
+    .support-tier { background: var(--card-bg) !important; border: 1px solid var(--border-col) !important; border-radius: 12px !important; }
+
+    /* ─── AUTH MODAL ─── */
+    .auth-input { border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; }
+    .auth-submit-btn { border-radius: 8px !important; font-family: var(--vx-font, system-ui, sans-serif) !important; font-size: 13px !important; letter-spacing: 0 !important; font-weight: 500 !important; }
+
+    /* ─── VEXIS NEW TAB HOME — FULL PAGE ─── */
+    #home-section.newtab-active {
+      padding: 0;
+      height: calc(100vh - 110px);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    #home-newtab {
+      height: 100%;
+      width: 100%;
+      background: var(--bg);
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+    .newtab-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 60px 80px;
+      gap: 0;
+      box-sizing: border-box;
+    }
+    .newtab-logo-wrap {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    /* ─── NEWTAB CLOCK ─── */
+    #nt-clock-wrap { text-align: center; margin-bottom: 28px; }
+    #nt-time-row { display: flex; align-items: baseline; justify-content: center; gap: 6px; line-height: 1; }
+    #nt-time { font-size: 72px; font-weight: 100; color: var(--fg); font-family: var(--vx-font, system-ui, sans-serif); letter-spacing: -4px; }
+    #nt-ampm { font-size: 18px; font-weight: 300; color: var(--muted); font-family: var(--vx-font, system-ui, sans-serif); letter-spacing: 0; }
+    #nt-date { font-size: 13px; color: var(--muted); font-family: var(--vx-font, system-ui, sans-serif); margin-top: 6px; font-weight: 300; }
+    .newtab-logo {
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 64px;
+      font-weight: 200;
+      color: var(--fg);
+      letter-spacing: -3px;
+      line-height: 1;
+    }
+    .newtab-logo-line {
+      width: 48px;
+      height: 1px;
+      background: var(--border-col);
+      margin: 16px auto 0;
+    }
+    .newtab-search-wrap {
+      width: 100%;
+      max-width: 620px;
+      margin-bottom: 44px;
+    }
+    .newtab-search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border-radius: 999px;
+      padding: 0 20px;
+      height: 52px;
+      gap: 12px;
+      border: 1px solid var(--border-col);
+      transition: border-color 0.15s;
+    }
+    .newtab-search-bar:focus-within { border-color: var(--accent); }
+    .newtab-search-icon { flex-shrink: 0; }
+    .newtab-search-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--fg);
+      font-size: 15px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      min-width: 0;
+    }
+    .newtab-search-input::placeholder { color: var(--muted); }
+    .newtab-engine-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .newtab-engine-select {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 2px;
+    }
+    .newtab-engine-select option { background: var(--modal-bg); color: var(--fg); }
+    .newtab-icons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .newtab-icon-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-col);
+      background: var(--card-bg);
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      width: 72px;
+      flex-shrink: 0;
+    }
+    .newtab-icon-btn:hover { background: var(--bg2); border-color: var(--accent); transform: translateY(-2px); }
+    .newtab-icon-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .newtab-icon-btn:hover .newtab-icon-circle { background: var(--input-bg); }
+    .newtab-icon-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--vx-font, system-ui, sans-serif);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .newtab-icon-btn:hover .newtab-icon-label { color: var(--fg); }
+
+
+    /* ─── SECTION FADE ANIMATION ─── */
+    @keyframes vxFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .section.active { animation: vxFadeIn 0.18s ease forwards; }
+    /* item cards hover lift */
+    .item-card { transition: transform 0.15s, border-color 0.15s, background 0.15s !important; }
+    .item-card:hover { transform: translateY(-2px) !important; }
+    /* social hub card transition already set */
+    /* app web card transition already set */
+    .newtab-shortcuts {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 680px;
+    }
+    .newtab-shortcut-chip {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--fg);
+      font-family: var(--vx-font, system-ui, sans-serif);
+      transition: border-color 0.15s;
+      border: 1px solid var(--border-col);
+    }
+    .newtab-shortcut-chip:hover { border-color: var(--accent); }
+    .sc-remove { font-size: 10px; opacity: 0.35; color: var(--fg); margin-left: 4px; cursor: pointer; }
+    .sc-remove:hover { opacity: 0.85; }
+    .newtab-footer {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      padding: 16px;
+      border-top: 1px solid var(--border-col);
+    }
+    .newtab-footer a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      transition: color 0.1s;
+    }
+    .newtab-footer a:hover { color: var(--fg); }
+    /* Add shortcut modal */
+    #add-shortcut-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      backdrop-filter: blur(4px);
+    }
+    #add-shortcut-modal.open { display: flex; }
+    .add-shortcut-box {
+      background: var(--modal-bg);
+      border-radius: 14px;
+      padding: 26px;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid var(--border-col);
+    }
+    .add-shortcut-box h3 {
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-weight: 400;
+      color: var(--fg);
+      font-size: 17px;
+      margin: 0;
+    }
+    .add-shortcut-box input {
+      background: var(--input-bg);
+      border: 1px solid var(--border-col);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--fg);
+      font-size: 14px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      outline: none;
+      width: 100%;
+    }
+    .add-shortcut-box input:focus { border-color: var(--accent); }
+    .add-shortcut-btns { display: flex; gap: 8px; justify-content: flex-end; }
+    .add-shortcut-btns button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--vx-font, system-ui, sans-serif);
+    }
+    .btn-sc-cancel { background: var(--bg2); color: var(--fg); }
+    .btn-sc-add { background: var(--accent); color: var(--accent-fg); font-weight: 500; }
+    /* AI view wrapper inside home section */
+    #home-ai-view {
+      padding: 0;
+    }
+    .home-ai-topbar {
+      padding: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: var(--border);
+      margin-bottom: 20px;
+    }
+    .home-ai-back {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      padding: 6px 12px;
+      background: var(--bg2);
+      color: var(--fg);
+      border: var(--border);
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    .home-ai-back:hover { background: var(--fg); color: var(--bg); }
+    /* SVG icons inherit theme foreground color */
+    .newtab-icon-circle svg { stroke: var(--fg) !important; }
+
+    /* Privacy info overlay */
+    #privacy-info-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+    }
+    #privacy-info-modal.open { display: flex; }
+    .privacy-box {
+      background: var(--modal-bg);
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 400px;
+      width: 90%;
+      color: var(--fg);
+      font-family: var(--vx-font, system-ui, sans-serif);
+      font-size: 14px;
+      line-height: 1.7;
+      border: 1px solid var(--border-col);
+    }
+    .privacy-box h3 { color: var(--fg); font-weight: 400; font-size: 18px; margin: 0 0 14px; }
+    .privacy-close-btn {
+      margin-top: 18px;
+      background: var(--bg2);
+      border: 1px solid var(--border-col);
+      border-radius: 8px;
+      padding: 8px 18px;
+      color: var(--fg);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--vx-font, system-ui, sans-serif);
+    }
+    .privacy-close-btn:hover { border-color: var(--accent); }
+
+    /* Proxy loading overlay inside fullscreen */
+    #proxy-loading {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 2;
+      font-family: var(--vx-font, system-ui, sans-serif);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    #proxy-loading.show { display: flex; }
+    .proxy-spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border-col);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body>
+
+  <!-- ─── VEXIS BROWSER CHROME ─── -->
+  <div id="vexis-chrome">
+    <div id="vexis-tab-strip">
+      <div id="vexis-tabs-container"></div>
+      <button id="vexis-new-tab-btn" title="New tab">+</button>
+    </div>
+    <div id="vexis-nav-bar">
+      <div id="vexis-nav-controls">
+        <button class="vexis-ctrl-btn" id="vb-back" title="Back" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-forward" title="Forward" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-reload" title="Reload page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-home" title="New tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </button>
+      </div>
+      <div id="vexis-address-wrap">
+        <svg id="vexis-address-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="vexis-address-bar" placeholder="Search or enter a URL..." spellcheck="false" autocomplete="off">
+      </div>
+      <div id="vexis-nav-right">
+        <button class="vexis-ctrl-btn" id="vb-settings" title="Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-auth" title="Account">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-notif" title="Notifications" style="position:relative">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="vb-notif-dot" class="vb-notif-badge" style="display:none"></span>
+        </button>
+        <button class="vexis-ctrl-btn" id="vb-menu" title="Menu">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="vexis-quickbar">
+      <button class="vexis-qb-btn" id="vqb-ai" onclick="vexisNavigate('vexis://ai')">✦ AI</button>
+      <div class="vexis-qb-sep"></div>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://games')">Games</button>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://apps')">Apps</button>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://tools')">Tools</button>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://social')">Social</button>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://stats')">Stats</button>
+      <button class="vexis-qb-btn" onclick="vexisNavigate('vexis://support')">Support</button>
+      <button class="vexis-qb-btn" id="qb-mod" style="display:none;" onclick="vexisNavigate('vexis://mod')">🛡 Mod</button>
+      <button class="vexis-qb-btn" id="qb-owner" style="display:none;" onclick="vexisNavigate('vexis://admin')">👑 Owner</button>
+    </div>
+  </div>
 
   <!-- ─── ANNOUNCEMENT BANNER ─── -->
   <div id="announcement-banner">
@@ -3157,11 +3949,11 @@
     <div class="nav-logo" id="nav-logo">homewrk 3.0</div>
     <div class="nav-center">
       <button class="nav-btn" id="nav-games">⬦ GAMES</button>
+      <button class="nav-btn" id="nav-apps">⊞ APPS</button>
       <button class="nav-btn" id="nav-tools">⚙ TOOLS</button>
       <button class="nav-btn" id="nav-ai">✦ AI</button>
       <button class="nav-btn" id="nav-social">◉ SOCIAL <span id="social-badge" class="notif-badge"
           style="display:none">0</span></button>
-      <button class="nav-btn" id="nav-changelog">📋 LOG</button>
       <button class="nav-btn" id="nav-activity">📡 FEED</button>
       <button class="nav-btn" id="nav-stats">📊 STATS</button>
       <button class="nav-btn" id="nav-shared-ai">✦ SHARED AI</button>
@@ -3179,11 +3971,33 @@
     </div>
   </nav>
 
+  <!-- ─── ADD SHORTCUT MODAL ─── -->
+  <div id="add-shortcut-modal">
+    <div class="add-shortcut-box">
+      <h3>Add shortcut</h3>
+      <input id="shortcut-name-input" placeholder="Name" autocomplete="off">
+      <input id="shortcut-url-input" placeholder="URL (e.g. https://example.com)" autocomplete="off">
+      <div class="add-shortcut-btns">
+        <button class="btn-sc-cancel" onclick="closeAddShortcut()">Cancel</button>
+        <button class="btn-sc-add" onclick="saveShortcut()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── PRIVACY INFO MODAL ─── -->
+  <div id="privacy-info-modal">
+    <div class="privacy-box">
+      <h3>Privacy</h3>
+      <p>vexis does not collect or sell your personal data. The built-in proxy (Ultraviolet) routes traffic through a local bare server — your requests stay within this server instance. AI features use OpenAI's API and are subject to their privacy policy. No browsing history is stored on the server.</p>
+      <button class="privacy-close-btn" onclick="document.getElementById('privacy-info-modal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+
   <!-- ─── FULLSCREEN OVERLAY ─── -->
   <div id="fullscreen-overlay">
-    <div class="fullscreen-bar">
-      <span class="fullscreen-title" id="fullscreen-title">Loading...</span>
-      <button class="fullscreen-close" id="fullscreen-close">✕ CLOSE</button>
+    <div id="proxy-loading">
+      <div class="proxy-spinner"></div>
+      <span id="proxy-loading-msg">Connecting...</span>
     </div>
     <iframe id="fullscreen-frame" title="Content"></iframe>
   </div>
@@ -3250,6 +4064,17 @@
               <button class="admin-action-btn" onclick="saveCustomTheme()" style="font-size:6px">💾 SAVE THEME</button>
               <button class="admin-action-btn ghost" onclick="resetCustomTheme()" style="font-size:6px">↺ RESET</button>
             </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <span class="settings-label">FONT</span>
+          <div class="settings-row" id="font-btn-row">
+            <button class="font-btn" data-font="'Segoe UI', system-ui, sans-serif">System UI</button>
+            <button class="font-btn" data-font="'Inter', system-ui, sans-serif">Inter</button>
+            <button class="font-btn" data-font="'Share Tech Mono', monospace">Mono</button>
+            <button class="font-btn" data-font="'Press Start 2P', monospace">Pixel</button>
+            <button class="font-btn" data-font="Georgia, 'Times New Roman', serif">Serif</button>
+            <button class="font-btn" data-font="'Comic Sans MS', cursive">Casual</button>
           </div>
         </div>
         <div class="settings-section">
@@ -3481,7 +4306,114 @@
   </div>
 
   <!-- ─── SECTIONS ─── -->
-  <section class="section active" id="home-section">
+  <section class="section active newtab-active" id="home-section">
+
+    <!-- ─── VEXIS NEW TAB VIEW ─── -->
+    <div id="home-newtab">
+      <div class="newtab-center">
+        <div class="newtab-logo-wrap">
+          <div class="newtab-logo">vexis</div>
+          <div class="newtab-logo-line"></div>
+        </div>
+
+        <div id="nt-clock-wrap">
+          <div id="nt-time-row"><span id="nt-time">12:00</span><span id="nt-ampm">AM</span></div>
+          <div id="nt-date"></div>
+        </div>
+
+        <div class="newtab-search-wrap">
+          <form id="newtab-search-form" onsubmit="newtabSubmit(event)">
+            <div class="newtab-search-bar">
+              <svg class="newtab-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input id="newtab-url-input" class="newtab-search-input" placeholder="Search the web or type a URL..." autocomplete="off" autocorrect="off" spellcheck="false">
+              <div class="newtab-engine-wrap">
+                <select id="newtab-engine" class="newtab-engine-select">
+                  <option value="ddg">DuckDuckGo</option>
+                  <option value="google">Google</option>
+                  <option value="bing">Bing</option>
+                  <option value="brave">Brave</option>
+                </select>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" style="pointer-events:none;flex-shrink:0">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="newtab-icons">
+          <div class="newtab-icon-btn" onclick="vexisNavigate('vexis://games')">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <rect x="2" y="7" width="20" height="13" rx="3"/>
+                <path d="M8 11v4M6 13h4"/>
+                <circle cx="16" cy="12" r="1" fill="rgba(255,255,255,0.8)" stroke="none"/>
+                <circle cx="18" cy="14" r="1" fill="rgba(255,255,255,0.8)" stroke="none"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">Games</span>
+          </div>
+          <div class="newtab-icon-btn" onclick="vexisNavigate('vexis://tools')">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">Tools</span>
+          </div>
+          <div class="newtab-icon-btn" onclick="vexisNavigate('vexis://ai')">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <path d="M12 2a5 5 0 0 1 5 5c0 2.4-1.7 4.4-4 4.9V13h2v2h-2v2h2v2h-2v1a1 1 0 0 1-2 0v-1H9v-2h2v-2H9v-2h2v-1.1A5 5 0 0 1 7 7a5 5 0 0 1 5-5z"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">AI</span>
+          </div>
+          <div class="newtab-icon-btn" onclick="vexisNavigate('vexis://social')">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">Social</span>
+          </div>
+          <div class="newtab-icon-btn" onclick="vexisNavigate('vexis://apps')">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">Apps</span>
+          </div>
+          <div class="newtab-icon-btn" onclick="openAddShortcut()">
+            <div class="newtab-icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </div>
+            <span class="newtab-icon-label">Add</span>
+          </div>
+        </div>
+
+        <div id="newtab-shortcuts-row" class="newtab-shortcuts"></div>
+      </div>
+
+      <div class="newtab-footer">
+        <a href="#" onclick="openPrivacyInfo();return false;">Privacy</a>
+        <a href="#" onclick="vexisNavigate('vexis://support');return false;">Support</a>
+        <a href="#" onclick="vexisNavigate('vexis://stats');return false;">Stats</a>
+      </div>
+    </div>
+
+    <!-- ─── AI CHAT VIEW ─── -->
+    <div id="home-ai-view" style="display:none">
+      <div class="home-ai-topbar">
+        <button class="home-ai-back" onclick="vexisNavigate('vexis://newtab')">← HOME</button>
+        <span style="font-family:var(--font-pixel);font-size:8px;color:var(--muted)">✦ VEXIS AI</span>
+      </div>
     <div id="home-inner" style="max-width:660px;margin:0 auto;">
 
       <!-- Fullscreen top bar (only visible in fullscreen mode) -->
@@ -3525,19 +4457,18 @@
         <button class="persona-btn" data-persona="hype">🎉 HYPE</button>
       </div>
 
-      <!-- AI Mode Tabs -->
-      <div class="ai-tab-bar">
-        <button class="ai-tab-btn active" id="ai-tab-chat" onclick="switchAiTab('chat')">✦ CHAT</button>
-        <button class="ai-tab-btn" id="ai-tab-img" onclick="switchAiTab('img')">🎨 IMAGE GEN</button>
-        <button class="ai-fs-btn2" id="ai-fs-btn" onclick="toggleAiFs()">⤢ FULLSCREEN</button>
-      </div>
-
-      <!-- CHAT PANEL -->
+      <!-- CHAT + IMAGE PANEL (unified) -->
       <div id="ai-panel-chat">
         <div class="chat-wrap">
           <div class="chat-messages" id="chat-messages"></div>
           <div class="chat-input-area">
             <div class="img-preview-wrap" id="img-preview-wrap"></div>
+            <!-- Image mode: uploaded reference preview -->
+            <div id="img-upload-preview-chat" class="img-upload-preview" style="display:none">
+              <img id="img-upload-thumb-chat" src="" alt="">
+              <span id="img-upload-label-chat">Reference attached — describe your edits below</span>
+              <button class="img-upload-clear" onclick="clearImgUploadChat()">✕</button>
+            </div>
             <div class="chat-input-row">
               <input class="chat-input" id="chat-input" placeholder="Ask VEXIS anything..." autocomplete="off">
               <button class="chat-send-btn" id="chat-send-btn">SEND</button>
@@ -3547,7 +4478,37 @@
               <button class="tool-btn" id="new-conv-btn">+ NEW</button>
               <button class="tool-btn" id="history-btn">📁 HISTORY</button>
               <button class="tool-btn" id="memory-btn">🧠 MEMORY</button>
+              <button class="tool-btn" id="img-mode-btn" style="margin-left:auto;">🎨 Image Mode</button>
+              <button class="ai-fs-btn2" id="ai-fs-btn" onclick="toggleAiFs()">⤢</button>
               <input type="file" id="image-upload-input" accept="image/*">
+            </div>
+            <!-- Image mode options bar (hidden until image mode active) -->
+            <div id="img-mode-bar" style="display:none;padding:6px 10px;border-top:1px solid var(--border-col);background:var(--bg2);display:none;flex-wrap:wrap;gap:8px;align-items:center;">
+              <span style="font-size:11px;color:var(--muted);font-family:var(--vx-font,system-ui);">Engine:</span>
+              <select id="img-model-select" style="font-family:var(--vx-font,system-ui);font-size:12px;padding:4px 8px;border:1px solid var(--border-col);border-radius:6px;background:var(--input-bg);color:var(--fg);outline:none;">
+                <option value="pollinations">✨ Pollinations (free)</option>
+                <option value="gpt-image-1">GPT Image 1 (coins)</option>
+              </select>
+              <span id="poll-model-wrap" style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;color:var(--muted);font-family:var(--vx-font,system-ui);">Style:</span>
+                <select id="poll-model-select" style="font-family:var(--vx-font,system-ui);font-size:12px;padding:4px 8px;border:1px solid var(--border-col);border-radius:6px;background:var(--input-bg);color:var(--fg);outline:none;">
+                  <option value="flux">Flux (default)</option>
+                  <option value="turbo">Turbo (fast)</option>
+                  <option value="flux-realism">Realistic</option>
+                  <option value="flux-anime">Anime</option>
+                  <option value="flux-3d">3D</option>
+                </select>
+              </span>
+              <span id="gpt-image-opts" style="display:none;align-items:center;gap:6px;">
+                <span style="font-size:11px;color:var(--muted);font-family:var(--vx-font,system-ui);">Quality:</span>
+                <select id="img-quality-select" style="font-family:var(--vx-font,system-ui);font-size:12px;padding:4px 8px;border:1px solid var(--border-col);border-radius:6px;background:var(--input-bg);color:var(--fg);outline:none;">
+                  <option value="standard">Standard</option>
+                  <option value="hd">HD</option>
+                </select>
+                <button class="tool-btn" id="img-edit-btn-chat" style="font-size:11px;">📎 Edit Image</button>
+                <span id="coin-display-chat" style="font-size:11px;color:#fa0;font-family:var(--vx-font,system-ui);">🪙 —</span>
+              </span>
+              <input type="file" id="img-file-input-chat" accept="image/*" style="display:none">
             </div>
           </div>
         </div>
@@ -3577,41 +4538,11 @@
         </div>
       </div>
 
-      <!-- IMAGE GEN PANEL -->
-      <div id="ai-panel-img" style="display:none">
-      <div style="display:flex;flex-direction:column;border:var(--border);background:var(--modal-bg);min-height:480px">
-        <div style="flex-shrink:0;padding:7px 14px;background:var(--bg2);border-bottom:var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"><span style="font-family:var(--font-pixel);font-size:7px;color:var(--accent)">💸</span> 1 coin per image · 5 free coins/day</span>
-          <span id="coin-display" style="font-family:var(--font-pixel);font-size:8px;color:#fa0;white-space:nowrap">🪙 — coins</span>
-        </div>
-        <div class="imagegen-output" id="imagegen-output2" style="flex:1;min-height:320px"><p class="imagegen-placeholder">✦ Describe what you want to generate<br>and hit GENERATE below.</p></div>
-        <div class="imagegen-input-area" style="flex-shrink:0">
-          <div id="img-upload-preview" class="img-upload-preview" style="display:none">
-            <img id="img-upload-thumb" src="" alt="">
-            <span id="img-upload-label">Reference image attached — describe your edits below</span>
-            <button class="img-upload-clear" onclick="clearImgUpload()">✕</button>
-          </div>
-          <div class="imagegen-input-row">
-            <input class="imagegen-input" id="imagegen-input2" placeholder="A futuristic city at sunset, neon lights...">
-            <button class="imagegen-btn" id="imagegen-btn2">GENERATE</button>
-          </div>
-          <div class="imagegen-opts">
-            <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted)">SIZE:</span>
-            <button class="imagegen-size-btn active" data-size="1024x1024">1024×1024</button>
-            <button class="imagegen-size-btn" data-size="1792x1024">1792×1024</button>
-            <button class="imagegen-size-btn" data-size="1024x1792">1024×1792</button>
-            <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:10px">QUALITY:</span>
-            <button class="imagegen-size-btn active" data-quality="standard">STANDARD</button>
-            <button class="imagegen-size-btn" data-quality="hd">HD</button>
-            <button class="tool-btn" id="img-upload-btn" style="margin-left:auto;font-size:7px">📎 EDIT IMAGE</button>
-            <input type="file" id="img-file-input" accept="image/*" style="display:none">
-            <span style="font-size:10px;color:var(--muted);display:block;width:100%;margin-top:2px">Generate with DALL-E 3 · Edit with GPT Image 1</span>
-          </div>
-        </div>
-      </div>
-    </div><!-- end ai-panel-img -->
+    <!-- old ai-panel-img removed; image mode is now inline in chat -->
 
     </div><!-- end home-inner -->
+    </div><!-- end home-ai-view -->
+
   </section>
 
   <section class="section" id="shared-ai-section">
@@ -3728,23 +4659,53 @@
 
 
   <section class="section" id="social-section">
-    <div class="section-title">◉ SOCIAL</div>
-    <div class="big-btn-row">
-      <button class="big-btn" id="open-social-chat-btn">💬 COMMUNITY CHAT</button>
-      <button class="big-btn" id="open-dm-btn-social">✉ DIRECT MESSAGES</button>
-      <button class="big-btn" id="open-friend-activity-btn">👥 FRIEND ACTIVITY</button>
+    <div class="vx-page-hdr">
+      <div class="vx-page-title">Social</div>
+      <div class="vx-page-sub">Connect with the vexis community in real time</div>
     </div>
-    <div id="friend-activity-panel" style="display:none;border:var(--border);background:var(--modal-bg);margin-bottom:16px">
-      <div style="font-family:var(--font-pixel);font-size:8px;padding:10px 14px;border-bottom:var(--border);background:var(--bg2);display:flex;justify-content:space-between;align-items:center">
-        <span>👥 FRIEND ACTIVITY</span>
-        <button class="modal-close" onclick="document.getElementById('friend-activity-panel').style.display='none'">✕</button>
+
+    <div class="social-hub-grid">
+      <div class="social-hub-card" id="open-social-chat-btn">
+        <div class="social-hub-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="social-hub-info">
+          <div class="social-hub-title">Community Chat</div>
+          <div class="social-hub-desc">Chat with everyone on vexis in real time</div>
+        </div>
+        <svg class="social-hub-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div id="friend-activity-list"><div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">Loading...</div></div>
+      <div class="social-hub-card" id="open-dm-btn-social">
+        <div class="social-hub-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="social-hub-info">
+          <div class="social-hub-title">Direct Messages</div>
+          <div class="social-hub-desc">Private one-on-one and group conversations</div>
+        </div>
+        <svg class="social-hub-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="social-hub-card" id="open-friend-activity-btn">
+        <div class="social-hub-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="social-hub-info">
+          <div class="social-hub-title">Friend Activity</div>
+          <div class="social-hub-desc">See what other users are doing right now</div>
+        </div>
+        <svg class="social-hub-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
     </div>
-    <p style="font-size:13px;color:var(--muted);line-height:1.8;">
-      Chat with other homewrk 3.0 users in real time.<br>
-      You need to be logged in to participate. Click the 👤 button to sign in or create an account.
-    </p>
+
+    <div id="friend-activity-panel" style="display:none">
+      <div class="vx-panel-hdr">
+        <div class="vx-panel-title">Friend Activity</div>
+        <button class="vx-panel-close" onclick="document.getElementById('friend-activity-panel').style.display='none'">✕</button>
+      </div>
+      <div id="friend-activity-list"><div style="padding:20px;text-align:center;font-size:13px;color:var(--muted)">Loading...</div></div>
+    </div>
+
+    <div class="social-hint">Sign in to participate — click the profile icon in the top right</div>
   </section>
 
   <section class="section" id="activity-section">
@@ -3758,48 +4719,17 @@
     </div>
   </section>
 
-  <section class="section" id="changelog-section">
-    <div class="section-title">📋 CHANGELOG</div>
-
-    <div class="changelog-entry">
-      <div class="changelog-entry-hdr"><span>v3.2 — homewrk 3.0 update</span><span>2026</span></div>
-      <div class="changelog-entry-body">
-        <ul>
-          <li>Dark theme is now the default</li>
-          <li>Community chat now opens fullscreen</li>
-          <li>Fixed GIF picker — all GIFs now load and display correctly</li>
-          <li>AI Tools: new Coding mode button (starts a coding-focused session)</li>
-          <li>AI Tools: Image Generator powered by Pollinations.ai</li>
-          <li>Direct Messages — search any user by username and DM them privately</li>
-          <li>DMs save conversation history and support real-time messaging</li>
-        </ul>
-      </div>
+  <!-- ─── APPS SECTION ─── -->
+  <section class="section" id="apps-section">
+    <div class="vx-page-hdr">
+      <div class="vx-page-title">Apps</div>
+      <div class="vx-page-sub">Web apps that open in the vexis browser</div>
     </div>
-    <div class="changelog-entry">
-      <div class="changelog-entry-hdr"><span>v3.1 — homewrk 3.0 update</span><span>2026</span></div>
-      <div class="changelog-entry-body">
-        <ul>
-          <li>Fixed Firebase social chat — real-time messaging now works correctly</li>
-          <li>Admin panel — whitelist users, ban/unban management</li>
-          <li>5 new themes: Midnight, Forest, Sunset, Vapor, Slate</li>
-          <li>New conversation button now properly resets and starts fresh chat</li>
-          <li>GIFs now display full-size in social chat</li>
-          <li>Profile editing — change display name and photo URL from settings</li>
-        </ul>
-      </div>
-    </div>
-    <div class="changelog-entry">
-      <div class="changelog-entry-hdr"><span>v3.0 — homewrk 3.0</span><span>2025</span></div>
-      <div class="changelog-entry-body">
-        <ul>
-          <li>Full site redesign and rename to homewrk 3.0</li>
-          <li>VEXIS AI — new AI assistant with improved responses</li>
-          <li>Firebase authentication — login, register, Google sign-in</li>
-          <li>Community chat — real-time social chat with Firebase</li>
-          <li>GIF support via Tenor + favorites system</li>
-          <li>5 themes: Light, Dark, Retro, Ocean, Pink</li>
-          <li>Panic button, tab masking, settings panel</li>
-        </ul>
+    <div class="apps-web-grid" style="justify-content:center;">
+      <div class="app-web-card" onclick="vexisNavigate('guhtunes.html')" style="max-width:160px;">
+        <div class="app-web-icon">♪</div>
+        <div class="app-web-name">Guh Tunes</div>
+        <div class="app-web-desc">Music streaming</div>
       </div>
     </div>
   </section>
@@ -3880,11 +4810,13 @@
 
   <!-- MOD SECTION -->
   <section class="section" id="mod-section">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-      <div class="section-title" style="margin-bottom:0">🛡 MOD PANEL</div>
-      <span style="font-family:var(--font-pixel);font-size:7px;padding:3px 8px;border:1px solid #fa0;color:#fa0" id="mod-role-badge">MODERATOR</span>
+    <div class="vx-page-hdr">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="vx-page-title">Mod Panel</div>
+        <span id="mod-role-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #fa0;color:#fa0;font-family:var(--vx-font,system-ui);">Moderator</span>
+      </div>
+      <div class="vx-page-sub">Ban/unban users and view reports. For full controls contact the site owner.</div>
     </div>
-    <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:18px">Ban/unban users and view reports. For full controls, contact the site owner.</div>
     <div class="admin-tabs" id="mod-tabs">
       <button class="admin-tab active" data-modpanel="users">👥 USERS</button>
       <button class="admin-tab" data-modpanel="reports">🚩 REPORTS</button>
@@ -3908,10 +4840,13 @@
   </section>
 
   <section class="section" id="admin-section">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-      <div class="section-title" style="margin-bottom:0">👑 OWNER PANEL</div>
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"><span class="rt-dot"></span>LIVE</span>
-      <span style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);margin-left:auto" id="admin-role-badge"></span>
+    <div class="vx-page-hdr">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="vx-page-title">Owner Panel</div>
+        <span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;"><span class="rt-dot"></span>Live</span>
+        <span id="admin-role-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--accent);color:var(--accent);font-family:var(--vx-font,system-ui);margin-left:4px;"></span>
+      </div>
+      <div class="vx-page-sub">Full site controls — users, roles, reports, announcements.</div>
     </div>
     <div class="admin-tabs">
       <button class="admin-tab active" data-panel="users">👥 USERS</button>
@@ -4318,6 +5253,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <!-- Ultraviolet proxy bundle -->
+  <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
   <script>
     /* =====================================================
        CONFIGURATION
@@ -4440,6 +5378,7 @@
       document.documentElement.setAttribute("data-theme", theme);
       document.querySelectorAll(".theme-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.theme === theme);
+        btn.classList.toggle("vx-active", btn.dataset.theme === theme);
       });
       settings.theme = theme;
       if (theme === 'space') startSpaceCanvas();
@@ -4605,10 +5544,10 @@
     const NAV_MAP = {
       "home": null,
       "games": "nav-games",
+      "apps": "nav-apps",
       "tools": "nav-tools",
       "ai-tools": "nav-ai",
       "social": "nav-social",
-      "changelog": "nav-changelog",
       "activity": "nav-activity",
       "stats": "nav-stats",
       "other": "nav-other",
@@ -4630,12 +5569,12 @@
       if (name === "mod") { loadModData(); }
     }
 
-    document.getElementById("nav-logo").addEventListener("click", () => showSection("home"));
+    document.getElementById("nav-logo").addEventListener("click", () => { showSection("home"); showHomeNewTab(); });
     document.getElementById("nav-games").addEventListener("click", () => showSection("games"));
+    document.getElementById("nav-apps").addEventListener("click", () => showSection("apps"));
     document.getElementById("nav-tools").addEventListener("click", () => showSection("tools"));
-    document.getElementById("nav-ai").addEventListener("click", () => showSection("home"));
+    document.getElementById("nav-ai").addEventListener("click", () => { showSection("home"); showHomeAI(); });
     document.getElementById("nav-social").addEventListener("click", () => showSection("social"));
-    document.getElementById("nav-changelog").addEventListener("click", () => showSection("changelog"));
     document.getElementById("nav-activity").addEventListener("click", () => { showSection("activity"); loadActivityFeed(); });
     document.getElementById("nav-stats").addEventListener("click", () => { showSection("stats"); loadSiteStats(); });
     document.getElementById("nav-other").addEventListener("click", () => showSection("other"));
@@ -4664,15 +5603,43 @@
        FULLSCREEN OVERLAY
     ===================================================== */
     function openFullscreen(url, label) {
-      document.getElementById("fullscreen-title").textContent = label;
-      document.getElementById("fullscreen-frame").src = url;
-      document.getElementById("fullscreen-overlay").classList.add("open");
+      const frame = document.getElementById("fullscreen-frame");
+      const overlay = document.getElementById("fullscreen-overlay");
+      const loading = document.getElementById("proxy-loading");
+      const loadMsg = document.getElementById("proxy-loading-msg");
+
+      // Show spinner
+      loading.classList.add("show");
+      frame.style.opacity = "0";
+      if (loadMsg) loadMsg.textContent = "Connecting to " + (label || url) + "…";
+
+      frame.src = url;
+      overlay.classList.add("open");
+
+      // Hide spinner once iframe responds (load or error)
+      const done = () => {
+        loading.classList.remove("show");
+        frame.style.opacity = "1";
+      };
+      frame.onload = done;
+      frame.onerror = done;
+
+      // Fallback: hide spinner after 8s no matter what
+      clearTimeout(frame._loadTimer);
+      frame._loadTimer = setTimeout(done, 8000);
     }
     function closeFullscreen() {
       document.getElementById("fullscreen-overlay").classList.remove("open");
       document.getElementById("fullscreen-frame").src = "";
+      document.getElementById("proxy-loading").classList.remove("show");
     }
-    document.getElementById("fullscreen-close").addEventListener("click", closeFullscreen);
+
+    // Close fullscreen with Escape key
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && document.getElementById("fullscreen-overlay").classList.contains("open")) {
+        closeFullscreen();
+      }
+    });
     document.querySelectorAll(".item-card").forEach(card => {
       card.addEventListener("click", () => openFullscreen(card.dataset.url, card.dataset.label));
     });
@@ -4745,7 +5712,7 @@
     /* =====================================================
        AI CONVERSATION MANAGEMENT
     ===================================================== */
-    function newConversation(modeLabel) {
+    function newConversation(modeLabel, _notify = false) {
       currentConvId = String(Date.now());
       const chatMessages = document.getElementById("chat-messages");
       chatMessages.innerHTML = "";
@@ -4756,7 +5723,7 @@
         ? `💻 Coding Mode activated. I'm VEXIS — paste your code or ask me anything technical.`
         : "Hey! What's up? I'm VEXIS — ask me anything.";
       appendBotMsg(greeting);
-      showToast(modeLabel || "NEW CONVERSATION");
+      if (_notify) showToast(modeLabel || "NEW CONVERSATION");
     }
 
 
@@ -4836,7 +5803,7 @@
         showToast("ALL CLEARED");
       }
     });
-    document.getElementById("new-conv-btn").addEventListener("click", () => newConversation());
+    document.getElementById("new-conv-btn").addEventListener("click", () => newConversation(null, true));
     document.getElementById("history-btn").addEventListener("click", () => {
       const panel = document.getElementById("home-conv-panel");
       const isHidden = panel.style.display === "none";
@@ -4845,61 +5812,70 @@
     });
 
     /* =====================================================
-       IMAGE GENERATOR
+       IMAGE GENERATOR — UNIFIED MODE
     ===================================================== */
-    // Old modal imagegen btn (keep wired to close gracefully)
-    document.getElementById("imagegen-btn") && document.getElementById("imagegen-btn").addEventListener("click", () => showToast("USE THE IMAGE GEN TAB ON HOME"));
-    document.getElementById("imagegen-input") && document.getElementById("imagegen-input").addEventListener("keydown", e => { if (e.key === "Enter") showToast("USE THE IMAGE GEN TAB ON HOME"); });
-
-    // ── INLINE IMAGE GEN (DALL-E 3 + coins) ──────────────────────────────
     const COINS_PER_DAY = 5;
-    let imagegenSize = "1024x1024", imagegenQuality = "standard";
-    let imgUploadB64 = null, imgUploadMime = "image/png";
+    let imgModeActive = false;
+    let imgUploadChatB64 = null, imgUploadChatMime = "image/png";
+    let imgQualityChat = "standard";
 
-    document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(b => b.addEventListener("click", () => {
-      document.querySelectorAll(".imagegen-size-btn[data-size]").forEach(x => x.classList.remove("active"));
-      b.classList.add("active"); imagegenSize = b.dataset.size;
-    }));
-    document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(b => b.addEventListener("click", () => {
-      document.querySelectorAll(".imagegen-size-btn[data-quality]").forEach(x => x.classList.remove("active"));
-      b.classList.add("active"); imagegenQuality = b.dataset.quality;
-    }));
-    document.getElementById("imagegen-btn2").addEventListener("click", generateImage);
-    document.getElementById("imagegen-input2").addEventListener("keydown", e => { if (e.key === "Enter") generateImage(); });
-    document.getElementById("img-upload-btn").addEventListener("click", () => document.getElementById("img-file-input").click());
-    document.getElementById("img-file-input").addEventListener("change", e => {
+    // Old modal imagegen btn stub
+    document.getElementById("imagegen-btn") && document.getElementById("imagegen-btn").addEventListener("click", () => showToast("Use the 🎨 Image Mode button in the AI chat"));
+
+    /* ── Toggle image mode ── */
+    function toggleImageMode(force) {
+      imgModeActive = (force !== undefined) ? force : !imgModeActive;
+      const bar = document.getElementById("img-mode-bar");
+      const btn = document.getElementById("img-mode-btn");
+      const sendBtn = document.getElementById("chat-send-btn");
+      const input = document.getElementById("chat-input");
+      bar.style.display = imgModeActive ? "flex" : "none";
+      btn.style.background = imgModeActive ? "var(--accent)" : "";
+      btn.style.color = imgModeActive ? "#fff" : "";
+      sendBtn.textContent = imgModeActive ? "Generate" : "SEND";
+      input.placeholder = imgModeActive ? "Describe the image you want to generate..." : "Ask VEXIS anything...";
+      if (imgModeActive) {
+        onImgModelChange();
+        refreshCoinDisplayChat();
+      }
+    }
+
+    document.getElementById("img-mode-btn").addEventListener("click", () => toggleImageMode());
+
+    /* ── Model picker visibility ── */
+    function onImgModelChange() {
+      const m = document.getElementById("img-model-select").value;
+      document.getElementById("poll-model-wrap").style.display = m === "pollinations" ? "flex" : "none";
+      document.getElementById("gpt-image-opts").style.display = m === "gpt-image-1" ? "flex" : "none";
+      if (m === "gpt-image-1") refreshCoinDisplayChat();
+    }
+    document.getElementById("img-model-select").addEventListener("change", onImgModelChange);
+
+    /* ── Upload reference image for GPT Image 1 edit ── */
+    document.getElementById("img-edit-btn-chat").addEventListener("click", () => document.getElementById("img-file-input-chat").click());
+    document.getElementById("img-file-input-chat").addEventListener("change", e => {
       const file = e.target.files[0]; if (!file) return;
       const reader = new FileReader();
       reader.onload = ev => {
-        const d = ev.target.result; imgUploadB64 = d.split(",")[1]; imgUploadMime = file.type || "image/png";
-        document.getElementById("img-upload-thumb").src = d;
-        document.getElementById("img-upload-label").textContent = file.name + " — describe your edits below";
-        document.getElementById("img-upload-preview").style.display = "flex";
-        document.getElementById("imagegen-input2").placeholder = "Describe the edits...";
+        const d = ev.target.result;
+        imgUploadChatB64 = d.split(",")[1]; imgUploadChatMime = file.type || "image/png";
+        document.getElementById("img-upload-thumb-chat").src = d;
+        document.getElementById("img-upload-label-chat").textContent = file.name + " — describe your edits";
+        document.getElementById("img-upload-preview-chat").style.display = "flex";
+        document.getElementById("chat-input").placeholder = "Describe the edits...";
       };
       reader.readAsDataURL(file);
     });
-    function clearImgUpload() {
-      imgUploadB64 = null; imgUploadMime = "image/png";
-      document.getElementById("img-upload-preview").style.display = "none";
-      document.getElementById("img-upload-thumb").src = "";
-      document.getElementById("img-file-input").value = "";
-      document.getElementById("imagegen-input2").placeholder = "A futuristic city at sunset, neon lights...";
+    document.getElementById("img-quality-select").addEventListener("change", e => { imgQualityChat = e.target.value; });
+    function clearImgUploadChat() {
+      imgUploadChatB64 = null; imgUploadChatMime = "image/png";
+      document.getElementById("img-upload-preview-chat").style.display = "none";
+      document.getElementById("img-upload-thumb-chat").src = "";
+      document.getElementById("img-file-input-chat").value = "";
+      document.getElementById("chat-input").placeholder = "Describe the image you want to generate...";
     }
-    function switchAiTab(tab) {
-      const isChat = tab === "chat";
-      document.getElementById("ai-panel-chat").style.display = isChat ? "block" : "none";
-      document.getElementById("ai-panel-img").style.display = isChat ? "none" : "block";
-      document.getElementById("ai-tab-chat").classList.toggle("active", isChat);
-      document.getElementById("ai-tab-img").classList.toggle("active", !isChat);
-      if (!isChat) refreshCoinDisplay();
-    }
-    let aiFsOn = false;
-    function toggleAiFs() {
-      aiFsOn = !aiFsOn;
-      document.getElementById("home-section").classList.toggle("ai-fs", aiFsOn);
-      document.getElementById("ai-fs-btn").textContent = aiFsOn ? "⤡ EXIT" : "⤢ FULLSCREEN";
-    }
+
+    /* ── Coins ── */
     async function getUserCoins() {
       if (!currentUser) return 0;
       const doc = await db.collection("users").doc(currentUser.uid).get();
@@ -4911,56 +5887,180 @@
       }
       return typeof data.coins === "number" ? data.coins : COINS_PER_DAY;
     }
-    async function refreshCoinDisplay() {
-      const el = document.getElementById("coin-display"); if (!el) return;
-      if (!currentUser) { el.textContent = "🪙 Sign in to generate"; return; }
+    async function refreshCoinDisplayChat() {
+      const el = document.getElementById("coin-display-chat"); if (!el) return;
+      if (!currentUser) { el.textContent = "🪙 sign in"; return; }
       const coins = await getUserCoins();
-      el.textContent = `🪙 ${coins} coin${coins !== 1 ? "s" : ""} left today`;
+      el.textContent = `🪙 ${coins} coin${coins !== 1 ? "s" : ""}`;
       el.style.color = coins <= 1 ? "#f55" : "#fa0";
     }
-    async function generateImage() {
-      const prompt = document.getElementById("imagegen-input2").value.trim();
-      if (!prompt) return;
-      if (!currentUser) { showToast("SIGN IN TO GENERATE IMAGES"); return; }
-      const coins = await getUserCoins();
-      if (coins <= 0) { showToast("NO COINS LEFT — COME BACK TOMORROW"); return; }
-      const btn = document.getElementById("imagegen-btn2"); btn.disabled = true; btn.textContent = "...";
-      const output = document.getElementById("imagegen-output2");
-      const loadDiv = document.createElement("div");
-      loadDiv.style.cssText = "padding:20px;color:var(--muted);font-family:var(--font-pixel);font-size:8px;text-align:center;";
-      loadDiv.textContent = imgUploadB64 ? "EDITING WITH GPT IMAGE 1..." : "GENERATING WITH DALL-E 3...";
-      output.insertBefore(loadDiv, output.firstChild);
-      await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-1) });
-      await refreshCoinDisplay();
+
+    /* ── Append generated image as a chat message ── */
+    function appendImageMsg(prompt, src, isBlob) {
+      const messages = document.getElementById("chat-messages");
+      const wrap = document.createElement("div");
+      wrap.className = "msg ai";
+      wrap.style.cssText = "display:flex;gap:10px;margin:12px 0;align-items:flex-start;";
+      const av = document.createElement("div");
+      av.className = "msg-avatar ai-av"; av.textContent = "V";
+      const bubble = document.createElement("div");
+      bubble.className = "msg-bubble ai-bubble";
+      bubble.style.cssText = "flex:1;min-width:0;";
+      const caption = document.createElement("div");
+      caption.style.cssText = "font-size:12px;color:var(--muted);margin-bottom:8px;font-family:var(--vx-font,system-ui);";
+      caption.textContent = `"${prompt}"`;
+      const img = document.createElement("img");
+      img.src = src; img.alt = prompt;
+      img.style.cssText = "max-width:100%;border-radius:10px;display:block;border:1px solid var(--border-col);";
+      img.onload = () => messages.scrollTop = messages.scrollHeight;
+      const actions = document.createElement("div");
+      actions.style.cssText = "display:flex;gap:8px;margin-top:8px;";
+      const dlBtn = document.createElement("a");
+      dlBtn.href = src; dlBtn.download = "vexis-gen.png"; dlBtn.target = "_blank";
+      dlBtn.style.cssText = "font-size:12px;color:var(--accent);font-family:var(--vx-font,system-ui);text-decoration:none;padding:4px 10px;border:1px solid var(--border-col);border-radius:6px;";
+      dlBtn.textContent = "↓ Download";
+      actions.appendChild(dlBtn);
+      bubble.appendChild(caption); bubble.appendChild(img); bubble.appendChild(actions);
+      wrap.appendChild(av); wrap.appendChild(bubble);
+      messages.appendChild(wrap);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    /* ── Pollinations generation (proxied through backend) ── */
+    async function generatePollinations(prompt) {
+      const model = document.getElementById("poll-model-select").value || "flux";
+      const seed = Math.floor(Math.random() * 999999);
+      const params = new URLSearchParams({ prompt, model, width: 1024, height: 1024, seed });
+      const url = `/api/pollinations?${params}`;
+
+      const userMsg = document.getElementById("chat-messages");
+      const userWrap = document.createElement("div");
+      userWrap.className = "msg user";
+      userWrap.style.cssText = "display:flex;gap:10px;margin:12px 0;align-items:flex-start;justify-content:flex-end;";
+      const userBubble = document.createElement("div");
+      userBubble.className = "msg-bubble user-bubble";
+      userBubble.style.cssText = "max-width:80%;font-size:13px;font-family:var(--vx-font,system-ui);";
+      userBubble.textContent = `🎨 ${prompt}`;
+      userWrap.appendChild(userBubble);
+      userMsg.appendChild(userWrap);
+      userMsg.scrollTop = userMsg.scrollHeight;
+
+      const loadWrap = document.createElement("div");
+      loadWrap.className = "msg ai";
+      loadWrap.style.cssText = "display:flex;gap:10px;margin:12px 0;align-items:flex-start;";
+      const loadAv = document.createElement("div"); loadAv.className = "msg-avatar ai-av"; loadAv.textContent = "V";
+      const loadBubble = document.createElement("div");
+      loadBubble.style.cssText = "font-size:12px;color:var(--muted);font-family:var(--vx-font,system-ui);padding:10px 0;";
+      loadBubble.textContent = "Generating with Pollinations...";
+      loadWrap.appendChild(loadAv); loadWrap.appendChild(loadBubble);
+      userMsg.appendChild(loadWrap); userMsg.scrollTop = userMsg.scrollHeight;
+
+      const sendBtn = document.getElementById("chat-send-btn");
+      sendBtn.disabled = true; sendBtn.textContent = "...";
       try {
-        let resultUrl = null, resultB64 = null, revisedPrompt = prompt;
-        if (imgUploadB64) {
-          const res = await fetch("/api/imageedit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, imageBase64: imgUploadB64, mimeType: imgUploadMime, size: imagegenSize }) });
-          const data = await res.json(); if (!res.ok) throw new Error(data.error || "Edit failed");
-          resultB64 = data.b64; resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
-        } else {
-          const res = await fetch("/api/imagegen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, size: imagegenSize, quality: imagegenQuality }) });
-          const data = await res.json(); if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
-          resultUrl = data.url; revisedPrompt = data.revised_prompt || prompt;
+        const response = await fetch(url);
+        if (!response.ok) {
+          const errJson = await response.json().catch(() => ({}));
+          throw new Error(errJson.error || `Server error ${response.status}`);
         }
-        if (output.contains(loadDiv)) output.removeChild(loadDiv);
-        const wrapper = document.createElement("div"); wrapper.style.cssText = "width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;";
-        const img = document.createElement("img"); img.style.cssText = "max-width:100%;border:var(--border);display:block;"; img.alt = prompt;
-        img.src = resultB64 ? `data:image/png;base64,${resultB64}` : resultUrl;
-        const lbl = document.createElement("div"); lbl.style.cssText = "font-size:11px;color:var(--muted);font-family:var(--font-mono);text-align:center;max-width:100%;"; lbl.textContent = revisedPrompt;
-        const dl = document.createElement("a"); dl.href = img.src; dl.download = "vexis-gen.png"; dl.target = "_blank";
-        dl.style.cssText = "font-family:var(--font-pixel);font-size:7px;padding:6px 12px;border:var(--border);background:var(--fg);color:var(--bg);cursor:pointer;text-decoration:none;"; dl.textContent = "↓ DOWNLOAD";
-        wrapper.appendChild(img); wrapper.appendChild(lbl); wrapper.appendChild(dl);
-        output.insertBefore(wrapper, output.firstChild);
-        btn.disabled = false; btn.textContent = "GENERATE";
+        const blob = await response.blob();
+        if (!blob.type.startsWith("image/")) throw new Error("Server did not return an image");
+        const objUrl = URL.createObjectURL(blob);
+        userMsg.removeChild(loadWrap);
+        appendImageMsg(prompt, objUrl, true);
       } catch (err) {
-        if (output.contains(loadDiv)) output.removeChild(loadDiv);
-        await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(1) });
-        await refreshCoinDisplay();
-        const errDiv = document.createElement("div"); errDiv.style.cssText = "padding:12px;color:#f55;font-family:var(--font-pixel);font-size:7px;text-align:center;border:1px solid #f55;";
-        errDiv.textContent = "ERROR: " + (err.message || "Failed"); output.insertBefore(errDiv, output.firstChild);
-        btn.disabled = false; btn.textContent = "GENERATE"; showToast("IMAGE GEN FAILED — COIN REFUNDED");
+        loadBubble.style.color = "#f55";
+        loadBubble.textContent = "Generation failed: " + err.message;
+      } finally {
+        sendBtn.disabled = false; sendBtn.textContent = "Generate";
       }
+    }
+
+    /* ── GPT Image 1 / image edit generation ── */
+    async function generateGptImage(prompt) {
+      if (!currentUser) { showToast("Sign in to use GPT Image 1"); return; }
+      const coins = await getUserCoins();
+      if (coins <= 0) { showToast("No coins left — come back tomorrow"); return; }
+
+      // Show user prompt
+      const messages = document.getElementById("chat-messages");
+      const userWrap = document.createElement("div");
+      userWrap.className = "msg user";
+      userWrap.style.cssText = "display:flex;gap:10px;margin:12px 0;align-items:flex-start;justify-content:flex-end;";
+      const userBubble = document.createElement("div");
+      userBubble.className = "msg-bubble user-bubble";
+      userBubble.style.cssText = "max-width:80%;font-size:13px;font-family:var(--vx-font,system-ui);";
+      userBubble.textContent = `🎨 ${prompt}`;
+      userWrap.appendChild(userBubble); messages.appendChild(userWrap);
+
+      const loadWrap = document.createElement("div");
+      loadWrap.style.cssText = "padding:10px 0;color:var(--muted);font-size:12px;font-family:var(--vx-font,system-ui);";
+      loadWrap.textContent = imgUploadChatB64 ? "Editing with GPT Image 1..." : "Generating with GPT Image 1...";
+      messages.appendChild(loadWrap); messages.scrollTop = messages.scrollHeight;
+
+      const sendBtn = document.getElementById("chat-send-btn");
+      sendBtn.disabled = true; sendBtn.textContent = "...";
+      await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-1) });
+      refreshCoinDisplayChat();
+      try {
+        let src;
+        if (imgUploadChatB64) {
+          const res = await fetch("/api/imageedit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, imageBase64: imgUploadChatB64, mimeType: imgUploadChatMime, size: "1024x1024" }) });
+          const data = await res.json(); if (!res.ok) throw new Error(data.error || "Edit failed");
+          src = data.b64_json ? `data:image/png;base64,${data.b64_json}` : data.url;
+        } else {
+          const res = await fetch("/api/imagegen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt, size: "1024x1024", quality: imgQualityChat }) });
+          const data = await res.json(); if (!res.ok || !data.url) throw new Error(data.error || "Generation failed");
+          src = data.url;
+        }
+        messages.removeChild(loadWrap);
+        appendImageMsg(prompt, src, false);
+        clearImgUploadChat();
+      } catch (err) {
+        loadWrap.style.color = "#f55";
+        loadWrap.textContent = "Error: " + err.message;
+        await db.collection("users").doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(1) });
+        refreshCoinDisplayChat();
+        showToast("Image gen failed — coin refunded");
+      } finally {
+        sendBtn.disabled = false; sendBtn.textContent = "Generate";
+      }
+    }
+
+    /* ── Wire send button to route chat or image ── */
+    const _origSendBtn = document.getElementById("chat-send-btn");
+    _origSendBtn.addEventListener("click", async () => {
+      if (!imgModeActive) return; // chat path handled elsewhere
+      const prompt = document.getElementById("chat-input").value.trim();
+      if (!prompt) return;
+      document.getElementById("chat-input").value = "";
+      const engine = document.getElementById("img-model-select").value;
+      if (engine === "pollinations") {
+        await generatePollinations(prompt);
+      } else {
+        await generateGptImage(prompt);
+      }
+    });
+    document.getElementById("chat-input").addEventListener("keydown", async e => {
+      if (e.key === "Enter" && !e.shiftKey && imgModeActive) {
+        e.preventDefault();
+        const prompt = e.target.value.trim();
+        if (!prompt) return;
+        e.target.value = "";
+        const engine = document.getElementById("img-model-select").value;
+        if (engine === "pollinations") {
+          await generatePollinations(prompt);
+        } else {
+          await generateGptImage(prompt);
+        }
+      }
+    });
+
+    let aiFsOn = false;
+    function toggleAiFs() {
+      aiFsOn = !aiFsOn;
+      document.getElementById("home-section").classList.toggle("ai-fs", aiFsOn);
+      document.getElementById("ai-fs-btn").textContent = aiFsOn ? "⤡" : "⤢";
     }
 
     /* =====================================================
@@ -5366,17 +6466,25 @@
             const userData2 = userDoc2.data() || {};
             const userRole = user.uid === ADMIN_UID ? "owner" : (userData2.role || "user");
             document.getElementById("nav-owner").style.display = userRole === "owner" ? "inline-block" : "none";
+            document.getElementById("qb-owner").style.display = userRole === "owner" ? "inline-flex" : "none";
             if (userRole === "owner" || userRole === "admin") {
               document.getElementById("nav-mod").style.display = "inline-block";
+              document.getElementById("qb-mod").style.display = "inline-flex";
             } else {
               document.getElementById("nav-mod").style.display = "none";
+              document.getElementById("qb-mod").style.display = "none";
               db.collection("whitelist").doc(user.uid).get().then(w => {
-                if (w.exists) document.getElementById("nav-mod").style.display = "inline-block";
+                if (w.exists) {
+                  document.getElementById("nav-mod").style.display = "inline-block";
+                  document.getElementById("qb-mod").style.display = "inline-flex";
+                }
               }).catch(() => {});
             }
           } catch (_e) {
             document.getElementById("nav-owner").style.display = "none";
             document.getElementById("nav-mod").style.display = "none";
+            document.getElementById("qb-owner").style.display = "none";
+            document.getElementById("qb-mod").style.display = "none";
           }
         loadDmConversations();
         startIncomingCallListener();
@@ -5393,6 +6501,8 @@
         document.getElementById("settings-profile-section").style.display = "none";
         document.getElementById("nav-mod").style.display = "none";
         document.getElementById("nav-owner").style.display = "none";
+        document.getElementById("qb-mod").style.display = "none";
+        document.getElementById("qb-owner").style.display = "none";
       }
     });
 
@@ -7426,120 +8536,146 @@
       stopSpaceCanvas();
       const canvas = document.createElement('canvas');
       canvas.id = 'space-canvas';
-      canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;';
+      canvas.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;';
       document.body.insertBefore(canvas, document.body.firstChild);
 
       const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
       resize();
       window.addEventListener('resize', resize);
+      canvas._resizeHandler = resize;
 
       const ctx = canvas.getContext('2d');
       const W = () => canvas.width, H = () => canvas.height;
 
-      // Generate stars with variety
-      const stars = Array.from({ length: 280 }, () => ({
+      // Stars — viewport-relative fractional coords
+      const stars = Array.from({ length: 320 }, () => ({
         x: Math.random(), y: Math.random(),
-        r: Math.random() < 0.05 ? Math.random() * 2 + 1.5 : Math.random() * 1.2 + 0.2,
+        r: Math.random() < 0.05 ? Math.random() * 2 + 1.5 : Math.random() * 1.1 + 0.2,
         phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.015 + 0.003,
-        hue: Math.random() < 0.1 ? (Math.random() < 0.5 ? 200 : 30) : 0
+        speed: Math.random() * 0.014 + 0.003,
+        hue: Math.random() < 0.1 ? (Math.random() < 0.5 ? 210 : 35) : 0,
       }));
 
-      // Planets
-      const planets = [
-        { rx: 0.82, ry: 0.72, size: 0.065, c1: 'rgba(80,130,255,0.95)', c2: 'rgba(30,60,150,0.7)', glow: 'rgba(80,130,255,0.12)', rings: false, orbitSpeed: 0 },
-        { rx: 0.14, ry: 0.22, size: 0.038, c1: 'rgba(190,120,255,0.95)', c2: 'rgba(100,40,180,0.7)', glow: 'rgba(180,100,255,0.12)', rings: true, orbitSpeed: 0 },
-        { rx: 0.55, ry: 0.85, size: 0.022, c1: 'rgba(255,170,80,0.9)', c2: 'rgba(180,80,20,0.6)', glow: 'rgba(255,150,60,0.1)', rings: false, orbitSpeed: 0 }
+      // Nebula clouds — viewport-relative
+      const nebulae = [
+        { x: 0.28, y: 0.38, col: 'rgba(40,10,90,0.08)',  r: 0.36 },
+        { x: 0.72, y: 0.62, col: 'rgba(10,40,100,0.07)', r: 0.32 },
+        { x: 0.50, y: 0.18, col: 'rgba(20,50,30,0.06)',  r: 0.28 },
       ];
 
-      let t = 0, shootingStar = null, nextShoot = 300;
+      // Planets — viewport-relative
+      const planets = [
+        { x: 0.82, y: 0.70, r: 68,  c1:'rgba(80,140,255,0.95)', c2:'rgba(25,55,160,0.8)', glow:'rgba(80,140,255,0.16)',  rings: false, bands: true  },
+        { x: 0.14, y: 0.22, r: 42,  c1:'rgba(195,110,255,0.95)',c2:'rgba(90,30,180,0.8)',  glow:'rgba(180,90,255,0.14)',  rings: true,  bands: false },
+        { x: 0.55, y: 0.88, r: 30,  c1:'rgba(255,100,40,0.95)', c2:'rgba(160,30,10,0.8)',  glow:'rgba(255,80,30,0.13)',   rings: false, bands: true  },
+        { x: 0.06, y: 0.75, r: 18,  c1:'rgba(60,230,210,0.95)', c2:'rgba(10,100,120,0.8)', glow:'rgba(40,210,190,0.12)',  rings: false, bands: false },
+        { x: 0.90, y: 0.12, r: 22,  c1:'rgba(255,220,80,0.95)', c2:'rgba(180,110,10,0.8)', glow:'rgba(255,190,50,0.14)',  rings: false, bands: true  },
+      ];
+
+      let t = 0;
+      let shooters = [];
+      let nextShoot = 200 + Math.floor(Math.random() * 200);
 
       const draw = () => {
         ctx.clearRect(0, 0, W(), H());
         t++;
 
-        // Nebula clouds
-        [[0.3, 0.4, 'rgba(40,10,90,0.07)'], [0.7, 0.6, 'rgba(10,30,80,0.06)'], [0.5, 0.2, 'rgba(0,40,100,0.05)']].forEach(([nx, ny, col]) => {
-          const g = ctx.createRadialGradient(nx*W(), ny*H(), 0, nx*W(), ny*H(), W()*0.35);
-          g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+        // Nebulae
+        nebulae.forEach(nb => {
+          const nx = nb.x * W(), ny = nb.y * H(), rad = Math.min(W(), H()) * nb.r;
+          const g = ctx.createRadialGradient(nx, ny, 0, nx, ny, rad);
+          g.addColorStop(0, nb.col); g.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g; ctx.fillRect(0, 0, W(), H());
         });
 
         // Stars
         stars.forEach(s => {
           s.phase += s.speed;
-          const alpha = 0.45 + 0.55 * Math.sin(s.phase);
-          const color = s.hue ? `hsla(${s.hue},80%,80%,${alpha})` : `rgba(255,255,255,${alpha})`;
-          ctx.beginPath();
-          ctx.arc(s.x*W(), s.y*H(), s.r, 0, Math.PI*2);
+          const alpha = 0.4 + 0.6 * Math.sin(s.phase);
+          const sx = s.x * W(), sy = s.y * H();
+          const color = s.hue ? `hsla(${s.hue},80%,82%,${alpha})` : `rgba(255,255,255,${alpha})`;
+          ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, Math.PI*2);
           ctx.fillStyle = color; ctx.fill();
-          // Star cross flare for big stars
-          if (s.r > 1.5) {
-            ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.3})`;
+          if (s.r > 1.6) {
+            ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.28})`;
             ctx.lineWidth = 0.5;
-            const cx = s.x*W(), cy = s.y*H(), fl = s.r * 4;
-            ctx.beginPath(); ctx.moveTo(cx-fl, cy); ctx.lineTo(cx+fl, cy); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx, cy-fl); ctx.lineTo(cx, cy+fl); ctx.stroke();
+            const fl = s.r * 4;
+            ctx.beginPath(); ctx.moveTo(sx-fl, sy); ctx.lineTo(sx+fl, sy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sx, sy-fl); ctx.lineTo(sx, sy+fl); ctx.stroke();
           }
         });
 
         // Planets
         planets.forEach(p => {
-          const px = p.rx * W(), py = p.ry * H(), pr = Math.min(W(), H()) * p.size;
+          const px = p.x * W(), py = p.y * H(), pr = p.r;
+
           // Glow
-          const glow = ctx.createRadialGradient(px, py, pr*0.8, px, py, pr*2.2);
-          glow.addColorStop(0, p.glow); glow.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(px, py, pr*2.2, 0, Math.PI*2); ctx.fill();
-          // Planet body
-          const pg = ctx.createRadialGradient(px-pr*0.35, py-pr*0.35, pr*0.05, px, py, pr);
-          pg.addColorStop(0, p.c1); pg.addColorStop(0.65, p.c2); pg.addColorStop(1, 'rgba(0,0,0,0.6)');
-          ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.fillStyle = pg; ctx.fill();
-          // Atmosphere rim
-          const atm = ctx.createRadialGradient(px, py, pr*0.85, px, py, pr*1.08);
-          atm.addColorStop(0, 'rgba(255,255,255,0.0)'); atm.addColorStop(1, p.glow.replace('0.12','0.25'));
-          ctx.beginPath(); ctx.arc(px, py, pr*1.08, 0, Math.PI*2); ctx.fillStyle = atm; ctx.fill();
-          // Rings (saturn-like)
-          if (p.rings) {
-            ctx.save(); ctx.translate(px, py); ctx.rotate(-0.45); ctx.scale(1, 0.22);
-            [1.7, 2.0, 2.3].forEach((mult, i) => {
-              ctx.beginPath(); ctx.arc(0, 0, pr*mult, 0, Math.PI*2);
-              ctx.strokeStyle = `rgba(190,120,255,${0.28 - i*0.08})`; ctx.lineWidth = pr*0.35/(i+1); ctx.stroke();
-            });
+          const gl = ctx.createRadialGradient(px, py, pr * 0.5, px, py, pr * 2.8);
+          gl.addColorStop(0, p.glow); gl.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(px, py, pr * 2.8, 0, Math.PI*2); ctx.fill();
+
+          // Body
+          const bg = ctx.createRadialGradient(px - pr*0.32, py - pr*0.32, pr*0.05, px, py, pr);
+          bg.addColorStop(0, p.c1); bg.addColorStop(0.6, p.c2); bg.addColorStop(1, 'rgba(0,0,0,0.65)');
+          ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.fillStyle = bg; ctx.fill();
+
+          // Surface bands
+          if (p.bands) {
+            ctx.save(); ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.clip();
+            for (let i = -3; i <= 3; i++) {
+              const bh = pr * 0.16;
+              ctx.fillStyle = 'rgba(255,255,255,0.035)';
+              ctx.fillRect(px - pr, py + i * pr * 0.28 - bh/2, pr*2, bh);
+            }
             ctx.restore();
           }
-          // Surface bands for large planet
-          if (p.size > 0.05) {
-            ctx.save(); ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI*2); ctx.clip();
-            for (let i = -2; i <= 2; i++) {
-              const bw = pr * 0.18;
-              ctx.fillStyle = 'rgba(255,255,255,0.04)';
-              ctx.fillRect(px - pr, py + i * pr * 0.3 - bw/2, pr*2, bw);
-            }
+
+          // Atmosphere rim
+          const atm = ctx.createRadialGradient(px, py, pr * 0.82, px, py, pr * 1.1);
+          atm.addColorStop(0, 'rgba(255,255,255,0)');
+          atm.addColorStop(1, p.glow.replace(/[\d.]+\)$/, '0.22)'));
+          ctx.beginPath(); ctx.arc(px, py, pr * 1.1, 0, Math.PI*2); ctx.fillStyle = atm; ctx.fill();
+
+          // Rings
+          if (p.rings) {
+            ctx.save(); ctx.translate(px, py); ctx.rotate(-0.42); ctx.scale(1, 0.2);
+            [1.65, 1.95, 2.25].forEach((m, i) => {
+              ctx.beginPath(); ctx.arc(0, 0, pr * m, 0, Math.PI*2);
+              ctx.strokeStyle = p.glow.replace(/[\d.]+\)$/, `${0.35 - i*0.09})`);
+              ctx.lineWidth = pr * 0.38 / (i + 1); ctx.stroke();
+            });
             ctx.restore();
           }
         });
 
-        // Shooting star
-        if (!shootingStar && t % nextShoot === 0) {
-          shootingStar = { x: Math.random()*0.6 + 0.05, y: Math.random()*0.4, life: 0, maxLife: 90 + Math.floor(Math.random()*60) };
-          nextShoot = 200 + Math.floor(Math.random()*400);
+        // Shooting stars
+        if (t % nextShoot === 0) {
+          const angle = (Math.random() * 40 + 20) * Math.PI / 180;
+          shooters.push({ x: Math.random() * W(), y: Math.random() * H() * 0.5, life: 0, maxLife: 75 + Math.floor(Math.random()*55), angle });
+          nextShoot = 160 + Math.floor(Math.random()*350);
         }
-        if (shootingStar) {
-          const p = shootingStar.life / shootingStar.maxLife;
-          const alpha = p < 0.15 ? p/0.15 : p > 0.75 ? (1-p)/0.25 : 1;
-          const sx = (shootingStar.x + p * 0.45) * W();
-          const sy = (shootingStar.y + p * 0.22) * H();
-          const tailX = sx - 100, tailY = sy - 40;
-          const sg = ctx.createLinearGradient(tailX, tailY, sx, sy);
-          sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(1, `rgba(255,255,255,${alpha*0.9})`);
-          ctx.beginPath(); ctx.moveTo(tailX, tailY); ctx.lineTo(sx, sy);
-          ctx.strokeStyle = sg; ctx.lineWidth = 1.8; ctx.stroke();
-          const tg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 5);
-          tg.addColorStop(0, `rgba(255,255,255,${alpha})`); tg.addColorStop(1, 'rgba(255,255,255,0)');
-          ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI*2); ctx.fillStyle = tg; ctx.fill();
-          shootingStar.life++;
-          if (shootingStar.life >= shootingStar.maxLife) shootingStar = null;
-        }
+        shooters = shooters.filter(s => s.life < s.maxLife);
+        shooters.forEach(s => {
+          const prog = s.life / s.maxLife;
+          const alpha = prog < 0.15 ? prog/0.15 : prog > 0.75 ? (1-prog)/0.25 : 1;
+          const dist = prog * 300;
+          const sx = s.x + Math.cos(s.angle) * dist;
+          const sy = s.y + Math.sin(s.angle) * dist;
+          const tailLen = 100;
+          const tx = sx - Math.cos(s.angle) * tailLen;
+          const ty = sy - Math.sin(s.angle) * tailLen;
+          const sg = ctx.createLinearGradient(tx, ty, sx, sy);
+          sg.addColorStop(0, 'rgba(255,255,255,0)');
+          sg.addColorStop(0.6, `rgba(200,220,255,${alpha*0.5})`);
+          sg.addColorStop(1, `rgba(255,255,255,${alpha})`);
+          ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(sx, sy);
+          ctx.strokeStyle = sg; ctx.lineWidth = 1.6; ctx.stroke();
+          const hd = ctx.createRadialGradient(sx, sy, 0, sx, sy, 4);
+          hd.addColorStop(0, `rgba(255,255,255,${alpha})`);
+          hd.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI*2); ctx.fillStyle = hd; ctx.fill();
+          s.life++;
+        });
 
         _spaceAnimId = requestAnimationFrame(draw);
       };
@@ -7549,7 +8685,7 @@
     function stopSpaceCanvas() {
       if (_spaceAnimId) { cancelAnimationFrame(_spaceAnimId); _spaceAnimId = null; }
       const c = document.getElementById('space-canvas');
-      if (c) c.remove();
+      if (c) { window.removeEventListener('resize', c._resizeHandler); c.remove(); }
     }
 
     /* =====================================================
@@ -8901,6 +10037,535 @@
         closeEmojiPicker();
       }
     });
+
+    /* =====================================================
+       VEXIS NEW TAB — HOME VIEW TOGGLE
+    ===================================================== */
+    function showHomeNewTab() {
+      const nt = document.getElementById('home-newtab');
+      nt.style.display = '';        // clear inline override — let CSS grid take over
+      nt.style.flexDirection = '';
+      document.getElementById('home-ai-view').style.display = 'none';
+      document.getElementById('home-section').classList.add('newtab-active');
+      renderShortcuts();
+    }
+
+    function showHomeAI() {
+      document.getElementById('home-newtab').style.display = 'none';
+      document.getElementById('home-ai-view').style.display = 'block';
+      document.getElementById('home-section').classList.remove('newtab-active');
+    }
+
+    /* =====================================================
+       VEXIS NEW TAB — SEARCH / PROXY
+    ===================================================== */
+    const SEARCH_ENGINES = {
+      ddg:    q => 'https://duckduckgo.com/?q=' + encodeURIComponent(q),
+      google: q => 'https://www.google.com/search?q=' + encodeURIComponent(q),
+      bing:   q => 'https://www.bing.com/search?q=' + encodeURIComponent(q),
+      brave:  q => 'https://search.brave.com/search?q=' + encodeURIComponent(q),
+    };
+
+    function isURL(str) {
+      if (/\s/.test(str)) return false;
+      if (/^https?:\/\//i.test(str)) return true;
+      if (/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(str)) return true;
+      return false;
+    }
+
+    function newtabSubmit(e) {
+      e.preventDefault();
+      const raw = document.getElementById('newtab-url-input').value.trim();
+      if (!raw) return;
+      const engine = document.getElementById('newtab-engine').value;
+      let target;
+      if (isURL(raw)) {
+        target = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+      } else {
+        target = SEARCH_ENGINES[engine](raw);
+      }
+      vexisNavigate(target);
+    }
+
+    /* =====================================================
+       UV BROWSER — open in fullscreen overlay
+    ===================================================== */
+    let uvReady = false;
+
+    // If SW is already controlling this page (from a previous load), mark ready immediately
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      uvReady = true;
+    }
+
+    async function registerUVSW() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        const reg = await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/' });
+        // Already active (returning visitor)
+        if (reg.active) { uvReady = true; return; }
+        // Wait for SW to activate on first install
+        const pending = reg.installing || reg.waiting;
+        if (pending) {
+          pending.addEventListener('statechange', function() {
+            if (this.state === 'activated') uvReady = true;
+          });
+        }
+      } catch(err) {
+        console.warn('UV SW registration failed:', err);
+      }
+    }
+
+    // Also catch controller changes (e.g. page claim after activation)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => { uvReady = true; });
+    }
+
+    function openUVBrowser() {
+      openUVBrowserUrl('https://www.google.com');
+    }
+
+    function openUVBrowserUrl(url) {
+      try {
+        const encoded = __uv$config.encodeUrl(url);
+        openFullscreen(__uv$config.prefix + encoded, url);
+      } catch(err) {
+        // UV config not ready — load directly in iframe
+        openFullscreen(url, url);
+      }
+    }
+
+    // Register SW on page load
+    registerUVSW();
+
+    /* =====================================================
+       ADD SHORTCUT
+    ===================================================== */
+    let shortcuts = JSON.parse(localStorage.getItem('vexis-shortcuts') || '[]');
+
+    function renderShortcuts() {
+      const row = document.getElementById('newtab-shortcuts-row');
+      if (!row) return;
+      row.innerHTML = shortcuts.map((s, i) => `
+        <div class="newtab-shortcut-chip" onclick="openUVBrowserUrl(${JSON.stringify(s.url)})">
+          <span>${s.name}</span>
+          <span class="sc-remove" onclick="removeShortcut(event,${i})">✕</span>
+        </div>`).join('');
+    }
+
+    function openAddShortcut() {
+      document.getElementById('shortcut-name-input').value = '';
+      document.getElementById('shortcut-url-input').value = '';
+      document.getElementById('add-shortcut-modal').classList.add('open');
+      setTimeout(() => document.getElementById('shortcut-name-input').focus(), 50);
+    }
+
+    function closeAddShortcut() {
+      document.getElementById('add-shortcut-modal').classList.remove('open');
+    }
+
+    function saveShortcut() {
+      const name = document.getElementById('shortcut-name-input').value.trim();
+      let url = document.getElementById('shortcut-url-input').value.trim();
+      if (!name || !url) return;
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+      shortcuts.push({ name, url });
+      localStorage.setItem('vexis-shortcuts', JSON.stringify(shortcuts));
+      closeAddShortcut();
+      renderShortcuts();
+    }
+
+    function removeShortcut(e, i) {
+      e.stopPropagation();
+      shortcuts.splice(i, 1);
+      localStorage.setItem('vexis-shortcuts', JSON.stringify(shortcuts));
+      renderShortcuts();
+    }
+
+    document.getElementById('add-shortcut-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('add-shortcut-modal')) closeAddShortcut();
+    });
+
+    // Allow Enter in shortcut inputs
+    ['shortcut-name-input','shortcut-url-input'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') saveShortcut();
+        if (e.key === 'Escape') closeAddShortcut();
+      });
+    });
+
+    /* =====================================================
+       PRIVACY INFO
+    ===================================================== */
+    function openPrivacyInfo() {
+      document.getElementById('privacy-info-modal').classList.add('open');
+    }
+
+    document.getElementById('privacy-info-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('privacy-info-modal'))
+        document.getElementById('privacy-info-modal').classList.remove('open');
+    });
+
+    // Initialize shortcuts on load
+    renderShortcuts();
+
+    /* =====================================================
+       FONT PICKER
+    ===================================================== */
+    (function() {
+      const FONT_KEY = 'vexis-font';
+      function applyFont(font) {
+        document.documentElement.style.setProperty('--vx-font', font);
+        localStorage.setItem(FONT_KEY, font);
+        document.querySelectorAll('.font-btn').forEach(b => {
+          b.classList.toggle('vx-active', b.dataset.font === font);
+        });
+      }
+      // Apply saved font on load
+      const saved = localStorage.getItem(FONT_KEY);
+      if (saved) applyFont(saved);
+
+      // Wire font buttons (settings modal may not be in DOM yet so use delegation)
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('.font-btn');
+        if (btn && btn.dataset.font) applyFont(btn.dataset.font);
+      });
+    })();
+
+    /* =====================================================
+       VEXIS BROWSER — TAB SYSTEM
+    ===================================================== */
+    const VEXIS_PAGES = {
+      'newtab':     { title: 'New Tab',       favicon: '🌐', section: 'home',      view: 'newtab' },
+      'games':      { title: 'Games',         favicon: '🎮', section: 'games',     view: null },
+      'apps':       { title: 'Apps',          favicon: '⊞',  section: 'apps',      view: null },
+      'tools':      { title: 'Tools',         favicon: '🔧', section: 'tools',     view: null },
+      'ai':         { title: 'VEXIS AI',      favicon: '✦',  section: 'home',      view: 'ai' },
+      'social':     { title: 'Social',        favicon: '💬', section: 'social',    view: null },
+      'shared-ai':  { title: 'Shared AI',     favicon: '✦',  section: 'shared-ai', view: null },
+      'stats':      { title: 'Statistics',    favicon: '📊', section: 'stats',     view: null },
+      'activity':   { title: 'Activity',      favicon: '📡', section: 'activity',  view: null },
+      'other':      { title: 'Other',         favicon: '◈',  section: 'other',     view: null },
+      'support':    { title: 'Support',       favicon: '💸', section: 'support',   view: null },
+      'mod':        { title: 'Mod Panel',     favicon: '🛡', section: 'mod',       view: null },
+      'admin':      { title: 'Admin',         favicon: '👑', section: 'admin',     view: null },
+    };
+
+    let _vtCounter = 1;
+    let _vtActive  = 1;
+    let _vtTabs    = [
+      { id: 1, title: 'New Tab', favicon: '🌐', url: 'vexis://newtab', history: ['vexis://newtab'], hIdx: 0 }
+    ];
+
+    /* ── helpers ── */
+    function _vxEsc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function _vxResolve(url) {
+      if (!url || url === 'vexis://newtab') return { title: 'New Tab', favicon: '🌐' };
+      if (url.startsWith('vexis://')) {
+        const p = url.slice(8);
+        const info = VEXIS_PAGES[p];
+        return info ? { title: info.title, favicon: info.favicon } : { title: p, favicon: '🌐' };
+      }
+      try { return { title: new URL(url).hostname, favicon: '🌐' }; }
+      catch { return { title: url, favicon: '🌐' }; }
+    }
+
+    /* ── render tabs ── */
+    function vxRenderTabs() {
+      const c = document.getElementById('vexis-tabs-container');
+      if (!c) return;
+      c.innerHTML = _vtTabs.map(t => `
+        <div class="vexis-tab${t.id === _vtActive ? ' active' : ''}" onclick="vxSwitchTab(${t.id})">
+          <span class="vexis-tab-favicon">${_vxEsc(t.favicon)}</span>
+          <span class="vexis-tab-title">${_vxEsc(t.title)}</span>
+          <button class="vexis-tab-close" onclick="event.stopPropagation();vxCloseTab(${t.id})" title="Close tab">×</button>
+        </div>`).join('');
+    }
+
+    /* ── address bar sync ── */
+    function vxSyncBar() {
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      const bar = document.getElementById('vexis-address-bar');
+      if (!bar || !t) return;
+      bar.value = (t.url === 'vexis://newtab') ? '' : t.url;
+      // back/forward buttons
+      const back = document.getElementById('vb-back');
+      const fwd  = document.getElementById('vb-forward');
+      if (back) back.disabled = t.hIdx === 0;
+      if (fwd)  fwd.disabled  = t.hIdx >= t.history.length - 1;
+    }
+
+    /* ── apply a url to the content area ── */
+    function vxApplyUrl(url) {
+      // close any open social modals on navigation
+      ['social-chat-modal','dm-modal'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.classList.remove('open');
+      });
+      if (!url || url === 'vexis://newtab') {
+        closeFullscreen();
+        showSection('home');
+        showHomeNewTab();
+        return;
+      }
+      if (url.startsWith('vexis://')) {
+        closeFullscreen();
+        const page = url.slice(8);
+        const info = VEXIS_PAGES[page];
+        if (!info) return;
+        showSection(info.section);
+        if (info.view === 'newtab') showHomeNewTab();
+        else if (info.view === 'ai') showHomeAI();
+        if (page === 'stats') loadSiteStats();
+        if (page === 'activity') loadActivityFeed();
+        return;
+      }
+      // external URL — try UV proxy, fall back to direct iframe
+      try {
+        const enc = __uv$config.encodeUrl(url);
+        openFullscreen(__uv$config.prefix + enc, url);
+      } catch(e) { openFullscreen(url, url); }
+    }
+
+    /* ── switch tab ── */
+    function vxSwitchTab(id) {
+      _vtActive = id;
+      const t = _vtTabs.find(t => t.id === id);
+      if (t) vxApplyUrl(t.url);
+      vxRenderTabs();
+      vxSyncBar();
+    }
+
+    /* ── close tab ── */
+    function vxCloseTab(id) {
+      if (_vtTabs.length === 1) {
+        // reset to new tab instead of closing last
+        _vtTabs[0] = { ..._vtTabs[0], title: 'New Tab', favicon: '🌐', url: 'vexis://newtab', history: ['vexis://newtab'], hIdx: 0 };
+        vxApplyUrl('vexis://newtab');
+        vxRenderTabs(); vxSyncBar(); return;
+      }
+      const idx = _vtTabs.findIndex(t => t.id === id);
+      _vtTabs.splice(idx, 1);
+      if (_vtActive === id) {
+        const next = _vtTabs[Math.min(idx, _vtTabs.length - 1)];
+        vxSwitchTab(next.id);
+      } else {
+        vxRenderTabs();
+      }
+    }
+
+    /* ── create tab ── */
+    function vxNewTab(url = 'vexis://newtab') {
+      _vtCounter++;
+      const info = _vxResolve(url);
+      _vtTabs.push({ id: _vtCounter, title: info.title, favicon: info.favicon, url, history: [url], hIdx: 0 });
+      vxSwitchTab(_vtCounter);
+    }
+
+    /* ── main navigate ── */
+    function vexisNavigate(raw, newTab = false) {
+      let url = (raw || '').trim();
+      if (!url) { vexisNavigate('vexis://newtab'); return; }
+      // already a vexis:// url
+      if (!url.startsWith('vexis://') && !url.startsWith('http://') && !url.startsWith('https://')) {
+        if (/^[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})(\/.*)?$/.test(url) && !url.includes(' ')) {
+          url = 'https://' + url;
+        } else {
+          url = SEARCH_ENGINES['ddg'](url);
+        }
+      }
+      if (newTab) { vxNewTab(url); return; }
+
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      if (!t) return;
+      // push history
+      t.history = t.history.slice(0, t.hIdx + 1);
+      t.history.push(url);
+      t.hIdx = t.history.length - 1;
+      t.url = url;
+      const info = _vxResolve(url);
+      t.title  = info.title;
+      t.favicon = info.favicon;
+
+      vxApplyUrl(url);
+      vxRenderTabs();
+      vxSyncBar();
+    }
+
+    /* ── back / forward ── */
+    function vexisBack() {
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      if (!t || t.hIdx <= 0) return;
+      t.hIdx--;
+      t.url = t.history[t.hIdx];
+      const info = _vxResolve(t.url);
+      t.title = info.title; t.favicon = info.favicon;
+      vxApplyUrl(t.url); vxRenderTabs(); vxSyncBar();
+    }
+    function vexisForward() {
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      if (!t || t.hIdx >= t.history.length - 1) return;
+      t.hIdx++;
+      t.url = t.history[t.hIdx];
+      const info = _vxResolve(t.url);
+      t.title = info.title; t.favicon = info.favicon;
+      vxApplyUrl(t.url); vxRenderTabs(); vxSyncBar();
+    }
+
+    /* ── focus address bar (for Browser icon) ── */
+    function vexisAddressBarFocus() {
+      const bar = document.getElementById('vexis-address-bar');
+      if (bar) { bar.focus(); bar.select(); }
+    }
+
+    /* ── wire chrome buttons ── */
+    document.getElementById('vexis-new-tab-btn').addEventListener('click', () => vxNewTab());
+    document.getElementById('vb-back').addEventListener('click', vexisBack);
+    document.getElementById('vb-forward').addEventListener('click', vexisForward);
+    document.getElementById('vb-reload').addEventListener('click', () => {
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      if (!t) return;
+      if (t.url.startsWith('http')) { vxApplyUrl(t.url); }
+      else { vxApplyUrl(t.url); }
+    });
+    document.getElementById('vb-home').addEventListener('click', () => vexisNavigate('vexis://newtab'));
+    document.getElementById('vb-settings').addEventListener('click', () => openSettings());
+    document.getElementById('vb-auth').addEventListener('click', () => {
+      if (typeof currentUser !== 'undefined' && currentUser) openProfileModal();
+      else openAuthModal();
+    });
+    document.getElementById('vb-notif').addEventListener('click', () => {
+      document.getElementById('notif-bell-btn').click();
+    });
+    /* ── three-dots: browser page menu ── */
+    let _pageMenuOpen = false;
+    document.getElementById('vb-menu').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const existing = document.getElementById('vx-page-menu');
+      if (_pageMenuOpen && existing) { existing.remove(); _pageMenuOpen = false; return; }
+      _pageMenuOpen = true;
+      const menu = document.createElement('div');
+      menu.id = 'vx-page-menu';
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      const currentUrl = t ? t.url : '';
+      const isExternal = currentUrl.startsWith('http');
+      const menuItems = [
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`, label: 'Reload page', action: () => { const fr = document.getElementById('fullscreen-frame'); if (fr) fr.src = fr.src; } },
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`, label: 'Copy URL', action: () => { navigator.clipboard.writeText(currentUrl).then(() => showToast('URL copied')); } },
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`, label: 'Open in new window', action: () => { if (isExternal) window.open(currentUrl, '_blank'); }, disabled: !isExternal },
+        { sep: true },
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`, label: 'Find in page', action: () => { const fr = document.getElementById('fullscreen-frame'); if (fr && fr.contentWindow) fr.contentWindow.focus(); document.execCommand && document.execCommand('find'); } },
+        { sep: true },
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>`, label: 'Settings', action: () => openSettings() },
+        { icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`, label: 'New tab', action: () => vxNewTab() },
+      ];
+      menu.innerHTML = menuItems.map(item => {
+        if (item.sep) return `<div class="vx-pm-sep"></div>`;
+        return `<div class="vx-pm-item${item.disabled ? '" style="opacity:0.35;cursor:default' : ''}" onclick="_vxPmAction(${menuItems.indexOf(item)})">${item.icon}<span>${item.label}</span></div>`;
+      }).join('');
+      window._vxPmActions = menuItems.filter(i => !i.sep).map(i => i.action);
+      window._vxPmAction = (idx) => {
+        const actions = menuItems.map((item,i) => item.action).filter(Boolean);
+        const item = menuItems[idx];
+        if (item && item.action && !item.disabled) { item.action(); }
+        menu.remove(); _pageMenuOpen = false;
+      };
+      document.body.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', function h(e) {
+          if (!menu.contains(e.target) && e.target.id !== 'vb-menu') {
+            menu.remove(); _pageMenuOpen = false;
+            document.removeEventListener('click', h);
+          }
+        });
+      }, 10);
+    });
+
+    /* ── address bar ── */
+    document.getElementById('vexis-address-bar').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { vexisNavigate(e.target.value); e.target.blur(); }
+      if (e.key === 'Escape') { vxSyncBar(); e.target.blur(); }
+    });
+    document.getElementById('vexis-address-bar').addEventListener('focus', e => { e.target.select(); });
+
+    /* ── sync notif badge to chrome ── */
+    const _origUpdateBadge = typeof updateSocialBadge === 'function' ? updateSocialBadge : null;
+
+    /* ── override showSection to update address bar ── */
+    const __origShowSection = showSection;
+    window.showSection = function(name) {
+      __origShowSection(name);
+      const t = _vtTabs.find(t => t.id === _vtActive);
+      if (t && !t.url.startsWith('http')) {
+        const url = name === 'home' ? t.url : `vexis://${name}`;
+        if (name !== 'home') {
+          const info = _vxResolve(url);
+          t.url = url; t.title = info.title; t.favicon = info.favicon;
+          vxRenderTabs(); vxSyncBar();
+        }
+      }
+    };
+
+    /* ── init ── */
+    vxRenderTabs();
+    vxSyncBar();
+
+    /* =====================================================
+       NEWTAB CLOCK (12-hour)
+    ===================================================== */
+    function ntClockTick() {
+      const now = new Date();
+      let h = now.getHours();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const te = document.getElementById('nt-time');
+      const ae = document.getElementById('nt-ampm');
+      if (te) te.textContent = `${h}:${m}`;
+      if (ae) ae.textContent = ampm;
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const de = document.getElementById('nt-date');
+      if (de) de.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    }
+    ntClockTick();
+    setInterval(ntClockTick, 1000);
+
+    /* =====================================================
+       TAB PERSISTENCE
+    ===================================================== */
+    function vxSaveTabs() {
+      try {
+        const payload = { tabs: _vtTabs, active: _vtActive, counter: _vtCounter };
+        localStorage.setItem('hw3_vx_tabs', JSON.stringify(payload));
+      } catch (_) {}
+    }
+    function vxRestoreTabs() {
+      try {
+        const raw = localStorage.getItem('hw3_vx_tabs');
+        if (!raw) return;
+        const p = JSON.parse(raw);
+        if (!Array.isArray(p.tabs) || p.tabs.length === 0) return;
+        _vtTabs = p.tabs;
+        _vtCounter = p.counter || p.tabs.length;
+        _vtActive = p.active || _vtTabs[0].id;
+        vxRenderTabs();
+        vxSyncBar();
+        const t = _vtTabs.find(t => t.id === _vtActive);
+        if (t) vxApplyUrl(t.url);
+      } catch (_) {}
+    }
+    // Patch all tab-mutating functions to auto-save
+    const _origNavigate = vexisNavigate;
+    window.vexisNavigate = function(...a) { _origNavigate(...a); vxSaveTabs(); };
+    const _origNewTab = vxNewTab;
+    window.vxNewTab = function(...a) { _origNewTab(...a); vxSaveTabs(); };
+    const _origCloseTab = vxCloseTab;
+    window.vxCloseTab = function(...a) { _origCloseTab(...a); vxSaveTabs(); };
+    vxRestoreTabs();
+
+
   </script>
 </body>
 
