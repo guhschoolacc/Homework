@@ -72,7 +72,7 @@ app.get("/api/pollinations", async (req, res) => {
 
 // ── POST /api/imagegen ────────────────────────────────────────────────────────
 app.post("/api/imagegen", async (req, res) => {
-  const { prompt, size = "1024x1024", quality = "auto" } = req.body;
+  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
 
   if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
     return res.status(400).json({ error: "prompt is required." });
@@ -83,7 +83,7 @@ app.post("/api/imagegen", async (req, res) => {
 
   try {
     const response = await openai.images.generate({
-      model: "gpt-image-1",
+      model: "dall-e-3",
       prompt: prompt.trim(),
       n: 1,
       size: safeSize,
@@ -92,9 +92,6 @@ app.post("/api/imagegen", async (req, res) => {
 
     const item = response.data[0];
     const revisedPrompt = item.revised_prompt || prompt;
-    if (item.b64_json) {
-      return res.json({ b64_json: item.b64_json, revised_prompt: revisedPrompt });
-    }
     return res.json({ url: item.url, revised_prompt: revisedPrompt });
   } catch (err) {
     console.error("Image gen error:", err.message);
@@ -118,7 +115,7 @@ app.post("/api/imageedit", async (req, res) => {
     const imageFile = await toFile(imageBuffer, "image.png", { type: mimeType });
 
     const response = await openai.images.edit({
-      model: "gpt-image-1",
+      model: "dall-e-2",
       image: imageFile,
       prompt: prompt.trim(),
       n: 1,
