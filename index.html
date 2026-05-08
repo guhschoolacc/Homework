@@ -4502,8 +4502,10 @@
               <span id="gpt-image-opts" style="display:none;align-items:center;gap:6px;">
                 <span style="font-size:11px;color:var(--muted);font-family:var(--vx-font,system-ui);">Quality:</span>
                 <select id="img-quality-select" style="font-family:var(--vx-font,system-ui);font-size:12px;padding:4px 8px;border:1px solid var(--border-col);border-radius:6px;background:var(--input-bg);color:var(--fg);outline:none;">
-                  <option value="standard">Standard</option>
-                  <option value="hd">HD</option>
+                  <option value="auto" selected>Auto</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
                 </select>
                 <button class="tool-btn" id="img-edit-btn-chat" style="font-size:11px;">📎 Edit Image</button>
                 <span id="coin-display-chat" style="font-size:11px;color:#fa0;font-family:var(--vx-font,system-ui);">🪙 —</span>
@@ -5816,7 +5818,7 @@
     const COINS_PER_DAY = 5;
     let imgModeActive = false;
     let imgUploadChatB64 = null, imgUploadChatMime = "image/png";
-    let imgQualityChat = "standard";
+    let imgQualityChat = "auto";
 
     // Old modal imagegen btn stub
     document.getElementById("imagegen-btn") && document.getElementById("imagegen-btn").addEventListener("click", () => showToast("Use the 🎨 Image Mode button in the AI chat"));
@@ -8387,7 +8389,7 @@
     ===================================================== */
     function syncMyPhoto(newPhoto) {
       // For base64 photos store in session; for URLs Firebase Auth handles persistence
-      _sessionPhoto = newPhoto && newPhoto.startsWith("data:") ? newPhoto : null;
+      _sessionPhoto = newPhoto || null;
       const photo = newPhoto || null;
       const initial = (currentUser?.displayName || "U")[0].toUpperCase();
 
