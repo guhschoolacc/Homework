@@ -1688,14 +1688,15 @@
       border: var(--border);
       overflow: hidden;
       display: block;
+      height: 120px;
+      background: var(--bg2);
     }
 
     .gif-item img {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
-      min-height: 60px;
-      object-fit: cover;
+      object-fit: contain;
     }
 
     .gif-fav-btn {
@@ -3473,7 +3474,7 @@
     .modal-close:hover { color: var(--fg) !important; }
     .modal-body { padding: 16px 18px !important; }
     /* fullscreen modals must start below the chrome */
-    #dm-modal, #social-chat-modal { top: 110px !important; height: calc(100vh - 110px) !important; bottom: 0 !important; }
+    #dm-modal, #social-chat-modal { top: 52px !important; height: calc(100vh - 52px) !important; bottom: 0 !important; }
     #dm-modal .modal-box, #social-chat-modal .modal-box { height: 100% !important; max-height: 100% !important; }
 
     /* ─── SETTINGS ─── */
@@ -4725,7 +4726,7 @@
       <div class="vx-page-sub">Web apps that open in the vexis browser</div>
     </div>
     <div class="apps-web-grid" style="justify-content:center;">
-      <div class="app-web-card" onclick="vexisNavigate('apps/guhtunes.html')" style="max-width:160px;">
+      <div class="app-web-card" onclick="openFullscreen('apps/guhtunes.html','Guh Tunes')" style="max-width:160px;">
         <div class="app-web-icon">♪</div>
         <div class="app-web-name">Guh Tunes</div>
         <div class="app-web-desc">Music streaming</div>
