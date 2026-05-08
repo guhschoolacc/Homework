@@ -72,7 +72,7 @@ app.get("/api/pollinations", async (req, res) => {
 
 // ── POST /api/imagegen ────────────────────────────────────────────────────────
 app.post("/api/imagegen", async (req, res) => {
-  const { prompt, size = "1024x1024", quality = "standard" } = req.body;
+  const { prompt, size = "1024x1024", quality = "auto" } = req.body;
 
   if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
     return res.status(400).json({ error: "prompt is required." });
@@ -90,9 +90,12 @@ app.post("/api/imagegen", async (req, res) => {
       quality,
     });
 
-    const imageUrl = response.data[0].url;
-    const revisedPrompt = response.data[0].revised_prompt || prompt;
-    return res.json({ url: imageUrl, revised_prompt: revisedPrompt });
+    const item = response.data[0];
+    const revisedPrompt = item.revised_prompt || prompt;
+    if (item.b64_json) {
+      return res.json({ b64_json: item.b64_json, revised_prompt: revisedPrompt });
+    }
+    return res.json({ url: item.url, revised_prompt: revisedPrompt });
   } catch (err) {
     console.error("Image gen error:", err.message);
     return res.status(err.status || 500).json({ error: err.message || "Image generation failed." });
