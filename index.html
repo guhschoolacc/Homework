@@ -4574,7 +4574,6 @@
       <div class="stat-card"><div class="stat-card-val" id="stat-s-online">—</div><div class="stat-card-label">ONLINE NOW</div></div>
       <div class="stat-card"><div class="stat-card-val" id="stat-s-groups">—</div><div class="stat-card-label">GROUP CHATS</div></div>
       <div class="stat-card"><div class="stat-card-val" id="stat-s-dms">—</div><div class="stat-card-label">DM CONVOS</div></div>
-      <div class="stat-card"><div class="stat-card-val" id="stat-s-shared">—</div><div class="stat-card-label">SHARED AI MSGS</div></div>
     </div>
     <div class="stats-section-title">TOP ACTIVITY</div>
     <div id="stats-top-users" style="border:var(--border);background:var(--modal-bg)"></div>
@@ -9833,12 +9832,11 @@
       // Fetch all collections in parallel
       try {
         document.getElementById('stat-s-users').textContent = '...';
-        const [usersSnap, msgsSnap, groupsSnap, dmsSnap, sharedSnap] = await Promise.all([
+        const [usersSnap, msgsSnap, groupsSnap, dmsSnap] = await Promise.all([
           db.collection('users').get(),
           db.collection('socialMessages').get(),
           db.collection('groupChats').get(),
-          db.collection('directMessages').get(),
-          db.collection('sharedAiMessages').get()
+          db.collection('directMessages').get()
         ]);
         const now = Date.now();
         const onlineCount = (() => {
@@ -9855,8 +9853,7 @@
         document.getElementById('stat-s-online').textContent = onlineCount;
         document.getElementById('stat-s-groups').textContent = groupsSnap.size;
         document.getElementById('stat-s-dms').textContent = dmsSnap.size;
-        document.getElementById('stat-s-shared').textContent = sharedSnap.size;
-        // Top users by message count
+// Top users by message count
         const msgsByUser = {};
         msgsSnap.forEach(doc => {
           const d = doc.data();
