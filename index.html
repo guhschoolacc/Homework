@@ -1532,6 +1532,162 @@
       border-top: var(--border);
       padding: 10px;
       flex-shrink: 0;
+      position: relative;
+    }
+
+    /* ─── MENTION PICKER ─── */
+    .mention-dropdown {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      background: var(--modal-bg);
+      border: var(--border);
+      border-bottom: none;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+    }
+    .mention-dropdown.open { display: flex; }
+    .mention-dropdown-header {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      padding: 7px 12px 4px;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border-col);
+      background: var(--bg2);
+    }
+    .mention-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.1s;
+      border-bottom: 1px solid var(--border-col);
+    }
+    .mention-item:last-child { border-bottom: none; }
+    .mention-item:hover,
+    .mention-item.mention-selected {
+      background: var(--fg);
+      color: var(--bg);
+    }
+    .mention-item:hover .mention-item-sub,
+    .mention-item.mention-selected .mention-item-sub { color: var(--bg); opacity: 0.6; }
+    .mention-av {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: 1px solid var(--border-col);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .mention-av img { width: 100%; height: 100%; object-fit: cover; }
+    .mention-av.ai-av {
+      background: var(--fg);
+      color: var(--bg);
+      font-size: 9px;
+    }
+    .mention-item-name {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      flex: 1;
+      min-width: 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .mention-item-sub {
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .mention-tag {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    /* On own (outgoing) messages the bubble bg is the accent color — make tag visible */
+    .social-msg.own .mention-tag {
+      color: inherit;
+      background: rgba(255,255,255,0.25);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    /* DM own messages too */
+    .dm-msg.own .mention-tag,
+    .dm-msg-own .mention-tag {
+      color: inherit;
+      background: rgba(255,255,255,0.25);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    /* Vexis AI response bubble styling */
+    .social-msg.vexis-ai .social-msg-av {
+      background: var(--fg);
+      color: var(--bg);
+      font-size: 9px;
+      border-radius: 10px;
+    }
+    .social-msg.vexis-ai .social-msg-bubble {
+      border-color: var(--accent);
+      background: var(--bg2);
+    }
+    .vexis-ai-badge {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      padding: 2px 6px;
+      background: var(--accent);
+      color: var(--accent-fg);
+      margin-left: 6px;
+      letter-spacing: 1px;
+      vertical-align: middle;
+    }
+    .vexis-thinking-row .social-msg-bubble {
+      border-color: var(--accent);
+    }
+
+    /* ─── IMPROVED COMMUNITY CHAT HEADER ─── */
+    .social-chat-header-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: var(--border);
+      background: var(--nav-bg);
+      flex-shrink: 0;
+    }
+    .social-chat-header-title {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      flex: 1;
+      letter-spacing: 1px;
+    }
+    .online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4caf50;
+      display: inline-block;
+      margin-right: 4px;
+      box-shadow: 0 0 4px #4caf50;
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .online-count-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .reply-preview {
@@ -3939,7 +4095,10 @@
   <!-- ─── ANNOUNCEMENT BANNER ─── -->
   <div id="announcement-banner">
     <span id="announcement-text"></span>
-    <button class="ann-close" onclick="dismissAnnouncement()">✕</button>
+    <div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0">
+      <button class="ann-close" id="ann-delete-btn" style="display:none;background:rgba(0,0,0,.2);border:none;color:inherit;cursor:pointer;font-size:11px;padding:2px 7px;border-radius:3px;font-family:var(--font-mono)" onclick="deleteAnnouncement()">🗑 DELETE</button>
+      <button class="ann-close" onclick="dismissAnnouncement()">✕</button>
+    </div>
   </div>
 
   <!-- ─── TOAST ─── -->
@@ -4136,16 +4295,20 @@
   <!-- ─── SOCIAL CHAT MODAL (FULLSCREEN) ─── -->
   <div class="modal-overlay" id="social-chat-modal">
     <div class="modal-box">
-      <div class="modal-hdr" style="flex-shrink:0;">
-        <span>◉ COMMUNITY CHAT</span>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button class="tool-btn" id="notif-mute-btn" style="font-size:6px;">🔔 MUTE</button>
-          <button class="modal-close" id="social-chat-close">✕ CLOSE</button>
-        </div>
+      <div class="social-chat-header-bar">
+        <span class="online-dot"></span>
+        <span class="social-chat-header-title">◉ COMMUNITY CHAT</span>
+        <span class="online-count-badge" id="social-online-count"></span>
+        <button class="tool-btn" id="notif-mute-btn" style="font-size:6px;">🔔 MUTE</button>
+        <button class="modal-close" id="social-chat-close">✕ CLOSE</button>
       </div>
       <div class="social-chat-messages" id="social-chat-messages"></div>
       <div class="typing-indicator" id="social-typing-indicator"></div>
       <div class="social-input-area" style="flex-shrink:0;">
+        <!-- Mention Dropdown (Community Chat) -->
+        <div class="mention-dropdown" id="mention-dropdown-social">
+          <div class="mention-dropdown-header">MENTION A USER — TYPE @ TO SEARCH</div>
+        </div>
         <div class="reply-preview" id="reply-preview">
           <div class="reply-preview-inner">
             <span id="reply-preview-text" style="font-size:12px;color:var(--muted);">Replying to...</span>
@@ -4153,7 +4316,7 @@
           </div>
         </div>
         <div class="social-input-row">
-          <input class="social-input" id="social-input" placeholder="Say something..." autocomplete="off">
+          <input class="social-input" id="social-input" placeholder="Say something… type @ to mention" autocomplete="off">
           <button class="social-send-btn" id="social-send-btn">SEND</button>
         </div>
         <div class="social-tools-row">
@@ -4266,9 +4429,13 @@
             </div>
           </div>
           <div class="typing-indicator" id="dm-typing-indicator"></div>
-          <div class="dm-input-area" style="display:none;" id="dm-input-area">
+          <div class="dm-input-area" style="display:none;position:relative;" id="dm-input-area">
+            <!-- Mention Dropdown (DM/Group Chat) -->
+            <div class="mention-dropdown" id="mention-dropdown-dm">
+              <div class="mention-dropdown-header">MENTION A USER — TYPE @ TO SEARCH</div>
+            </div>
             <div class="dm-input-row">
-              <input class="dm-input" id="dm-input" placeholder="Message..." autocomplete="off">
+              <input class="dm-input" id="dm-input" placeholder="Message… type @ to mention" autocomplete="off">
               <button class="dm-send-btn" id="dm-send-btn">SEND</button>
             </div>
             <div class="social-tools-row" style="margin-top:7px;">
@@ -4597,61 +4764,61 @@
   <section class="section" id="games-section">
     <div class="section-title">⬦ GAMES</div>
     <div class="items-grid" id="games-grid">
-      <div class="item-card" data-url="games/2048.html" data-label="2048"><span class="ic">🎮</span>2048</div>
-      <div class="item-card" data-url="games/bingo.html" data-label="BINGO"><span class="ic">🎯</span>BINGO</div>
-      <div class="item-card" data-url="games/block-breaker.html" data-label="BLOCK BREAKER"><span
+      <div class="item-card" data-url="2048.html" data-label="2048"><span class="ic">🎮</span>2048</div>
+      <div class="item-card" data-url="bingo.html" data-label="BINGO"><span class="ic">🎯</span>BINGO</div>
+      <div class="item-card" data-url="block-breaker.html" data-label="BLOCK BREAKER"><span
           class="ic">🧱</span>BLOCK BREAKER</div>
-      <div class="item-card" data-url="games/bubble-shooter.html" data-label="BUBBLE SHOOTER"><span
+      <div class="item-card" data-url="bubble-shooter.html" data-label="BUBBLE SHOOTER"><span
           class="ic">🫧</span>BUBBLE SHOOTER</div>
-      <div class="item-card" data-url="games/chess.html" data-label="CHESS"><span class="ic">♟</span>CHESS</div>
-      <div class="item-card" data-url="games/flappy-bird.html" data-label="FLAPPY BIRD"><span class="ic">🐦</span>FLAPPY
+      <div class="item-card" data-url="chess.html" data-label="CHESS"><span class="ic">♟</span>CHESS</div>
+      <div class="item-card" data-url="flappy-bird.html" data-label="FLAPPY BIRD"><span class="ic">🐦</span>FLAPPY
         BIRD</div>
-      <div class="item-card" data-url="games/guh-clicker.html" data-label="GUH CLICKER"><span class="ic">👆</span>GUH
+      <div class="item-card" data-url="guh-clicker.html" data-label="GUH CLICKER"><span class="ic">👆</span>GUH
         CLICKER</div>
-      <div class="item-card" data-url="games/hangman.html" data-label="HANGMAN"><span class="ic">🪢</span>HANGMAN</div>
-      <div class="item-card" data-url="games/mines.html" data-label="MINES"><span class="ic">💣</span>MINES</div>
-      <div class="item-card" data-url="games/sandbox.html" data-label="SANDBOX"><span class="ic">🏖</span>SANDBOX</div>
-      <div class="item-card" data-url="games/snake.html" data-label="SNAKE"><span class="ic">🐍</span>SNAKE</div>
-      <div class="item-card" data-url="games/tictactoe.html" data-label="TIC TAC TOE"><span class="ic">✖</span>TIC TAC
+      <div class="item-card" data-url="hangman.html" data-label="HANGMAN"><span class="ic">🪢</span>HANGMAN</div>
+      <div class="item-card" data-url="mines.html" data-label="MINES"><span class="ic">💣</span>MINES</div>
+      <div class="item-card" data-url="sandbox.html" data-label="SANDBOX"><span class="ic">🏖</span>SANDBOX</div>
+      <div class="item-card" data-url="snake.html" data-label="SNAKE"><span class="ic">🐍</span>SNAKE</div>
+      <div class="item-card" data-url="tictactoe.html" data-label="TIC TAC TOE"><span class="ic">✖</span>TIC TAC
         TOE</div>
-      <div class="item-card" data-url="games/wormscape.html" data-label="WORMSCAPE"><span class="ic">🪱</span>WORMSCAPE
+      <div class="item-card" data-url="wormscape.html" data-label="WORMSCAPE"><span class="ic">🪱</span>WORMSCAPE
       </div>
-      <div class="item-card" data-url="games/minecraft.html" data-label="MINECRAFT RIPOFF"><span class="ic">⛏</span>MINECRAFT RIPOFF</div>
+      <div class="item-card" data-url="minecraft.html" data-label="MINECRAFT RIPOFF"><span class="ic">⛏</span>MINECRAFT RIPOFF</div>
     </div>
   </section>
 
   <section class="section" id="tools-section">
     <div class="section-title">⚙ TOOLS</div>
     <div class="items-grid" id="tools-grid">
-      <div class="item-card" data-url="tools/base64-tool.html" data-label="BASE64 TOOL"><span class="ic">📋</span>BASE64
+      <div class="item-card" data-url="base64-tool.html" data-label="BASE64 TOOL"><span class="ic">📋</span>BASE64
         TOOL</div>
-      <div class="item-card" data-url="tools/calculator.html" data-label="CALCULATOR"><span
+      <div class="item-card" data-url="calculator.html" data-label="CALCULATOR"><span
           class="ic">🔢</span>CALCULATOR</div>
-      <div class="item-card" data-url="tools/clock.html" data-label="CLOCK"><span class="ic">⏰</span>CLOCK</div>
-      <div class="item-card" data-url="tools/converter.html" data-label="CONVERTER"><span class="ic">🔄</span>CONVERTER
+      <div class="item-card" data-url="clock.html" data-label="CLOCK"><span class="ic">⏰</span>CLOCK</div>
+      <div class="item-card" data-url="converter.html" data-label="CONVERTER"><span class="ic">🔄</span>CONVERTER
       </div>
-      <div class="item-card" data-url="tools/fl-studio.html" data-label="FL STUDIO"><span class="ic">🎵</span>FL STUDIO
+      <div class="item-card" data-url="fl-studio.html" data-label="FL STUDIO"><span class="ic">🎵</span>FL STUDIO
       </div>
-      <div class="item-card" data-url="tools/image-cropper.html" data-label="IMAGE CROPPER"><span
+      <div class="item-card" data-url="image-cropper.html" data-label="IMAGE CROPPER"><span
           class="ic">✂</span>IMAGE CROPPER</div>
-      <div class="item-card" data-url="tools/image-resizer.html" data-label="IMAGE RESIZER"><span
+      <div class="item-card" data-url="image-resizer.html" data-label="IMAGE RESIZER"><span
           class="ic">🖼</span>IMAGE RESIZER</div>
-      <div class="item-card" data-url="tools/ip-lookup.html" data-label="IP LOOKUP"><span class="ic">🌐</span>IP LOOKUP
+      <div class="item-card" data-url="ip-lookup.html" data-label="IP LOOKUP"><span class="ic">🌐</span>IP LOOKUP
       </div>
-      <div class="item-card" data-url="tools/json-formatter.html" data-label="JSON FORMATTER"><span class="ic">{
+      <div class="item-card" data-url="json-formatter.html" data-label="JSON FORMATTER"><span class="ic">{
           }</span>JSON FORMATTER</div>
-      <div class="item-card" data-url="tools/localstorage-viewer.html" data-label="LOCALSTORAGE VIEWER"><span
+      <div class="item-card" data-url="localstorage-viewer.html" data-label="LOCALSTORAGE VIEWER"><span
           class="ic">💾</span>LOCALSTORAGE VIEWER</div>
-      <div class="item-card" data-url="tools/notepad.html" data-label="NOTEPAD"><span class="ic">📝</span>NOTEPAD</div>
-      <div class="item-card" data-url="tools/qr-generator.html" data-label="QR GENERATOR"><span class="ic">⬛</span>QR
+      <div class="item-card" data-url="notepad.html" data-label="NOTEPAD"><span class="ic">📝</span>NOTEPAD</div>
+      <div class="item-card" data-url="qr-generator.html" data-label="QR GENERATOR"><span class="ic">⬛</span>QR
         GENERATOR</div>
-      <div class="item-card" data-url="tools/qr-scanner.html" data-label="QR SCANNER"><span class="ic">⬜</span>QR
+      <div class="item-card" data-url="qr-scanner.html" data-label="QR SCANNER"><span class="ic">⬜</span>QR
         SCANNER</div>
-      <div class="item-card" data-url="tools/regex-tester.html" data-label="REGEX TESTER"><span
+      <div class="item-card" data-url="regex-tester.html" data-label="REGEX TESTER"><span
           class="ic">.*</span>REGEX TESTER</div>
-      <div class="item-card" data-url="tools/soundboard.html" data-label="SOUNDBOARD"><span
+      <div class="item-card" data-url="soundboard.html" data-label="SOUNDBOARD"><span
           class="ic">🔊</span>SOUNDBOARD</div>
-      <div class="item-card" data-url="tools/text-to-speech.html" data-label="TEXT TO SPEECH"><span
+      <div class="item-card" data-url="text-to-speech.html" data-label="TEXT TO SPEECH"><span
           class="ic">💬</span>TEXT TO SPEECH</div>
     </div>
   </section>
@@ -4726,7 +4893,7 @@
       <div class="vx-page-sub">Web apps that open in the vexis browser</div>
     </div>
     <div class="apps-web-grid" style="justify-content:center;">
-      <div class="app-web-card" onclick="openFullscreen('apps/guhtunes.html','Guh Tunes')" style="max-width:160px;">
+      <div class="app-web-card" onclick="openFullscreen('guhtunes.html','Guh Tunes')" style="max-width:160px;">
         <div class="app-web-icon">♪</div>
         <div class="app-web-name">Guh Tunes</div>
         <div class="app-web-desc">Music streaming</div>
@@ -5256,6 +5423,8 @@
   <!-- Ultraviolet proxy bundle -->
   <script src="/uv/uv.bundle.js"></script>
   <script src="/uv/uv.config.js"></script>
+  <!-- bare-mux transport layer (required by UV v3) -->
+  <script src="/baremux/index.js"></script>
   <script>
     /* =====================================================
        CONFIGURATION
@@ -5294,6 +5463,7 @@
     ===================================================== */
     let currentSection = "home";
     let currentUser = null;
+    let currentUserRole = 'user';
     let currentConvId = null;
     let attachedB64 = null;
     let attachedMime = null;
@@ -6465,6 +6635,7 @@
             const userDoc2 = await db.collection("users").doc(user.uid).get();
             const userData2 = userDoc2.data() || {};
             const userRole = user.uid === ADMIN_UID ? "owner" : (userData2.role || "user");
+            currentUserRole = userRole;
             document.getElementById("nav-owner").style.display = userRole === "owner" ? "inline-block" : "none";
             document.getElementById("qb-owner").style.display = userRole === "owner" ? "inline-flex" : "none";
             if (userRole === "owner" || userRole === "admin") {
@@ -6620,14 +6791,17 @@
       const container = document.getElementById("social-chat-messages");
       if (document.querySelector(`[data-msg-id="${msg.id}"]`)) return;
       const isOwn = currentUser && msg.userId === currentUser.uid;
+      const isVexisAI = msg.isVexisAI || msg.userId === "__vexis_ai__";
       const row = document.createElement("div");
-      row.className = "social-msg" + (isOwn ? " own" : "");
+      row.className = "social-msg" + (isOwn ? " own" : "") + (isVexisAI ? " vexis-ai" : "");
       row.dataset.msgId = msg.id;
       row.dataset.origText = msg.text || '';
       row.dataset.edited = msg.edited ? 'true' : 'false';
       let avHTML;
       const clickAttr = isOwn ? ' data-my-avatar' : ` data-uid-click onclick="showUserProfileCard('${escHtml(msg.userId)}',this)" style="cursor:pointer"`;
-      if (msg.photoURL) {
+      if (isVexisAI) {
+        avHTML = `<div class="social-msg-av" style="background:var(--fg);color:var(--bg);font-family:var(--font-pixel);font-size:9px;border-radius:10px;">✦</div>`;
+      } else if (msg.photoURL) {
         avHTML = `<div class="social-msg-av"${clickAttr}><img src="${escHtml(msg.photoURL)}" alt="${escHtml(msg.displayName || '?')}"></div>`;
       } else {
         avHTML = `<div class="social-msg-av"${clickAttr}>${(msg.displayName || "?")[0].toUpperCase()}</div>`;
@@ -6639,8 +6813,18 @@
       const time = msg.timestamp
         ? new Date(msg.timestamp.toMillis ? msg.timestamp.toMillis() : msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         : "";
-      const actionsHTML = `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>`;
+      const actionsHTML = isVexisAI
+        ? `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button></div>`
+        : `<div class="msg-actions"><button class="msg-action-btn reply-btn">↩ REPLY</button>${isOwn ? `<button class="msg-action-btn" onclick="editSocialMessage('${msg.id}','${escHtml(msg.text||"").replace(/'/g,"\\'")}')">✏</button><button class="msg-action-btn" onclick="deleteSocialMessage('${msg.id}')">🗑</button>` : `<button class="msg-report-btn">🚩</button>`}</div>`;
       const reactionsHTML = `<div id="rbar-${msg.id}" class="msg-reactions-bar">${buildReactionPills(msg.reactions||{}, msg.id, 'socialMessages')}<button class="react-add-btn" onclick="showReactionPicker(event,'socialMessages','${msg.id}')">+</button></div>`;
+
+      // Highlight @mentions in text — greedy, stops at punctuation that can't be in a name
+      function highlightMentions(text) {
+        // First escape HTML, then replace @Name patterns
+        return escHtml(text).replace(/@([\w][\w\s]{0,40}?)(?=\s{2,}|[^\w\s]|$)/g, (match, name) => {
+          return `<span class="mention-tag">@${name.trimEnd()}</span>`;
+        });
+      }
 
       if (msg.type === 'poll') {
         // Poll: render outside the bubble so it has its own background
@@ -6656,13 +6840,16 @@
     </div>`;
       } else {
         let contentHTML = "";
-        if (msg.text) contentHTML += `<div>${escHtml(msg.text)}</div>`;
+        if (msg.text) contentHTML += `<div>${highlightMentions(msg.text)}</div>`;
         if (msg.gifUrl) contentHTML += `<img class="social-msg-gif" src="${escHtml(msg.gifUrl)}" alt="gif">`;
         if (msg.imageUrl) contentHTML += `<img class="social-msg-img" src="${escHtml(msg.imageUrl)}" alt="image" onerror="this.style.display='none'">`;
+        const nameLabel = isVexisAI
+          ? `${escHtml(VEXIS_AI_BOT_NAME || "Vexis AI")} <span class="vexis-ai-badge">AI</span>`
+          : escHtml(msg.displayName || "Anonymous");
         row.innerHTML = `
     ${avHTML}
     <div class="social-msg-body">
-      <div class="social-msg-name">${escHtml(msg.displayName || "Anonymous")}</div>
+      <div class="social-msg-name">${nameLabel}</div>
       <div class="social-msg-bubble">${replyHTML}${contentHTML}</div>
       ${reactionsHTML}
       <div class="social-msg-time">${time}</div>
@@ -6714,21 +6901,50 @@
     document.getElementById("chat-send-btn").addEventListener("click", sendChatMessage);
 
     // Typing in social chat
-    document.getElementById("social-input").addEventListener("input", () => {
+    document.getElementById("social-input").addEventListener("input", (e) => {
       setTyping("socialMessages", true);
       if (_typingTimeout) clearTimeout(_typingTimeout);
       _typingTimeout = setTimeout(() => setTyping("socialMessages", false), 4000);
+      handleMentionInput(e.target, "social");
     });
     document.getElementById("social-send-btn").addEventListener("click", () => {
       const input = document.getElementById("social-input");
       const text = input.value.trim();
-      if (text) { sendSocialMessage(text, null, null); input.value = ""; }
+      if (text) {
+        closeMentionDropdown("social");
+        sendSocialMessage(text, null, null);
+        input.value = "";
+        checkAndRespondVexisAI(text, "social");
+      }
     });
     document.getElementById("social-input").addEventListener("keydown", e => {
+      // Arrow key navigation in mention dropdown
+      if (mentionActive.social) {
+        if (e.key === "ArrowDown") { e.preventDefault(); moveMentionSelection("social", 1); return; }
+        if (e.key === "ArrowUp") { e.preventDefault(); moveMentionSelection("social", -1); return; }
+        if (e.key === "Tab" || (e.key === "Enter" && mentionActive.social)) {
+          e.preventDefault();
+          const selected = document.querySelector("#mention-dropdown-social .mention-selected");
+          if (selected) { selected.click(); return; }
+          // If Enter and no selection, close dropdown and send
+          if (e.key === "Enter") {
+            closeMentionDropdown("social");
+            const text = e.target.value.trim();
+            if (text) { sendSocialMessage(text, null, null); e.target.value = ""; checkAndRespondVexisAI(text, "social"); }
+          }
+          return;
+        }
+        if (e.key === "Escape") { e.preventDefault(); closeMentionDropdown("social"); return; }
+      }
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         const text = document.getElementById("social-input").value.trim();
-        if (text) { sendSocialMessage(text, null, null); document.getElementById("social-input").value = ""; }
+        if (text) {
+          closeMentionDropdown("social");
+          sendSocialMessage(text, null, null);
+          document.getElementById("social-input").value = "";
+          checkAndRespondVexisAI(text, "social");
+        }
       }
     });
 
@@ -7233,8 +7449,23 @@
       _dmSearchTimer = setTimeout(() => searchDmUsers(e.target.value.trim()), 250);
     });
     document.getElementById("dm-send-btn").addEventListener("click", () => sendDmMessage());
+    document.getElementById("dm-input").addEventListener("input", e => {
+      handleMentionInput(e.target, "dm");
+    });
     document.getElementById("dm-input").addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendDmMessage(); }
+      if (mentionActive.dm) {
+        if (e.key === "ArrowDown") { e.preventDefault(); moveMentionSelection("dm", 1); return; }
+        if (e.key === "ArrowUp") { e.preventDefault(); moveMentionSelection("dm", -1); return; }
+        if (e.key === "Tab" || (e.key === "Enter" && mentionActive.dm)) {
+          e.preventDefault();
+          const sel = document.querySelector("#mention-dropdown-dm .mention-selected");
+          if (sel) { sel.click(); return; }
+          if (e.key === "Enter") { closeMentionDropdown("dm"); sendDmMessage(); }
+          return;
+        }
+        if (e.key === "Escape") { e.preventDefault(); closeMentionDropdown("dm"); return; }
+      }
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); closeMentionDropdown("dm"); sendDmMessage(); }
     });
     document.getElementById("dm-img-btn").addEventListener("click", () => {
       if (!currentUser || (!activeDmId && !activeGroupId)) { showToast("SELECT A CONVERSATION FIRST"); return; }
@@ -7551,11 +7782,19 @@
       if (_typingTimeout) clearTimeout(_typingTimeout);
       _typingTimeout = setTimeout(() => setTyping(path, false), 4000);
     });
+    document.getElementById("dm-input").removeEventListener("input", () => {});
+    document.getElementById("dm-input").addEventListener("input", () => {
+      if (!activeDmId && !activeGroupId) return;
+      const path = activeGroupId ? `groupChats/${activeGroupId}/messages` : `directMessages/${activeDmId}/messages`;
+      setTyping(path, true);
+      if (_typingTimeout) clearTimeout(_typingTimeout);
+      _typingTimeout = setTimeout(() => setTyping(path, false), 4000);
+    });
     document.getElementById("dm-send-btn").removeEventListener("click", sendDmMessage);
-    document.getElementById("dm-send-btn").addEventListener("click", () => { if (activeGroupId) sendGroupMessage(); else sendDmMessage(); });
+    document.getElementById("dm-send-btn").addEventListener("click", () => { closeMentionDropdown("dm"); if (activeGroupId) sendGroupMessage(); else sendDmMessage(); });
     document.getElementById("dm-input").removeEventListener("keydown", () => {});
     document.getElementById("dm-input").addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (activeGroupId) sendGroupMessage(); else sendDmMessage(); }
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); closeMentionDropdown("dm"); if (activeGroupId) sendGroupMessage(); else sendDmMessage(); }
     });
 
     /* =====================================================
@@ -7651,8 +7890,9 @@
 
     async function loadAdminData() {
       if (!currentUser) { showSection("home"); showToast("ACCESS DENIED"); return; }
-      try { const doc = await db.collection("users").doc(currentUser.uid).get(); adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : ((doc.data() || {}).role || "user"); } catch (_) { adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : "user"; }
+      try { const doc = await db.collection("users").doc(currentUser.uid).get(); adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : ((doc.data() || {}).role || "user"); } catch (_) { adminMyRole = currentUser.uid === ADMIN_UID ? "owner" : (currentUserRole || "user"); }
       if (adminMyRole !== "owner") { showSection("home"); showToast("OWNER ONLY"); return; }
+      fetchAnnToken();
       document.getElementById("admin-role-badge").textContent = "OWNER";
       fetchAdminUsers();
       if (adminPollIv) clearInterval(adminPollIv);
@@ -9199,48 +9439,98 @@
     /* =====================================================
        ANNOUNCEMENTS
     ===================================================== */
+    let _annEvtSource = null;
+    let _annToken = null;
+
+    async function fetchAnnToken() {
+      try {
+        const r = await fetch('/api/announcement/token');
+        const d = await r.json();
+        _annToken = d.token || null;
+      } catch {}
+    }
+
     function loadAnnouncement() {
-      db.collection('siteSettings').doc('announcement').get().then(doc => {
-        const data = doc.data();
-        if (data?.text && data?.active) {
+      // Fetch current state immediately
+      fetch('/api/announcement').then(r => r.json()).then(data => {
+        if (data.active && data.text) {
           const dismissed = localStorage.getItem('hw3_ann_dismissed');
           if (dismissed !== data.text) showAnnouncement(data.text);
         }
       }).catch(() => {});
+
+      // Connect SSE for real-time updates
+      if (_annEvtSource) _annEvtSource.close();
+      _annEvtSource = new EventSource('/api/announcement/stream');
+      _annEvtSource.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.active && data.text) {
+            const dismissed = localStorage.getItem('hw3_ann_dismissed');
+            if (dismissed !== data.text) showAnnouncement(data.text);
+          } else {
+            document.getElementById('announcement-banner').classList.remove('show');
+          }
+        } catch {}
+      };
     }
+
     function showAnnouncement(text) {
       document.getElementById('announcement-text').textContent = text;
       document.getElementById('announcement-banner').classList.add('show');
+      const deleteBtn = document.getElementById('ann-delete-btn');
+      if (deleteBtn) deleteBtn.style.display = currentUserRole === 'owner' ? 'inline-block' : 'none';
     }
+
     function dismissAnnouncement() {
       const text = document.getElementById('announcement-text').textContent;
       localStorage.setItem('hw3_ann_dismissed', text);
       document.getElementById('announcement-banner').classList.remove('show');
     }
+
     async function postAnnouncement() {
       const text = document.getElementById('ann-input').value.trim();
       if (!text) { showToast('ENTER ANNOUNCEMENT TEXT'); return; }
+      if (!_annToken) await fetchAnnToken();
       try {
-        await db.collection('siteSettings').doc('announcement').set({ text, active: true, postedAt: firebase.firestore.FieldValue.serverTimestamp(), postedBy: currentUser?.uid });
+        const resp = await fetch('/api/announcement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, token: _annToken }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || resp.statusText);
         showToast('ANNOUNCEMENT POSTED');
-        showAnnouncement(text);
+        document.getElementById('ann-input').value = '';
       } catch (err) { showToast('ERROR: ' + err.message); }
     }
+
     async function clearAnnouncement() {
+      if (!_annToken) await fetchAnnToken();
       try {
-        await db.collection('siteSettings').doc('announcement').set({ active: false });
-        document.getElementById('announcement-banner').classList.remove('show');
+        const resp = await fetch('/api/announcement', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: _annToken }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || resp.statusText);
         showToast('ANNOUNCEMENT CLEARED');
       } catch (err) { showToast('ERROR: ' + err.message); }
+    }
+
+    async function deleteAnnouncement() {
+      if (!confirm('Delete this announcement for everyone?')) return;
+      await clearAnnouncement();
     }
 
     /* =====================================================
        GLOBAL SEARCH
     ===================================================== */
     const GAMES_LIST = ['2048','BINGO','BLOCK BREAKER','BUBBLE SHOOTER','CHESS','FLAPPY BIRD','GUH CLICKER','HANGMAN','MINES','SANDBOX','SNAKE','TIC TAC TOE','WORMSCAPE','MINECRAFT RIPOFF'];
-    const GAMES_URLS = {'2048':'games/2048.html','BINGO':'games/bingo.html','BLOCK BREAKER':'games/block-breaker.html','BUBBLE SHOOTER':'games/bubble-shooter.html','CHESS':'games/chess.html','FLAPPY BIRD':'games/flappy-bird.html','GUH CLICKER':'games/guh-clicker.html','HANGMAN':'games/hangman.html','MINES':'games/mines.html','SANDBOX':'games/sandbox.html','SNAKE':'games/snake.html','TIC TAC TOE':'games/tictactoe.html','WORMSCAPE':'games/wormscape.html','MINECRAFT RIPOFF':'games/minecraft.html'};
+    const GAMES_URLS = {'2048':'2048.html','BINGO':'bingo.html','BLOCK BREAKER':'block-breaker.html','BUBBLE SHOOTER':'bubble-shooter.html','CHESS':'chess.html','FLAPPY BIRD':'flappy-bird.html','GUH CLICKER':'guh-clicker.html','HANGMAN':'hangman.html','MINES':'mines.html','SANDBOX':'sandbox.html','SNAKE':'snake.html','TIC TAC TOE':'tictactoe.html','WORMSCAPE':'wormscape.html','MINECRAFT RIPOFF':'minecraft.html'};
     const TOOLS_LIST = ['BASE64','CALCULATOR','CLOCK','CONVERTER','FL STUDIO','IMAGE CROPPER','IMAGE RESIZER','IP LOOKUP','JSON FORMATTER','LOCALSTORAGE VIEWER','NOTEPAD','QR GENERATOR','QR SCANNER','REGEX TESTER','SOUNDBOARD','TEXT TO SPEECH'];
-    const TOOLS_URLS = {'BASE64':'tools/base64-tool.html','CALCULATOR':'tools/calculator.html','CLOCK':'tools/clock.html','CONVERTER':'tools/converter.html','FL STUDIO':'tools/fl-studio.html','IMAGE CROPPER':'tools/image-cropper.html','IMAGE RESIZER':'tools/image-resizer.html','IP LOOKUP':'tools/ip-lookup.html','JSON FORMATTER':'tools/json-formatter.html','LOCALSTORAGE VIEWER':'tools/localstorage-viewer.html','NOTEPAD':'tools/notepad.html','QR GENERATOR':'tools/qr-generator.html','QR SCANNER':'tools/qr-scanner.html','REGEX TESTER':'tools/regex-tester.html','SOUNDBOARD':'tools/soundboard.html','TEXT TO SPEECH':'tools/text-to-speech.html'};
+    const TOOLS_URLS = {'BASE64':'base64-tool.html','CALCULATOR':'calculator.html','CLOCK':'clock.html','CONVERTER':'converter.html','FL STUDIO':'fl-studio.html','IMAGE CROPPER':'image-cropper.html','IMAGE RESIZER':'image-resizer.html','IP LOOKUP':'ip-lookup.html','JSON FORMATTER':'json-formatter.html','LOCALSTORAGE VIEWER':'localstorage-viewer.html','NOTEPAD':'notepad.html','QR GENERATOR':'qr-generator.html','QR SCANNER':'qr-scanner.html','REGEX TESTER':'regex-tester.html','SOUNDBOARD':'soundboard.html','TEXT TO SPEECH':'text-to-speech.html'};
     let _searchTab = 'all', _searchTimer = null;
 
     function openSearch() {
@@ -10098,14 +10388,17 @@
     async function registerUVSW() {
       if (!('serviceWorker' in navigator)) return;
       try {
-        const reg = await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/' });
+        const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
         // Already active (returning visitor)
-        if (reg.active) { uvReady = true; return; }
-        // Wait for SW to activate on first install
+        if (reg.active && navigator.serviceWorker.controller) { uvReady = true; return; }
+        // First install — reload once so the SW takes control of this page
         const pending = reg.installing || reg.waiting;
         if (pending) {
           pending.addEventListener('statechange', function() {
-            if (this.state === 'activated') uvReady = true;
+            if (this.state === 'activated') {
+              uvReady = true;
+              window.location.reload();
+            }
           });
         }
       } catch(err) {
@@ -10132,8 +10425,21 @@
       }
     }
 
+    // Initialize bare-mux transport using epoxy + WISP
+    async function initBareTransport() {
+      try {
+        if (typeof BareMux === 'undefined') return;
+        const conn = new BareMux.BareMuxConnection('/baremux/worker.js');
+        const wispUrl = (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/wisp/';
+        await conn.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
+      } catch(e) {
+        console.warn('bare-mux transport init failed:', e);
+      }
+    }
+
     // Register SW on page load
     registerUVSW();
+    initBareTransport();
 
     /* =====================================================
        ADD SHORTCUT
@@ -10564,6 +10870,224 @@
     const _origCloseTab = vxCloseTab;
     window.vxCloseTab = function(...a) { _origCloseTab(...a); vxSaveTabs(); };
     vxRestoreTabs();
+
+    /* =====================================================
+       @ MENTION SYSTEM + VEXIS AI IN COMMUNITY CHAT
+    ===================================================== */
+    const mentionActive = { social: false, dm: false };
+    let mentionQuery = { social: "", dm: "" };
+    let mentionStartIdx = { social: -1, dm: -1 };
+    let cachedUsers = [];
+
+    // Fetch some recent users for mention suggestions
+    async function fetchMentionUsers(query) {
+      const results = []; // always Vexis AI at top
+      try {
+        const snap = await db.collection("users")
+          .orderBy("displayName")
+          .startAt(query)
+          .endAt(query + "\uf8ff")
+          .limit(10)
+          .get();
+        snap.forEach(d => {
+          const u = d.data();
+          results.push({ uid: d.id, displayName: u.displayName || "Anonymous", photoURL: u.photoURL || null, online: u.online || false });
+        });
+      } catch (_) {}
+      return results;
+    }
+
+    function handleMentionInput(inputEl, context) {
+      const val = inputEl.value;
+      const caret = inputEl.selectionStart;
+      // Find the last @ before the caret
+      const textBefore = val.substring(0, caret);
+      const atIdx = textBefore.lastIndexOf("@");
+      if (atIdx === -1) { closeMentionDropdown(context); return; }
+      // Check there's no space between @ and caret (word in progress)
+      const fragment = textBefore.substring(atIdx + 1);
+      if (/\s/.test(fragment)) { closeMentionDropdown(context); return; }
+      // Open the dropdown
+      mentionActive[context] = true;
+      mentionStartIdx[context] = atIdx;
+      mentionQuery[context] = fragment.toLowerCase();
+      renderMentionDropdown(context, fragment);
+    }
+
+    async function renderMentionDropdown(context, query) {
+      const dropId = context === "social" ? "mention-dropdown-social" : "mention-dropdown-dm";
+      const drop = document.getElementById(dropId);
+      drop.classList.add("open");
+
+      // Vexis AI always first
+      const items = [{ uid: "__vexis__", displayName: "Vexis AI", sub: "AI assistant", isAI: true }];
+
+      // Fetch real users matching query
+      const users = await fetchMentionUsers(query.length ? query.charAt(0).toUpperCase() + query.slice(1) : "");
+      users.forEach(u => {
+        if (u.uid !== (currentUser && currentUser.uid)) {
+          items.push({ uid: u.uid, displayName: u.displayName, sub: u.online ? "online" : "", isAI: false, photoURL: u.photoURL });
+        }
+      });
+
+      // Filter by query
+      const filtered = query
+        ? items.filter(i => i.displayName.toLowerCase().includes(query))
+        : items;
+
+      const header = drop.querySelector(".mention-dropdown-header");
+      // Clear existing items (except header)
+      Array.from(drop.children).forEach(c => { if (!c.classList.contains("mention-dropdown-header")) c.remove(); });
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.style.cssText = "padding:10px 12px;font-size:12px;color:var(--muted);font-family:var(--font-mono)";
+        empty.textContent = "No users found";
+        drop.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach((u, idx) => {
+        const item = document.createElement("div");
+        item.className = "mention-item" + (idx === 0 ? " mention-selected" : "");
+        const avEl = u.isAI
+          ? `<div class="mention-av ai-av">✦</div>`
+          : (u.photoURL
+            ? `<div class="mention-av"><img src="${escHtml(u.photoURL)}" alt=""></div>`
+            : `<div class="mention-av">${(u.displayName||"?")[0].toUpperCase()}</div>`);
+        item.innerHTML = `${avEl}
+          <span class="mention-item-name">${escHtml(u.displayName)}</span>
+          ${u.sub ? `<span class="mention-item-sub">${escHtml(u.sub)}</span>` : ""}`;
+        item.dataset.uid = u.uid;
+        item.dataset.name = u.displayName;
+        item.addEventListener("click", () => insertMention(context, u.displayName, u.isAI));
+        drop.appendChild(item);
+      });
+    }
+
+    function insertMention(context, displayName, isAI) {
+      const inputId = context === "social" ? "social-input" : "dm-input";
+      const input = document.getElementById(inputId);
+      const val = input.value;
+      const start = mentionStartIdx[context];
+      const caret = input.selectionStart;
+      // Replace from @ to caret with @DisplayName
+      const mentionText = `@${displayName} `;
+      input.value = val.substring(0, start) + mentionText + val.substring(caret);
+      // Move caret to after mention
+      const newCaret = start + mentionText.length;
+      input.setSelectionRange(newCaret, newCaret);
+      input.focus();
+      closeMentionDropdown(context);
+    }
+
+    function closeMentionDropdown(context) {
+      mentionActive[context] = false;
+      const dropId = context === "social" ? "mention-dropdown-social" : "mention-dropdown-dm";
+      const drop = document.getElementById(dropId);
+      if (drop) drop.classList.remove("open");
+    }
+
+    function moveMentionSelection(context, dir) {
+      const dropId = context === "social" ? "mention-dropdown-social" : "mention-dropdown-dm";
+      const items = document.querySelectorAll(`#${dropId} .mention-item`);
+      if (!items.length) return;
+      let idx = Array.from(items).findIndex(i => i.classList.contains("mention-selected"));
+      items[idx]?.classList.remove("mention-selected");
+      idx = (idx + dir + items.length) % items.length;
+      items[idx].classList.add("mention-selected");
+      items[idx].scrollIntoView({ block: "nearest" });
+    }
+
+    // Close mention dropdown when clicking outside
+    document.addEventListener("click", e => {
+      ["social", "dm"].forEach(ctx => {
+        if (!mentionActive[ctx]) return;
+        const dropId = ctx === "social" ? "mention-dropdown-social" : "mention-dropdown-dm";
+        const inputId = ctx === "social" ? "social-input" : "dm-input";
+        const drop = document.getElementById(dropId);
+        const input = document.getElementById(inputId);
+        if (drop && !drop.contains(e.target) && e.target !== input) closeMentionDropdown(ctx);
+      });
+    });
+
+    /* ─── VEXIS AI IN COMMUNITY CHAT ─── */
+    const VEXIS_AI_BOT_NAME = "Vexis AI";
+    const VEXIS_SYSTEM_PROMPT = `You are Vexis AI, a helpful and friendly AI assistant built into the Vexis community chat platform. You've been @mentioned by a user and should reply helpfully and concisely. Keep your response under 3 sentences unless a longer response is clearly needed. You're talking in a community chat, so be friendly, helpful, and brief. Don't use excessive markdown. Don't start your reply with your name.`;
+
+    let _vexisAiBusy = false; // lock — prevent double-fire from click + keydown both triggering
+
+    async function checkAndRespondVexisAI(text, context) {
+      if (context !== "social") return;
+      // Only respond to explicit @Vexis AI pings — require the @ sign
+      if (!/@Vexis\s+AI\b/i.test(text)) return;
+      // Prevent double-fire (click handler + keydown handler can both fire)
+      if (_vexisAiBusy) return;
+      _vexisAiBusy = true;
+
+      // Extract the question (remove the @VexisAI mention and trim)
+      const question = text.replace(/@Vexis\s+AI\b/gi, "").trim();
+      // Allow responding even with no question (just "@Vexis AI" alone = general greeting)
+
+      const messagesEl = document.getElementById("social-chat-messages");
+      if (!messagesEl) { _vexisAiBusy = false; return; }
+
+      const thinkRow = document.createElement("div");
+      thinkRow.className = "social-msg vexis-ai vexis-thinking-row";
+      thinkRow.innerHTML = `
+        <div class="social-msg-av" style="background:var(--fg);color:var(--bg);border-radius:10px;font-family:var(--font-pixel);font-size:9px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✦</div>
+        <div class="social-msg-body">
+          <div class="social-msg-name">${VEXIS_AI_BOT_NAME} <span class="vexis-ai-badge">AI</span></div>
+          <div class="social-msg-bubble"><div class="thinking-dots"><span></span><span></span><span></span></div></div>
+        </div>`;
+      messagesEl.appendChild(thinkRow);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      try {
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 1000,
+            system: VEXIS_SYSTEM_PROMPT,
+            messages: [{ role: "user", content: question || "Hello! Someone just mentioned you." }]
+          })
+        });
+        const data = await response.json();
+        const reply = data.content && data.content[0] && data.content[0].text
+          ? data.content[0].text
+          : "Sorry, I couldn't process that right now.";
+
+        thinkRow.remove();
+
+        await db.collection("socialMessages").add({
+          userId: "__vexis_ai__",
+          displayName: VEXIS_AI_BOT_NAME,
+          photoURL: null,
+          text: reply,
+          gifUrl: null,
+          imageUrl: null,
+          isVexisAI: true,
+          replyTo: null,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (err) {
+        thinkRow.remove();
+        await db.collection("socialMessages").add({
+          userId: "__vexis_ai__",
+          displayName: VEXIS_AI_BOT_NAME,
+          photoURL: null,
+          text: "Sorry, I ran into an issue responding. Please try again.",
+          isVexisAI: true,
+          replyTo: null,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } finally {
+        // Release lock after a short delay so a second rapid send can't re-fire for the same message
+        setTimeout(() => { _vexisAiBusy = false; }, 2000);
+      }
+    }
 
 
   </script>
